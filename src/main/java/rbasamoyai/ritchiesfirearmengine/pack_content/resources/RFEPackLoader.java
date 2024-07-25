@@ -3,7 +3,9 @@ package rbasamoyai.ritchiesfirearmengine.pack_content.resources;
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.FileUtil;
+import net.minecraft.Util;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -26,6 +28,7 @@ import rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.RFEContent
 import rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.RFEContentData;
 import rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.creative_mode_tab.RFECreativeModeTabBuilder;
 import rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.plugins.RFEPluginManager;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEModUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
@@ -34,12 +37,24 @@ import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class RFEPackLoader {
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Map<String, RFEContentPack> LOADED_CONTENT_PACKS = new Object2ObjectLinkedOpenHashMap<>();
+    private static final Set<String> CLAIMED_CONTENT_PACK_NAMESPACES = new ObjectOpenHashSet<>();
+    private static final Set<String> RESERVED_NAMESPACES = Util.make(new ObjectOpenHashSet<>(), s -> {
+       s.add("minecraft");
+       s.add("brigadier");
+       s.add("realms");
+       s.add("forge");
+       s.add("fabric");
+       s.add("neoforge");
+       s.add("quilt");
+       s.add("c");
+    });
 
     public static void prepareResources() {
         loadModBuiltInPacks();
@@ -52,14 +67,15 @@ public class RFEPackLoader {
         for (IModFileInfo modFileInfo : ModList.get().getModFiles()) {
             IModFile modFile = modFileInfo.getFile();
             Path resourcePath = modFile.findResource(".").normalize();
-            for (IModInfo modInfo : modFile.getModInfos()) {
-                try {
-                    Pack.ResourcesSupplier packResourcesSupplier = FolderRepositorySource.detectPackResources(resourcePath, false);
-                    if (packResourcesSupplier != null)
-                        loadContentPack("mod/" + modInfo.getModId(), resourcePath, packResourcesSupplier, true);
-                } catch (Exception exception) {
-                    throw new IllegalStateException("Could not load built-in mod RFE content packs", exception);
-                }
+            Set<String> modNamespaces = new ObjectOpenHashSet<>();
+            for (IModInfo modInfo : modFile.getModInfos())
+                modNamespaces.add(modInfo.getModId());
+            try {
+                Pack.ResourcesSupplier packResourcesSupplier = FolderRepositorySource.detectPackResources(resourcePath, false);
+                if (packResourcesSupplier != null)
+                    loadContentPack("mod/" + modFileInfo.moduleName(), resourcePath, packResourcesSupplier, new BuiltInPackContext(modNamespaces));
+            } catch (Exception exception) {
+                throw new IllegalStateException("Could not load built-in mod RFE content packs", exception);
             }
         }
     }
@@ -69,13 +85,15 @@ public class RFEPackLoader {
         LOGGER.info("Loading local RFE content packs in {}", packsPath.toAbsolutePath());
         try {
             FileUtil.createDirectoriesSafe(packsPath);
-            FolderRepositorySource.discoverPacks(packsPath, false, (path, sup) -> loadContentPack("file/" + nameFromPath(path), path, sup, false));
+            FolderRepositorySource.discoverPacks(packsPath, false, (path, sup) -> loadContentPack("file/" + nameFromPath(path), path, sup, null));
         } catch (IOException exception) {
             throw new IllegalStateException("Could not load local RFE content packs", exception);
         }
     }
 
-    private static void loadContentPack(String packId, Path packPath, Pack.ResourcesSupplier packResourcesSupplier, boolean builtIn) {
+    private static void loadContentPack(String packId, Path packPath, Pack.ResourcesSupplier packResourcesSupplier,
+                                        @Nullable BuiltInPackContext builtInContext) {
+        boolean builtIn = builtInContext != null;
         try (PackResources packResources = packResourcesSupplier.open(packId)) {
             RFEPackMetadata metadata = packResources.getMetadataSection(RFEPackMetadata.TYPE);
             if (metadata == null) {
@@ -83,6 +101,9 @@ public class RFEPackLoader {
                     LOGGER.error("Could not load metadata for RFE content pack {}, skipping content pack", packId);
                 return;
             }
+            if (!validatePackFromMetadata(metadata, packId, builtInContext))
+                return;
+
             LOGGER.info("Found RFE content pack in {}", packPath.toAbsolutePath());
             RFEPluginManager.registerAndInitPlugins(packId, metadata);
             RFEContentData contentData = RFEContentData.loadContentData(packResources, metadata);
@@ -100,9 +121,40 @@ public class RFEPackLoader {
                 return;
             }
             LOADED_CONTENT_PACKS.put(packId, new RFEContentPack(metadata, contentData, resourcePack, dataPack));
+            CLAIMED_CONTENT_PACK_NAMESPACES.add(metadata.namespace());
         } catch (Exception exception) {
             LOGGER.error("Exception encountered loading RFE content pack {}, skipping content pack: {}", packId, exception);
         }
+    }
+
+    private static boolean validatePackFromMetadata(RFEPackMetadata metadata, String packId,
+                                                    @Nullable BuiltInPackContext builtInContext) {
+        String namespace = metadata.namespace();
+        if (CLAIMED_CONTENT_PACK_NAMESPACES.contains(namespace)) {
+            LOGGER.error("RFE content pack {} using already existing content pack namespace {}, skipping content pack", packId, namespace);
+            return false;
+        }
+        if (RESERVED_NAMESPACES.contains(namespace)) {
+            LOGGER.error("RFE content pack {} using reserved namespace {}, skipping content pack", packId, namespace);
+            return false;
+        }
+        if (RFEModUtils.isModPresent(namespace)) {
+            if (builtInContext == null) {
+                LOGGER.error("Local RFE content pack {} using mod namespace {}, skipping content pack", packId, namespace);
+                return false;
+            } else if (!builtInContext.modIds.contains(namespace)) {
+                LOGGER.error("Built-in RFE content pack {} using outside mod namespace {}, skipping content pack", packId, namespace);
+                return false;
+            }
+        }
+        for (RFEPackMetadata.DependencyInfo dependency : metadata.dependencies()) {
+            if (!RFEModUtils.isModPresentAndSatisfiesVersion(dependency.modId(), dependency.version())) {
+                LOGGER.error("RFE content pack {} requires mod {} with version {}, skipping content pack", packId,
+                        dependency.modId(), dependency.version());
+                return false;
+            }
+        }
+        return true;
     }
 
     @Nullable
@@ -182,6 +234,9 @@ public class RFEPackLoader {
         public void loadPacks(Consumer<Pack> onLoad) {
             this.list.forEach(onLoad);
         }
+    }
+
+    private record BuiltInPackContext(Set<String> modIds) {
     }
 
     private RFEPackLoader() {}

@@ -1,10 +1,11 @@
-package rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.items;
+package rbasamoyai.ritchiesfirearmengine.content;
 
 import com.google.gson.JsonObject;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.items.RFEItemBuilder;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 public class AmmoItem extends Item {
@@ -25,6 +26,8 @@ public class AmmoItem extends Item {
         @Override
         public Item apply(JsonObject obj) {
             int stacksTo = GsonHelper.getAsInt(obj, "stacks_to", 64);
+            if (stacksTo < 1)
+                throw new IllegalStateException("'stacks_to' must be at least 1");
             Rarity rarity = RFEUtils.getRarityFromString(GsonHelper.getAsString(obj, "rarity", "common"));
             boolean glint = GsonHelper.getAsBoolean(obj, "glint", false);
             return new AmmoItem(new Properties().stacksTo(stacksTo).rarity(rarity), glint);

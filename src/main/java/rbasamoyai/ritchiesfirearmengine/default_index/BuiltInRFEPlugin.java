@@ -2,7 +2,7 @@ package rbasamoyai.ritchiesfirearmengine.default_index;
 
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.RFEContentBuilderRegistry;
-import rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.items.AmmoItem;
+import rbasamoyai.ritchiesfirearmengine.content.AmmoItem;
 import rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.plugins.RFEPlugin;
 
 /**

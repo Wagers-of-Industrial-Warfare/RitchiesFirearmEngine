@@ -135,6 +135,7 @@ public class RFEPackLoader {
                 } catch (Exception e) {
                     LOGGER.error("Exception encountered while registering RFE content pack item {} from pack {}, skipping item: {}",
                             entryKey, packEntry.getKey(), e);
+                    throw e;
                 }
             }
         }
@@ -159,6 +160,7 @@ public class RFEPackLoader {
                 } catch (Exception e) {
                     LOGGER.error("Exception encountered while registering RFE content pack item {} from pack {}, skipping item: {}",
                             entryKey, packEntry.getKey(), e);
+                    throw e;
                 }
             }
         }

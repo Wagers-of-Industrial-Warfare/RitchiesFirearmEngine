@@ -6,6 +6,12 @@
   "rfe_pack": {
     "namespace": "rfe_builtin",
     "display_name": "Ritchie's Firearm Engine Built-In Pack",
+    "dependencies": [
+      {
+        "mod": "ritchiesfirearmengine",
+        "forge_version": "[0.0.1,)"
+      }
+    ],
     "plugins": [
       {
         "class": "rbasamoyai.ritchiesfirearmengine.default_index.BuiltInRFEPlugin",

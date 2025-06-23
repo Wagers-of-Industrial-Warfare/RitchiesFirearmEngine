@@ -14,6 +14,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.config.RFEConfig;
+import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.pack_content.resources.RFEPackLoader;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
@@ -36,18 +37,20 @@ public class RitchiesFirearmEngine {
 
         RFEPackLoader.prepareResources();
 
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> RFEClient.init(modBus, forgeBus));
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> RFEClientForge.init(modBus, forgeBus));
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-
+        event.enqueueWork(() -> {
+            RFENetwork.init();
+        });
     }
 
     private void onRegisterObjects(final RegisterEvent event) {
         if (event.getRegistryKey() == Registries.ITEM) {
-            RFEPackLoader.loadItems();
+            RFEPackLoader.loadItems((loc, item) -> event.register(Registries.ITEM, loc, () -> item));
         } else if (event.getRegistryKey() == Registries.CREATIVE_MODE_TAB) {
-            RFEPackLoader.loadCreativeModeTabs();
+            RFEPackLoader.loadCreativeModeTabs((loc, tab) -> event.register(Registries.CREATIVE_MODE_TAB, loc, () -> tab));
         }
     }
 

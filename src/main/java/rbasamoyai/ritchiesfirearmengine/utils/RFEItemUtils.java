@@ -1,0 +1,106 @@
+package rbasamoyai.ritchiesfirearmengine.utils;
+
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItem;
+import rbasamoyai.ritchiesfirearmengine.content.firearms.logic.FirearmDataUtils;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
+
+public class RFEItemUtils {
+
+    public static void addItemToEntity(ItemStack itemStack, LivingEntity entity) {
+        if (entity instanceof Player player) {
+            player.getInventory().placeItemBackInInventory(itemStack);
+            return;
+        }
+        // TODO item handlers
+        Containers.dropItemStack(entity.level(), entity.getX(), entity.getY(), entity.getZ(), itemStack);
+    }
+
+    public static void consumeItemsFromEntity(LivingEntity entity, Predicate<ItemStack> predicate, UnaryOperator<ItemStack> op) {
+        consumeItemsFromEntity(entity, predicate, op, () -> true);
+    }
+
+    public static void consumeItemsFromEntity(LivingEntity entity, Predicate<ItemStack> predicate, UnaryOperator<ItemStack> op,
+                                              Supplier<Boolean> breakOnSuccess) {
+        // TODO item handlers
+        ItemStack offhandStack = entity.getOffhandItem();
+        if (predicate.test(offhandStack)) {
+            ItemStack result = op.apply(offhandStack);
+            entity.setItemInHand(InteractionHand.OFF_HAND, result);
+            if (breakOnSuccess.get())
+                return;
+        }
+        if (entity instanceof Player player) {
+            for (ListIterator<ItemStack> lister = player.getInventory().items.listIterator(); lister.hasNext(); ) {
+                ItemStack invStack = lister.next();
+                if (!predicate.test(invStack))
+                    continue;
+                ItemStack result = op.apply(invStack);
+                lister.set(result);
+                if (breakOnSuccess.get())
+                    return;
+            }
+        }
+    }
+
+    /**
+     * Set maxCount to 0 to take as many items as possible.
+     */
+    public static List<ItemStack> getItemsFromEntity(LivingEntity entity, Predicate<ItemStack> predicate, int maxCount) {
+        List<ItemStack> list = new LinkedList<>();
+        consumeItemsFromEntity(entity, predicate, s -> {
+            int takeAmount = maxCount > 0 ? Math.min(maxCount - countItems(list), s.getMaxStackSize()) : s.getMaxStackSize();
+            ItemStack addition = s.split(takeAmount);
+            FirearmDataUtils.addAmmo(list, addition, false);
+            return s.isEmpty() ? ItemStack.EMPTY : s;
+        }, () -> maxCount > 0 && list.size() >= maxCount);
+        return list;
+    }
+
+    public static int countItems(List<ItemStack> items) {
+        int count = 0;
+        for (ItemStack itemStack : items)
+            count += itemStack.getCount();
+        return count;
+    }
+
+    /**
+     * Set best to 0 to return nothing.
+     */
+    public static ItemStack findBestSpeedloader(LivingEntity entity, Predicate<ItemStack> predicate, int bestCount) {
+        if (bestCount <= 0)
+            return ItemStack.EMPTY;
+        List<ItemStack> list = getItemsFromEntity(entity, predicate, 0);
+        if (list.isEmpty())
+            return ItemStack.EMPTY;
+        int largestCount = Integer.MAX_VALUE;
+        ItemStack bestStack = ItemStack.EMPTY;
+        for (ItemStack itemStack : list) {
+            if (!(itemStack.getItem() instanceof MagazineItem magazineItem))
+                continue;
+            int storedAmmo = countItems(magazineItem.getStoredAmmo(itemStack));
+            if (storedAmmo == 0)
+                continue;
+            if (storedAmmo == bestCount)
+                return itemStack;
+            if (storedAmmo > largestCount)
+                continue;
+            largestCount = storedAmmo;
+            bestStack = itemStack;
+        }
+        return bestStack;
+    }
+
+    private RFEItemUtils() {}
+
+}

@@ -6,8 +6,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.FileUtil;
 import net.minecraft.Util;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
@@ -38,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class RFEPackLoader {
@@ -53,6 +52,8 @@ public class RFEPackLoader {
        s.add("fabric");
        s.add("neoforge");
        s.add("quilt");
+       s.add("fabric-api");
+       s.add("fabricloader");
        s.add("c");
     });
 
@@ -168,7 +169,7 @@ public class RFEPackLoader {
 
     private static String nameFromPath(Path path) { return path.getFileName().toString(); }
 
-    public static void loadItems() {
+    public static void loadItems(BiConsumer<ResourceLocation, Item> cons) {
         LOGGER.info("Registering RFE content pack items");
         int totalObjectCount = 0;
         int successfulObjectCount = 0;
@@ -182,7 +183,7 @@ public class RFEPackLoader {
                     JsonObject itemDefinition = itemEntry.getValue();
                     ResourceLocation typeLocation = RFEUtils.location(GsonHelper.getAsString(itemDefinition, "type"));
                     Item item = RFEContentBuilderRegistry.buildItem(typeLocation, itemDefinition);
-                    Registry.register(BuiltInRegistries.ITEM, entryKey, item);
+                    cons.accept(entryKey, item);
                     ++successfulObjectCount;
                 } catch (Exception e) {
                     LOGGER.error("Exception encountered while registering RFE content pack item {} from pack {}, skipping item: {}",
@@ -194,7 +195,7 @@ public class RFEPackLoader {
         LOGGER.debug("RFE successfully registered {} out of {} found items", successfulObjectCount, totalObjectCount);
     }
 
-    public static void loadCreativeModeTabs() {
+    public static void loadCreativeModeTabs(BiConsumer<ResourceLocation, CreativeModeTab> cons) {
         LOGGER.info("Registering RFE content pack creative mode tabs");
         int totalObjectCount = 0;
         int successfulObjectCount = 0;
@@ -207,7 +208,7 @@ public class RFEPackLoader {
                 try {
                     JsonObject tabDefinition = tabEntry.getValue();
                     CreativeModeTab creativeModeTab = RFECreativeModeTabBuilder.buildTab(entryKey, tabDefinition);
-                    Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, entryKey, creativeModeTab);
+                    cons.accept(entryKey, creativeModeTab);
                     ++successfulObjectCount;
                 } catch (Exception e) {
                     LOGGER.error("Exception encountered while registering RFE content pack item {} from pack {}, skipping item: {}",

@@ -4,9 +4,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Rarity;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class RFEUtils {
@@ -40,5 +42,17 @@ public class RFEUtils {
      * @return the rarity
      */
     public static Rarity getRarityFromString(String id) { return RFE_RARITY_MAPPING.getOrDefault(id, Rarity.COMMON); }
+
+    public static <T> Predicate<T> orAllPredicates(Collection<? extends Predicate<T>> collection) {
+        return t -> {
+            for (Predicate<T> pred : collection) {
+                if (pred.test(t))
+                    return true;
+            }
+            return false;
+        };
+    }
+
+    private RFEUtils() {}
 
 }

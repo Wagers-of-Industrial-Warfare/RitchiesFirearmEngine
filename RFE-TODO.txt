@@ -1,0 +1,35 @@
+TODO
+
+feature, incomplete: Added example bolt-action rifle (Remington 700)
+
+[feature: Added example bolt-action rifles (Remington 700, Kar 98k, Lee-Enfield no. 4)]
+[feature: Added basic entity-less bullets and shooting]
+[feature: Added data packing for RFEFirearmMode properties]
+[feature: Added recoil and spread]
+TODO recoil + new recoil properties?
+TODO spread + new spread properties?
+
+[feature: Added example semi-automatic rifle (MAS-49/56)]
+[feature: Added example pistol (Colt M1911A1)]
+[feature: Added example assault rifle (H&K G3)]
+
+[feature: Added shotgun bullets]
+[feature: Added example shotgun (Mossberg 500)]
+
+[feature: Added example submachine gun (Sten)]
+[feature: Added example machine gun (FN MAG)]
+
+[feature: Added secondary ammo handling]
+[feature: Added example percussion musket (Pattern 1853 Enfield rifle-musket)]
+[feature: Added ticking of ammo slots]
+[feature: Added example arquebus]
+
+[feature: Added winding up and winding down]
+[feature: Added example minigun]
+
+[feature: Added supporting system]
+[feature: Added attachment system]
+
+[feature: Added block loading feature]
+- Usable for mod versions, e.g. lite version, full version, etc
+

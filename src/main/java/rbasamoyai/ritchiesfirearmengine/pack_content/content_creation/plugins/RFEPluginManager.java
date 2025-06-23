@@ -17,9 +17,8 @@ public class RFEPluginManager {
             if (!PLUGINS.containsKey(info.classPath()))
                 foundPlugins.put(info.classPath(), loadPlugin(packId, info, metadata));
         }
-        for (RFEPlugin plugin : foundPlugins.values()) {
-            plugin.registerItemBuilders();
-        }
+        for (RFEPlugin plugin : foundPlugins.values())
+            plugin.register();
         PLUGINS.putAll(foundPlugins);
     }
 

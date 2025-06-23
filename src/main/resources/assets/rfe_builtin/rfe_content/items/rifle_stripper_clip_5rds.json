@@ -1,0 +1,13 @@
+{
+  "type": "ritchiesfirearmengine:speedloader",
+  "stacks_to": 64,
+  "rarity": "common",
+  "glint": false,
+  "capacity": 5,
+  "reload_cooldown": 5,
+  "valid_ammo": [
+    "rfe_builtin:rifle_cartridge"
+  ],
+  "valid_speedloaders": [
+  ]
+}

@@ -1,4 +1,4 @@
-package rbasamoyai.ritchiesfirearmengine.content;
+package rbasamoyai.ritchiesfirearmengine.content.ammo;
 
 import com.google.gson.JsonObject;
 import net.minecraft.util.GsonHelper;

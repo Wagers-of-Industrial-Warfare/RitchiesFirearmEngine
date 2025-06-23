@@ -35,4 +35,7 @@ public class RFEModUtils {
         return false;
     }
 
+    private RFEModUtils () {
+    }
+
 }

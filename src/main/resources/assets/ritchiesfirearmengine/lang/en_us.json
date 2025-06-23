@@ -1,3 +1,7 @@
 {
-  "gui.ritchiesfirearmengine.pack_default": "(Pack Default)"
+  "gui.ritchiesfirearmengine.pack_default": "(Pack Default)",
+  "key.ritchiesfirearmengine.category": "Ritchie's Firearm Engine",
+  "key.ritchiesfirearmengine.reload_firearm": "Reload Firearm",
+  "key.ritchiesfirearmengine.unload_firearm": "Unload Firearm",
+  "key.ritchiesfirearmengine.switch_mode": "Switch Firearm Mode"
 }

@@ -8,6 +8,7 @@ import java.util.*;
 
 public class RFEFirearmModeBuilder {
     protected final String modeId;
+    protected String modeTagId = "MainMode";
 
     protected int drawTime = 1;
     @Nullable
@@ -74,6 +75,8 @@ public class RFEFirearmModeBuilder {
     }
 
     public RFEFirearmModeBuilder forkBuilder(RFEFirearmModeBuilder newBuilder) {
+        newBuilder.modeTagId = this.modeTagId;
+
         newBuilder.drawTime = this.drawTime;
         newBuilder.drawSound = this.drawSound;
 
@@ -122,6 +125,11 @@ public class RFEFirearmModeBuilder {
         newBuilder.coolingDelayTime = this.coolingDelayTime;
 
         return newBuilder;
+    }
+
+    public RFEFirearmModeBuilder modeTag(String modeTag) {
+        this.modeTagId = modeTag;
+        return this;
     }
 
     public RFEFirearmModeBuilder drawTime(int drawTime) {

@@ -18,14 +18,44 @@ public class FirearmDataUtils {
     // Charging methods
 
     public static boolean isCharged(ItemStack itemStack) {
-        return itemStack.getOrCreateTag().contains("Charged");
+        return isCharged(itemStack.getOrCreateTag());
+    }
+
+    public static boolean isCharged(CompoundTag tag) {
+        return tag.contains("Charged");
     }
 
     public static void setCharged(ItemStack itemStack, boolean charged) {
+        setCharged(itemStack.getOrCreateTag(), charged);
+    }
+
+    public static void setCharged(CompoundTag tag, boolean charged) {
         if (charged) {
-            itemStack.getOrCreateTag().putBoolean("Charged", true);
+            tag.putBoolean("Charged", true);
         } else {
-            itemStack.getOrCreateTag().remove("Charged");
+            tag.remove("Charged");
+        }
+    }
+
+    // Jamming methods
+
+    public static boolean isJammed(ItemStack itemStack) {
+        return isJammed(itemStack.getOrCreateTag());
+    }
+
+    public static boolean isJammed(CompoundTag tag) {
+        return tag.contains("Jammed");
+    }
+
+    public static void setJammed(ItemStack itemStack, boolean jammed) {
+        setJammed(itemStack.getOrCreateTag(), jammed);
+    }
+
+    public static void setJammed(CompoundTag tag, boolean jammed) {
+        if (jammed) {
+            tag.putBoolean("Jammed", true);
+        } else {
+            tag.remove("Jammed");
         }
     }
 
@@ -215,35 +245,63 @@ public class FirearmDataUtils {
     // Heating methods
 
     public static void setHeat(ItemStack itemStack, float heat) {
-        itemStack.getOrCreateTag().putFloat("FirearmHeat", heat);
+        setHeat(itemStack.getOrCreateTag(), heat);
+    }
+
+    public static void setHeat(CompoundTag tag, float heat) {
+        tag.putFloat("FirearmHeat", heat);
     }
 
     public static float getHeat(ItemStack itemStack) {
-        return itemStack.getOrCreateTag().getFloat("FirearmHeat");
+        return getHeat(itemStack.getOrCreateTag());
+    }
+
+    public static float getHeat(CompoundTag tag) {
+        return tag.getFloat("FirearmHeat");
     }
 
     public static void addHeat(ItemStack itemStack, float addedHeat) {
-        setHeat(itemStack, getHeat(itemStack) + addedHeat);
+        addHeat(itemStack.getOrCreateTag(), addedHeat);
+    }
+
+    public static void addHeat(CompoundTag tag, float addedHeat) {
+        setHeat(tag, getHeat(tag) + addedHeat);
     }
 
     public static void setCoolingDelay(ItemStack itemStack, int delay) {
-        itemStack.getOrCreateTag().putInt("CoolingDelay", delay);
+        setCoolingDelay(itemStack.getOrCreateTag(), delay);
+    }
+
+    public static void setCoolingDelay(CompoundTag tag, int delay) {
+        tag.putInt("CoolingDelay", delay);
     }
 
     public static int getCoolingDelay(ItemStack itemStack) {
-        return itemStack.getOrCreateTag().getInt("CoolingDelay");
+        return getCoolingDelay(itemStack.getOrCreateTag());
+    }
+
+    public static int getCoolingDelay(CompoundTag tag) {
+        return tag.getInt("CoolingDelay");
     }
 
     public static void setOverheated(ItemStack itemStack, boolean overheated) {
+        setOverheated(itemStack.getOrCreateTag(), overheated);
+    }
+
+    public static void setOverheated(CompoundTag tag, boolean overheated) {
         if (overheated) {
-            itemStack.getOrCreateTag().putBoolean("Overheated", true);
+            tag.putBoolean("Overheated", true);
         } else {
-            itemStack.getOrCreateTag().remove("Overheated");
+            tag.remove("Overheated");
         }
     }
 
     public static boolean isOverheated(ItemStack itemStack) {
-        return itemStack.getOrCreateTag().contains("Overheated");
+        return isOverheated(itemStack.getOrCreateTag());
+    }
+
+    public static boolean isOverheated(CompoundTag tag) {
+        return tag.contains("Overheated");
     }
 
     // Key methods

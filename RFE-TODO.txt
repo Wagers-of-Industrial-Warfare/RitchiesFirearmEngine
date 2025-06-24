@@ -1,8 +1,6 @@
 TODO
 
-feature: Added item conditions
-[feature: Separated mode data]
-[feature, incomplete: Added example bolt-action rifle (Remington 700)]
+feature, incomplete: Added example bolt-action rifle (Remington 700)
 
 [feature: Added example bolt-action rifles (Remington 700, Kar 98k, Lee-Enfield no. 4)]
 [feature: Added basic entity-less bullets and shooting]

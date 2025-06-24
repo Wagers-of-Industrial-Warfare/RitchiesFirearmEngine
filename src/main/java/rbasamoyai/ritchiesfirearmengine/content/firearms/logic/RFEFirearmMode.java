@@ -26,6 +26,8 @@ public class RFEFirearmMode {
 
     protected final FirearmModeDataPackProperties defaultDataPackProperties;
 
+    // TODO mode tag
+
     // Drawing
     protected final int drawTime;
     @Nullable protected final SoundEvent drawSound;
@@ -185,7 +187,7 @@ public class RFEFirearmMode {
         if (this.fireMode == FireMode.SAFETY || !FirearmDataUtils.isCharged(itemStack) || FirearmDataUtils.getActionTime(itemStack) > 0)
             return false;
         // TODO check for secondary ammo
-        return !this.isJammed(itemStack, entity) && !this.getNextRoundsInItem(itemStack, entity, this.ammoConsumed, false).isEmpty();
+        return !this.isJammed(itemStack) && !this.getNextRoundsInItem(itemStack, entity, this.ammoConsumed, false).isEmpty();
     }
 
     public void fireProjectile(ItemStack itemStack, LivingEntity entity) {
@@ -395,20 +397,8 @@ public class RFEFirearmMode {
             FirearmDataUtils.addMultipleAmmo(ammoList, foundAmmo, phase.ammoAddedLast(), false, capacity);
         } else {
             Predicate<ItemStack> speedloaderPred = RFEUtils.orAllPredicates(properties.speedloaderAmmoPredicates());
-            Predicate<ItemStack> totalPredicate = s -> {
-                if (s == itemStack || !(s.getItem() instanceof MagazineItem magazineItem) || !speedloaderPred.test(s))
-                    return false;
-                List<ItemStack> ammo = magazineItem.getStoredAmmo(s);
-                if (ammo.isEmpty())
-                    return false;
-                for (ItemStack ammoStack : ammo) {
-                    if (!ammoPred.test(ammoStack))
-                        return false;
-                }
-                return true;
-            };
             int reloadCount1 = capacity - this.getLoadedAmmoCount(itemStack, entity, false);
-            ItemStack bestSpeedloaderStack = RFEItemUtils.findBestSpeedloader(entity, totalPredicate, reloadCount1);
+            ItemStack bestSpeedloaderStack = RFEItemUtils.findBestSpeedloader(entity, speedloaderPred, ammoPred, reloadCount1);
             if (bestSpeedloaderStack.getItem() instanceof MagazineItem magazineItem) {
                 List<ItemStack> strippedAmmo = magazineItem.getStoredAmmo(bestSpeedloaderStack);
                 FirearmDataUtils.addMultipleAmmo(ammoList, strippedAmmo, phase.ammoAddedLast(), false, capacity);
@@ -593,7 +583,7 @@ public class RFEFirearmMode {
         }
     }
 
-    public boolean isJammed(ItemStack itemStack, LivingEntity entity) {
+    public boolean isJammed(ItemStack itemStack) {
         return itemStack.getOrCreateTag().contains("Jammed");
     }
 
@@ -714,4 +704,99 @@ public class RFEFirearmMode {
         }
     }
 
+    public int countFreeAmmoSpaces(ItemStack itemStack) {
+        if (this.internalCapacity > 0) {
+            List<ItemStack> ammoList = FirearmDataUtils.getRounds(itemStack, "InternalRounds");
+            int count = RFEItemUtils.countItems(ammoList);
+            return this.nominalCapacity - count;
+        } else {
+            CompoundTag magazineTag = itemStack.getOrCreateTag().getCompound("DetachedMagazine");
+            ItemStack magazine = ItemStack.of(magazineTag);
+            if (magazine.getItem() instanceof MagazineItem magazineItem) {
+                int capacity = magazineItem.getMagazineCapacity(magazine);
+                List<ItemStack> ammoList = magazineItem.getStoredAmmo(magazine);
+                int count = RFEItemUtils.countItems(ammoList);
+                return capacity - count;
+            } else {
+                return 0;
+            }
+        }
+    }
+
+    public int countExtraAmmoSpaces(ItemStack itemStack) {
+        if (this.internalCapacity > 0) {
+            List<ItemStack> ammoList = FirearmDataUtils.getRounds(itemStack, "InternalRounds");
+            int count = RFEItemUtils.countItems(ammoList);
+            int extraSlots = this.internalCapacity - this.nominalCapacity;
+            int extraAmmo = Math.max(0, count - this.nominalCapacity);
+            return extraSlots - extraAmmo;
+        } else {
+            return 0; // Magazines have no extra slots
+        }
+    }
+
+    public boolean hasAmmo(ItemStack itemStack) {
+        if (this.internalCapacity > 0) {
+            List<ItemStack> ammoList = FirearmDataUtils.getRounds(itemStack, "InternalRounds");
+            return !ammoList.isEmpty();
+        } else {
+            CompoundTag magazineTag = itemStack.getOrCreateTag().getCompound("DetachedMagazine");
+            ItemStack magazine = ItemStack.of(magazineTag);
+            if (magazine.getItem() instanceof MagazineItem magazineItem) {
+                List<ItemStack> ammoList = magazineItem.getStoredAmmo(magazine);
+                return !ammoList.isEmpty();
+            } else {
+                return false;
+            }
+        }
+    }
+
+    public boolean hasChamberedRound(ItemStack itemStack) {
+        if (!this.isCharged(itemStack))
+            return false;
+        if (this.internalCapacity > 0) {
+            List<ItemStack> ammoList = FirearmDataUtils.getRounds(itemStack, "InternalRounds");
+            return !ammoList.isEmpty();
+        } else {
+            CompoundTag magazineTag = itemStack.getOrCreateTag().getCompound("DetachedMagazine");
+            ItemStack magazine = ItemStack.of(magazineTag);
+            if (magazine.getItem() instanceof MagazineItem magazineItem) {
+                List<ItemStack> ammoList = magazineItem.getStoredAmmo(magazine);
+                return !ammoList.isEmpty();
+            } else {
+                return false;
+            }
+        }
+    }
+
+    public boolean isCharged(ItemStack itemStack) {
+        return FirearmDataUtils.isCharged(itemStack);
+    }
+
+    public boolean hasMagazine(ItemStack itemStack) {
+        if (this.internalCapacity > 0)
+            return false;
+        CompoundTag magazineTag = itemStack.getOrCreateTag().getCompound("DetachedMagazine");
+        ItemStack magazine = ItemStack.of(magazineTag);
+        return magazine.getItem() instanceof MagazineItem;
+    }
+
+    public boolean entityHasMagazine(LivingEntity entity) {
+        if (this.internalCapacity > 0)
+            return false;
+        FirearmModeDataPackProperties properties = this.getDataPackProperties();
+        ItemStack magazine = RFEItemUtils.findFullestMagazine(entity, RFEUtils.orAllPredicates(properties.magazineAmmoPredicates()),
+                RFEUtils.orAllPredicates(properties.primaryAmmoPredicates()));
+        return !magazine.isEmpty();
+    }
+
+    public int bestSpeedloaderAmmoCount(ItemStack itemStack, LivingEntity entity) {
+        FirearmModeDataPackProperties properties = this.getDataPackProperties();
+        Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(properties.primaryAmmoPredicates());
+        Predicate<ItemStack> speedloaderPred = RFEUtils.orAllPredicates(properties.speedloaderAmmoPredicates());
+        int reloadCount1 = this.getNominalCapacity(itemStack, entity);
+        ItemStack bestSpeedloaderStack = RFEItemUtils.findBestSpeedloader(entity, speedloaderPred, ammoPred, reloadCount1);
+        return bestSpeedloaderStack.getItem() instanceof MagazineItem magazine ? magazine.countAmmo(bestSpeedloaderStack) : 0;
+    }
+    
 }

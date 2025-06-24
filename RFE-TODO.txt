@@ -1,11 +1,13 @@
 TODO
 
-feature, incomplete: Added example bolt-action rifle (Remington 700)
+feature: Added item conditions
+[feature: Separated mode data]
+[feature, incomplete: Added example bolt-action rifle (Remington 700)]
 
 [feature: Added example bolt-action rifles (Remington 700, Kar 98k, Lee-Enfield no. 4)]
 [feature: Added basic entity-less bullets and shooting]
 [feature: Added data packing for RFEFirearmMode properties]
-[feature: Added recoil and spread]
+[feature: Added recoil and spread, added recoil and spread providers]
 TODO recoil + new recoil properties?
 TODO spread + new spread properties?
 
@@ -13,7 +15,7 @@ TODO spread + new spread properties?
 [feature: Added example pistol (Colt M1911A1)]
 [feature: Added example assault rifle (H&K G3)]
 
-[feature: Added shotgun bullets]
+[feature: Added default shotgun bullets]
 [feature: Added example shotgun (Mossberg 500)]
 
 [feature: Added example submachine gun (Sten)]
@@ -31,5 +33,7 @@ TODO spread + new spread properties?
 [feature: Added attachment system]
 
 [feature: Added block loading feature]
-- Usable for mod versions, e.g. lite version, full version, etc
+- Usable for blocking mod distributions, e.g. lite version blocked by full version, etc
+
+TODO geckolib
 

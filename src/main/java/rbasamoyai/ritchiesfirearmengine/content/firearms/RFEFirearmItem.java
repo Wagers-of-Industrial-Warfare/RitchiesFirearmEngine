@@ -18,8 +18,11 @@ import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.content.HoldAttackKeyInteraction;
 import rbasamoyai.ritchiesfirearmengine.content.SimultaneousUseAndAttack;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.logic.FirearmDataUtils;
+import rbasamoyai.ritchiesfirearmengine.content.firearms.logic.FirearmModeDataPackProperties;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.logic.RFEFirearmMode;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.logic.ReloadPhase;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -154,6 +157,57 @@ public abstract class RFEFirearmItem extends Item implements SimultaneousUseAndA
         FirearmDataUtils.setHoldingAttackKey(itemStack, false);
         RFEFirearmMode firearmMode = this.getCurrentMode(itemStack);
         firearmMode.onReleaseAttackKey(itemStack, player);
+    }
+
+    public int countAmmo(ItemStack itemStack, LivingEntity entity) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        FirearmModeDataPackProperties properties = mode.getDataPackProperties();
+        return RFEItemUtils.countItems(RFEItemUtils.getItemsFromEntity(entity, RFEUtils.orAllPredicates(properties.primaryAmmoPredicates()), 0));
+    }
+
+    public int freeAmmoSpace(ItemStack itemStack) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.countFreeAmmoSpaces(itemStack);
+    }
+
+    public int extraAmmoSpace(ItemStack itemStack) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.countExtraAmmoSpaces(itemStack);
+    }
+
+    public boolean hasAmmo(ItemStack itemStack) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.hasAmmo(itemStack);
+    }
+
+    public boolean hasChamberedRound(ItemStack itemStack) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.hasChamberedRound(itemStack);
+    }
+
+    public boolean isCharged(ItemStack itemStack) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.isCharged(itemStack);
+    }
+
+    public boolean isJammed(ItemStack itemStack) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.isJammed(itemStack);
+    }
+
+    public boolean hasMagazine(ItemStack itemStack) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.hasMagazine(itemStack);
+    }
+
+    public boolean entityHasMagazine(ItemStack itemStack, LivingEntity entity) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.entityHasMagazine(entity);
+    }
+
+    public int bestSpeedloaderAmmoCount(ItemStack itemStack, LivingEntity entity) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.bestSpeedloaderAmmoCount(itemStack, entity);
     }
 
     public enum Action implements StringRepresentable {

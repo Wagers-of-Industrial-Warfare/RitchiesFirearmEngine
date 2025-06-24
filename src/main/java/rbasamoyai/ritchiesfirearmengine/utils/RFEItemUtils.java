@@ -77,26 +77,64 @@ public class RFEItemUtils {
     /**
      * Set best to 0 to return nothing.
      */
-    public static ItemStack findBestSpeedloader(LivingEntity entity, Predicate<ItemStack> predicate, int bestCount) {
+    public static ItemStack findBestSpeedloader(LivingEntity entity, Predicate<ItemStack> speedloaderPredicate, Predicate<ItemStack> ammoPredicate, int bestCount) {
         if (bestCount <= 0)
             return ItemStack.EMPTY;
-        List<ItemStack> list = getItemsFromEntity(entity, predicate, 0);
+        List<ItemStack> list = getItemsFromEntity(entity, speedloaderPredicate, 0);
         if (list.isEmpty())
             return ItemStack.EMPTY;
-        int largestCount = Integer.MAX_VALUE;
+        int largestCount = 0;
         ItemStack bestStack = ItemStack.EMPTY;
         for (ItemStack itemStack : list) {
             if (!(itemStack.getItem() instanceof MagazineItem magazineItem))
                 continue;
-            int storedAmmo = countItems(magazineItem.getStoredAmmo(itemStack));
-            if (storedAmmo == 0)
+            List<ItemStack> storedAmmo = magazineItem.getStoredAmmo(itemStack);
+            if (storedAmmo.isEmpty())
                 continue;
-            if (storedAmmo == bestCount)
+            boolean success = true;
+            for (ItemStack ammo : storedAmmo) {
+                if (!ammoPredicate.test(ammo)) {
+                    success = false;
+                    break;
+                }
+            }
+            if (!success)
+                continue;
+            int ammoCount = countItems(storedAmmo);
+            if (ammoCount == bestCount)
                 return itemStack;
-            if (storedAmmo > largestCount)
+            if (ammoCount <= largestCount)
                 continue;
-            largestCount = storedAmmo;
+            largestCount = ammoCount;
             bestStack = itemStack;
+        }
+        return bestStack;
+    }
+
+    public static ItemStack findFullestMagazine(LivingEntity entity, Predicate<ItemStack> magazinePredicate, Predicate<ItemStack> ammoPredicate) {
+        List<ItemStack> list = getItemsFromEntity(entity, magazinePredicate, 0);
+        if (list.isEmpty())
+            return ItemStack.EMPTY;
+        ItemStack bestStack = ItemStack.EMPTY;
+        int largestCount = 0;
+        for (ItemStack itemStack : list) {
+            if (!(itemStack.getItem() instanceof MagazineItem magazineItem))
+                continue;
+            List<ItemStack> storedAmmo = magazineItem.getStoredAmmo(itemStack);
+            boolean success = true;
+            for (ItemStack ammo : storedAmmo) {
+                if (!ammoPredicate.test(ammo)) {
+                    success = false;
+                    break;
+                }
+            }
+            if (!success)
+                continue;
+            int count = countItems(storedAmmo);
+            if (count > largestCount) {
+                largestCount = count;
+                bestStack = itemStack;
+            }
         }
         return bestStack;
     }

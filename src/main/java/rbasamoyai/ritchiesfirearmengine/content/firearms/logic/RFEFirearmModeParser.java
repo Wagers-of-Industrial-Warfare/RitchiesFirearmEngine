@@ -135,6 +135,7 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                     builder.windDownTime(time);
                     this.windDownEffects(builder, windDown, modeId);
                 }
+                this.firingEffects(builder, firing, modeId);
             }
         }
 
@@ -206,16 +207,16 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
     }
 
     protected void drawingEffects(T builder, JsonObject drawingObj, String modeId) {
-        if (GsonHelper.isStringValue(drawingObj, "draw_sound")) {
-            String str = GsonHelper.getAsString(drawingObj, "draw_sound");
+        if (GsonHelper.isStringValue(drawingObj, "sound")) {
+            String str = GsonHelper.getAsString(drawingObj, "sound");
             SoundEvent drawSound = SoundEvent.createVariableRangeEvent(new ResourceLocation(str));
             builder.drawSound(drawSound);
         }
     }
 
     protected void modeChangeEffects(T builder, JsonObject modeChangeObj, String modeId) {
-        if (GsonHelper.isStringValue(modeChangeObj, "mode_change_sound")) {
-            String str = GsonHelper.getAsString(modeChangeObj, "mode_change_sound");
+        if (GsonHelper.isStringValue(modeChangeObj, "sound")) {
+            String str = GsonHelper.getAsString(modeChangeObj, "sound");
             SoundEvent modeChangeSound = SoundEvent.createVariableRangeEvent(new ResourceLocation(str));
             builder.modeChangeSound(modeChangeSound);
         }
@@ -237,9 +238,17 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
         }
     }
 
+    protected void firingEffects(T builder, JsonObject windDownObj, String modeId) {
+        if (GsonHelper.isStringValue(windDownObj, "sound")) {
+            String str = GsonHelper.getAsString(windDownObj, "sound");
+            SoundEvent firingSound = SoundEvent.createVariableRangeEvent(new ResourceLocation(str));
+            builder.firingSound(firingSound);
+        }
+    }
+
     protected void cooldownEffects(T builder, JsonObject overheatingObj, String modeId) {
-        if (GsonHelper.isStringValue(overheatingObj, "cooldown_sound")) {
-            String str = GsonHelper.getAsString(overheatingObj, "cooldown_sound");
+        if (GsonHelper.isStringValue(overheatingObj, "sound")) {
+            String str = GsonHelper.getAsString(overheatingObj, "sound");
             SoundEvent modeChangeSound = SoundEvent.createVariableRangeEvent(new ResourceLocation(str));
             builder.cooldownSound(modeChangeSound);
         }

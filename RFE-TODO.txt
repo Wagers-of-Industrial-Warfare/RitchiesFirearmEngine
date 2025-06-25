@@ -1,9 +1,6 @@
 TODO
 
-feature, assets: Added stock firearm sounds
-
-[feature: Added example bolt-action rifles (Kar 98k, Lee-Enfield no. 4)]
-[feature: Added basic entity-less bullets and shooting]
+feature: Added basic entity-less bullets and shooting
 [feature: Added data packing for damage properties]
 TODO damage model
 [feature: Added data packing for RFEFirearmMode properties]
@@ -11,6 +8,7 @@ TODO damage model
 TODO recoil + new recoil properties?
 TODO spread + new spread properties?
 
+[feature: Added more example bolt-action rifles (Kar 98k, Lee-Enfield no. 4)]
 [feature: Added example semi-automatic rifle (MAS-49/56)]
 [feature: Added example pistol (Colt M1911A1)]
 [feature: Added example assault rifle (H&K G3)]

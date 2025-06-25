@@ -1,7 +1,8 @@
 {
   "type": "ritchiesfirearmengine:firearm",
   "drawing": {
-    "draw_time": 18
+    "draw_time": 18,
+    "sound": "rfe_builtin:item.generic.rifle.draw"
   },
   "ammo": {
     "primary": [
@@ -13,7 +14,8 @@
     "fire_mode": "single_action",
     "cooldown": 50,
     "vertical_recoil": 3,
-    "horizontal_recoil": 1
+    "horizontal_recoil": 1,
+    "sound": "rfe_builtin:item.generic.rifle.shot"
   },
   "reload": {
     "phases": [
@@ -34,7 +36,8 @@
             }
           ]
         },
-        "time": 15
+        "time": 15,
+        "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_start"
       },
       {
         "phase": "reload",
@@ -55,12 +58,14 @@
         },
         "time": 25,
         "reload_type": "rounds",
-        "reload_delay": 25
+        "reload_delay": 25,
+        "sound": "rfe_builtin:item.generic.rifle.bullet_reload"
       },
       {
         "phase": "finish",
         "time": 15,
-        "charge_firearm": true
+        "charge_firearm": true,
+        "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_end"
       }
     ]
   },
@@ -73,7 +78,8 @@
           "operator": "less_than",
           "value": 5
         },
-        "time": 15
+        "time": 15,
+        "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_start"
       },
       {
         "phase": "unload",
@@ -85,7 +91,8 @@
         "time": 10,
         "unload_type": "rounds",
         "end_unload": true,
-        "unload_delay": 10
+        "unload_delay": 10,
+        "sound": "rfe_builtin:item.generic.rifle.bullet_unload"
       },
       {
         "phase": "unload",
@@ -98,11 +105,13 @@
         "unload_type": "rounds",
         "end_unload": true,
         "unload_count": 5,
-        "unload_delays": [1, 10, 10, 10, 10]
+        "unload_delays": [1, 10, 10, 10, 10],
+        "sound": "rfe_builtin:item.generic.rifle.bullets_unload"
       },
       {
         "phase": "finish",
-        "time": 15
+        "time": 15,
+        "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_end"
       }
     ]
   },
@@ -124,7 +133,8 @@
             }
           ]
         },
-        "time": 25
+        "time": 25,
+        "sound": "rfe_builtin:item.generic.rifle.bolt_cycle"
       }
     ]
   }

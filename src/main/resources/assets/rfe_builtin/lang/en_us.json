@@ -4,5 +4,10 @@
   "item.rfe_builtin.rifle_magazine_10rds": "Rifle Magazine (10 rds)",
   "item.rfe_builtin.rifle_stripper_clip_5rds": "Rifle Stripper Clip (5 rds)",
   "itemGroup.rfe_builtin.base": "Ritchie's Firearms Engine Content",
-  "itemGroup.rfe_builtin.weapons": "Ritchie's Firearms Engine Example Weapons"
+  "itemGroup.rfe_builtin.weapons": "Ritchie's Firearms Engine Example Weapons",
+  "subtitles.rfe_builtin.item.generic.rifle.bolt_cycle": "Bolt-action rifle cycled",
+  "subtitles.rfe_builtin.item.generic.rifle.bullet_reload": "Rifle bullet loaded",
+  "subtitles.rfe_builtin.item.generic.rifle.bullet_unload": "Rifle unloaded",
+  "subtitles.rfe_builtin.item.generic.rifle.draw": "Rifle equipped",
+  "subtitles.rfe_builtin.item.generic.rifle.shot": "Rifle shot"
 }

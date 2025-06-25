@@ -6,7 +6,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
@@ -203,17 +202,20 @@ public class RFEFirearmMode {
     }
 
     public void fireProjectile(ItemStack itemStack, LivingEntity entity) {
+        // TODO windup
         FirearmModeDataPackProperties properties = this.getDataPackProperties();
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
-        // TODO consume secondary ammo if required
-        List<ItemStack> strippedAmmo = this.getNextRoundsInItem(itemStack, entity, this.ammoConsumed, true);
-        // TODO spawn anyway if ammo not consumed, usable for infinity guns/blasters
-        for (ItemStack ammoStack : strippedAmmo) {
-            int summons = ammoStack.getCount();
-            RitchiesFirearmEngine.LOGGER.info("Bang!");
-            // TODO actually spawn projectile
-            // TODO effects
+        if (this.ammoConsumed > 0) {
+            List<ItemStack> strippedAmmo = this.getNextRoundsInItem(itemStack, entity, this.ammoConsumed, true);
+            // TODO consume secondary ammo if required
+            for (ItemStack ammoStack : strippedAmmo) {
+                int summons = ammoStack.getCount();
+                // TODO actually spawn projectile
+            }
+        } else {
+            // TODO spawn anyway if ammo not consumed, usable for infinity guns/blasters
         }
+        this.playFiringEffects(itemStack, entity);
         if (this.canOverheat) {
             FirearmDataUtils.addHeat(modeTag, properties.heatAddedOnFiring());
             FirearmDataUtils.setCoolingDelay(modeTag, properties.coolingDelayTime());
@@ -226,6 +228,11 @@ public class RFEFirearmMode {
             FirearmDataUtils.setActionTime(itemStack, this.firingCooldown);
         if (this.fireMode == FireMode.SINGLE_ACTION && !properties.manualCharging())
             itemStack.getOrCreateTag().putBoolean("HoldAutomaticCycle", true);
+    }
+
+    public void playFiringEffects(ItemStack itemStack, LivingEntity entity) {
+        if (this.firingSound != null)
+            entity.level().playSound(null, entity.blockPosition(), this.firingSound, SoundSource.NEUTRAL, 1, 1);
     }
 
     public void onTickFiring(ItemStack itemStack, LivingEntity entity) {
@@ -536,7 +543,7 @@ public class RFEFirearmMode {
     }
 
     public boolean canCharge(ItemStack itemStack, LivingEntity entity) {
-        return this.fireMode != FireMode.SAFETY && FirearmDataUtils.getActionTime(itemStack) <= 0;
+        return this.fireMode != FireMode.SAFETY && FirearmDataUtils.getActionTime(itemStack) <= 0 && !this.isCharged(itemStack);
     }
 
     public void onCharge(ItemStack itemStack, LivingEntity entity) {
@@ -600,7 +607,7 @@ public class RFEFirearmMode {
 
     public void playDrawEffects(ItemStack itemStack, LivingEntity entity) {
         if (this.drawSound != null)
-            entity.level().playSound(null, entity.blockPosition(), this.drawSound, SoundSource.NEUTRAL, 0.25f, 1f);
+            entity.level().playSound(null, entity.blockPosition(), this.drawSound, SoundSource.NEUTRAL, 1f, 1f);
     }
 
     public void onTickCooldown(ItemStack itemStack, LivingEntity entity) {
@@ -617,7 +624,7 @@ public class RFEFirearmMode {
 
     public void playCooldownEffects(ItemStack itemStack, LivingEntity entity) {
         if (this.cooldownSound != null)
-            entity.level().playSound(null, entity.blockPosition(), this.cooldownSound, SoundSource.NEUTRAL, 0.25f, 1f);
+            entity.level().playSound(null, entity.blockPosition(), this.cooldownSound, SoundSource.NEUTRAL, 1f, 1f);
     }
 
     public void startSwitchMode(ItemStack itemStack, LivingEntity entity) {
@@ -627,7 +634,7 @@ public class RFEFirearmMode {
 
     public void playSwitchModeEffects(ItemStack itemStack, LivingEntity entity) {
         if (this.modeChangeSound != null)
-            entity.level().playSound(null, entity.blockPosition(), this.modeChangeSound, SoundSource.NEUTRAL, 0.25f, 1f);
+            entity.level().playSound(null, entity.blockPosition(), this.modeChangeSound, SoundSource.NEUTRAL, 1f, 1f);
     }
 
     public void onTickSwitchMode(ItemStack itemStack, LivingEntity entity) {
@@ -700,12 +707,10 @@ public class RFEFirearmMode {
     public void onReleaseAttackKey(ItemStack itemStack, LivingEntity entity) {
         RFEFirearmItem.Action action = FirearmDataUtils.getAction(itemStack);
         CompoundTag tag = itemStack.getOrCreateTag();
-        if (action == RFEFirearmItem.Action.FIRING) {
-            if (this.fireMode == FireMode.SINGLE_ACTION) {
-                tag.remove("HoldAutomaticCycle");
-            } else if (this.fireMode == FireMode.FULL_AUTO) {
-                tag.putBoolean("StopAutoFire", true);
-            }
+        if (this.fireMode == FireMode.SINGLE_ACTION) {
+            tag.remove("HoldAutomaticCycle");
+        } else if (this.fireMode == FireMode.FULL_AUTO) {
+            tag.putBoolean("StopAutoFire", true);
         }
     }
 

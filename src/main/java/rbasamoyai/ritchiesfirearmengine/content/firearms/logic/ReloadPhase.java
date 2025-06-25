@@ -49,7 +49,7 @@ public class ReloadPhase {
 
     public void playEffects(ItemStack itemStack, LivingEntity entity) {
         if (this.sound != null)
-            entity.level().playSound(null, entity.blockPosition(), this.sound, SoundSource.NEUTRAL, 0.25f, 1f);
+            entity.level().playSound(null, entity.blockPosition(), this.sound, SoundSource.NEUTRAL, 1f, 1f);
     }
 
     public PhaseType phaseType() { return this.phaseType; }

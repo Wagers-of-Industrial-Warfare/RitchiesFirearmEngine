@@ -28,12 +28,13 @@ public class ChargeAction {
             return false;
         FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.CHARGING);
         FirearmDataUtils.setActionTime(itemStack, this.time);
+        this.playEffects(itemStack, entity);
         return true;
     }
 
     protected void playEffects(ItemStack itemStack, LivingEntity entity) {
         if (this.sound != null)
-            entity.level().playSound(null, entity.blockPosition(), this.sound, SoundSource.NEUTRAL, 0.25f, 1f);
+            entity.level().playSound(null, entity.blockPosition(), this.sound, SoundSource.NEUTRAL, 1f, 1f);
     }
 
     public static ChargeAction fromJson(JsonObject obj) {

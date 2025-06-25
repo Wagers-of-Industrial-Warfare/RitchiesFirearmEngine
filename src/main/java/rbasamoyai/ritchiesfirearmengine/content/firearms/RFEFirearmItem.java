@@ -87,7 +87,7 @@ public abstract class RFEFirearmItem extends Item implements SimultaneousUseAndA
 
     public boolean commonOnEntitySwing(ItemStack stack, LivingEntity entity) {
         if (entity.level().isClientSide)
-            return false;
+            return true;
         FirearmDataUtils.setHoldingAttackKey(stack, true);
         RFEFirearmMode firearmMode = this.getCurrentMode(stack);
         if (firearmMode.canFireProjectile(stack, entity)) {
@@ -95,7 +95,7 @@ public abstract class RFEFirearmItem extends Item implements SimultaneousUseAndA
         } else if (firearmMode.canCharge(stack, entity)) {
             firearmMode.onCharge(stack, entity);
         }
-        return false;
+        return true;
     }
 
     public void onReload(ItemStack stack, LivingEntity entity) {

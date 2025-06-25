@@ -33,18 +33,20 @@ public class RFEClient {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
 
-        ItemStack stack = mc.player.getUseItem();
-        InteractionHand hand = mc.player.getUsedItemHand();
-        if (hand == InteractionHand.MAIN_HAND) {
-            if (stack.getItem() instanceof SimultaneousUseAndAttack) {
+        ItemStack useStack = mc.player.getUseItem();
+        InteractionHand useHand = mc.player.getUsedItemHand();
+        if (useHand == InteractionHand.MAIN_HAND) {
+            if (useStack.getItem() instanceof SimultaneousUseAndAttack) {
                 while (mc.options.keyAttack.consumeClick()) {
-                    mc.player.swing(hand);
+                    mc.player.swing(useHand);
                 }
             }
-            if (stack.getItem() instanceof HoldAttackKeyInteraction holdAttackKeyInteraction) {
-                if (holdAttackKeyInteraction.isHoldingAttackKey(stack, mc.player) && !mc.options.keyAttack.isDown())
-                    RFENetwork.sendToServer(new ServerboundReleaseAttackKeyPacket());
-            }
+        }
+
+        ItemStack mainhandItem = mc.player.getMainHandItem();
+        if (mainhandItem.getItem() instanceof HoldAttackKeyInteraction holdAttackKeyInteraction) {
+            if (holdAttackKeyInteraction.isHoldingAttackKey(mainhandItem, mc.player) && !mc.options.keyAttack.isDown())
+                RFENetwork.sendToServer(new ServerboundReleaseAttackKeyPacket());
         }
     }
 

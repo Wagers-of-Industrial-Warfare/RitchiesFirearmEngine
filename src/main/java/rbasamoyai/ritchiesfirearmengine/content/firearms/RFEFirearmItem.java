@@ -214,6 +214,10 @@ public abstract class RFEFirearmItem extends Item implements SimultaneousUseAndA
         return mode.bestSpeedloaderAmmoCount(itemStack, entity);
     }
 
+    public boolean laysFlatOnGround(ItemStack stack) {
+        return true;
+    }
+
     public enum Action implements StringRepresentable {
         RELOAD,
         UNLOAD,

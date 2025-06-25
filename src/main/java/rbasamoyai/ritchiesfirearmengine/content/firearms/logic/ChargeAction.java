@@ -37,7 +37,8 @@ public class ChargeAction {
     }
 
     public static ChargeAction fromJson(JsonObject obj) {
-        FirearmCondition condition = FirearmCondition.fromJson(obj.getAsJsonObject("condition"));
+        FirearmCondition condition = GsonHelper.isObjectNode(obj, "condition") ? FirearmCondition.fromJson(obj.getAsJsonObject("condition"))
+                : FirearmCondition.AlwaysTrue.ALWAYS_TRUE;
         int time = GsonHelper.getAsInt(obj, "time");
         if (time < 1)
             throw new IllegalStateException("Charge action time cannot be less than 1");

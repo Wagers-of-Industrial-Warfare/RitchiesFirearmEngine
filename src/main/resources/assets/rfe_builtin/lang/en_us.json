@@ -1,6 +1,8 @@
 {
+  "item.rfe_builtin.remington_700": "Remington Model 700",
   "item.rfe_builtin.rifle_cartridge": "Rifle Cartridge",
   "item.rfe_builtin.rifle_magazine_10rds": "Rifle Magazine (10 rds)",
   "item.rfe_builtin.rifle_stripper_clip_5rds": "Rifle Stripper Clip (5 rds)",
-  "itemGroup.rfe_builtin": "Ritchie's Firearms Engine Content"
+  "itemGroup.rfe_builtin.base": "Ritchie's Firearms Engine Content",
+  "itemGroup.rfe_builtin.weapons": "Ritchie's Firearms Engine Example Weapons"
 }

@@ -5,6 +5,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.logic.FirearmDataUtils;
 
@@ -18,6 +19,7 @@ import java.util.function.UnaryOperator;
 public class RFEItemUtils {
 
     public static void addItemToEntity(ItemStack itemStack, LivingEntity entity) {
+        RitchiesFirearmEngine.LOGGER.info("Added {}!", itemStack);
         if (entity instanceof Player player) {
             player.getInventory().placeItemBackInInventory(itemStack);
             return;
@@ -56,11 +58,17 @@ public class RFEItemUtils {
     /**
      * Set maxCount to 0 to take as many items as possible.
      */
-    public static List<ItemStack> getItemsFromEntity(LivingEntity entity, Predicate<ItemStack> predicate, int maxCount) {
+    public static List<ItemStack> getItemsFromEntity(LivingEntity entity, Predicate<ItemStack> predicate, int maxCount, boolean take) {
         List<ItemStack> list = new LinkedList<>();
         consumeItemsFromEntity(entity, predicate, s -> {
             int takeAmount = maxCount > 0 ? Math.min(maxCount - countItems(list), s.getMaxStackSize()) : s.getMaxStackSize();
-            ItemStack addition = s.split(takeAmount);
+            ItemStack addition;
+            if (take) {
+                addition = s.split(takeAmount);
+            } else {
+                addition = s.copy();
+                addition.setCount(takeAmount);
+            }
             FirearmDataUtils.addAmmo(list, addition, false);
             return s.isEmpty() ? ItemStack.EMPTY : s;
         }, () -> maxCount > 0 && list.size() >= maxCount);
@@ -77,10 +85,11 @@ public class RFEItemUtils {
     /**
      * Set best to 0 to return nothing.
      */
-    public static ItemStack findBestSpeedloader(LivingEntity entity, Predicate<ItemStack> speedloaderPredicate, Predicate<ItemStack> ammoPredicate, int bestCount) {
+    public static ItemStack findBestSpeedloader(LivingEntity entity, Predicate<ItemStack> speedloaderPredicate,
+                                                Predicate<ItemStack> ammoPredicate, int bestCount, boolean take) {
         if (bestCount <= 0)
             return ItemStack.EMPTY;
-        List<ItemStack> list = getItemsFromEntity(entity, speedloaderPredicate, 0);
+        List<ItemStack> list = getItemsFromEntity(entity, speedloaderPredicate, 0, take);
         if (list.isEmpty())
             return ItemStack.EMPTY;
         int largestCount = 0;
@@ -111,8 +120,8 @@ public class RFEItemUtils {
         return bestStack;
     }
 
-    public static ItemStack findFullestMagazine(LivingEntity entity, Predicate<ItemStack> magazinePredicate, Predicate<ItemStack> ammoPredicate) {
-        List<ItemStack> list = getItemsFromEntity(entity, magazinePredicate, 0);
+    public static ItemStack findFullestMagazine(LivingEntity entity, Predicate<ItemStack> magazinePredicate, Predicate<ItemStack> ammoPredicate, boolean take) {
+        List<ItemStack> list = getItemsFromEntity(entity, magazinePredicate, 0, take);
         if (list.isEmpty())
             return ItemStack.EMPTY;
         ItemStack bestStack = ItemStack.EMPTY;

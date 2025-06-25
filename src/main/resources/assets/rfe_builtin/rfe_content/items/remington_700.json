@@ -1,0 +1,131 @@
+{
+  "type": "ritchiesfirearmengine:firearm",
+  "drawing": {
+    "draw_time": 18
+  },
+  "ammo": {
+    "primary": [
+      "rfe_builtin:rifle_cartridge"
+    ],
+    "internal_capacity": 5
+  },
+  "firing": {
+    "fire_mode": "single_action",
+    "cooldown": 50,
+    "vertical_recoil": 3,
+    "horizontal_recoil": 1
+  },
+  "reload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": {
+          "type": "and",
+          "conditions": [
+            {
+              "source": "ritchiesfirearmengine:free_ammo_space",
+              "operator": "greater_than",
+              "value": 0
+            },
+            {
+              "source": "ritchiesfirearmengine:entity_ammo_count",
+              "operator": "greater_than",
+              "value": 0
+            }
+          ]
+        },
+        "time": 15
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "type": "and",
+          "conditions": [
+            {
+              "source": "ritchiesfirearmengine:free_ammo_space",
+              "operator": "greater_than",
+              "value": 0
+            },
+            {
+              "source": "ritchiesfirearmengine:entity_ammo_count",
+              "operator": "greater_than",
+              "value": 0
+            }
+          ]
+        },
+        "time": 25,
+        "reload_type": "rounds",
+        "reload_delay": 25
+      },
+      {
+        "phase": "finish",
+        "time": 15,
+        "charge_firearm": true
+      }
+    ]
+  },
+  "unload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": {
+          "source": "ritchiesfirearmengine:free_ammo_space",
+          "operator": "less_than",
+          "value": 5
+        },
+        "time": 15
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "source": "ritchiesfirearmengine:free_ammo_space",
+          "operator": "equals",
+          "value": 4
+        },
+        "time": 10,
+        "unload_type": "rounds",
+        "end_unload": true,
+        "unload_delay": 10
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "source": "ritchiesfirearmengine:free_ammo_space",
+          "operator": "less_than_or_equal_to",
+          "value": 3
+        },
+        "time": 20,
+        "unload_type": "rounds",
+        "end_unload": true,
+        "unload_count": 5,
+        "unload_delays": [1, 10, 10, 10, 10]
+      },
+      {
+        "phase": "finish",
+        "time": 15
+      }
+    ]
+  },
+  "charge": {
+    "actions": [
+      {
+        "condition": {
+          "type": "or",
+          "conditions": [
+            {
+              "source": "ritchiesfirearmengine:is_charged",
+              "operator": "equals",
+              "value": 0
+            },
+            {
+              "source": "ritchiesfirearmengine:is_jammed",
+              "operator": "equals",
+              "value": 1
+            }
+          ]
+        },
+        "time": 25
+      }
+    ]
+  }
+}

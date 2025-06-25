@@ -53,6 +53,8 @@ public abstract class RFEFirearmItem extends Item implements SimultaneousUseAndA
     @Override
     public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
         super.inventoryTick(itemStack, level, entity, slotId, isSelected);
+        if (level.isClientSide)
+            return; // TODO maybe clientside effects?
         if (!isSelected)
             FirearmDataUtils.setHoldingAttackKey(itemStack, false);
         if (entity instanceof LivingEntity living)
@@ -84,6 +86,8 @@ public abstract class RFEFirearmItem extends Item implements SimultaneousUseAndA
     }
 
     public boolean commonOnEntitySwing(ItemStack stack, LivingEntity entity) {
+        if (entity.level().isClientSide)
+            return false;
         FirearmDataUtils.setHoldingAttackKey(stack, true);
         RFEFirearmMode firearmMode = this.getCurrentMode(stack);
         if (firearmMode.canFireProjectile(stack, entity)) {
@@ -162,7 +166,7 @@ public abstract class RFEFirearmItem extends Item implements SimultaneousUseAndA
     public int countAmmo(ItemStack itemStack, LivingEntity entity) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
         FirearmModeDataPackProperties properties = mode.getDataPackProperties();
-        return RFEItemUtils.countItems(RFEItemUtils.getItemsFromEntity(entity, RFEUtils.orAllPredicates(properties.primaryAmmoPredicates()), 0));
+        return RFEItemUtils.countItems(RFEItemUtils.getItemsFromEntity(entity, RFEUtils.orAllPredicates(properties.primaryAmmoPredicates()), 0, false));
     }
 
     public int freeAmmoSpace(ItemStack itemStack) {

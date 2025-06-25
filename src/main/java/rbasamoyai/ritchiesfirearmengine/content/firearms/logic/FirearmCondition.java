@@ -18,7 +18,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public abstract class FirearmCondition implements BiPredicate<ItemStack, LivingEntity> {
+public abstract sealed class FirearmCondition implements BiPredicate<ItemStack, LivingEntity> {
 
     private FirearmCondition() {
     }
@@ -103,6 +103,17 @@ public abstract class FirearmCondition implements BiPredicate<ItemStack, LivingE
                     return true;
             }
             return false;
+        }
+    }
+
+    public static final class AlwaysTrue extends FirearmCondition {
+        public static final AlwaysTrue ALWAYS_TRUE = new AlwaysTrue();
+
+        private AlwaysTrue() {}
+
+        @Override
+        public boolean test(ItemStack itemStack, LivingEntity entity) {
+            return true;
         }
     }
 

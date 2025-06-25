@@ -146,7 +146,7 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                 for (JsonElement reloadPhaseEl : reloadPhasesArr) {
                     if (!reloadPhaseEl.isJsonObject())
                         throw new JsonParseException("Invalid reload phase");
-                    ReloadPhase reloadPhase = ReloadPhase.fromJson(obj, false);
+                    ReloadPhase reloadPhase = ReloadPhase.fromJson(reloadPhaseEl.getAsJsonObject(), false);
                     builder.addReloadPhase(reloadPhase);
                 }
             }
@@ -160,7 +160,7 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                 for (JsonElement unloadPhaseEl : unloadPhasesArr) {
                     if (!unloadPhaseEl.isJsonObject())
                         throw new JsonParseException("Invalid unload phase");
-                    ReloadPhase unloadPhase = ReloadPhase.fromJson(obj, true);
+                    ReloadPhase unloadPhase = ReloadPhase.fromJson(unloadPhaseEl.getAsJsonObject(), true);
                     builder.addUnloadPhase(unloadPhase);
                 }
             }

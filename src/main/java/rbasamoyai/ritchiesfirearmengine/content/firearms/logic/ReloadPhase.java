@@ -76,8 +76,12 @@ public class ReloadPhase {
             throw new JsonParseException("Invalid " + reloadKey + " phase type '" + phaseTypeString + "', must be one of 'prepare', '" + reloadKey + "', 'finish'");
         builder.phaseType(phaseType);
 
-        FirearmCondition condition = FirearmCondition.fromJson(obj.getAsJsonObject("condition"));
-        builder.condition(condition);
+        if (GsonHelper.isObjectNode(obj, "condition")) {
+            FirearmCondition condition = FirearmCondition.fromJson(obj.getAsJsonObject("condition"));
+            builder.condition(condition);
+        } else {
+            builder.condition(FirearmCondition.AlwaysTrue.ALWAYS_TRUE);
+        }
 
         int time = GsonHelper.getAsInt(obj, "time");
         builder.time(time);
@@ -99,10 +103,6 @@ public class ReloadPhase {
                 throw new JsonParseException("Invalid " + reloadKey + " type '" + reloadTypeString +
                         "', must be one of 'rounds', 'magazines', " + (unload ? "" : "'speedloaders', ") + "'secondaries'");
             builder.reloadType(reloadType);
-            if (obj.has(reloadKey + "_delay")) {
-                int reloadDelay = GsonHelper.getAsInt(obj, reloadKey + "_delay");
-                builder.reloadDelay(reloadDelay);
-            }
             if (reloadType != ReloadType.MAGAZINES) {
                 int reloadCount = obj.has(reloadKey + "_count") ? GsonHelper.getAsInt(obj, reloadKey + "_count") : 1;
                 boolean ammoAddedLast = GsonHelper.getAsBoolean(obj, unload ? "ammo_removed_last" : "ammo_added_last", false);
@@ -110,6 +110,10 @@ public class ReloadPhase {
                 builder.reloadCount(reloadCount)
                         .ammoAddedLast(ammoAddedLast)
                         .endReload(endReload);
+                if (obj.has(reloadKey + "_delay")) {
+                    int reloadDelay = GsonHelper.getAsInt(obj, reloadKey + "_delay");
+                    builder.reloadDelay(reloadDelay);
+                }
                 if (reloadCount > 1 && reloadType != ReloadType.SPEEDLOADERS && obj.has(reloadKey + "_delays")) {
                     JsonArray delayArr = GsonHelper.getAsJsonArray(obj, reloadKey + "_delays");
                     List<Integer> delayList = new ArrayList<>();
@@ -247,6 +251,10 @@ public class ReloadPhase {
                 throw new IllegalStateException("Cannot have both explicit single and multiple " + this.mode + " delays");
             if (delays.isEmpty())
                 RitchiesFirearmEngine.LOGGER.warn("Loading empty {} delays list", this.mode);
+            for (int delay : delays) {
+                if (delay < 1)
+                    throw new IllegalStateException("Cannot have " + this.mode + " delay less than 1");
+            }
             this.multipleReloadDelays = delays;
             return this;
         }

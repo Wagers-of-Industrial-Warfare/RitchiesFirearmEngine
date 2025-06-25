@@ -196,7 +196,7 @@ public class RFEFirearmModeBuilder {
     private void resetMagazineOptions() {
         this.magazineAmmoPredicates = new LinkedList<>();
         this.canLoadSingleRounds = false;
-        this.plusOneCapacity = true;
+        this.plusOneCapacity = false;
     }
 
     public RFEFirearmModeBuilder addSecondaryAmmo(AmmoPredicate secondaryAmmoPredicate) {

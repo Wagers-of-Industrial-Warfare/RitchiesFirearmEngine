@@ -1,0 +1,16 @@
+{
+  "type": "ritchiesfirearmengine:ammo_packet",
+  "stacks_to": 64,
+  "rarity": "common",
+  "glint": false,
+  "use_time": 60,
+  "reload_cooldown": 60,
+  "use_sound": "rfe_builtin:item.generic.ammo_packet.unwrap",
+  "spawn_particles_on_use": true,
+  "ammo": [
+    {
+      "ammo": "rfe_builtin:rifle_cartridge",
+      "capacity": 10
+    }
+  ]
+}

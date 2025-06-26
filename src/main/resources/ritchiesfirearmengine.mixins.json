@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "ritchiesfirearmengine.refmap.json",
   "mixins": [
+    "LivingEntityMixin"
   ],
   "client": [
     "client.GuiMixin",

@@ -4,6 +4,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.content.ammo.AmmoItem;
+import rbasamoyai.ritchiesfirearmengine.content.ammo.AmmoPacketItem;
 import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.RFEDefaultFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.RFEFirearmItem;
@@ -21,6 +22,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("ammo"), new AmmoItem.Builder());
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("magazine"), new MagazineItem.Builder());
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("speedloader"), new MagazineItem.Builder()); // Alias of magazine
+        RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("ammo_packet"), new AmmoPacketItem.Builder());
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("firearm"), new RFEDefaultFirearmItem.Builder());
         // TODO revolver builder
 

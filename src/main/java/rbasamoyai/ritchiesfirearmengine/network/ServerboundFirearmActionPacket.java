@@ -4,10 +4,11 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
+import rbasamoyai.ritchiesfirearmengine.content.ammo.AmmoPacketItem;
 import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.RFEFirearmItem;
 
+import javax.annotation.Nullable;
 import java.util.concurrent.Executor;
 
 public record ServerboundFirearmActionPacket(RFEFirearmItem.Action action) implements RFEPacket {
@@ -37,6 +38,11 @@ public record ServerboundFirearmActionPacket(RFEFirearmItem.Action action) imple
             switch (this.action) {
                 case RELOAD -> magazine.tryReloadingOutsideOfMenu(mainhandItem, sender);
                 case UNLOAD -> magazine.tryUnloadingOutsideOfMenu(mainhandItem, sender);
+            }
+        }
+        if (mainhandItem.getItem() instanceof AmmoPacketItem ammoPacket) {
+            switch (this.action) {
+                case RELOAD -> ammoPacket.tryReloadingOutsideOfMenu(mainhandItem, sender);
             }
         }
     }

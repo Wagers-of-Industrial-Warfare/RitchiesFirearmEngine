@@ -152,7 +152,7 @@ public class FirearmDataUtils {
      * @return The amount of rounds loaded
      */
     public static int addAmmo(List<ItemStack> ammo, ItemStack itemStack, boolean last, int maxCount) {
-        if (itemStack.isEmpty())
+        if (itemStack.isEmpty() || maxCount < 0)
             return 0;
         ItemStack copy = itemStack.copy();
         if (maxCount > 0)

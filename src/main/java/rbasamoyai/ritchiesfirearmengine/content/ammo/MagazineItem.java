@@ -13,13 +13,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.logic.AmmoPredicate;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.items.RFEItemBuilder;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,10 +28,10 @@ import java.util.Map;
 public class MagazineItem extends Item {
 
     private final boolean glint;
-    private final int capacity; // Datapackable
+    private final int capacity;
     private final List<AmmoPredicate> defaultAmmoPredicates; // Datapackable
     private final List<AmmoPredicate> defaultSpeedloaderPredicates; // Datapackable
-    private final int reloadCooldown; // Datapackable
+    private final int reloadCooldown;
 
     public MagazineItem(Properties pProperties, boolean glint, int capacity, List<AmmoPredicate> defaultAmmoPredicates,
                         List<AmmoPredicate> defaultSpeedloaderPredicates, int reloadCooldown) {
@@ -45,6 +45,7 @@ public class MagazineItem extends Item {
 
     @Override public boolean isFoil(ItemStack stack) { return this.glint || super.isFoil(stack); }
 
+    // TODO not forge
     @Override
     public int getMaxStackSize(ItemStack stack) {
         return this.countAmmo(stack) > 0 ? 1 : super.getMaxStackSize(stack);

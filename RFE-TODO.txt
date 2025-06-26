@@ -1,7 +1,5 @@
 TODO
 
-feature: Added ammo packet item
-
 [feature: Added basic entity-less bullets and shooting]
 [feature: Added data packing for damage properties]
 TODO damage model

@@ -1,4 +1,24 @@
 {
+  "item.generic.ammo_packet.unwrap": {
+    "sounds": [
+      {
+        "name": "minecraft:item/book/open_flip1",
+        "volume": 0.25,
+        "pitch": 0.9
+      },
+      {
+        "name": "minecraft:item/book/open_flip2",
+        "volume": 0.25,
+        "pitch": 0.9
+      },
+      {
+        "name": "minecraft:item/book/open_flip3",
+        "volume": 0.25,
+        "pitch": 0.9vvvv
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.ammo_packet.unwrap"
+  },
   "item.generic.rifle.aim": {
     "sounds": [
       {

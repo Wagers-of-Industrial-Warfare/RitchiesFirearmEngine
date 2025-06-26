@@ -11,6 +11,7 @@ import org.lwjgl.glfw.GLFW;
 import rbasamoyai.ritchiesfirearmengine.content.FovModifyingItem;
 import rbasamoyai.ritchiesfirearmengine.content.HoldAttackKeyInteraction;
 import rbasamoyai.ritchiesfirearmengine.content.SimultaneousUseAndAttack;
+import rbasamoyai.ritchiesfirearmengine.content.ammo.AmmoPacketItem;
 import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.logic.FirearmDataUtils;
@@ -61,7 +62,8 @@ public class RFEClient {
 
         if (mc.player != null && mc.screen == null) {
             ItemStack useStack = mc.player.getMainHandItem();
-            if (useStack.getItem() instanceof RFEFirearmItem || useStack.getItem() instanceof MagazineItem) {
+            if (useStack.getItem() instanceof RFEFirearmItem || useStack.getItem() instanceof MagazineItem
+                || useStack.getItem() instanceof AmmoPacketItem) {
                 if (RELOAD_FIREARM.consumeClick()) {
                     RFENetwork.sendToServer(new ServerboundFirearmActionPacket(RFEFirearmItem.Action.RELOAD));
                 } else if (UNLOAD_FIREARM.consumeClick()) {

@@ -1,7 +1,8 @@
 {
   "title": "itemGroup.rfe_builtin.base",
-  "icon": "rfe_builtin:rifle_cartridge",
+  "icon": "rfe_builtin:ammo_packet",
   "contents": [
+    "rfe_builtin:ammo_packet",
     "rfe_builtin:rifle_cartridge",
     "rfe_builtin:rifle_stripper_clip_5rds",
     "rfe_builtin:rifle_magazine_10rds"

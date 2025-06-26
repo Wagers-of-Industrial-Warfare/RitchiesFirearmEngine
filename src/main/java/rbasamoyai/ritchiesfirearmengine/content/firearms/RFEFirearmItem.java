@@ -41,7 +41,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
     protected final String defaultMode;
 
     protected RFEFirearmItem(Properties properties, Map<String, RFEFirearmMode> baseFirearmModes, List<String> modeOrder, String defaultMode) {
-        super(properties);
+        super(properties.stacksTo(1));
         this.baseFirearmModes = baseFirearmModes;
         this.modeOrder = modeOrder;
         this.defaultMode = defaultMode;

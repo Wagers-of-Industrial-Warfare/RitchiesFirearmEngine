@@ -18,6 +18,13 @@ public class RFEFirearmModeBuilder {
     @Nullable
     protected SoundEvent modeChangeSound = null;
 
+    protected int aimTime = -1;
+    protected int unaimTime = -1;
+    @Nullable
+    protected SoundEvent aimSound = null;
+    @Nullable
+    protected SoundEvent unaimSound = null;
+
     protected List<AmmoPredicate> primaryAmmoPredicates = new LinkedList<>(); // Datapackable
     protected List<AmmoPredicate> speedloaderAmmoPredicates = new LinkedList<>(); // Datapackable
     protected List<AmmoPredicate> magazineAmmoPredicates = new LinkedList<>(); // Datapackable
@@ -82,6 +89,11 @@ public class RFEFirearmModeBuilder {
 
         newBuilder.modeChangeTime = this.modeChangeTime;
         newBuilder.modeChangeSound = this.modeChangeSound;
+
+        newBuilder.aimTime = this.aimTime;
+        newBuilder.unaimTime = this.unaimTime;
+        newBuilder.aimSound = this.aimSound;
+        newBuilder.unaimSound = this.unaimSound;
 
         newBuilder.primaryAmmoPredicates = this.primaryAmmoPredicates;
         newBuilder.speedloaderAmmoPredicates = this.speedloaderAmmoPredicates;
@@ -153,6 +165,26 @@ public class RFEFirearmModeBuilder {
 
     public RFEFirearmModeBuilder modeChangeSound(SoundEvent modeChangeSound) {
         this.modeChangeSound = modeChangeSound;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder aimTime(int aimTime) {
+        this.aimTime = aimTime;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder unaimTime(int unaimTime) {
+        this.unaimTime = unaimTime;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder aimSound(SoundEvent aimSound) {
+        this.aimSound = aimSound;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder unaimSound(SoundEvent unaimSound) {
+        this.unaimSound = unaimSound;
         return this;
     }
 
@@ -467,6 +499,10 @@ public class RFEFirearmModeBuilder {
             throw new IllegalStateException("Must specify firing cooldown");
         if (this.canOverheat && this.cooldownTime < 0)
             throw new IllegalStateException("Must specify cooldown time");
+        if (this.aimTime < 0)
+            throw new IllegalStateException("Must specify aiming time");
+        if (this.unaimTime < 0)
+            this.unaimTime = this.aimTime;
 
         if (!this.reloadPhases.isEmpty()) {
             Set<ReloadPhase.PhaseType> absentReloadPhaseTypes = EnumSet.allOf(ReloadPhase.PhaseType.class);

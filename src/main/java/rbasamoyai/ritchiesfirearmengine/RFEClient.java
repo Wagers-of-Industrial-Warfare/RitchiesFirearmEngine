@@ -5,12 +5,15 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
+import rbasamoyai.ritchiesfirearmengine.content.FovModifyingItem;
 import rbasamoyai.ritchiesfirearmengine.content.HoldAttackKeyInteraction;
 import rbasamoyai.ritchiesfirearmengine.content.SimultaneousUseAndAttack;
 import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.RFEFirearmItem;
+import rbasamoyai.ritchiesfirearmengine.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundFirearmActionPacket;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundReleaseAttackKeyPacket;
@@ -26,6 +29,9 @@ public class RFEClient {
     public static void onClientSetup() {
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("round_count"), (itemStack, level, entity, seed) -> {
            return itemStack.getItem() instanceof MagazineItem magazine ? magazine.countAmmo(itemStack) : 0;
+        });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("aiming"), (itemStack, level, entity, seed) -> {
+           return FirearmDataUtils.isAiming(itemStack) ? 1 : 0;
         });
     }
 
@@ -75,6 +81,14 @@ public class RFEClient {
         cons.accept(RELOAD_FIREARM);
         cons.accept(UNLOAD_FIREARM);
         cons.accept(SWITCH_MODE);
+    }
+
+    public static float modifyFov(float currentFovModifier, Player player) {
+        Minecraft mc = Minecraft.getInstance();
+        // TODO offhand modifier - take lowest fov modifier
+        ItemStack itemStack = player.getMainHandItem();
+        float partialTicks = mc.getPartialTick();
+        return itemStack.getItem() instanceof FovModifyingItem fovModifier ? fovModifier.getFov(itemStack, player, currentFovModifier, partialTicks) : currentFovModifier;
     }
 
 }

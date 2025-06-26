@@ -12,9 +12,13 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
 
     protected abstract T getBuilder(String modeId);
 
-    public RFEFirearmMode fromJson(JsonObject obj, String modeId) {
+    public final RFEFirearmMode fromJson(JsonObject obj, String modeId) {
         T builder = this.getBuilder(modeId);
+        this.modifyBuilder(builder, obj, modeId);
+        return builder.build();
+    }
 
+    protected void modifyBuilder(T builder, JsonObject obj, String modeId) {
         if (GsonHelper.isStringValue(obj, "mode_tag")) {
             String modeTag = GsonHelper.getAsString(obj, "mode_tag");
             builder.modeTag(modeTag);
@@ -31,6 +35,14 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
             int modeChangeTime = GsonHelper.getAsInt(modeChange, "mode_change_time", 1);
             builder.modeChangeTime(modeChangeTime);
             this.modeChangeEffects(builder, modeChange, modeId);
+        }
+        if (GsonHelper.isObjectNode(obj, "aiming")) {
+            JsonObject aiming = obj.getAsJsonObject("aiming");
+            int aimTime = GsonHelper.getAsInt(aiming, "aim_time");
+            int unaimTime = GsonHelper.getAsInt(aiming, "unaim_time", aimTime);
+            builder.aimTime(aimTime)
+                    .unaimTime(unaimTime);
+            this.aimingEffects(builder, aiming, modeId);
         }
 
         if (GsonHelper.isObjectNode(obj, "ammo")) {
@@ -202,8 +214,6 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                 this.cooldownEffects(builder, overheating, modeId);
             }
         }
-
-        return builder.build();
     }
 
     protected void drawingEffects(T builder, JsonObject drawingObj, String modeId) {
@@ -219,6 +229,19 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
             String str = GsonHelper.getAsString(modeChangeObj, "sound");
             SoundEvent modeChangeSound = SoundEvent.createVariableRangeEvent(new ResourceLocation(str));
             builder.modeChangeSound(modeChangeSound);
+        }
+    }
+
+    protected void aimingEffects(T builder, JsonObject aimingObj, String modeId) {
+        if (GsonHelper.isStringValue(aimingObj, "aim_sound")) {
+            String str = GsonHelper.getAsString(aimingObj, "aim_sound");
+            SoundEvent aimSound = SoundEvent.createVariableRangeEvent(new ResourceLocation(str));
+            builder.aimSound(aimSound);
+        }
+        if (GsonHelper.isStringValue(aimingObj, "unaim_sound")) {
+            String str = GsonHelper.getAsString(aimingObj, "unaim_sound");
+            SoundEvent unaimSound = SoundEvent.createVariableRangeEvent(new ResourceLocation(str));
+            builder.unaimSound(unaimSound);
         }
     }
 
@@ -238,9 +261,9 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
         }
     }
 
-    protected void firingEffects(T builder, JsonObject windDownObj, String modeId) {
-        if (GsonHelper.isStringValue(windDownObj, "sound")) {
-            String str = GsonHelper.getAsString(windDownObj, "sound");
+    protected void firingEffects(T builder, JsonObject firingObj, String modeId) {
+        if (GsonHelper.isStringValue(firingObj, "sound")) {
+            String str = GsonHelper.getAsString(firingObj, "sound");
             SoundEvent firingSound = SoundEvent.createVariableRangeEvent(new ResourceLocation(str));
             builder.firingSound(firingSound);
         }

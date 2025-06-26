@@ -4,6 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItem;
@@ -34,6 +35,12 @@ public class RFEFirearmMode {
     // Mode change
     protected final int modeChangeTime;
     @Nullable protected final SoundEvent modeChangeSound;
+
+    // Aiming
+    protected final int aimTime;
+    protected final int unaimTime;
+    @Nullable protected final SoundEvent aimSound;
+    @Nullable protected final SoundEvent unaimSound;
 
     // Ammo
     protected final int internalCapacity;
@@ -83,6 +90,11 @@ public class RFEFirearmMode {
 
         this.modeChangeTime = builder.modeChangeTime;
         this.modeChangeSound = builder.modeChangeSound;
+
+        this.aimTime = builder.aimTime;
+        this.unaimTime = builder.unaimTime;
+        this.aimSound = builder.aimSound;
+        this.unaimSound = builder.unaimSound;
 
         this.internalCapacity = builder.internalCapacity;
         this.nominalCapacity = builder.nominalCapacity;
@@ -649,6 +661,52 @@ public class RFEFirearmMode {
         FirearmDataUtils.setAction(itemStack, null);
     }
 
+    public boolean canAim(ItemStack itemStack, LivingEntity entity) {
+        RFEFirearmItem.Action action = FirearmDataUtils.getAction(itemStack);
+        if (action != null && !action.canAim())
+            return false;
+        if (action == RFEFirearmItem.Action.SWITCH_MODE)
+            ; // TODO do not allow switch mode if transition isn't "seamless" (e.g. safety toggle, mechanism switch)
+        return true;
+    }
+
+    public void startAiming(ItemStack itemStack, LivingEntity entity) {
+        FirearmDataUtils.setAiming(itemStack, true);
+        int currentUnaimingTime = FirearmDataUtils.getAimingTime(itemStack);
+        float frac = this.unaimTime == 0 ? 0 : (float) currentUnaimingTime / (float) this.unaimTime;
+        frac = 1f - frac;
+        FirearmDataUtils.setAimingTime(itemStack, Mth.ceil(this.aimTime * frac));
+        if (this.aimSound != null)
+            entity.level().playSound(entity, entity.blockPosition(), this.aimSound, SoundSource.NEUTRAL, 1f, 1f);
+    }
+
+    public void stopAiming(ItemStack itemStack, LivingEntity entity) {
+        FirearmDataUtils.setAiming(itemStack, false);
+        int currentAimingTime = FirearmDataUtils.getAimingTime(itemStack);
+        float frac = this.aimTime == 0 ? 0 : (float) currentAimingTime / (float) this.aimTime;
+        frac = 1f - frac;
+        FirearmDataUtils.setAimingTime(itemStack, Mth.ceil(this.unaimTime * frac));
+        entity.stopUsingItem();
+        if (this.unaimSound != null)
+            entity.level().playSound(entity, entity.blockPosition(), this.unaimSound, SoundSource.NEUTRAL, 1f, 1f);
+    }
+
+    public boolean isAiming(ItemStack itemStack, LivingEntity entity) {
+        return FirearmDataUtils.isAiming(itemStack);
+    }
+
+    public int getAimingTime(ItemStack itemStack, LivingEntity entity) {
+        return FirearmDataUtils.getAimingTime(itemStack);
+    }
+
+    public void setAimingTime(ItemStack itemStack, LivingEntity entity, int time) {
+        FirearmDataUtils.setAimingTime(itemStack, time);
+    }
+
+    public int aimTime() { return this.aimTime; }
+
+    public int unaimTime() { return this.unaimTime; }
+
     public void onTick(ItemStack itemStack, LivingEntity entity, boolean selected) {
         if (!selected) {
             FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.DRAW);
@@ -681,6 +739,15 @@ public class RFEFirearmMode {
                     && !tag.contains("HoldAutomaticCycle") && this.canCharge(itemStack, entity)) {
                 this.onCharge(itemStack, entity);
             }
+        }
+
+        if (this.isAiming(itemStack, entity) && !this.canAim(itemStack, entity)) {
+            this.stopAiming(itemStack, entity);
+        }
+        int aimingTime = this.getAimingTime(itemStack, entity);
+        if (aimingTime > 0) {
+            --aimingTime;
+            this.setAimingTime(itemStack, entity, aimingTime);
         }
 
         // TODO secondary ammo:

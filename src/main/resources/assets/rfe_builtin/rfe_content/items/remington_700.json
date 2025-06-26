@@ -4,6 +4,11 @@
     "draw_time": 18,
     "sound": "rfe_builtin:item.generic.rifle.draw"
   },
+  "aiming": {
+    "aim_time": 5,
+    "aim_sound": "rfe_builtin:item.generic.rifle.aim",
+    "unaim_sound": "rfe_builtin:item.generic.rifle.unaim"
+  },
   "ammo": {
     "primary": [
       "rfe_builtin:rifle_cartridge"

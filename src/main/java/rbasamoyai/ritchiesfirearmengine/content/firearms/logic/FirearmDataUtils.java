@@ -316,6 +316,28 @@ public class FirearmDataUtils {
         return itemStack.getOrCreateTag().contains("HoldingAttackKey");
     }
 
+    // Aiming methods
+
+    public static void setAiming(ItemStack itemStack, boolean aiming) {
+        if (aiming) {
+            itemStack.getOrCreateTag().putBoolean("Aiming", aiming);
+        } else {
+            itemStack.getOrCreateTag().remove("Aiming");
+        }
+    }
+
+    public static boolean isAiming(ItemStack itemStack) {
+        return itemStack.getOrCreateTag().contains("Aiming");
+    }
+
+    public static void setAimingTime(ItemStack itemStack, int time) {
+        itemStack.getOrCreateTag().putInt("AimingTime", time);
+    }
+
+    public static int getAimingTime(ItemStack itemStack) {
+        return itemStack.getOrCreateTag().getInt("AimingTime");
+    }
+
     private FirearmDataUtils() {
     }
 

@@ -1,6 +1,8 @@
 TODO
 
-feature: Added basic entity-less bullets and shooting
+feature: Added ammo packet item
+
+[feature: Added basic entity-less bullets and shooting]
 [feature: Added data packing for damage properties]
 TODO damage model
 [feature: Added data packing for RFEFirearmMode properties]
@@ -38,3 +40,12 @@ TODO ejected shells
 
 TODO geckolib
 
+TODO left and right-handed animations
+
+TODO akimbo
+
+TODO melee
+
+TODO seamless transition for aiming and switch mode
+
+TODO crosshair rendering

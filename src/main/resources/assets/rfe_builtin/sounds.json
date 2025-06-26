@@ -1,4 +1,13 @@
 {
+  "item.generic.rifle.aim": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/aim",
+        "volume": 0.25,
+        "pitch": 0.7
+      }
+    ]
+  },
   "item.generic.rifle.bolt_cycle": {
     "sounds": [
       {
@@ -124,5 +133,14 @@
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.rifle.shot"
+  },
+  "item.generic.rifle.unaim": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/aim",
+        "volume": 0.25,
+        "pitch": 0.6
+      }
+    ]
   }
 }

@@ -4,7 +4,10 @@ import com.google.common.collect.Multimap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,10 +16,9 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.level.Level;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
-import rbasamoyai.ritchiesfirearmengine.content.HoldAttackKeyInteraction;
-import rbasamoyai.ritchiesfirearmengine.content.SimultaneousUseAndAttack;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.logic.FirearmModeDataPackProperties;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.logic.RFEFirearmMode;
@@ -32,7 +34,7 @@ import java.util.stream.Collectors;
 /**
  * Basic firearms class.
  */
-public abstract class RFEFirearmItem extends Item implements SimultaneousUseAndAttack, HoldAttackKeyInteraction {
+public abstract class RFEFirearmItem extends Item implements IFirearmItem {
 
     protected final Map<String, RFEFirearmMode> baseFirearmModes;
     protected final List<String> modeOrder;
@@ -218,23 +220,89 @@ public abstract class RFEFirearmItem extends Item implements SimultaneousUseAndA
         return true;
     }
 
+    public boolean disableAttackAnimation(ItemStack itemStack, Player player) {
+        return true; // TODO melee?
+    }
+
+    @Override
+    public float getFov(ItemStack itemStack, Player player, float currentFovModifier, float partialTicks) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        boolean isAiming = player.isUsingItem();
+        float zoomIn = 0.5f; // TODO configurable by attachments, etc
+
+        int denom = mode.isAiming(itemStack, player) ? mode.aimTime() : mode.unaimTime();
+        float aimingTime = (float) denom - mode.getAimingTime(itemStack, player);
+        float frac = denom > 0 ? aimingTime / (float) denom : 1;
+        float frac1 = denom > 0 ? partialTicks / (float) denom : 0;
+        float d = isAiming ? frac + frac1 : 1 - frac - frac1;
+        d = Mth.clamp(d, 0f, 1f);
+        float d1 = d * d * d;
+        return Mth.lerp(d1, 1f, zoomIn) * currentFovModifier;
+    }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack itemStack = player.getItemInHand(hand);
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        boolean startUsing = false;
+        if (mode.canAim(itemStack, player)) {
+            mode.startAiming(itemStack, player);
+            startUsing = true;
+        }
+        // TODO other interactions
+        return startUsing ? ItemUtils.startUsingInstantly(level, player, hand) : super.use(level, player, hand);
+    }
+
+    @Override public int getUseDuration(ItemStack itemStack) { return 72000; }
+
+    @Override
+    public ItemStack finishUsingItem(ItemStack itemStack, Level level, LivingEntity entity) {
+        this.stopAiming(itemStack, entity);
+        return super.finishUsingItem(itemStack, level, entity);
+    }
+
+    @Override
+    public void releaseUsing(ItemStack itemStack, Level level, LivingEntity entity, int timeCharged) {
+        this.stopAiming(itemStack, entity);
+        super.releaseUsing(itemStack, level, entity, timeCharged);
+    }
+
+    public void stopAiming(ItemStack itemStack, LivingEntity entity) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        mode.stopAiming(itemStack, entity);
+    }
+
+    @Override
+    public boolean isAiming(ItemStack itemStack, LivingEntity entity) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.isAiming(itemStack, entity);
+    }
+
     public enum Action implements StringRepresentable {
-        RELOAD,
-        UNLOAD,
-        FIRING,
-        CHARGING,
-        DRAW,
-        SWITCH_MODE,
-        COOLDOWN;
+        RELOAD(false),
+        UNLOAD(false),
+        FIRING(true),
+        CHARGING(true),
+        DRAW(false),
+        SWITCH_MODE(true),
+        COOLDOWN(false);
 
         private static final Map<String, Action> BY_ID = Arrays.stream(values())
                 .collect(Collectors.toMap(Action::getSerializedName, Function.identity()));
 
         private final String id = this.name().toLowerCase(Locale.ROOT);
 
+        private final boolean canAim;
+
+        Action(boolean canAim) {
+            this.canAim = canAim;
+        }
+
         @Override public String getSerializedName() { return this.id; }
 
         @Nullable public static Action byId(String id) { return BY_ID.get(id); }
+
+        public boolean canAim() { return this.canAim; }
     }
 
 }

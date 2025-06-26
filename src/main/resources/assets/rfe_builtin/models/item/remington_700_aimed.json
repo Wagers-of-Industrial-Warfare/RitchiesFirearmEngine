@@ -315,10 +315,10 @@
 			"scale": [0.75, 0.75, 0.75]
 		},
 		"firstperson_righthand": {
-			"translation": [0.25, 3.75, -6.75]
+			"translation": [-9, 7.75, -6.75]
 		},
 		"firstperson_lefthand": {
-			"translation": [0.25, 3.75, -6.75]
+			"translation": [-9, 7.75, -6.75]
 		},
 		"ground": {
 			"rotation": [0, 0, 90],
@@ -386,12 +386,6 @@
 					"children": [26]
 				}
 			]
-		}
-	],
-	"overrides": [
-		{
-			"predicate": { "ritchiesfirearmengine:aiming": 1 },
-			"model": "rfe_builtin:item/remington_700_aimed"
 		}
 	]
 }

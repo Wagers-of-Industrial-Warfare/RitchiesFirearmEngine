@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine;
 
+import net.minecraftforge.client.event.ComputeFovModifierEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -13,6 +14,7 @@ public class RFEClientForge {
 
         forgeBus.addListener(RFEClientForge::onMouseInput);
         forgeBus.addListener(RFEClientForge::onKeyInput);
+        forgeBus.addListener(RFEClientForge::onComputeFov);
     }
 
     private static void onClientSetup(final FMLClientSetupEvent event) {
@@ -29,6 +31,10 @@ public class RFEClientForge {
 
     private static void onRegisterKeyMappings(final RegisterKeyMappingsEvent event) {
         RFEClient.registerKeyMappings(event::register);
+    }
+
+    private static void onComputeFov(final ComputeFovModifierEvent event) {
+        event.setNewFovModifier(RFEClient.modifyFov(event.getNewFovModifier(), event.getPlayer()));
     }
 
 }

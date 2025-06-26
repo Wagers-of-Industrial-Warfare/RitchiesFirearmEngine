@@ -7,7 +7,9 @@
   "mixins": [
   ],
   "client": [
-    "client.ItemEntityRendererMixin"
+    "client.GuiMixin",
+    "client.ItemEntityRendererMixin",
+    "client.ItemInHandRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

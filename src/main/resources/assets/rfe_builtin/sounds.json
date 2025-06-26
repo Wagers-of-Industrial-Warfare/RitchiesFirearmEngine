@@ -14,7 +14,7 @@
       {
         "name": "minecraft:item/book/open_flip3",
         "volume": 0.25,
-        "pitch": 0.9vvvv
+        "pitch": 0.9
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.ammo_packet.unwrap"

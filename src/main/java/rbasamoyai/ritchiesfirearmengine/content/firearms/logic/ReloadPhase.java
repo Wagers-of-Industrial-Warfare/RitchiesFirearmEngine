@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.GsonHelper;
@@ -13,6 +12,7 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -92,7 +92,7 @@ public class ReloadPhase {
 
         if (GsonHelper.isStringValue(obj, "sound")) {
             String str = GsonHelper.getAsString(obj, "sound");
-            SoundEvent evt = SoundEvent.createVariableRangeEvent(new ResourceLocation(str));
+            SoundEvent evt = SoundEvent.createVariableRangeEvent(RFEUtils.location(str));
             builder.sound(evt);
         }
 

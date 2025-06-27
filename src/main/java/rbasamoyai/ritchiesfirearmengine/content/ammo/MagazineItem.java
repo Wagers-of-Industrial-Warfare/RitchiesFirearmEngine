@@ -41,6 +41,7 @@ public class MagazineItem extends Item {
         this.defaultAmmoPredicates = defaultAmmoPredicates;
         this.defaultSpeedloaderPredicates = defaultSpeedloaderPredicates;
         this.reloadCooldown = reloadCooldown;
+        MagazineItemPropertiesHandler.registerDefaults(this, defaultAmmoPredicates, defaultSpeedloaderPredicates);
     }
 
     @Override public boolean isFoil(ItemStack stack) { return this.glint || super.isFoil(stack); }
@@ -53,7 +54,10 @@ public class MagazineItem extends Item {
 
     public int getMagazineCapacity(ItemStack itemStack) { return this.capacity; }
 
-    public List<AmmoPredicate> getAmmoPredicates(ItemStack itemStack) { return this.defaultAmmoPredicates; }
+    public List<AmmoPredicate> getAmmoPredicates(ItemStack itemStack) {
+        List<AmmoPredicate> predicates = MagazineItemPropertiesHandler.getValidAmmoPredicates(this);
+        return predicates == null ? this.defaultAmmoPredicates : predicates;
+    }
 
     public boolean matchesAmmoItem(ItemStack magazine, ItemStack ammo) {
         for (AmmoPredicate pred : this.getAmmoPredicates(magazine)) {
@@ -63,7 +67,10 @@ public class MagazineItem extends Item {
         return false;
     }
 
-    public List<AmmoPredicate> getSpeedloaderPredicate(ItemStack itemStack) { return this.defaultSpeedloaderPredicates; }
+    public List<AmmoPredicate> getSpeedloaderPredicate(ItemStack itemStack) {
+        List<AmmoPredicate> predicates = MagazineItemPropertiesHandler.getValidSpeedloaderPredicates(this);
+        return predicates == null ? this.defaultSpeedloaderPredicates : predicates;
+    }
 
     public boolean matchesSpeedloaderItem(ItemStack magazine, ItemStack speedloader) {
         for (AmmoPredicate pred : this.getSpeedloaderPredicate(magazine)) {

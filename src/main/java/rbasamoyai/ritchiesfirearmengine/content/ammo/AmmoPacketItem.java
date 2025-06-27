@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.InteractionHand;
@@ -191,7 +190,7 @@ public class AmmoPacketItem extends Item {
             SoundEvent useSound = null;
             if (GsonHelper.isStringValue(obj, "use_sound")) {
                 String str = GsonHelper.getAsString(obj, "use_sound");
-                useSound = SoundEvent.createVariableRangeEvent(new ResourceLocation(str));
+                useSound = SoundEvent.createVariableRangeEvent(RFEUtils.location(str));
             }
             boolean spawnParticlesOnUse = GsonHelper.getAsBoolean(obj, "spawn_particles_on_use", false);
 

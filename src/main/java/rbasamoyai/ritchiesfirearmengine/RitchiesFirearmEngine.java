@@ -6,6 +6,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
+import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -15,6 +17,7 @@ import net.minecraftforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.config.RFEConfig;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
+import rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.plugins.RFEPluginManager;
 import rbasamoyai.ritchiesfirearmengine.pack_content.resources.RFEPackLoader;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
@@ -31,7 +34,9 @@ public class RitchiesFirearmEngine {
         modBus.addListener(this::onRegisterObjects);
         modBus.addListener(this::commonSetup);
         modBus.addListener(this::onAddPackFinders);
-        forgeBus.register(this);
+
+        forgeBus.addListener(this::onAddReloadListeners);
+        forgeBus.addListener(this::onSyncDatapack);
 
         RFEConfig.registerConfigs(modBus);
 
@@ -56,6 +61,18 @@ public class RitchiesFirearmEngine {
 
     private void onAddPackFinders(final AddPackFindersEvent event) {
         RFEPackLoader.addPacks(event.getPackType(), event::addRepositorySource);
+    }
+
+    private void onAddReloadListeners(final AddReloadListenerEvent event) {
+        RFEPluginManager.registerResourceListeners((id, listener) -> event.addListener(listener));
+    }
+
+    private void onSyncDatapack(final OnDatapackSyncEvent event) {
+        if (event.getPlayer() == null) {
+            RFECommonEvents.onDatapackReload();
+        } else {
+            RFECommonEvents.onDatapackSync(event.getPlayer());
+        }
     }
 
     public static ResourceLocation resource(String path) { return RFEUtils.location(MOD_ID, path); }

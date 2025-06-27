@@ -1,15 +1,20 @@
 package rbasamoyai.ritchiesfirearmengine.default_index;
 
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.content.ammo.AmmoItem;
 import rbasamoyai.ritchiesfirearmengine.content.ammo.AmmoPacketItem;
 import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItem;
+import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItemPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.RFEDefaultFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.plugins.RFEPlugin;
+
+import java.util.function.BiConsumer;
 
 /**
  * Because it's always best to lead by example.
@@ -36,6 +41,11 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("firearm_has_magazine"), BuiltInRFEPlugin::firearmHasMagazine);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("entity_has_magazine"), BuiltInRFEPlugin::entityHasMagazine);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("best_speedloader_ammo_count"), BuiltInRFEPlugin::bestSpeedloaderAmmoCount);
+    }
+
+    @Override
+    public void registerResourceListeners(BiConsumer<ResourceLocation, PreparableReloadListener> registry) {
+        registry.accept(RitchiesFirearmEngine.resource("magazine_item"), MagazineItemPropertiesHandler.ReloadListener.INSTANCE);
     }
 
     /**

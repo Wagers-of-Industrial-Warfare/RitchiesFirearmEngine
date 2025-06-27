@@ -1,11 +1,14 @@
 package rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.plugins;
 
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.pack_content.resources.RFEPackMetadata;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEModUtils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class RFEPluginManager {
 
@@ -43,6 +46,11 @@ public class RFEPluginManager {
             RitchiesFirearmEngine.LOGGER.error("Error loading plugin class {} of mod {} from source {}", info.classPath(), info.modId(), packId);
             throw t;
         }
+    }
+
+    public static void registerResourceListeners(BiConsumer<ResourceLocation, PreparableReloadListener> registry) {
+        for (Map.Entry<String, RFEPlugin> entry : PLUGINS.entrySet())
+            entry.getValue().registerResourceListeners(registry);
     }
 
     private RFEPluginManager() {}

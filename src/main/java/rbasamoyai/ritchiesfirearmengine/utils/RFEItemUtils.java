@@ -5,7 +5,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.logic.FirearmDataUtils;
 
@@ -19,7 +18,6 @@ import java.util.function.UnaryOperator;
 public class RFEItemUtils {
 
     public static void addItemToEntity(ItemStack itemStack, LivingEntity entity) {
-        RitchiesFirearmEngine.LOGGER.info("Added {}!", itemStack);
         if (entity instanceof Player player) {
             player.getInventory().placeItemBackInInventory(itemStack);
             return;

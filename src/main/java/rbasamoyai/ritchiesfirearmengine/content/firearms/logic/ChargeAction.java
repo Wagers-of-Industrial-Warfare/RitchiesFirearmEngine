@@ -1,13 +1,13 @@
 package rbasamoyai.ritchiesfirearmengine.content.firearms.logic;
 
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.RFEFirearmItem;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
 
@@ -46,7 +46,7 @@ public class ChargeAction {
         SoundEvent soundEvent = null;
         if (GsonHelper.isStringValue(obj, "sound")) {
             String str = GsonHelper.getAsString(obj, "sound");
-            soundEvent = SoundEvent.createVariableRangeEvent(new ResourceLocation(str));
+            soundEvent = SoundEvent.createVariableRangeEvent(RFEUtils.location(str));
         }
         return new ChargeAction(condition, time, soundEvent);
     }

@@ -7,6 +7,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+import rbasamoyai.ritchiesfirearmengine.content.ammo.AmmoPacketItemPropertiesHandler.ClientboundSyncAmmoPacketPropertiesPacket;
 import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItemPropertiesHandler.ClientboundSyncMagazinePropertiesPacket;
 
 import java.util.function.Function;
@@ -29,6 +30,7 @@ public class RFENetwork {
         buildMessage(network, id++, ServerboundFirearmActionPacket.class, ServerboundFirearmActionPacket::new);
         buildMessage(network, id++, ServerboundReleaseAttackKeyPacket.class, ServerboundReleaseAttackKeyPacket::new);
         buildMessage(network, id++, ClientboundSyncMagazinePropertiesPacket.class, ClientboundSyncMagazinePropertiesPacket::decode);
+        buildMessage(network, id++, ClientboundSyncAmmoPacketPropertiesPacket.class, ClientboundSyncAmmoPacketPropertiesPacket::decode);
 
         return network;
     }

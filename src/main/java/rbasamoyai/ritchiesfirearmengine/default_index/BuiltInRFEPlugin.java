@@ -5,10 +5,7 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
-import rbasamoyai.ritchiesfirearmengine.content.ammo.AmmoItem;
-import rbasamoyai.ritchiesfirearmengine.content.ammo.AmmoPacketItem;
-import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItem;
-import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItemPropertiesHandler;
+import rbasamoyai.ritchiesfirearmengine.content.ammo.*;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.RFEDefaultFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.RFEContentBuilderRegistry;
@@ -45,7 +42,8 @@ public class BuiltInRFEPlugin implements RFEPlugin {
 
     @Override
     public void registerResourceListeners(BiConsumer<ResourceLocation, PreparableReloadListener> registry) {
-        registry.accept(RitchiesFirearmEngine.resource("magazine_item"), MagazineItemPropertiesHandler.ReloadListener.INSTANCE);
+        registry.accept(RitchiesFirearmEngine.resource("magazine_item_properties"), MagazineItemPropertiesHandler.ReloadListener.INSTANCE);
+        registry.accept(RitchiesFirearmEngine.resource("ammo_packet_item_properties"), AmmoPacketItemPropertiesHandler.ReloadListener.INSTANCE);
     }
 
     /**

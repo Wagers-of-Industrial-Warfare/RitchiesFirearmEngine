@@ -82,8 +82,8 @@ public class MagazineItemPropertiesHandler {
             if (!VALID_SPEEDLOADERS.containsKey(item))
                 VALID_SPEEDLOADERS.put(item, new LinkedList<>());
             List<AmmoPredicate> list = VALID_SPEEDLOADERS.get(item);
-            JsonArray ammoArr = GsonHelper.getAsJsonArray(obj, "valid_speedloaders");
-            for (JsonElement el : ammoArr) {
+            JsonArray speedloaderArr = GsonHelper.getAsJsonArray(obj, "valid_speedloaders");
+            for (JsonElement el : speedloaderArr) {
                 if (!GsonHelper.isStringValue(el))
                     throw new JsonParseException("Expected string value for speedloader predicate");
                 list.add(AmmoPredicate.fromString(el.getAsString()));

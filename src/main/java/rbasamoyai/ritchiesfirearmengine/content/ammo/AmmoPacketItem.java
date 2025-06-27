@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvent;
@@ -22,7 +23,6 @@ import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,10 +44,12 @@ public class AmmoPacketItem extends Item {
         this.useSound = useSound;
         this.spawnParticlesOnUse = spawnParticlesOnUse;
         this.defaultAmmoCapacities = defaultAmmoCapacities;
+        AmmoPacketItemPropertiesHandler.registerDefaults(this, defaultAmmoCapacities);
     }
 
     public Map<AmmoPredicate, Integer> getAmmoCapacities() {
-        return this.defaultAmmoCapacities; // TODO datapack
+        Map<AmmoPredicate, Integer> ammoCapacities = AmmoPacketItemPropertiesHandler.getAmmoCapacities(this);
+        return ammoCapacities == null ? this.defaultAmmoCapacities : ammoCapacities;
     }
 
     @Override public boolean isFoil(ItemStack itemStack) { return this.glint || super.isFoil(itemStack); }
@@ -162,7 +164,7 @@ public class AmmoPacketItem extends Item {
     public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(itemStack, level, tooltip, flag);
         List<ItemStack> storedAmmo = this.getStoredAmmo(itemStack);
-        Map<Item, Integer> storedIndex = new LinkedHashMap<>();
+        Map<Item, Integer> storedIndex = new Object2IntLinkedOpenHashMap<>();
         for (ItemStack ammoStack : storedAmmo)
             storedIndex.merge(ammoStack.getItem(), ammoStack.getCount(), Integer::sum);
         for (Map.Entry<Item, Integer> entry : storedIndex.entrySet()) {
@@ -195,7 +197,7 @@ public class AmmoPacketItem extends Item {
             boolean spawnParticlesOnUse = GsonHelper.getAsBoolean(obj, "spawn_particles_on_use", false);
 
             JsonArray primaryAmmoCapArr = GsonHelper.getAsJsonArray(obj, "ammo");
-            Map<AmmoPredicate, Integer> primaryAmmoCapacities = new LinkedHashMap<>();
+            Map<AmmoPredicate, Integer> primaryAmmoCapacities = new Object2IntLinkedOpenHashMap<>();
             for (JsonElement el : primaryAmmoCapArr) {
                 if (!el.isJsonObject())
                     throw new JsonParseException("Ammo packet capacity must be a json object");

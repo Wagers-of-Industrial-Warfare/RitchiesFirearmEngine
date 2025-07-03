@@ -2,6 +2,7 @@ package rbasamoyai.ritchiesfirearmengine.network;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
@@ -9,6 +10,11 @@ import net.minecraftforge.network.simple.SimpleChannel;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.content.ammo.AmmoPacketItemPropertiesHandler.ClientboundSyncAmmoPacketPropertiesPacket;
 import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItemPropertiesHandler.ClientboundSyncMagazinePropertiesPacket;
+import rbasamoyai.ritchiesfirearmengine.projectiles.RFEProjectileManager.ClientboundRemoveAllProjectilesPacket;
+import rbasamoyai.ritchiesfirearmengine.projectiles.RFEProjectileManager.ClientboundRemoveRFEProjectilePacket;
+import rbasamoyai.ritchiesfirearmengine.projectiles.RFEProjectileManager.ClientboundSpawnRFEProjectilePacket;
+import rbasamoyai.ritchiesfirearmengine.projectiles.RFEProjectileManager.ClientboundUpdateRFEProjectilePacket;
+import rbasamoyai.ritchiesfirearmengine.projectiles.RFEProjectileTypeHandler.ClientboundSyncRFEProjectileTypesPacket;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -31,6 +37,11 @@ public class RFENetwork {
         buildMessage(network, id++, ServerboundReleaseAttackKeyPacket.class, ServerboundReleaseAttackKeyPacket::new);
         buildMessage(network, id++, ClientboundSyncMagazinePropertiesPacket.class, ClientboundSyncMagazinePropertiesPacket::decode);
         buildMessage(network, id++, ClientboundSyncAmmoPacketPropertiesPacket.class, ClientboundSyncAmmoPacketPropertiesPacket::decode);
+        buildMessage(network, id++, ClientboundSpawnRFEProjectilePacket.class, ClientboundSpawnRFEProjectilePacket::decode);
+        buildMessage(network, id++, ClientboundUpdateRFEProjectilePacket.class, ClientboundUpdateRFEProjectilePacket::decode);
+        buildMessage(network, id++, ClientboundRemoveRFEProjectilePacket.class, ClientboundRemoveRFEProjectilePacket::decode);
+        buildMessage(network, id++, ClientboundRemoveAllProjectilesPacket.class, ClientboundRemoveAllProjectilesPacket::decode);
+        buildMessage(network, id++, ClientboundSyncRFEProjectileTypesPacket.class, ClientboundSyncRFEProjectileTypesPacket::decode);
 
         return network;
     }
@@ -57,6 +68,10 @@ public class RFENetwork {
 
     public static <MSG extends RFEPacket> void sendToAll(MSG msg) {
         NETWORK.send(PacketDistributor.SERVER.noArg(), msg);
+    }
+
+    public static <MSG extends RFEPacket> void sendToAllInDimension(MSG msg, Level level) {
+        NETWORK.send(PacketDistributor.DIMENSION.with(level::dimension), msg);
     }
 
     public static void init() {}

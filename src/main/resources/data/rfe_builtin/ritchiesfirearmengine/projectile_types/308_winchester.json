@@ -1,0 +1,14 @@
+{
+  "type": "ritchiesfirearmengine:bullet",
+  "muzzle_velocity": 20,
+  "drag": 0.002,
+  "gravity": 0.025,
+  "ignores_invulnerability": true,
+  "renders_invulnerable": false,
+  "damage_model": [
+    {
+      "distance": 0,
+      "damage": 16
+    }
+  ]
+}

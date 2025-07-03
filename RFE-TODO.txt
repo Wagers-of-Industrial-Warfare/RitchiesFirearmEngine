@@ -47,3 +47,9 @@ TODO melee
 TODO seamless transition for aiming and switch mode
 
 TODO crosshair rendering
+
+TODO damage multiplier
+
+TODO pack synchronization
+
+TODO pack validation

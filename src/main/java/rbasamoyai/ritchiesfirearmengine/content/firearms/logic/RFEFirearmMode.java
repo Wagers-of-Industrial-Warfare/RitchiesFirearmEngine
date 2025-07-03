@@ -222,6 +222,7 @@ public class RFEFirearmMode {
             // TODO consume secondary ammo if required
             for (ItemStack ammoStack : strippedAmmo) {
                 int summons = ammoStack.getCount();
+
                 // TODO actually spawn projectile
             }
         } else {

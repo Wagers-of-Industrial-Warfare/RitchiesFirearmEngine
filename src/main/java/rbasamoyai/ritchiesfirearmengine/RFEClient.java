@@ -18,6 +18,7 @@ import rbasamoyai.ritchiesfirearmengine.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundFirearmActionPacket;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundReleaseAttackKeyPacket;
+import rbasamoyai.ritchiesfirearmengine.projectiles.RFEProjectileManager;
 
 import java.util.function.Consumer;
 
@@ -91,6 +92,10 @@ public class RFEClient {
         ItemStack itemStack = player.getMainHandItem();
         float partialTicks = mc.getPartialTick();
         return itemStack.getItem() instanceof FovModifyingItem fovModifier ? fovModifier.getFov(itemStack, player, currentFovModifier, partialTicks) : currentFovModifier;
+    }
+
+    public static void onClientLogout() {
+        RFEProjectileManager.clearAllProjectiles();
     }
 
 }

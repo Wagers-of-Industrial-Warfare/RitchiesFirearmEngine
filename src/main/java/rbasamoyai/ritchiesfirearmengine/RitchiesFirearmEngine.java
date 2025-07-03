@@ -8,6 +8,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.OnDatapackSyncEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -37,6 +40,9 @@ public class RitchiesFirearmEngine {
 
         forgeBus.addListener(this::onAddReloadListeners);
         forgeBus.addListener(this::onSyncDatapack);
+        forgeBus.addListener(this::onLevelUnload);
+        forgeBus.addListener(this::onEntityJoinLevel);
+        forgeBus.addListener(this::onLevelTick);
 
         RFEConfig.registerConfigs(modBus);
 
@@ -73,6 +79,18 @@ public class RitchiesFirearmEngine {
         } else {
             RFECommonEvents.onDatapackSync(event.getPlayer());
         }
+    }
+
+    private void onLevelUnload(final LevelEvent.Unload event) {
+        RFECommonEvents.onLevelUnload(event.getLevel());
+    }
+
+    private void onEntityJoinLevel(final EntityJoinLevelEvent event) {
+        RFECommonEvents.onEntityJoin(event.getEntity(), event.getLevel());
+    }
+
+    private void onLevelTick(final TickEvent.LevelTickEvent event) {
+        RFECommonEvents.onLevelTick(event.level);
     }
 
     public static ResourceLocation resource(String path) { return RFEUtils.location(MOD_ID, path); }

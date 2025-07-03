@@ -8,8 +8,10 @@ import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.content.ammo.*;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.RFEDefaultFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.content.firearms.RFEFirearmItem;
+import rbasamoyai.ritchiesfirearmengine.content.projectiles.RFEBulletProjectileType;
 import rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.plugins.RFEPlugin;
+import rbasamoyai.ritchiesfirearmengine.projectiles.RFEProjectileTypeHandler;
 
 import java.util.function.BiConsumer;
 
@@ -28,6 +30,8 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("firearm"), new RFEDefaultFirearmItem.Builder());
         // TODO revolver builder
 
+        ProjectileTypes.register();
+
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("entity_ammo_count"), BuiltInRFEPlugin::entityAmmoCount);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("free_ammo_space"), BuiltInRFEPlugin::freeAmmoSpace);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("extra_ammo_space"), BuiltInRFEPlugin::extraAmmoSpace);
@@ -44,6 +48,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
     public void registerResourceListeners(BiConsumer<ResourceLocation, PreparableReloadListener> registry) {
         registry.accept(RitchiesFirearmEngine.resource("magazine_item_properties"), MagazineItemPropertiesHandler.ReloadListener.INSTANCE);
         registry.accept(RitchiesFirearmEngine.resource("ammo_packet_item_properties"), AmmoPacketItemPropertiesHandler.ReloadListener.INSTANCE);
+        registry.accept(RitchiesFirearmEngine.resource("rfe_projectile_types"), RFEProjectileTypeHandler.ReloadListener.INSTANCE);
     }
 
     /**
@@ -139,6 +144,14 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         if (itemStack.getItem() instanceof RFEFirearmItem firearm)
             return firearm.bestSpeedloaderAmmoCount(itemStack, entity);
         return 0;
+    }
+
+    public static class ProjectileTypes {
+        public static final RFEBulletProjectileType.Serializer BULLET = new RFEBulletProjectileType.Serializer();
+
+        public static void register() {
+            RFEContentBuilderRegistry.registerProjectileTypeSerializer(RitchiesFirearmEngine.resource("bullet"), BULLET);
+        }
     }
 
 }

@@ -14,7 +14,7 @@
     ],
     "plugins": [
       {
-        "class": "rbasamoyai.ritchiesfirearmengine.default_index.BuiltInRFEPlugin",
+        "class": "rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin",
         "mod": "ritchiesfirearmengine"
       }
     ]

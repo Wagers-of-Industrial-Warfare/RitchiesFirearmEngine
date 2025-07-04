@@ -4,7 +4,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import rbasamoyai.ritchiesfirearmengine.content.projectiles.RFEEntityHitResult;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEEntityHitResult;
 
 import javax.annotation.Nullable;
 import java.util.Optional;

@@ -5,8 +5,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItem;
-import rbasamoyai.ritchiesfirearmengine.content.firearms.logic.FirearmDataUtils;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
 
 import java.util.LinkedList;
 import java.util.List;

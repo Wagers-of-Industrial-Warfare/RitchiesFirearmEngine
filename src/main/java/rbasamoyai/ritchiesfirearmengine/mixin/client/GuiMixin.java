@@ -9,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import rbasamoyai.ritchiesfirearmengine.content.firearms.IFirearmItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.IFirearmItem;
 
 @Mixin(Gui.class)
 public abstract class GuiMixin {

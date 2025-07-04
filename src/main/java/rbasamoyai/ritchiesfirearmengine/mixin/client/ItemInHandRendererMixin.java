@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import rbasamoyai.ritchiesfirearmengine.content.firearms.RFEFirearmItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin {

@@ -2,7 +2,7 @@ package rbasamoyai.ritchiesfirearmengine.network;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
-import rbasamoyai.ritchiesfirearmengine.projectiles.RFEProjectileManager;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 
 public class RFEClientNetworkHandlers {
 

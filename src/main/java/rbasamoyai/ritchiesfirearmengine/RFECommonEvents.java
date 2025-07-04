@@ -4,11 +4,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import rbasamoyai.ritchiesfirearmengine.content.ammo.AmmoPacketItemPropertiesHandler;
-import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItemPropertiesHandler;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.AmmoPacketItemPropertiesHandler;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItemPropertiesHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
-import rbasamoyai.ritchiesfirearmengine.projectiles.RFEProjectileManager;
-import rbasamoyai.ritchiesfirearmengine.projectiles.RFEProjectileTypeHandler;
 
 public class RFECommonEvents {
 

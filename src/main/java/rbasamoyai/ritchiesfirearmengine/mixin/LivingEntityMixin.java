@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import rbasamoyai.ritchiesfirearmengine.content.ammo.AmmoPacketItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.AmmoPacketItem;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {

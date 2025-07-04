@@ -17,7 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import rbasamoyai.ritchiesfirearmengine.content.firearms.RFEFirearmItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 
 @Mixin(ItemEntityRenderer.class)
 public abstract class ItemEntityRendererMixin extends EntityRenderer<ItemEntity> {

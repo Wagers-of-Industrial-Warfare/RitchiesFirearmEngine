@@ -18,10 +18,10 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegisterEvent;
 import org.slf4j.Logger;
-import rbasamoyai.ritchiesfirearmengine.config.RFEConfig;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPluginManager;
+import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
+import rbasamoyai.ritchiesfirearmengine.foundation.pack_loading.RFEPackLoader;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
-import rbasamoyai.ritchiesfirearmengine.pack_content.content_creation.plugins.RFEPluginManager;
-import rbasamoyai.ritchiesfirearmengine.pack_content.resources.RFEPackLoader;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 @Mod(RitchiesFirearmEngine.MOD_ID)

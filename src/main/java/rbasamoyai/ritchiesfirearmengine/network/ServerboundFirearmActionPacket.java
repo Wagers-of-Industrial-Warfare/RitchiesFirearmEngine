@@ -4,9 +4,9 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import rbasamoyai.ritchiesfirearmengine.content.ammo.AmmoPacketItem;
-import rbasamoyai.ritchiesfirearmengine.content.ammo.MagazineItem;
-import rbasamoyai.ritchiesfirearmengine.content.firearms.RFEFirearmItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.AmmoPacketItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.Executor;

@@ -4,7 +4,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import rbasamoyai.ritchiesfirearmengine.content.HoldAttackKeyInteraction;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.HoldAttackKeyInteraction;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.Executor;

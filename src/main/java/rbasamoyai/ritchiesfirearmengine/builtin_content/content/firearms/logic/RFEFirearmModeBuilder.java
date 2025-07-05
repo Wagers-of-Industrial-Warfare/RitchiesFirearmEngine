@@ -25,14 +25,10 @@ public class RFEFirearmModeBuilder {
     @Nullable
     protected SoundEvent unaimSound = null;
 
-    protected List<AmmoPredicate> primaryAmmoPredicates = new LinkedList<>(); // Datapackable
-    protected List<AmmoPredicate> speedloaderAmmoPredicates = new LinkedList<>(); // Datapackable
-    protected List<AmmoPredicate> magazineAmmoPredicates = new LinkedList<>(); // Datapackable
-    protected List<AmmoPredicate> secondaryAmmoPredicates = new LinkedList<>(); // Datapackable
     protected int internalCapacity = 0;
     protected int nominalCapacity = 0;
     protected boolean explicitNominalCapacity = false;
-    protected boolean canLoadSingleRounds = false;
+    protected boolean canLoadSingleRounds = false; // TODO remove
     protected boolean plusOneCapacity = false;
     protected boolean requiresSecondaryAmmo = false;
 
@@ -95,10 +91,6 @@ public class RFEFirearmModeBuilder {
         newBuilder.aimSound = this.aimSound;
         newBuilder.unaimSound = this.unaimSound;
 
-        newBuilder.primaryAmmoPredicates = this.primaryAmmoPredicates;
-        newBuilder.speedloaderAmmoPredicates = this.speedloaderAmmoPredicates;
-        newBuilder.magazineAmmoPredicates = this.magazineAmmoPredicates;
-        newBuilder.secondaryAmmoPredicates = this.secondaryAmmoPredicates;
         newBuilder.internalCapacity = this.internalCapacity;
         newBuilder.nominalCapacity = this.nominalCapacity;
         newBuilder.explicitNominalCapacity = this.explicitNominalCapacity;
@@ -188,59 +180,14 @@ public class RFEFirearmModeBuilder {
         return this;
     }
 
-    public RFEFirearmModeBuilder addPrimaryAmmo(AmmoPredicate primaryPredicate) {
-        this.primaryAmmoPredicates.add(primaryPredicate);
-        return this;
-    }
-
-    public RFEFirearmModeBuilder resetPrimaryAmmo() {
-        this.primaryAmmoPredicates.clear();
-        return this;
-    }
-
-    public RFEFirearmModeBuilder addSpeedloader(AmmoPredicate speedloaderPredicate) {
-        this.speedloaderAmmoPredicates.add(speedloaderPredicate);
-        return this;
-    }
-
-    public RFEFirearmModeBuilder resetSpeedloaders() {
-        this.speedloaderAmmoPredicates.clear();
-        return this;
-    }
-
-    public RFEFirearmModeBuilder addMagazine(AmmoPredicate magazinePredicate) {
-        this.magazineAmmoPredicates.add(magazinePredicate);
-        this.resetInternalCapacityOptions();
-        return this;
-    }
-
-    public RFEFirearmModeBuilder resetMagazines() {
-        this.magazineAmmoPredicates.clear();
-        this.resetInternalCapacityOptions();
-        return this;
-    }
-
     private void resetInternalCapacityOptions() {
         this.internalCapacity = 0;
         this.nominalCapacity = 0;
     }
 
     private void resetMagazineOptions() {
-        this.magazineAmmoPredicates = new LinkedList<>();
         this.canLoadSingleRounds = false;
         this.plusOneCapacity = false;
-    }
-
-    public RFEFirearmModeBuilder addSecondaryAmmo(AmmoPredicate secondaryAmmoPredicate) {
-        this.secondaryAmmoPredicates.add(secondaryAmmoPredicate);
-        this.requiresSecondaryAmmo = true;
-        return this;
-    }
-
-    public RFEFirearmModeBuilder resetSecondaryAmmo() {
-        this.secondaryAmmoPredicates.clear();
-        this.requiresSecondaryAmmo = false;
-        return this;
     }
 
     public RFEFirearmModeBuilder internalCapacity(int internalCapacity) {
@@ -263,7 +210,7 @@ public class RFEFirearmModeBuilder {
     }
 
     public RFEFirearmModeBuilder canLoadSingleRounds(boolean canLoadSingleRounds) {
-        if (this.magazineAmmoPredicates.isEmpty())
+        if (this.internalCapacity > 0)
             throw new IllegalStateException("Can only specify single round loading for magazine firearms");
         this.canLoadSingleRounds = canLoadSingleRounds;
         this.resetInternalCapacityOptions();
@@ -271,10 +218,15 @@ public class RFEFirearmModeBuilder {
     }
 
     public RFEFirearmModeBuilder plusOneCapacity(boolean plusOneCapacity) {
-        if (this.magazineAmmoPredicates.isEmpty())
+        if (this.internalCapacity > 0)
             throw new IllegalStateException("Can only specify +1 capacity for magazine firearms");
         this.plusOneCapacity = plusOneCapacity;
         this.resetInternalCapacityOptions();
+        return this;
+    }
+
+    public RFEFirearmModeBuilder requiresSecondaryAmmo(boolean requiresSecondaryAmmo) {
+        this.requiresSecondaryAmmo = requiresSecondaryAmmo;
         return this;
     }
 
@@ -523,7 +475,7 @@ public class RFEFirearmModeBuilder {
                 throw new IllegalStateException("Missing unload phases, must have all of 'prepare', 'unload', and 'finish'");
         }
 
-        return new RFEFirearmMode(this);
+        return new RFEFirearmMode(this, this.modeId);
     }
 
     public static class Parser extends RFEFirearmModeParser<RFEFirearmModeBuilder> {

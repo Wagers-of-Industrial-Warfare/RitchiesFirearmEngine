@@ -36,18 +36,18 @@ public class RFEProjectileManager {
         if (!PROJECTILES_BY_LEVEL.containsKey(level))
             return;
         Collection<RFEProjectileInstance> projectiles = PROJECTILES_BY_LEVEL.get(level).values();
-        boolean syncAll = level.getLevelData().getGameTime() % 20 == 0;
+        boolean syncAll = !level.isClientSide && level.getLevelData().getGameTime() % 20 == 0;
         for (Iterator<RFEProjectileInstance> iter = projectiles.iterator(); iter.hasNext(); ) {
             RFEProjectileInstance projectile = iter.next();
             projectile.tick(level);
-            if (!level.isClientSide) {
-                if (projectile.isRemoved()) {
-                    iter.remove();
+            if (projectile.isRemoved()) {
+                iter.remove();
+                if (!level.isClientSide)
                     RFENetwork.sendToAllInDimension(new ClientboundRemoveRFEProjectilePacket(projectile.uuid(), level.dimension()), level);
-                } else if (syncAll || projectile.forceSync()) {
-                    projectile.setForceSync(false);
+            } else if (syncAll || projectile.forceSync()) {
+                projectile.setForceSync(false);
+                if (!level.isClientSide)
                     RFENetwork.sendToAllInDimension(ClientboundUpdateRFEProjectilePacket.fromProjectile(projectile, level), level);
-                }
             }
         }
         if (projectiles.isEmpty())
@@ -82,7 +82,8 @@ public class RFEProjectileManager {
         }
     }
 
-    public static void updateProjectile(UUID uuid, Vec3 position, Vec3 velocity, boolean leftOwner, double distanceTravelled, Level level) {
+    public static void updateProjectile(UUID uuid, Vec3 position, Vec3 velocity, boolean leftOwner, double distanceTravelled,
+                                        int age, Level level) {
         if (!PROJECTILES_BY_LEVEL.containsKey(level))
             return;
         Map<UUID, RFEProjectileInstance> map = PROJECTILES_BY_LEVEL.get(level);
@@ -93,6 +94,7 @@ public class RFEProjectileManager {
         instance.setVelocity(velocity);
         instance.setLeftOwner(leftOwner);
         instance.setDistanceTravelled(distanceTravelled);
+        instance.setAge(age);
     }
 
     public static void removeProjectile(UUID uuid, Level level) {
@@ -123,7 +125,9 @@ public class RFEProjectileManager {
                 ownerId = buf.readVarInt();
             ResourceKey<Level> level = buf.readResourceKey(Registries.DIMENSION);
             RFEProjectileType type = Objects.requireNonNull(RFEProjectileTypeHandler.getProjectileType(typeId));
-            RFEProjectileInstance instance = new RFEProjectileInstance(type, position, velocity);
+            RFEProjectileInstance instance = new RFEProjectileInstance(type);
+            instance.setPosition(position);
+            instance.setVelocity(velocity);
             instance.setUUID(uuid);
             instance.setLeftOwner(leftOwner);
             instance.setDistanceTravelled(distanceTravelled);
@@ -158,10 +162,10 @@ public class RFEProjectileManager {
     }
 
     public record ClientboundUpdateRFEProjectilePacket(UUID uuid, Vec3 position, Vec3 velocity, boolean leftOwner,
-                                                       double distanceTravelled, ResourceKey<Level> level) implements RFEPacket {
+                                                       double distanceTravelled, int age, ResourceKey<Level> level) implements RFEPacket {
         public static ClientboundUpdateRFEProjectilePacket fromProjectile(RFEProjectileInstance instance, Level level) {
             return new ClientboundUpdateRFEProjectilePacket(instance.uuid(), instance.position(), instance.velocity(),
-                    instance.leftOwner(), instance.distanceTravelled(), level.dimension());
+                    instance.leftOwner(), instance.distanceTravelled(), instance.age(), level.dimension());
         }
 
         public static ClientboundUpdateRFEProjectilePacket decode(FriendlyByteBuf buf) {
@@ -170,8 +174,9 @@ public class RFEProjectileManager {
             Vec3 velocity = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
             boolean leftOwner = buf.readBoolean();
             double distanceTravelled = buf.readDouble();
+            int age = buf.readVarInt();
             ResourceKey<Level> level = buf.readResourceKey(Registries.DIMENSION);
-            return new ClientboundUpdateRFEProjectilePacket(uuid, position, velocity, leftOwner, distanceTravelled, level);
+            return new ClientboundUpdateRFEProjectilePacket(uuid, position, velocity, leftOwner, distanceTravelled, age, level);
         }
         
         @Override
@@ -183,9 +188,10 @@ public class RFEProjectileManager {
                     .writeDouble(this.velocity.x)
                     .writeDouble(this.velocity.y)
                     .writeDouble(this.velocity.z);
-            buf.writeBoolean(this.leftOwner);
-            buf.writeDouble(this.distanceTravelled);
-            buf.writeResourceKey(this.level);
+            buf.writeBoolean(this.leftOwner)
+                    .writeDouble(this.distanceTravelled);
+            buf.writeVarInt(this.age)
+                    .writeResourceKey(this.level);
         }
 
         @Override

@@ -79,7 +79,7 @@ public class RFEProjectileTypeHandler {
     }
 
     public record ClientboundSyncRFEProjectileTypesPacket(Map<ResourceLocation, RFEProjectileType> projectileTypes) implements RFEPacket {
-        public ClientboundSyncRFEProjectileTypesPacket() { this(new Object2ReferenceOpenHashMap<>(PROJECTILE_TYPES)); }
+        ClientboundSyncRFEProjectileTypesPacket() { this(new Object2ReferenceOpenHashMap<>(PROJECTILE_TYPES)); }
 
         public static ClientboundSyncRFEProjectileTypesPacket decode(FriendlyByteBuf buf) {
             Map<ResourceLocation, RFEProjectileType> projectileTypes = new Object2ReferenceOpenHashMap<>();

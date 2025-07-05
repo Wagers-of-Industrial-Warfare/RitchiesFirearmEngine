@@ -55,6 +55,7 @@ public class RFEPackLoader {
        s.add("fabric-api");
        s.add("fabricloader");
        s.add("c");
+       s.add("ritchiesfirearmengine");
     });
 
     public static void prepareResources() {

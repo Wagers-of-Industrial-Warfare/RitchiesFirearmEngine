@@ -7,6 +7,7 @@ import com.google.gson.JsonParseException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.*;
+import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
@@ -27,19 +29,29 @@ public class RFEBulletProjectileType implements RFEProjectileType {
 
     private final double muzzleVelocity;
     private final double drag;
+    private final boolean quadraticDrag;
     private final double gravity;
     private final boolean ignoresInvulnerability;
     private final boolean rendersInvulnerable;
+    private final int maxAge;
     private final RFEProjectileDamageModel damageModel;
 
-    public RFEBulletProjectileType(double muzzleVelocity, double drag, double gravity, boolean ignoresInvulnerability,
-                                   boolean rendersInvulnerable, RFEProjectileDamageModel damageModel) {
+    public RFEBulletProjectileType(double muzzleVelocity, double drag, boolean quadraticDrag, double gravity,
+                                   boolean ignoresInvulnerability, boolean rendersInvulnerable, int maxAge,
+                                   RFEProjectileDamageModel damageModel) {
         this.muzzleVelocity = muzzleVelocity;
         this.drag = drag;
+        this.quadraticDrag = quadraticDrag;
         this.gravity = gravity;
         this.ignoresInvulnerability = ignoresInvulnerability;
         this.rendersInvulnerable = rendersInvulnerable;
+        this.maxAge = maxAge;
         this.damageModel = damageModel;
+    }
+
+    @Override
+    public void shoot(RFEProjectileInstance instance, double dx, double dy, double dz) {
+        instance.setVelocity(new Vec3(dx, dy, dz).normalize().scale(this.muzzleVelocity));
     }
 
     @Override
@@ -48,7 +60,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         Vec3 velocity = instance.velocity();
         Vec3 newPos = oldPos.add(velocity);
 
-        if (!level.hasChunkAt(new BlockPos((int) newPos.x, (int) newPos.y   , (int) newPos.z))) {
+        if (!level.hasChunkAt(new BlockPos((int) newPos.x, (int) newPos.y, (int) newPos.z))) {
             instance.setRemoved();
             return;
         }
@@ -56,7 +68,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         HitResult hitResult = level.clip(new ClipContext(oldPos, newPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
         if (hitResult.getType() != HitResult.Type.MISS)
             newPos = hitResult.getLocation();
-        AABB searchBox = this.getBoundingBox(oldPos).expandTowards(velocity).inflate(1.0d);
+        AABB searchBox = this.getAABB(level, instance).expandTowards(velocity).inflate(1.0d);
 
         while (!instance.isRemoved()) {
             EntityHitResult entityHitResult = RFEProjectileUtils.getEntityHitResult(level, oldPos, newPos, searchBox, e -> this.canHitEntity(instance, e), 0.1d);
@@ -88,12 +100,22 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         instance.setDistanceTravelled(instance.distanceTravelled() + newPos.subtract(oldPos).length());
         // TODO handle velocity when collision
 
-        instance.setVelocity(newVelocity.scale(1 - this.drag).add(0, -this.gravity, 0));
+        if (this.quadraticDrag) {
+            double dragMag = this.drag * newVelocity.lengthSqr();
+            newVelocity = newVelocity.scale(1 - dragMag / newVelocity.length());
+        } else {
+            newVelocity = newVelocity.scale(1 - this.drag);
+        }
+        instance.setVelocity(newVelocity.add(0, -this.gravity, 0));
         // TODO effects
+
+        if (instance.age() > this.maxAge)
+            instance.setRemoved();
     }
 
-    public AABB getBoundingBox(Vec3 center) {
-        return AABB.ofSize(center, 0, 0, 0);
+    @Override
+    public AABB getAABB(Level level, RFEProjectileInstance instance) {
+        return AABB.ofSize(instance.position(), 0, 0, 0);
     }
 
     protected boolean canHitEntity(RFEProjectileInstance instance, Entity target) {
@@ -196,12 +218,14 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         // TODO ricochet
         // TODO block breaking
 
+        RitchiesFirearmEngine.LOGGER.info("Travelled {} meters", instance.distanceTravelled());
         BlockState blockstate = level.getBlockState(pResult.getBlockPos());
         //this.lastState = blockstate;
         //blockstate.onProjectileHit(level, blockstate, pResult, this); TODO fake projectile
         Vec3 projPos = instance.position();
         Vec3 terminalVel = pResult.getLocation().subtract(projPos.x, projPos.y, projPos.z);
         instance.setVelocity(terminalVel);
+        instance.setRemoved();
         instance.setForceSync(true);
 
         // TODO hit effects
@@ -224,10 +248,12 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         @Override
         public RFEBulletProjectileType fromJson(JsonObject obj) {
             double muzzleVelocity = GsonHelper.getAsDouble(obj, "muzzle_velocity");
-            double drag = GsonHelper.getAsDouble(obj, "drag");
+            double drag = Mth.clamp(GsonHelper.getAsDouble(obj, "drag"), 0, 1);
+            boolean quadraticDrag = GsonHelper.getAsBoolean(obj, "quadratic_drag", true);
             double gravity = GsonHelper.getAsDouble(obj, "gravity");
-            boolean ignoresInvulnerability = GsonHelper.getAsBoolean(obj, "ignores_invulnerabilty");
+            boolean ignoresInvulnerability = GsonHelper.getAsBoolean(obj, "ignores_invulnerability");
             boolean rendersInvulnerable = GsonHelper.getAsBoolean(obj, "renders_invulnerable");
+            int maxAge = GsonHelper.getAsInt(obj, "max_age", 400);
 
             RFEProjectileDamageModel damageModel = new RFEProjectileDamageModel();
             JsonArray dmgModelArr = GsonHelper.getAsJsonArray(obj, "damage_model");
@@ -241,27 +267,33 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             }
             damageModel.validateDamageModel();
 
-            return new RFEBulletProjectileType(muzzleVelocity, drag, gravity, ignoresInvulnerability, rendersInvulnerable, damageModel);
+            return new RFEBulletProjectileType(muzzleVelocity, drag, quadraticDrag, gravity, ignoresInvulnerability,
+                    rendersInvulnerable, maxAge, damageModel);
         }
 
         @Override
         public RFEBulletProjectileType fromNetwork(FriendlyByteBuf buf) {
             double muzzleVelocity = buf.readDouble();
             double drag = buf.readDouble();
+            boolean quadraticDrag = buf.readBoolean();
             double gravity = buf.readDouble();
             boolean ignoresInvulnerability = buf.readBoolean();
             boolean rendersInvulnerable = buf.readBoolean();
+            int maxAge = buf.readVarInt();
             RFEProjectileDamageModel damageModel = RFEProjectileDamageModel.fromNetwork(buf);
-            return new RFEBulletProjectileType(muzzleVelocity, drag, gravity, ignoresInvulnerability, rendersInvulnerable, damageModel);
+            return new RFEBulletProjectileType(muzzleVelocity, drag, quadraticDrag, gravity, ignoresInvulnerability,
+                    rendersInvulnerable, maxAge, damageModel);
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf buf, RFEBulletProjectileType type) {
             buf.writeDouble(type.muzzleVelocity)
                     .writeDouble(type.drag)
+                    .writeBoolean(type.quadraticDrag)
                     .writeDouble(type.gravity)
                     .writeBoolean(type.ignoresInvulnerability)
                     .writeBoolean(type.rendersInvulnerable);
+            buf.writeVarInt(type.maxAge);
             RFEProjectileDamageModel.toNetwork(buf, type.damageModel);
         }
     }

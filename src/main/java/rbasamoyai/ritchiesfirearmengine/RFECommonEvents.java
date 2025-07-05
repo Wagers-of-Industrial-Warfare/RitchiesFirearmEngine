@@ -6,25 +6,42 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.AmmoPacketItemPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItemPropertiesHandler;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 
 public class RFECommonEvents {
 
-    public static void onDatapackReload() {
+    public static void loadTagsAndTypes() {
+        RFEFirearmAmmoHandler.loadProjectileTypes();
+    }
+
+    public static void onDatapackReload(boolean singleplayer) {
+        loadTagsAndTypes();
         RFEProjectileManager.clearAllProjectiles();
         RFENetwork.sendToAll(new RFEProjectileManager.ClientboundRemoveAllProjectilesPacket());
 
+        if (singleplayer)
+            return;
         RFEProjectileTypeHandler.syncToAll();
         MagazineItemPropertiesHandler.syncToAll();
         AmmoPacketItemPropertiesHandler.syncToAll();
+        RFEFirearmAmmoHandler.syncToAll();
     }
 
-    public static void onDatapackSync(ServerPlayer player) {
+    public static void onDatapackSync(ServerPlayer player, boolean singleplayer) {
+        if (singleplayer)
+            return;
         RFEProjectileTypeHandler.syncToPlayer(player);
         MagazineItemPropertiesHandler.syncToPlayer(player);
         AmmoPacketItemPropertiesHandler.syncToPlayer(player);
+        RFEFirearmAmmoHandler.syncToPlayer(player);
+    }
+
+    public static void onLevelLoad(LevelAccessor level) {
+        if (level.getServer() != null && !level.isClientSide() && level.getServer().overworld() == level)
+            loadTagsAndTypes();
     }
 
     public static void onLevelUnload(LevelAccessor level) {

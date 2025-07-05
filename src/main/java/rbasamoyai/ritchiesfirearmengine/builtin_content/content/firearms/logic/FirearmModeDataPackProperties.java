@@ -1,13 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic;
 
-import java.util.List;
-
 public class FirearmModeDataPackProperties {
-
-    private final List<AmmoPredicate> primaryAmmoPredicates;
-    private final List<AmmoPredicate> speedloaderAmmoPredicates;
-    private final List<AmmoPredicate> magazineAmmoPredicates;
-    private final List<AmmoPredicate> secondaryAmmoPredicates;
 
     private final float spread;
     private final float jamChance;
@@ -22,11 +15,6 @@ public class FirearmModeDataPackProperties {
     private final int coolingDelayTime;
 
     public FirearmModeDataPackProperties(RFEFirearmModeBuilder builder) {
-        this.primaryAmmoPredicates = builder.primaryAmmoPredicates;
-        this.speedloaderAmmoPredicates = builder.speedloaderAmmoPredicates;
-        this.magazineAmmoPredicates = builder.magazineAmmoPredicates;
-        this.secondaryAmmoPredicates = builder.secondaryAmmoPredicates;
-
         this.spread = builder.spread;
         this.jamChance = builder.jamChance;
         this.manualCharging = builder.manualCharging;
@@ -39,11 +27,6 @@ public class FirearmModeDataPackProperties {
         this.heatAddedOnFiring = builder.heatAddedOnFiring;
         this.coolingDelayTime = builder.coolingDelayTime;
     }
-
-    public List<AmmoPredicate> primaryAmmoPredicates() { return this.primaryAmmoPredicates; }
-    public List<AmmoPredicate> speedloaderAmmoPredicates() { return this.speedloaderAmmoPredicates; }
-    public List<AmmoPredicate> magazineAmmoPredicates() { return this.magazineAmmoPredicates; }
-    public List<AmmoPredicate> secondaryAmmoPredicates() { return this.secondaryAmmoPredicates; }
 
     public float spread() { return this.spread; }
     public float jamChance() { return this.jamChance; }

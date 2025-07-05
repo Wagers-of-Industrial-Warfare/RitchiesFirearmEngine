@@ -20,8 +20,8 @@ import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.level.Level;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmModeDataPackProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEFirearmMode;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEFirearmModeAmmoProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ReloadPhase;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
@@ -167,8 +167,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
 
     public int countAmmo(ItemStack itemStack, LivingEntity entity) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
-        FirearmModeDataPackProperties properties = mode.getDataPackProperties();
-        return RFEItemUtils.countItems(RFEItemUtils.getItemsFromEntity(entity, RFEUtils.orAllPredicates(properties.primaryAmmoPredicates()), 0, false));
+        RFEFirearmModeAmmoProperties ammoProperties = mode.getAmmoProperties(itemStack);
+        return RFEItemUtils.countItems(RFEItemUtils.getItemsFromEntity(entity, RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates()), 0, false));
     }
 
     public int freeAmmoSpace(ItemStack itemStack) {
@@ -208,7 +208,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
 
     public boolean entityHasMagazine(ItemStack itemStack, LivingEntity entity) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
-        return mode.entityHasMagazine(entity);
+        return mode.entityHasMagazine(itemStack, entity);
     }
 
     public int bestSpeedloaderAmmoCount(ItemStack itemStack, LivingEntity entity) {

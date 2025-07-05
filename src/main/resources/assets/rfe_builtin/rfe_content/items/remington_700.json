@@ -10,9 +10,6 @@
     "unaim_sound": "rfe_builtin:item.generic.rifle.unaim"
   },
   "ammo": {
-    "primary": [
-      "rfe_builtin:rifle_cartridge"
-    ],
     "internal_capacity": 5
   },
   "firing": {

@@ -40,6 +40,7 @@ public class RitchiesFirearmEngine {
 
         forgeBus.addListener(this::onAddReloadListeners);
         forgeBus.addListener(this::onSyncDatapack);
+        forgeBus.addListener(this::onLevelLoad);
         forgeBus.addListener(this::onLevelUnload);
         forgeBus.addListener(this::onEntityJoinLevel);
         forgeBus.addListener(this::onLevelTick);
@@ -74,11 +75,16 @@ public class RitchiesFirearmEngine {
     }
 
     private void onSyncDatapack(final OnDatapackSyncEvent event) {
+        boolean singleplayer = event.getPlayerList().getServer().isSingleplayer();
         if (event.getPlayer() == null) {
-            RFECommonEvents.onDatapackReload();
+            RFECommonEvents.onDatapackReload(singleplayer);
         } else {
-            RFECommonEvents.onDatapackSync(event.getPlayer());
+            RFECommonEvents.onDatapackSync(event.getPlayer(), singleplayer);
         }
+    }
+
+    private void onLevelLoad(final LevelEvent.Load event) {
+        RFECommonEvents.onLevelLoad(event.getLevel());
     }
 
     private void onLevelUnload(final LevelEvent.Unload event) {

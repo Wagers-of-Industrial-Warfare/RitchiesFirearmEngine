@@ -46,66 +46,21 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
         }
 
         if (GsonHelper.isObjectNode(obj, "ammo")) {
+            // TODO ammo required
             JsonObject ammo = obj.getAsJsonObject("ammo");
-            if (GsonHelper.isArrayNode(ammo, "primary")) {
-                builder.resetPrimaryAmmo();
-                JsonArray arr = GsonHelper.getAsJsonArray(ammo, "primary");
-                for (JsonElement primaryEl : arr) {
-                    if (!GsonHelper.isStringValue(primaryEl))
-                        throw new JsonParseException("Invalid primary ammo predicate");
-                    AmmoPredicate primaryPred = AmmoPredicate.fromString(primaryEl.getAsString());
-                    if (primaryPred == null)
-                        throw new JsonParseException("Invalid primary ammo predicate");
-                    builder.addPrimaryAmmo(primaryPred);
-                }
-            }
-            if (GsonHelper.isArrayNode(ammo, "speedloaders")) {
-                builder.resetSpeedloaders();
-                JsonArray arr = GsonHelper.getAsJsonArray(ammo, "speedloaders");
-                for (JsonElement speedloaderEl : arr) {
-                    if (!GsonHelper.isStringValue(speedloaderEl))
-                        throw new JsonParseException("Invalid speedloader ammo predicate");
-                    AmmoPredicate speedloaderPred = AmmoPredicate.fromString(speedloaderEl.getAsString());
-                    if (speedloaderPred == null)
-                        throw new JsonParseException("Invalid speedloader ammo predicate");
-                    builder.addSpeedloader(speedloaderPred);
-                }
-            }
-            if (GsonHelper.isArrayNode(ammo, "secondary")) {
-                builder.resetSecondaryAmmo();
-                JsonArray arr = GsonHelper.getAsJsonArray(ammo, "secondary");
-                for (JsonElement secondaryEl : arr) {
-                    if (!GsonHelper.isStringValue(secondaryEl))
-                        throw new JsonParseException("Invalid secondary ammo predicate");
-                    AmmoPredicate secondaryPred = AmmoPredicate.fromString(secondaryEl.getAsString());
-                    if (secondaryPred == null)
-                        throw new JsonParseException("Invalid secondary ammo predicate");
-                    builder.addSecondaryAmmo(secondaryPred);
-                }
-            }
             int internalCapacity = GsonHelper.getAsInt(ammo, "internal_capacity", 0);
             if (internalCapacity > 0) {
                 builder.internalCapacity(internalCapacity);
                 int nominalCapacity = GsonHelper.getAsInt(ammo, "nominal_capacity", internalCapacity);
                 builder.nominalCapacity(nominalCapacity);
             } else {
-                if (GsonHelper.isArrayNode(ammo, "magazines")) {
-                    builder.resetMagazines();
-                    JsonArray arr = GsonHelper.getAsJsonArray(ammo, "magazines");
-                    for (JsonElement magazineEl : arr) {
-                        if (!GsonHelper.isStringValue(magazineEl))
-                            throw new JsonParseException("Invalid magazine ammo predicate");
-                        AmmoPredicate magazinePred = AmmoPredicate.fromString(magazineEl.getAsString());
-                        if (magazinePred == null)
-                            throw new JsonParseException("Invalid magazine ammo predicate");
-                        builder.addMagazine(magazinePred);
-                    }
-                    boolean canLoadSingleRounds = GsonHelper.getAsBoolean(ammo, "can_load_single_rounds");
-                    boolean plusOneCapacity = GsonHelper.getAsBoolean(ammo, "plus_1_capacity", true);
-                    builder.canLoadSingleRounds(canLoadSingleRounds)
-                            .plusOneCapacity(plusOneCapacity);
-                }
+                boolean canLoadSingleRounds = GsonHelper.getAsBoolean(ammo, "can_load_single_rounds"); // TODO remove
+                boolean plusOneCapacity = GsonHelper.getAsBoolean(ammo, "plus_1_capacity", true);
+                builder.canLoadSingleRounds(canLoadSingleRounds)
+                        .plusOneCapacity(plusOneCapacity);
             }
+            boolean requiresSecondaryAmmo = GsonHelper.getAsBoolean(ammo, "requires_secondary_ammo", false);
+            builder.requiresSecondaryAmmo(requiresSecondaryAmmo);
         }
 
         if (GsonHelper.isObjectNode(obj, "firing")) {

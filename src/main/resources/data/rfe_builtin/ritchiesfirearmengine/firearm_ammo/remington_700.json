@@ -1,0 +1,20 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:rifle_cartridge",
+      "fires": "rfe_builtin:308_winchester"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "modes": {
+  }
+}

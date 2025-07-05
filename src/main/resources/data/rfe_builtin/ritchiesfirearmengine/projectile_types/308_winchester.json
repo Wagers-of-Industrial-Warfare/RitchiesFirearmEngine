@@ -1,10 +1,12 @@
 {
   "type": "ritchiesfirearmengine:bullet",
-  "muzzle_velocity": 20,
-  "drag": 0.002,
-  "gravity": 0.025,
+  "muzzle_velocity": 37,
+  "drag": 0.0075,
+  "quadratic_drag": true,
+  "gravity": 0.03,
   "ignores_invulnerability": true,
   "renders_invulnerable": false,
+  "max_age": 400,
   "damage_model": [
     {
       "distance": 0,

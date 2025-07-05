@@ -7,8 +7,13 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
@@ -23,6 +28,8 @@ import java.util.function.Predicate;
  * Basic firearm mode class.
  */
 public class RFEFirearmMode {
+
+    protected final String modeId;
 
     protected final FirearmModeDataPackProperties defaultDataPackProperties;
 
@@ -79,8 +86,9 @@ public class RFEFirearmMode {
     protected final int cooldownTime;
     @Nullable protected final SoundEvent cooldownSound;
 
-    // TODO validation for some required properties (e.g. requiredSecondaryAmmo)
-    public RFEFirearmMode(RFEFirearmModeBuilder builder) {
+    public RFEFirearmMode(RFEFirearmModeBuilder builder, String modeId) {
+        this.modeId = modeId;
+
         this.defaultDataPackProperties = new FirearmModeDataPackProperties(builder);
 
         this.modeTagId = builder.modeTagId;
@@ -124,6 +132,10 @@ public class RFEFirearmMode {
 
     public FirearmModeDataPackProperties getDataPackProperties() {
         return this.defaultDataPackProperties; // TODO datapack
+    }
+
+    public RFEFirearmModeAmmoProperties getAmmoProperties(ItemStack itemStack) {
+        return RFEFirearmAmmoHandler.getAmmoProperties(itemStack).getProperties(this.modeId);
     }
 
     public CompoundTag getOrCreateModeTag(ItemStack itemStack) {
@@ -215,31 +227,45 @@ public class RFEFirearmMode {
 
     public void fireProjectile(ItemStack itemStack, LivingEntity entity) {
         // TODO windup
-        FirearmModeDataPackProperties properties = this.getDataPackProperties();
+        RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
+        FirearmModeDataPackProperties firearmProperties = this.getDataPackProperties();
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+
+        Vec3 upDirection = entity.getUpVector(1f);
+        Vec3 aimDirection = entity.getViewVector(1f);
+
         if (this.ammoConsumed > 0) {
             List<ItemStack> strippedAmmo = this.getNextRoundsInItem(itemStack, entity, this.ammoConsumed, true);
             // TODO consume secondary ammo if required
             for (ItemStack ammoStack : strippedAmmo) {
-                int summons = ammoStack.getCount();
-
-                // TODO actually spawn projectile
+                for (Map.Entry<AmmoPredicate, RFEProjectileType> entry : ammoProperties.primaryAmmo().entrySet()) {
+                    if (!entry.getKey().test(ammoStack))
+                        continue;
+                    RFEProjectileInstance instance = entry.getValue().createInstance();
+                    // TODO shooter positioning
+                    instance.setOwner(entity);
+                    instance.setPosition(new Vec3(entity.getX(), entity.getEyeY(), entity.getZ()));
+                    instance.shoot(aimDirection.x, aimDirection.y, aimDirection.z);
+                    RFEProjectileManager.queueAddedProjectile(instance, entity.level());
+                    break;
+                }
             }
         } else {
             // TODO spawn anyway if ammo not consumed, usable for infinity guns/blasters
+            // TODO Figure out ammo type
         }
         this.playFiringEffects(itemStack, entity);
         if (this.canOverheat) {
-            FirearmDataUtils.addHeat(modeTag, properties.heatAddedOnFiring());
-            FirearmDataUtils.setCoolingDelay(modeTag, properties.coolingDelayTime());
-            if (FirearmDataUtils.getHeat(modeTag) > properties.heatCapacity())
+            FirearmDataUtils.addHeat(modeTag, firearmProperties.heatAddedOnFiring());
+            FirearmDataUtils.setCoolingDelay(modeTag, firearmProperties.coolingDelayTime());
+            if (FirearmDataUtils.getHeat(modeTag) > firearmProperties.heatCapacity())
                 FirearmDataUtils.setOverheated(modeTag, true);
         }
         this.setCharged(itemStack, entity, false);
         FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.FIRING);
         if (this.firingCooldown > 0)
             FirearmDataUtils.setActionTime(itemStack, this.firingCooldown);
-        if (this.fireMode == FireMode.SINGLE_ACTION && !properties.manualCharging())
+        if (this.fireMode == FireMode.SINGLE_ACTION && !firearmProperties.manualCharging())
             itemStack.getOrCreateTag().putBoolean("HoldAutomaticCycle", true);
     }
 
@@ -379,15 +405,16 @@ public class RFEFirearmMode {
 
     // TODO secondary ammo
     public void executeReloadPhase(ItemStack itemStack, LivingEntity entity, ReloadPhase phase, int actionTime) {
-        FirearmModeDataPackProperties properties = this.getDataPackProperties();
+        RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
+
         if (phase.reloadType() == ReloadPhase.ReloadType.MAGAZINES) {
             if (phase.unloadMagazineTime() == actionTime) {
                 ItemStack previousMagazine = this.setMagazine(itemStack, entity, ItemStack.EMPTY);
                 RFEItemUtils.addItemToEntity(previousMagazine, entity);
             }
             if (phase.reloadMagazineTime() == actionTime) {
-                Predicate<ItemStack> magPred = RFEUtils.orAllPredicates(properties.magazineAmmoPredicates());
-                Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(properties.primaryAmmoPredicates());
+                Predicate<ItemStack> magPred = RFEUtils.orAllPredicates(ammoProperties.magazines());
+                Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
                 ItemStack foundMagazine = RFEItemUtils.findFullestMagazine(entity, magPred, ammoPred, true);
                 if (!foundMagazine.isEmpty())
                     this.setMagazine(itemStack, entity, foundMagazine);
@@ -403,7 +430,7 @@ public class RFEFirearmMode {
         if (this.internalCapacity > 0) {
             ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
             capacity = this.internalCapacity;
-        } else if (this.canLoadSingleRounds) {
+        } else if (this.canLoadSingleRounds) { // TODO switch to else
             CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
             ItemStack magazine = ItemStack.of(magazineTag);
             if (!(magazine.getItem() instanceof MagazineItem magazineItem))
@@ -413,12 +440,12 @@ public class RFEFirearmMode {
         } else {
             return;
         }
-        Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(properties.primaryAmmoPredicates());
+        Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
         if (phase.reloadType() == ReloadPhase.ReloadType.ROUNDS) {
             List<ItemStack> foundAmmo = RFEItemUtils.getItemsFromEntity(entity, ammoPred.and(s -> s != itemStack), reloadCount, true);
             FirearmDataUtils.addMultipleAmmo(ammoList, foundAmmo, phase.ammoAddedLast(), false, capacity);
         } else {
-            Predicate<ItemStack> speedloaderPred = RFEUtils.orAllPredicates(properties.speedloaderAmmoPredicates());
+            Predicate<ItemStack> speedloaderPred = RFEUtils.orAllPredicates(ammoProperties.speedloaders());
             int reloadCount1 = capacity - this.getLoadedAmmoCount(itemStack, entity, false);
             ItemStack bestSpeedloaderStack = RFEItemUtils.findBestSpeedloader(entity, speedloaderPred, ammoPred, reloadCount1, true);
             if (bestSpeedloaderStack.getItem() instanceof MagazineItem magazineItem) {
@@ -862,19 +889,19 @@ public class RFEFirearmMode {
         return magazine.getItem() instanceof MagazineItem;
     }
 
-    public boolean entityHasMagazine(LivingEntity entity) {
+    public boolean entityHasMagazine(ItemStack itemStack, LivingEntity entity) {
         if (this.internalCapacity > 0)
             return false;
-        FirearmModeDataPackProperties properties = this.getDataPackProperties();
-        ItemStack magazine = RFEItemUtils.findFullestMagazine(entity, RFEUtils.orAllPredicates(properties.magazineAmmoPredicates()),
-                RFEUtils.orAllPredicates(properties.primaryAmmoPredicates()), false);
+        RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
+        ItemStack magazine = RFEItemUtils.findFullestMagazine(entity, RFEUtils.orAllPredicates(ammoProperties.magazines()),
+                RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates()), false);
         return !magazine.isEmpty();
     }
 
     public int bestSpeedloaderAmmoCount(ItemStack itemStack, LivingEntity entity) {
-        FirearmModeDataPackProperties properties = this.getDataPackProperties();
-        Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(properties.primaryAmmoPredicates());
-        Predicate<ItemStack> speedloaderPred = RFEUtils.orAllPredicates(properties.speedloaderAmmoPredicates());
+        RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
+        Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
+        Predicate<ItemStack> speedloaderPred = RFEUtils.orAllPredicates(ammoProperties.speedloaders());
         int reloadCount1 = this.getNominalCapacity(itemStack, entity);
         ItemStack bestSpeedloaderStack = RFEItemUtils.findBestSpeedloader(entity, speedloaderPred, ammoPred, reloadCount1, false);
         return bestSpeedloaderStack.getItem() instanceof MagazineItem magazine ? magazine.countAmmo(bestSpeedloaderStack) : 0;

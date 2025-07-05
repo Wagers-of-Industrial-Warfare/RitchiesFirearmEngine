@@ -26,7 +26,7 @@ public class RFEProjectileUtils {
                 continue;
             Vec3 pos1 = optional.get();
             double d1 = start.distanceToSqr(pos1);
-            if (d1 < d0)
+            if (d1 > d0)
                 continue;
             entity = entity1;
             pos = pos1;

@@ -10,6 +10,7 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
@@ -43,6 +44,7 @@ public class RitchiesFirearmEngine {
         forgeBus.addListener(this::onLevelLoad);
         forgeBus.addListener(this::onLevelUnload);
         forgeBus.addListener(this::onEntityJoinLevel);
+        forgeBus.addListener(this::onPlayerLoggedIn);
         forgeBus.addListener(this::onLevelTick);
 
         RFEConfig.registerConfigs(modBus);
@@ -93,6 +95,10 @@ public class RitchiesFirearmEngine {
 
     private void onEntityJoinLevel(final EntityJoinLevelEvent event) {
         RFECommonEvents.onEntityJoin(event.getEntity(), event.getLevel());
+    }
+
+    private void onPlayerLoggedIn(final PlayerEvent.PlayerLoggedInEvent event) {
+        RFECommonEvents.onPlayerLoggedIn(event.getEntity());
     }
 
     private void onLevelTick(final TickEvent.LevelTickEvent event) {

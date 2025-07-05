@@ -1,8 +1,12 @@
 package rbasamoyai.ritchiesfirearmengine.network;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
+import rbasamoyai.ritchiesfirearmengine.foundation.pack_loading.RFEPackLoader;
+
+import java.util.Map;
 
 public class RFEClientNetworkHandlers {
 
@@ -30,6 +34,18 @@ public class RFEClientNetworkHandlers {
         if (mc.level == null || mc.level.dimension() != packet.level())
             return;
         RFEProjectileManager.removeProjectile(packet.uuid(), mc.level);
+    }
+
+    public static void validateRFEContentPacks(ClientboundValidateRFEContentPacksPacket packet) {
+        Map<String, String> clientVersions = RFEPackLoader.getPackVersions();
+        if (packet.versions().equals(clientVersions))
+            return;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.getConnection() == null || mc.level == null)
+            return;
+        mc.level.disconnect();
+        mc.getConnection().onDisconnect(Component.literal("Different RFE pack versions on client and server, please ensure they are the same"));
+        // TODO screen
     }
 
 }

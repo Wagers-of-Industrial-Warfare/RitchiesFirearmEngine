@@ -32,10 +32,7 @@ import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -226,6 +223,13 @@ public class RFEPackLoader {
         for (RFEContentPack contentPack : LOADED_CONTENT_PACKS.values())
             packList.add(packType == PackType.CLIENT_RESOURCES ? contentPack.resourcePack : contentPack.dataPack);
         cons.accept(new RFEPackRepository(packList));
+    }
+
+    public static Map<String, String> getPackVersions() {
+        Map<String, String> versions = new LinkedHashMap<>();
+        for (RFEContentPack pack : LOADED_CONTENT_PACKS.values())
+            versions.put(pack.metadata().namespace(), pack.metadata().version());
+        return versions;
     }
 
     private record RFEContentPack(RFEPackMetadata metadata, RFEContentData contentData, Pack resourcePack, Pack dataPack) {

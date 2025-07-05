@@ -10,7 +10,7 @@ import rbasamoyai.ritchiesfirearmengine.utils.RFEModUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public record RFEPackMetadata(String namespace, String displayName, List<DependencyInfo> dependencies,
+public record RFEPackMetadata(String namespace, String version, String displayName, List<DependencyInfo> dependencies,
                               List<RFEPlugin.Info> pluginInfo) {
     public static final Serializer TYPE = new Serializer();
 
@@ -20,6 +20,7 @@ public record RFEPackMetadata(String namespace, String displayName, List<Depende
         @Override
         public RFEPackMetadata fromJson(JsonObject obj) {
             String namespace = GsonHelper.getAsString(obj, "namespace");
+            String packVersion = GsonHelper.getAsString(obj, "version");
             String displayName = GsonHelper.getAsString(obj, "display_name");
 
             List<DependencyInfo> allDependencies = new ArrayList<>();
@@ -44,7 +45,7 @@ public record RFEPackMetadata(String namespace, String displayName, List<Depende
                 allPluginInfo.add(new RFEPlugin.Info(modId, classPath));
             }
 
-            return new RFEPackMetadata(namespace, displayName, allDependencies, allPluginInfo);
+            return new RFEPackMetadata(namespace, packVersion, displayName, allDependencies, allPluginInfo);
         }
     }
 

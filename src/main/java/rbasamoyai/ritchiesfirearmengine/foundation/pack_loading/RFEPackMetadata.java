@@ -2,6 +2,7 @@ package rbasamoyai.ritchiesfirearmengine.foundation.pack_loading;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 import net.minecraft.util.GsonHelper;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPlugin;
@@ -45,11 +46,41 @@ public record RFEPackMetadata(String namespace, String version, String displayNa
                 allPluginInfo.add(new RFEPlugin.Info(modId, classPath));
             }
 
+            assertValidNamespace(namespace);
+            assertValidPackVersion(packVersion, namespace);
             return new RFEPackMetadata(namespace, packVersion, displayName, allDependencies, allPluginInfo);
         }
     }
 
     public record DependencyInfo(String modId, String version) {
+    }
+
+    public static void assertValidNamespace(String namespace) {
+        if (namespace.length() > 64)
+            throw new IllegalStateException("RFE content pack namespace is too long (over 64 characters):" + namespace);
+        if (!ResourceLocation.isValidNamespace(namespace))
+            throw new IllegalStateException("Non [a-z0-9_.-] character in namespace of RFE content pack: " + namespace);
+    }
+
+    public static void assertValidPackVersion(String version, String namespace) {
+        if (version.length() > 64)
+            throw new IllegalStateException("RFE content pack version for pack " + namespace + " is too long (over 64 characters)");
+        if (!isValidPackVersionCharacters(version))
+            throw new IllegalStateException("Non [a-zA-Z0-9_.-+] character in version of RFE content pack " + namespace + ": " + version);
+    }
+
+    public static boolean isValidPackVersionCharacters(String version) {
+        int l = version.length();
+        for (int i = 0; i < l; ++i) {
+            if (!isValidPackVersionCharacter(version.charAt(i)))
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean isValidPackVersionCharacter(char chr) {
+        return chr >= '0' && chr <= '9' || chr >= 'a' && chr <= 'z' || chr >= 'A' && chr <= 'Z'
+                || chr == '_' || chr == '.' || chr == '-' || chr == '+';
     }
 
 }

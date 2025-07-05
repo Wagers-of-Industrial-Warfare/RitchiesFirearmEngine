@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -21,7 +22,6 @@ import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,12 +29,12 @@ public class MagazineItem extends Item {
 
     private final boolean glint;
     private final int capacity;
-    private final List<AmmoPredicate> defaultAmmoPredicates; // Datapackable
-    private final List<AmmoPredicate> defaultSpeedloaderPredicates; // Datapackable
+    private final ImmutableList<AmmoPredicate> defaultAmmoPredicates; // Datapackable
+    private final ImmutableList<AmmoPredicate> defaultSpeedloaderPredicates; // Datapackable
     private final int reloadCooldown;
 
-    public MagazineItem(Properties pProperties, boolean glint, int capacity, List<AmmoPredicate> defaultAmmoPredicates,
-                        List<AmmoPredicate> defaultSpeedloaderPredicates, int reloadCooldown) {
+    public MagazineItem(Properties pProperties, boolean glint, int capacity, ImmutableList<AmmoPredicate> defaultAmmoPredicates,
+                        ImmutableList<AmmoPredicate> defaultSpeedloaderPredicates, int reloadCooldown) {
         super(pProperties);
         this.glint = glint;
         this.capacity = capacity;
@@ -54,8 +54,8 @@ public class MagazineItem extends Item {
 
     public int getMagazineCapacity(ItemStack itemStack) { return this.capacity; }
 
-    public List<AmmoPredicate> getAmmoPredicates(ItemStack itemStack) {
-        List<AmmoPredicate> predicates = MagazineItemPropertiesHandler.getValidAmmoPredicates(this);
+    public ImmutableList<AmmoPredicate> getAmmoPredicates(ItemStack itemStack) {
+        ImmutableList<AmmoPredicate> predicates = MagazineItemPropertiesHandler.getValidAmmoPredicates(this);
         return predicates == null ? this.defaultAmmoPredicates : predicates;
     }
 
@@ -67,8 +67,8 @@ public class MagazineItem extends Item {
         return false;
     }
 
-    public List<AmmoPredicate> getSpeedloaderPredicate(ItemStack itemStack) {
-        List<AmmoPredicate> predicates = MagazineItemPropertiesHandler.getValidSpeedloaderPredicates(this);
+    public ImmutableList<AmmoPredicate> getSpeedloaderPredicate(ItemStack itemStack) {
+        ImmutableList<AmmoPredicate> predicates = MagazineItemPropertiesHandler.getValidSpeedloaderPredicates(this);
         return predicates == null ? this.defaultSpeedloaderPredicates : predicates;
     }
 
@@ -196,21 +196,21 @@ public class MagazineItem extends Item {
             if (reloadCooldown < 0)
                 throw new IllegalStateException("'reload_cooldown' must be at least 0");
             JsonArray ammoPredicateArr = GsonHelper.getAsJsonArray(obj, "valid_ammo");
-            List<AmmoPredicate> ammoPredicates = new LinkedList<>();
+            ImmutableList.Builder<AmmoPredicate> ammoPredicates = ImmutableList.builder();
             for (JsonElement el : ammoPredicateArr) {
                 AmmoPredicate pred = AmmoPredicate.fromString(el.getAsString());
                 if (pred != null)
                     ammoPredicates.add(pred);
             }
             JsonArray speedloaderPredicateArr = GsonHelper.getAsJsonArray(obj, "valid_speedloaders", new JsonArray());
-            List<AmmoPredicate> speedloaderPredicates = new LinkedList<>();
+            ImmutableList.Builder<AmmoPredicate> speedloaderPredicates = ImmutableList.builder();
             for (JsonElement el : speedloaderPredicateArr) {
                 AmmoPredicate pred = AmmoPredicate.fromString(el.getAsString());
                 if (pred != null)
                     speedloaderPredicates.add(pred);
             }
-            return new MagazineItem(new Properties().stacksTo(stacksTo).rarity(rarity), glint, capacity, ammoPredicates,
-                    speedloaderPredicates, reloadCooldown);
+            return new MagazineItem(new Properties().stacksTo(stacksTo).rarity(rarity), glint, capacity, ammoPredicates.build(),
+                    speedloaderPredicates.build(), reloadCooldown);
         }
     }
 

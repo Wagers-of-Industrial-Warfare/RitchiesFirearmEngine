@@ -1,9 +1,9 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.gson.*;
 import com.mojang.logging.LogUtils;
-import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
@@ -27,8 +27,8 @@ import java.util.concurrent.Executor;
 
 public class AmmoPacketItemPropertiesHandler {
 
-    private static final Map<Item, Map<AmmoPredicate, Integer>> AMMO_CAPACITIES = new Reference2ObjectOpenHashMap<>();
-    private static final Map<Item, Map<AmmoPredicate, Integer>> DEFAULT_AMMO_CAPACITIES = new Reference2ObjectOpenHashMap<>();
+    private static final Map<Item, ImmutableMap<AmmoPredicate, Integer>> AMMO_CAPACITIES = new Reference2ObjectOpenHashMap<>();
+    private static final Map<Item, ImmutableMap<AmmoPredicate, Integer>> DEFAULT_AMMO_CAPACITIES = new Reference2ObjectOpenHashMap<>();
 
     private static final Logger LOGGER = LogUtils.getLogger();
     
@@ -48,7 +48,7 @@ public class AmmoPacketItemPropertiesHandler {
                             .orElseThrow(() -> new IllegalStateException("Item " + id + " does not exist"));
                     JsonElement el = entry.getValue();
                     if (!el.isJsonObject())
-                        continue;
+                        throw new JsonParseException("Expected JSON object when parsing ammo packet item data");
                     loadData(item, el.getAsJsonObject());
                 } catch (Exception e) {
                     LOGGER.warn("Error occurred loading ammo packet item data for {}: {}", id, e);
@@ -63,8 +63,10 @@ public class AmmoPacketItemPropertiesHandler {
             if (replace)
                 AMMO_CAPACITIES.remove(item);
             if (!AMMO_CAPACITIES.containsKey(item))
-                AMMO_CAPACITIES.put(item, new Object2IntLinkedOpenHashMap<>());
-            Map<AmmoPredicate, Integer> capacities = AMMO_CAPACITIES.get(item);
+                AMMO_CAPACITIES.put(item, ImmutableMap.of());
+            ImmutableMap<AmmoPredicate, Integer> capacities = AMMO_CAPACITIES.get(item);
+            ImmutableMap.Builder<AmmoPredicate, Integer> capMod = ImmutableMap.builder();
+            capMod.putAll(capacities);
             JsonArray ammoArr = GsonHelper.getAsJsonArray(obj, "ammo");
             for (JsonElement el : ammoArr) {
                 if (!el.isJsonObject())
@@ -73,9 +75,11 @@ public class AmmoPacketItemPropertiesHandler {
                 String str = GsonHelper.getAsString(capObj, "ammo");
                 AmmoPredicate pred = AmmoPredicate.fromString(str);
                 int capacity = GsonHelper.getAsInt(capObj, "capacity");
-                if (capacities.put(pred, capacity) != null)
-                    LOGGER.warn("Duplicate item predicate entry");
+                if (capacities.containsKey(pred))
+                    LOGGER.warn("Duplicate item predicate entry for item {}", BuiltInRegistries.ITEM.getKey(item));
+                capMod.put(pred, capacity);
             }
+            AMMO_CAPACITIES.put(item, capMod.build());
         }
     }
 
@@ -84,11 +88,11 @@ public class AmmoPacketItemPropertiesHandler {
         AMMO_CAPACITIES.putAll(DEFAULT_AMMO_CAPACITIES);
     }
 
-    public static void registerDefaults(Item item, Map<AmmoPredicate, Integer> ammoPredicates) {
+    public static void registerDefaults(Item item, ImmutableMap<AmmoPredicate, Integer> ammoPredicates) {
         DEFAULT_AMMO_CAPACITIES.put(item, ammoPredicates);
     }
 
-    @Nullable public static Map<AmmoPredicate, Integer> getAmmoCapacities(Item item) { return AMMO_CAPACITIES.get(item); }
+    @Nullable public static ImmutableMap<AmmoPredicate, Integer> getAmmoCapacities(Item item) { return AMMO_CAPACITIES.get(item); }
 
     public static void syncToPlayer(ServerPlayer player) {
         RFENetwork.sendToPlayer(new ClientboundSyncAmmoPacketPropertiesPacket(), player);
@@ -98,13 +102,13 @@ public class AmmoPacketItemPropertiesHandler {
         RFENetwork.sendToAll(new ClientboundSyncAmmoPacketPropertiesPacket());
     }
 
-    public record ClientboundSyncAmmoPacketPropertiesPacket(Map<Item, Map<AmmoPredicate, Integer>> capacities) implements RFEPacket {
-        public ClientboundSyncAmmoPacketPropertiesPacket() { this(AMMO_CAPACITIES); }
+    public record ClientboundSyncAmmoPacketPropertiesPacket(Map<Item, ImmutableMap<AmmoPredicate, Integer>> capacities) implements RFEPacket {
+        ClientboundSyncAmmoPacketPropertiesPacket() { this(new Reference2ObjectOpenHashMap<>(AMMO_CAPACITIES)); }
 
         @Override
         public void rootEncode(FriendlyByteBuf buf) {
-            buf.writeVarInt(AMMO_CAPACITIES.size());
-            for (Map.Entry<Item, Map<AmmoPredicate, Integer>> entry : AMMO_CAPACITIES.entrySet()) {
+            buf.writeVarInt(this.capacities.size());
+            for (Map.Entry<Item, ImmutableMap<AmmoPredicate, Integer>> entry : this.capacities.entrySet()) {
                 buf.writeResourceLocation(BuiltInRegistries.ITEM.getKey(entry.getKey()));
                 Map<AmmoPredicate, Integer> capacities = entry.getValue();
                 buf.writeVarInt(capacities.size());
@@ -117,15 +121,15 @@ public class AmmoPacketItemPropertiesHandler {
 
         public static ClientboundSyncAmmoPacketPropertiesPacket decode(FriendlyByteBuf buf) {
             int ammoSz = buf.readVarInt();
-            Map<Item, Map<AmmoPredicate, Integer>> ammoCapacitiesByItem = new Reference2ObjectOpenHashMap<>();
+            Map<Item, ImmutableMap<AmmoPredicate, Integer>> ammoCapacitiesByItem = new Reference2ObjectOpenHashMap<>();
             for (int itemInd = 0; itemInd < ammoSz; ++itemInd) {
                 ResourceLocation loc = buf.readResourceLocation();
                 int predSz = buf.readVarInt();
-                Map<AmmoPredicate, Integer> capacities = new Object2IntLinkedOpenHashMap<>();
+                ImmutableMap.Builder<AmmoPredicate, Integer> capacities = ImmutableMap.builder();
                 for (int capacityInd = 0; capacityInd < predSz; ++capacityInd)
                     capacities.put(AmmoPredicate.fromNetwork(buf), buf.readVarInt());
                 BuiltInRegistries.ITEM.getOptional(loc).ifPresentOrElse(i -> {
-                    ammoCapacitiesByItem.put(i, capacities);
+                    ammoCapacitiesByItem.put(i, capacities.build());
                 }, () -> LOGGER.warn("Attempted to sync missing item {}", loc));
             }
             return new ClientboundSyncAmmoPacketPropertiesPacket(ammoCapacitiesByItem);

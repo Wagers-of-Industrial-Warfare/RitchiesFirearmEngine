@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -33,10 +34,11 @@ public class AmmoPacketItem extends Item {
     private final int reloadCooldown;
     @Nullable private final SoundEvent useSound;
     private final boolean spawnParticlesOnUse;
-    private final Map<AmmoPredicate, Integer> defaultAmmoCapacities; // Datapackable
+    private final ImmutableMap<AmmoPredicate, Integer> defaultAmmoCapacities; // Datapackable
 
     public AmmoPacketItem(Properties properties, boolean glint, int useDuration, int reloadCooldown,
-                          @Nullable SoundEvent useSound, boolean spawnParticlesOnUse, Map<AmmoPredicate, Integer> defaultAmmoCapacities) {
+                          @Nullable SoundEvent useSound, boolean spawnParticlesOnUse,
+                          ImmutableMap<AmmoPredicate, Integer> defaultAmmoCapacities) {
         super(properties);
         this.glint = glint;
         this.useDuration = useDuration;
@@ -47,8 +49,8 @@ public class AmmoPacketItem extends Item {
         AmmoPacketItemPropertiesHandler.registerDefaults(this, defaultAmmoCapacities);
     }
 
-    public Map<AmmoPredicate, Integer> getAmmoCapacities() {
-        Map<AmmoPredicate, Integer> ammoCapacities = AmmoPacketItemPropertiesHandler.getAmmoCapacities(this);
+    public ImmutableMap<AmmoPredicate, Integer> getAmmoCapacities() {
+        ImmutableMap<AmmoPredicate, Integer> ammoCapacities = AmmoPacketItemPropertiesHandler.getAmmoCapacities(this);
         return ammoCapacities == null ? this.defaultAmmoCapacities : ammoCapacities;
     }
 
@@ -119,7 +121,7 @@ public class AmmoPacketItem extends Item {
     }
 
     protected boolean tryReloadForItem(List<ItemStack> ammo, ItemStack availableStack) {
-        Map<AmmoPredicate, Integer> ammoCapacities = this.getAmmoCapacities();
+        ImmutableMap<AmmoPredicate, Integer> ammoCapacities = this.getAmmoCapacities();
         if (ammo.isEmpty()) {
             for (Map.Entry<AmmoPredicate, Integer> entry : ammoCapacities.entrySet()) {
                 if (!entry.getKey().test(availableStack))
@@ -197,7 +199,7 @@ public class AmmoPacketItem extends Item {
             boolean spawnParticlesOnUse = GsonHelper.getAsBoolean(obj, "spawn_particles_on_use", false);
 
             JsonArray primaryAmmoCapArr = GsonHelper.getAsJsonArray(obj, "ammo");
-            Map<AmmoPredicate, Integer> primaryAmmoCapacities = new Object2IntLinkedOpenHashMap<>();
+            ImmutableMap.Builder<AmmoPredicate, Integer> primaryAmmoCapacities = ImmutableMap.builder();
             for (JsonElement el : primaryAmmoCapArr) {
                 if (!el.isJsonObject())
                     throw new JsonParseException("Ammo packet capacity must be a json object");
@@ -210,7 +212,7 @@ public class AmmoPacketItem extends Item {
             }
 
             return new AmmoPacketItem(new Properties().stacksTo(stacksTo).rarity(rarity), glint, useDuration, reloadCooldown,
-                    useSound, spawnParticlesOnUse, primaryAmmoCapacities);
+                    useSound, spawnParticlesOnUse, primaryAmmoCapacities.build());
         }
     }
 

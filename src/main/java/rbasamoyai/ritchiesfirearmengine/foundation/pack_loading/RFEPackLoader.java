@@ -146,6 +146,7 @@ public class RFEPackLoader {
             NAMESPACE_TO_PATH.put(namespace, packId);
             LOGGER.info("Found RFE content pack in {}", packPath.toAbsolutePath());
         } catch (Exception exception) {
+            // Few exceptions present as failing to load pack metadata by itself is considered not fatal; crash via lack of required packs
             LOGGER.error("Exception encountered loading RFE content pack metadata for {}, skipping content pack: {}", packId, exception);
         }
     }
@@ -155,110 +156,95 @@ public class RFEPackLoader {
         boolean builtIn = builtInContext != null;
         try (PackResources packResources = packResourcesSupplier.open(packId)) {
             RFEPackMetadata metadata = FOUND_METADATA_BY_PATH.get(packId);
-            if (metadata == null || !validatePackFromMetadata(metadata, packId, builtInContext))
+            if (metadata == null)
                 return;
+            validatePackFromMetadata(metadata, packId, builtInContext);
 
             RFEPluginManager.registerAndInitPlugins(packId, metadata);
             RFEContentData contentData = RFEContentData.loadContentData(packResources, metadata);
-            if (contentData == null) {
-                LOGGER.error("Could not load content data for RFE content pack {}, skipping content pack", packId);
-            }
+            if (contentData == null)
+                throw new IllegalStateException("Could not load content data for RFE content pack " + packId);
             Pack resourcePack = loadMinecraftPack(packResources, PackType.CLIENT_RESOURCES, packId, metadata, builtIn);
-            if (resourcePack == null) {
-                LOGGER.error("Could not load resource pack for RFE content pack {}, skipping content pack", packId);
-                return;
-            }
+            if (resourcePack == null)
+                throw new IllegalStateException("Could not load resource pack for RFE content pack " + packId);
             Pack dataPack = loadMinecraftPack(packResources, PackType.SERVER_DATA, packId, metadata, builtIn);
-            if (dataPack == null) {
-                LOGGER.error("Could not load data pack for RFE content pack {}, skipping content pack", packId);
-                return;
-            }
+            if (dataPack == null)
+                throw new IllegalStateException("Could not load data pack for RFE content pack " + packId);
             LOADED_CONTENT_PACKS.put(packId, new RFEContentPack(metadata, contentData, resourcePack, dataPack));
         } catch (Exception exception) {
-            LOGGER.error("Exception encountered loading RFE content pack {}, skipping content pack: {}", packId, exception);
+            throw new RFEPackLoadingException("Fatal exception encountered loading RFE content pack " + packId + ": " + exception);
         }
     }
 
-    private static boolean validatePackFromMetadata(RFEPackMetadata metadata, String packId,
-                                                    @Nullable BuiltInPackContext builtInContext) {
+    private static void validatePackFromMetadata(RFEPackMetadata metadata, String packId, @Nullable BuiltInPackContext builtInContext) {
         String namespace = metadata.namespace();
-        if (RESERVED_NAMESPACES.contains(namespace)) {
-            LOGGER.error("RFE content pack {} using reserved namespace {}, skipping content pack", packId, namespace);
-            return false;
-        }
+        if (RESERVED_NAMESPACES.contains(namespace))
+            throw new IllegalStateException("RFE content pack " + packId + " using reserved namespace " + namespace);
         if (RFEModUtils.isModPresent(namespace)) {
-            if (builtInContext == null) {
-                LOGGER.error("Local RFE content pack {} using mod namespace {}, skipping content pack", packId, namespace);
-                return false;
-            } else if (!builtInContext.modIds.contains(namespace)) {
-                LOGGER.error("Built-in RFE content pack {} using outside mod namespace {}, skipping content pack", packId, namespace);
-                return false;
-            }
+            if (builtInContext == null)
+                throw new IllegalStateException("Local RFE content pack " + packId + " using mod namespace " + namespace);
+            if (!builtInContext.modIds.contains(namespace))
+                throw new IllegalStateException("Built-in RFE content pack " + packId + " using outside mod namespace " + namespace);
         }
-        for (RFEPackMetadata.DependencyInfo dependency : metadata.dependencies()) {
-            if (hasIncompatibleDependency(dependency, packId))
-                return false;
-        }
-        return true;
+        for (RFEPackMetadata.DependencyInfo dependency : metadata.dependencies())
+            assertCompatibleDependency(dependency, packId);
     }
     
-    private static boolean hasIncompatibleDependency(RFEPackMetadata.DependencyInfo dependency, String packId) {
+    private static void assertCompatibleDependency(RFEPackMetadata.DependencyInfo dependency, String packId) {
         String dependencyId = dependency.dependencyId();
-        String version = dependency.version();
+        String versionRange = dependency.version();
         RFEPackMetadata.DependencyInfo.ContentType contentType = dependency.contentType();
         RFEPackMetadata.DependencyInfo.RelationType relation = dependency.relationType();
 
-        // TODO better versioning, perhaps even a screen
         if (contentType == RFEPackMetadata.DependencyInfo.ContentType.CONTENT_PACK) {
+            RFEPackMetadata metadata = FOUND_METADATA_BY_NAMESPACE.get(dependencyId);
             switch (relation) {
                 case REQUIRED:
-                    if (!isRFEContentPackPresentAndSatisfiesVersion(dependencyId, version, packId)) {
-                        LOGGER.error("RFE content pack {} requires content pack {} with version {}, skipping content pack", packId, dependencyId, version);
-                        return true;
-                    }
+                    if (metadata == null)
+                        throw new IllegalStateException("RFE content pack in " + packId + " requires missing content pack "
+                                + dependencyId + " in version range " + versionRange);
+                    if (!doesRFEContentPackSatisfyVersionRange(metadata, dependencyId, versionRange, packId))
+                        throw new IllegalStateException("RFE content pack in " + packId + " is incompatible with content pack "
+                                + dependencyId + " version " + metadata.version() + ", must be in version range " + versionRange);
                     break;
                 case OPTIONAL:
                     break;
                 case DISCOURAGED:
-                    if (isRFEContentPackPresentAndSatisfiesVersion(dependencyId, version, packId))
-                        LOGGER.warn("RFE content pack {} discourages using content pack {} with version {}", packId, dependencyId, version);
+                    if (metadata != null && doesRFEContentPackSatisfyVersionRange(metadata, dependencyId, versionRange, packId))
+                        LOGGER.warn("RFE content pack in {} discourages using content pack {} version {}", packId, dependencyId, metadata.version());
                     break;
                 case INCOMPATIBLE:
-                    if (isRFEContentPackPresentAndSatisfiesVersion(dependencyId, version, packId)) {
-                        LOGGER.error("RFE content pack {} is incompatible with content pack {}, version {}, skipping content pack", packId, dependencyId, version);
-                        return true;
-                    }
+                    if (metadata != null && doesRFEContentPackSatisfyVersionRange(metadata, dependencyId, versionRange, packId))
+                        throw new IllegalStateException("RFE content pack in " + packId + " is incompatible with content pack "
+                                + dependencyId + " version " + metadata.version());
                     break;
             }
         } else if (contentType == RFEPackMetadata.DependencyInfo.ContentType.MOD) {
             switch (relation) {
                 case REQUIRED:
-                    if (!RFEModUtils.isModPresentAndSatisfiesVersion(dependencyId, version)) {
-                        LOGGER.error("RFE content pack {} requires mod {} with version {}, skipping content pack", packId, dependencyId, version);
-                        return true;
-                    }
+                    if (!RFEModUtils.isModPresent(dependencyId))
+                        throw new IllegalStateException("RFE content pack in " + packId + " requires missing mod "
+                                + dependencyId + " in version range " + versionRange);
+                    if (!RFEModUtils.isModPresentAndSatisfiesVersion(dependencyId, versionRange))
+                        throw new IllegalStateException("RFE content pack in " + packId + " is incompatible with mod "
+                                + dependencyId + ", must be in version range " + versionRange);
                     break;
                 case OPTIONAL:
                     break;
                 case DISCOURAGED:
-                    if (RFEModUtils.isModPresentAndSatisfiesVersion(dependencyId, version))
-                        LOGGER.warn("RFE content pack {} discourages using mod {} with version {}", packId, dependencyId, version);
+                    if (RFEModUtils.isModPresentAndSatisfiesVersion(dependencyId, versionRange))
+                        LOGGER.warn("RFE content pack in {} discourages using mod {} with version {}", packId, dependencyId, versionRange);
                     break;
                 case INCOMPATIBLE:
-                    if (RFEModUtils.isModPresentAndSatisfiesVersion(dependencyId, version)) {
-                        LOGGER.error("RFE content pack {} is incompatible with mod {}, version {}, skipping content pack", packId, dependencyId, version);
-                        return true;
-                    }
+                    if (RFEModUtils.isModPresentAndSatisfiesVersion(dependencyId, versionRange))
+                        throw new IllegalStateException("RFE content pack in " + packId + " is incompatible with mod " + dependencyId
+                                + " in version range " + versionRange);
                     break;
             }
         }
-        return false;
     }
 
-    private static boolean isRFEContentPackPresentAndSatisfiesVersion(String dependencyId, String version, String packId) {
-        RFEPackMetadata metadata = FOUND_METADATA_BY_NAMESPACE.get(dependencyId);
-        if (metadata == null)
-            return false;
+    private static boolean doesRFEContentPackSatisfyVersionRange(RFEPackMetadata metadata, String dependencyId, String version, String packId) {
         VersionRange range;
         try {
             range = VersionRange.createFromVersionSpec(version);

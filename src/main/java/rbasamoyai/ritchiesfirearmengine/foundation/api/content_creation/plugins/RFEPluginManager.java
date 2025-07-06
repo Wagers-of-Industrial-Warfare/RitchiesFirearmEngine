@@ -31,7 +31,7 @@ public class RFEPluginManager {
                 throw new IllegalStateException("Plugin requires mod " + info.modId());
             boolean dependenciesMatch = false;
             for (RFEPackMetadata.DependencyInfo dependency : metadata.dependencies()) {
-                if (dependency.modId().equals(info.modId())) {
+                if (dependency.dependencyId().equals(info.modId())) {
                     dependenciesMatch = true;
                     break;
                 }

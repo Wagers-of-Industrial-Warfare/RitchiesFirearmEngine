@@ -5,7 +5,6 @@ import net.minecraftforge.forgespi.language.IModFileInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 
 public class RFEModUtils {
 
@@ -25,8 +24,7 @@ public class RFEModUtils {
         try {
             range = VersionRange.createFromVersionSpec(version);
         } catch (InvalidVersionSpecificationException exception) {
-            RitchiesFirearmEngine.LOGGER.error("Mod dependency {} has invalid version specification {}", modId, version);
-            return false;
+            throw new IllegalStateException("Mod dependency " + modId + " has invalid version specification " + version);
         }
         for (IModInfo modInfo : modFileInfo.getMods()) {
             if (modInfo.getModId().equals(modId) && range.containsVersion(modInfo.getVersion()))

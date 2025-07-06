@@ -21,6 +21,9 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.forgespi.language.IModFileInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.forgespi.locating.IModFile;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentData;
@@ -39,8 +42,10 @@ import java.util.function.Consumer;
 public class RFEPackLoader {
 
     private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Map<String, RFEPackMetadata> FOUND_METADATA_BY_PATH = new Object2ObjectLinkedOpenHashMap<>();
+    private static final Map<String, RFEPackMetadata> FOUND_METADATA_BY_NAMESPACE = new Object2ObjectLinkedOpenHashMap<>();
+    private static final Map<String, String> NAMESPACE_TO_PATH = new Object2ObjectLinkedOpenHashMap<>();
     private static final Map<String, RFEContentPack> LOADED_CONTENT_PACKS = new Object2ObjectLinkedOpenHashMap<>();
-    private static final Set<String> CLAIMED_CONTENT_PACK_NAMESPACES = new ObjectOpenHashSet<>();
     private static final Set<String> RESERVED_NAMESPACES = Util.make(new ObjectOpenHashSet<>(), s -> {
        s.add("minecraft");
        s.add("brigadier");
@@ -56,9 +61,39 @@ public class RFEPackLoader {
     });
 
     public static void prepareResources() {
+        findResources();
+        LOGGER.info("Successfully found {} RFE content packs", FOUND_METADATA_BY_PATH.size());
+
         loadModBuiltInPacks();
         loadLocalPacks();
         LOGGER.info("Successfully loaded {} RFE content packs", LOADED_CONTENT_PACKS.size());
+    }
+
+    private static void findResources() {
+        LOGGER.info("Finding built-in mod RFE content packs");
+        for (IModFileInfo modFileInfo : ModList.get().getModFiles()) {
+            IModFile modFile = modFileInfo.getFile();
+            Path resourcePath = modFile.findResource(".").normalize();
+            Set<String> modNamespaces = new ObjectOpenHashSet<>();
+            for (IModInfo modInfo : modFile.getModInfos())
+                modNamespaces.add(modInfo.getModId());
+            try {
+                Pack.ResourcesSupplier packResourcesSupplier = FolderRepositorySource.detectPackResources(resourcePath, false);
+                if (packResourcesSupplier != null)
+                    loadContentPackMetadata("mod/" + modFileInfo.moduleName(), resourcePath, packResourcesSupplier, new BuiltInPackContext(modNamespaces));
+            } catch (Exception exception) {
+                throw new IllegalStateException("Could not load built-in mod RFE content pack metadata", exception);
+            }
+        }
+
+        Path packsPath = Path.of(".", "rfe_packs").normalize();
+        LOGGER.info("Finding local RFE content packs in {}", packsPath.toAbsolutePath());
+        try {
+            FileUtil.createDirectoriesSafe(packsPath);
+            FolderRepositorySource.discoverPacks(packsPath, false, (path, sup) -> loadContentPackMetadata("file/" + nameFromPath(path), path, sup, null));
+        } catch (IOException exception) {
+            throw new IllegalStateException("Could not load local RFE content pack metadata", exception);
+        }
     }
 
     private static void loadModBuiltInPacks() {
@@ -90,8 +125,8 @@ public class RFEPackLoader {
         }
     }
 
-    private static void loadContentPack(String packId, Path packPath, Pack.ResourcesSupplier packResourcesSupplier,
-                                        @Nullable BuiltInPackContext builtInContext) {
+    private static void loadContentPackMetadata(String packId, Path packPath, Pack.ResourcesSupplier packResourcesSupplier,
+                                                @Nullable BuiltInPackContext builtInContext) {
         boolean builtIn = builtInContext != null;
         try (PackResources packResources = packResourcesSupplier.open(packId)) {
             RFEPackMetadata metadata = packResources.getMetadataSection(RFEPackMetadata.TYPE);
@@ -100,10 +135,29 @@ public class RFEPackLoader {
                     LOGGER.error("Could not load metadata for RFE content pack {}, skipping content pack", packId);
                 return;
             }
-            if (!validatePackFromMetadata(metadata, packId, builtInContext))
+            String namespace = metadata.namespace();
+            if (NAMESPACE_TO_PATH.containsKey(namespace)) {
+                LOGGER.error("RFE content pack {} has duplicate namespace {} found in other content pack {}, skipping content pack",
+                        packId, namespace, NAMESPACE_TO_PATH.get(namespace));
+                return;
+            }
+            FOUND_METADATA_BY_PATH.put(packId, metadata);
+            FOUND_METADATA_BY_NAMESPACE.put(namespace, metadata);
+            NAMESPACE_TO_PATH.put(namespace, packId);
+            LOGGER.info("Found RFE content pack in {}", packPath.toAbsolutePath());
+        } catch (Exception exception) {
+            LOGGER.error("Exception encountered loading RFE content pack metadata for {}, skipping content pack: {}", packId, exception);
+        }
+    }
+
+    private static void loadContentPack(String packId, Path packPath, Pack.ResourcesSupplier packResourcesSupplier,
+                                        @Nullable BuiltInPackContext builtInContext) {
+        boolean builtIn = builtInContext != null;
+        try (PackResources packResources = packResourcesSupplier.open(packId)) {
+            RFEPackMetadata metadata = FOUND_METADATA_BY_PATH.get(packId);
+            if (metadata == null || !validatePackFromMetadata(metadata, packId, builtInContext))
                 return;
 
-            LOGGER.info("Found RFE content pack in {}", packPath.toAbsolutePath());
             RFEPluginManager.registerAndInitPlugins(packId, metadata);
             RFEContentData contentData = RFEContentData.loadContentData(packResources, metadata);
             if (contentData == null) {
@@ -120,7 +174,6 @@ public class RFEPackLoader {
                 return;
             }
             LOADED_CONTENT_PACKS.put(packId, new RFEContentPack(metadata, contentData, resourcePack, dataPack));
-            CLAIMED_CONTENT_PACK_NAMESPACES.add(metadata.namespace());
         } catch (Exception exception) {
             LOGGER.error("Exception encountered loading RFE content pack {}, skipping content pack: {}", packId, exception);
         }
@@ -129,10 +182,6 @@ public class RFEPackLoader {
     private static boolean validatePackFromMetadata(RFEPackMetadata metadata, String packId,
                                                     @Nullable BuiltInPackContext builtInContext) {
         String namespace = metadata.namespace();
-        if (CLAIMED_CONTENT_PACK_NAMESPACES.contains(namespace)) {
-            LOGGER.error("RFE content pack {} using already existing content pack namespace {}, skipping content pack", packId, namespace);
-            return false;
-        }
         if (RESERVED_NAMESPACES.contains(namespace)) {
             LOGGER.error("RFE content pack {} using reserved namespace {}, skipping content pack", packId, namespace);
             return false;
@@ -147,13 +196,76 @@ public class RFEPackLoader {
             }
         }
         for (RFEPackMetadata.DependencyInfo dependency : metadata.dependencies()) {
-            if (!RFEModUtils.isModPresentAndSatisfiesVersion(dependency.modId(), dependency.version())) {
-                LOGGER.error("RFE content pack {} requires mod {} with version {}, skipping content pack", packId,
-                        dependency.modId(), dependency.version());
+            if (hasIncompatibleDependency(dependency, packId))
                 return false;
-            }
         }
         return true;
+    }
+    
+    private static boolean hasIncompatibleDependency(RFEPackMetadata.DependencyInfo dependency, String packId) {
+        String dependencyId = dependency.dependencyId();
+        String version = dependency.version();
+        RFEPackMetadata.DependencyInfo.ContentType contentType = dependency.contentType();
+        RFEPackMetadata.DependencyInfo.RelationType relation = dependency.relationType();
+
+        // TODO better versioning, perhaps even a screen
+        if (contentType == RFEPackMetadata.DependencyInfo.ContentType.CONTENT_PACK) {
+            switch (relation) {
+                case REQUIRED:
+                    if (!isRFEContentPackPresentAndSatisfiesVersion(dependencyId, version, packId)) {
+                        LOGGER.error("RFE content pack {} requires content pack {} with version {}, skipping content pack", packId, dependencyId, version);
+                        return true;
+                    }
+                    break;
+                case OPTIONAL:
+                    break;
+                case DISCOURAGED:
+                    if (isRFEContentPackPresentAndSatisfiesVersion(dependencyId, version, packId))
+                        LOGGER.warn("RFE content pack {} discourages using content pack {} with version {}", packId, dependencyId, version);
+                    break;
+                case INCOMPATIBLE:
+                    if (isRFEContentPackPresentAndSatisfiesVersion(dependencyId, version, packId)) {
+                        LOGGER.error("RFE content pack {} is incompatible with content pack {}, version {}, skipping content pack", packId, dependencyId, version);
+                        return true;
+                    }
+                    break;
+            }
+        } else if (contentType == RFEPackMetadata.DependencyInfo.ContentType.MOD) {
+            switch (relation) {
+                case REQUIRED:
+                    if (!RFEModUtils.isModPresentAndSatisfiesVersion(dependencyId, version)) {
+                        LOGGER.error("RFE content pack {} requires mod {} with version {}, skipping content pack", packId, dependencyId, version);
+                        return true;
+                    }
+                    break;
+                case OPTIONAL:
+                    break;
+                case DISCOURAGED:
+                    if (RFEModUtils.isModPresentAndSatisfiesVersion(dependencyId, version))
+                        LOGGER.warn("RFE content pack {} discourages using mod {} with version {}", packId, dependencyId, version);
+                    break;
+                case INCOMPATIBLE:
+                    if (RFEModUtils.isModPresentAndSatisfiesVersion(dependencyId, version)) {
+                        LOGGER.error("RFE content pack {} is incompatible with mod {}, version {}, skipping content pack", packId, dependencyId, version);
+                        return true;
+                    }
+                    break;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isRFEContentPackPresentAndSatisfiesVersion(String dependencyId, String version, String packId) {
+        RFEPackMetadata metadata = FOUND_METADATA_BY_NAMESPACE.get(dependencyId);
+        if (metadata == null)
+            return false;
+        VersionRange range;
+        try {
+            range = VersionRange.createFromVersionSpec(version);
+        } catch (InvalidVersionSpecificationException exception) {
+            throw new IllegalStateException("RFE content pack dependency " + dependencyId + " for pack " + packId + " has invalid version specification " + version);
+        }
+        return range.containsVersion(new DefaultArtifactVersion(metadata.version()));
     }
 
     @Nullable

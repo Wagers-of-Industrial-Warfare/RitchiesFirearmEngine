@@ -9,8 +9,10 @@
     "display_name": "Ritchie's Firearm Engine Built-In Pack",
     "dependencies": [
       {
-        "mod": "ritchiesfirearmengine",
-        "forge_version": "[0.0.1,)"
+        "content": "mod",
+        "id": "ritchiesfirearmengine",
+        "forge_version": "[0.0.1,)",
+        "relation": "required"
       }
     ],
     "plugins": [

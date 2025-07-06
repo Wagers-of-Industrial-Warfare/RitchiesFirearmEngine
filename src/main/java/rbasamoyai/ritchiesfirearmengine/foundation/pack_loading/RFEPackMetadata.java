@@ -5,11 +5,13 @@ import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 import net.minecraft.util.GsonHelper;
+import org.jetbrains.annotations.Nullable;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEModUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public record RFEPackMetadata(String namespace, String version, String displayName, List<DependencyInfo> dependencies,
                               List<RFEPlugin.Info> pluginInfo) {
@@ -29,11 +31,22 @@ public record RFEPackMetadata(String namespace, String version, String displayNa
             int dependencySize = dependencyJson.size();
             String versionField = RFEModUtils.getModVersionSpecifier();
             for (int i = 0; i < dependencySize; ++i) {
-                JsonObject pluginInfoObject = dependencyJson.get(i).getAsJsonObject();
-                String modId = GsonHelper.getAsString(pluginInfoObject, "mod");
+                JsonObject dependencyInfoObject = dependencyJson.get(i).getAsJsonObject();
+
+                String contentString = GsonHelper.getAsString(dependencyInfoObject, "content");
+                DependencyInfo.ContentType contentType = DependencyInfo.ContentType.fromString(contentString);
+                if (contentType == null)
+                    throw new IllegalStateException("Invalid dependency content type '" + contentString + "', must be 'content_pack', 'mod'");
+
+                String dependencyId = GsonHelper.getAsString(dependencyInfoObject, "id");
                 // Version only loads the loader version based on the field
-                String version = GsonHelper.getAsString(pluginInfoObject, versionField);
-                allDependencies.add(new DependencyInfo(modId, version));
+                String version = GsonHelper.getAsString(dependencyInfoObject, versionField);
+
+                String relationString = GsonHelper.getAsString(dependencyInfoObject, "relation");
+                DependencyInfo.RelationType relationType = DependencyInfo.RelationType.fromString(relationString);
+                if (relationType == null)
+                    throw new IllegalStateException("Invalid dependency relation type '" + relationString + "', must be 'required', 'optional', 'discouraged', 'incompatible'");
+                allDependencies.add(new DependencyInfo(dependencyId, version, contentType, relationType));
             }
 
             List<RFEPlugin.Info> allPluginInfo = new ArrayList<>();
@@ -52,7 +65,31 @@ public record RFEPackMetadata(String namespace, String version, String displayNa
         }
     }
 
-    public record DependencyInfo(String modId, String version) {
+    public record DependencyInfo(String dependencyId, String version, ContentType contentType, RelationType relationType) {
+        public enum ContentType {
+            CONTENT_PACK,
+            MOD;
+
+            private static final Map<String, ContentType> BY_STRING = Arrays.stream(values())
+                    .collect(Collectors.toMap(t -> t.name().toLowerCase(Locale.ROOT), Function.identity()));
+
+            @Nullable public static ContentType fromString(String str) { return BY_STRING.get(str); }
+        }
+
+        /**
+         * Modeled after NeoForge requirements types
+         */
+        public enum RelationType {
+            REQUIRED,
+            OPTIONAL,
+            DISCOURAGED,
+            INCOMPATIBLE;
+
+            private static final Map<String, RelationType> BY_STRING = Arrays.stream(values())
+                    .collect(Collectors.toMap(t -> t.name().toLowerCase(Locale.ROOT), Function.identity()));
+
+            @Nullable public static RFEPackMetadata.DependencyInfo.RelationType fromString(String str) { return BY_STRING.get(str); }
+        }
     }
 
     public static void assertValidNamespace(String namespace) {

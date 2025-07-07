@@ -1,16 +1,15 @@
 package rbasamoyai.ritchiesfirearmengine;
 
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.client.event.ComputeFovModifierEvent;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEClientPluginManager;
 
 public class RFEClientForge {
 
     public static void init(IEventBus modBus, IEventBus forgeBus) {
         modBus.addListener(RFEClientForge::onClientSetup);
+        modBus.addListener(RFEClientForge::onRegisterClientReloadListeners);
         modBus.addListener(RFEClientForge::onRegisterKeyMappings);
 
         forgeBus.addListener(RFEClientForge::onMouseInput);
@@ -21,6 +20,10 @@ public class RFEClientForge {
 
     private static void onClientSetup(final FMLClientSetupEvent event) {
         event.enqueueWork(RFEClient::onClientSetup);
+    }
+
+    private static void onRegisterClientReloadListeners(final RegisterClientReloadListenersEvent event) {
+        RFEClientPluginManager.registerResourceListeners((id, listener) -> event.registerReloadListener(listener));
     }
 
     private static void onMouseInput(final InputEvent.MouseButton inputEvent) {

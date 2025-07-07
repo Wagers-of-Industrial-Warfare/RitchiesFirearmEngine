@@ -14,7 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public record RFEPackMetadata(String namespace, String version, String displayName, List<DependencyInfo> dependencies,
-                              List<RFEPlugin.Info> pluginInfo) {
+                              List<RFEPlugin.Info> pluginInfo, List<RFEPlugin.Info> clientPluginInfo) {
     public static final Serializer TYPE = new Serializer();
 
     public static class Serializer implements MetadataSectionSerializer<RFEPackMetadata> {
@@ -59,9 +59,19 @@ public record RFEPackMetadata(String namespace, String version, String displayNa
                 allPluginInfo.add(new RFEPlugin.Info(modId, classPath));
             }
 
+            List<RFEPlugin.Info> allClientPluginInfo = new ArrayList<>();
+            JsonArray clientPluginsJson = GsonHelper.getAsJsonArray(obj, "client_plugins", new JsonArray());
+            int clientPluginSize = clientPluginsJson.size();
+            for (int i = 0; i < clientPluginSize; ++i) {
+                JsonObject clientPluginInfoObject = clientPluginsJson.get(i).getAsJsonObject();
+                String modId = GsonHelper.getAsString(clientPluginInfoObject, "mod");
+                String classPath = GsonHelper.getAsString(clientPluginInfoObject, "class");
+                allClientPluginInfo.add(new RFEPlugin.Info(modId, classPath));
+            }
+
             assertValidNamespace(namespace);
             assertValidPackVersion(packVersion, namespace);
-            return new RFEPackMetadata(namespace, packVersion, displayName, allDependencies, allPluginInfo);
+            return new RFEPackMetadata(namespace, packVersion, displayName, allDependencies, allPluginInfo, allClientPluginInfo);
         }
     }
 

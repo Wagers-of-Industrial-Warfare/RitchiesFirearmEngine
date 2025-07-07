@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.foundation.pack_loading.RFEPackMetadata;
+import rbasamoyai.ritchiesfirearmengine.utils.EnvExecute;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEModUtils;
 
 import java.util.LinkedHashMap;
@@ -23,6 +24,14 @@ public class RFEPluginManager {
         for (RFEPlugin plugin : foundPlugins.values())
             plugin.register();
         PLUGINS.putAll(foundPlugins);
+
+        EnvExecute.runOnClient(() -> () -> {
+            try {
+                RFEClientPluginManager.registerAndInitPlugins(packId, metadata);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private static RFEPlugin loadPlugin(String packId, RFEPlugin.Info info, RFEPackMetadata metadata) throws Exception {
@@ -40,7 +49,7 @@ public class RFEPluginManager {
                 throw new IllegalStateException("Plugin's mod requirement is not present in pack metadata dependencies section");
             Class<?> clazz = Class.forName(info.classPath());
             if (!RFEPlugin.class.isAssignableFrom(clazz))
-                throw new IllegalStateException("Plugin must implement RFEPlugin");
+                throw new IllegalStateException("Plugin " + info.classPath() + " must implement RFEPlugin");
             return (RFEPlugin) clazz.getDeclaredConstructor().newInstance();
         } catch (Exception t) {
             RitchiesFirearmEngine.LOGGER.error("Error loading plugin class {} of mod {} from source {}", info.classPath(), info.modId(), packId);

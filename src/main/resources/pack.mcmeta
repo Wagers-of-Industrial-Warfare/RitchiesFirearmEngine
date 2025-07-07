@@ -20,6 +20,12 @@
         "class": "rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin",
         "mod": "ritchiesfirearmengine"
       }
+    ],
+    "client_plugins": [
+      {
+        "class": "rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEClientPlugin",
+        "mod": "ritchiesfirearmengine"
+      }
     ]
   }
 }

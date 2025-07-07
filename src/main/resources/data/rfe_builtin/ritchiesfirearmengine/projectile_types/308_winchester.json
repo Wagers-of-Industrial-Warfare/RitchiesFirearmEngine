@@ -1,7 +1,7 @@
 {
   "type": "ritchiesfirearmengine:bullet",
   "muzzle_velocity": 37,
-  "drag": 0.0075,
+  "drag": 0.0025,
   "quadratic_drag": true,
   "gravity": 0.03,
   "ignores_invulnerability": true,

@@ -15,6 +15,7 @@ public class RFEProjectileInstance {
     private final RandomSource random = RandomSource.create();
     private final RFEProjectileType projectileType;
     private Vec3 position = Vec3.ZERO;
+    private Vec3 oldPosition = Vec3.ZERO;
     private Vec3 velocity = Vec3.ZERO;
     private UUID uuid = Mth.createInsecureUUID(this.random);
     private boolean removed = false;
@@ -35,6 +36,16 @@ public class RFEProjectileInstance {
 
     public Vec3 velocity() { return this.velocity; }
     public void setVelocity(Vec3 velocity) { this.velocity = velocity; }
+
+    public Vec3 oldPosition() { return this.oldPosition; }
+    public void setOldPosition(Vec3 oldPosition) { this.oldPosition = oldPosition; }
+    
+    public Vec3 getPosition(float partialTicks) {
+        double xt = Mth.lerp(partialTicks, this.oldPosition.x, this.position.x);
+        double yt = Mth.lerp(partialTicks, this.oldPosition.y, this.position.y);
+        double zt = Mth.lerp(partialTicks, this.oldPosition.z, this.position.z);
+        return new Vec3(xt, yt, zt);
+    }
 
     public boolean isRemoved() { return this.removed; }
     public void setRemoved() { this.removed = true; }
@@ -68,6 +79,8 @@ public class RFEProjectileInstance {
 
     public boolean forceSync() { return this.forceSync; }
     public void setForceSync(boolean forceSync) { this.forceSync = forceSync; }
+
+    public AABB getAABB(Level level) { return this.projectileType.getAABB(level, this); }
 
     public void tick(Level level) {
         if (!this.leftOwner)

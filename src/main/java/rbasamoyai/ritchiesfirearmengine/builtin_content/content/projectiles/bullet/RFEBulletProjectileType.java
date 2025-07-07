@@ -1,4 +1,4 @@
-package rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles;
+package rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bullet;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.*;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEProjectileDamageModel;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
@@ -96,15 +97,16 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         }
 
         Vec3 newVelocity = instance.velocity();
+        instance.setOldPosition(oldPos);
         instance.setPosition(newPos);
         instance.setDistanceTravelled(instance.distanceTravelled() + newPos.subtract(oldPos).length());
         // TODO handle velocity when collision
 
         if (this.quadraticDrag) {
             double dragMag = this.drag * newVelocity.lengthSqr();
-            newVelocity = newVelocity.scale(1 - dragMag / newVelocity.length());
+            newVelocity = newVelocity.scale(Math.max(1 - dragMag / newVelocity.length(), 0));
         } else {
-            newVelocity = newVelocity.scale(1 - this.drag);
+            newVelocity = newVelocity.scale(Math.max(1 - this.drag, 0));
         }
         instance.setVelocity(newVelocity.add(0, -this.gravity, 0));
         // TODO effects

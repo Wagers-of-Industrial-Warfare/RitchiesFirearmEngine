@@ -32,8 +32,8 @@ public class RFEClientNetworkHandlers {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.level.dimension() != packet.level())
             return;
-        RFEProjectileManager.updateProjectile(packet.uuid(), packet.position(), packet.velocity(), packet.leftOwner(),
-                packet.distanceTravelled(), packet.age(), mc.level);
+        RFEProjectileManager.updateProjectile(packet.uuid(), packet.position(), packet.oldPosition(), packet.velocity(),
+                packet.leftOwner(), packet.distanceTravelled(), packet.age(), mc.level);
     }
 
     public static void removeRFEProjectile(RFEProjectileManager.ClientboundRemoveRFEProjectilePacket packet) {

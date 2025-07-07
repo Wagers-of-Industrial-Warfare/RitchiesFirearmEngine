@@ -16,6 +16,7 @@ public class RFEClientForge {
         forgeBus.addListener(RFEClientForge::onKeyInput);
         forgeBus.addListener(RFEClientForge::onComputeFov);
         forgeBus.addListener(RFEClientForge::onClientLogout);
+        forgeBus.addListener(RFEClientForge::onRenderLevel);
     }
 
     private static void onClientSetup(final FMLClientSetupEvent event) {
@@ -44,6 +45,13 @@ public class RFEClientForge {
 
     private static void onClientLogout(final ClientPlayerNetworkEvent.LoggingOut event) {
         RFEClient.onClientLogout();
+    }
+
+    private static void onRenderLevel(final RenderLevelStageEvent event) {
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_ENTITIES) {
+            RFEClient.renderAfterEntities(event.getPoseStack(), event.getProjectionMatrix(), event.getRenderTick(),
+                    event.getPartialTick(), event.getCamera(), event.getFrustum());
+        }
     }
 
 }

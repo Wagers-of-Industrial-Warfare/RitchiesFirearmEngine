@@ -73,6 +73,21 @@ public class RFEItemUtils {
         return list;
     }
 
+    public static List<ItemStack> getEntityInventory(LivingEntity entity) {
+        // TODO handlers
+        List<ItemStack> list = new LinkedList<>();
+        ItemStack offhandStack = entity.getOffhandItem();
+        if (!offhandStack.isEmpty())
+            list.add(offhandStack);
+        if (entity instanceof Player player) {
+            for (ItemStack itemStack : player.getInventory().items) {
+                if (!itemStack.isEmpty())
+                    list.add(itemStack);
+            }
+        }
+        return list;
+    }
+
     public static int countItems(List<ItemStack> items) {
         int count = 0;
         for (ItemStack itemStack : items)

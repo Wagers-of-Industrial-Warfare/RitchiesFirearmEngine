@@ -1,6 +1,7 @@
 package rbasamoyai.ritchiesfirearmengine;
 
 import net.minecraftforge.client.event.*;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEClientPluginManager;
@@ -17,6 +18,7 @@ public class RFEClientForge {
         forgeBus.addListener(RFEClientForge::onComputeFov);
         forgeBus.addListener(RFEClientForge::onClientLogout);
         forgeBus.addListener(RFEClientForge::onRenderLevel);
+        forgeBus.addListener(RFEClientForge::onRenderGuiOverlay);
     }
 
     private static void onClientSetup(final FMLClientSetupEvent event) {
@@ -52,6 +54,13 @@ public class RFEClientForge {
             RFEClient.renderAfterEntities(event.getPoseStack(), event.getProjectionMatrix(), event.getRenderTick(),
                     event.getPartialTick(), event.getCamera(), event.getFrustum());
         }
+    }
+
+    private static void onRenderGuiOverlay(final RenderGuiOverlayEvent.Pre event) {
+        if (event.getOverlay().overlay() == VanillaGuiOverlay.HOTBAR.type().overlay()) {
+            RFEClient.renderHUDOverlay(event.getGuiGraphics(), event.getPartialTick());
+        }
+        // TODO crosshair
     }
 
 }

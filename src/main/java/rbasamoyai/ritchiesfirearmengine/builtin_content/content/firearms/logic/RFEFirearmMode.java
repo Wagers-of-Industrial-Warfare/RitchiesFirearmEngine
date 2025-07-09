@@ -18,10 +18,7 @@ import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -150,6 +147,25 @@ public class RFEFirearmMode {
             return this.nominalCapacity;
         ItemStack magazine = ItemStack.of(itemStack.getOrCreateTag().getCompound("DetachedMagazine"));
         return magazine.getItem() instanceof MagazineItem magazineItem ? magazineItem.getMagazineCapacity(magazine) : 0;
+    }
+
+    public List<ItemStack> getLoadedAmmo(ItemStack itemStack) {
+        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        if (this.internalCapacity > 0) {
+            return FirearmDataUtils.getRounds(modeTag, "InternalRounds");
+        } else {
+            List<ItemStack> list = new ArrayList<>();
+            if (this.plusOneCapacity) {
+                ItemStack loadedRound = ItemStack.of(modeTag.getCompound("LoadedRound"));
+                if (!loadedRound.isEmpty())
+                    list.add(loadedRound);
+            }
+            CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
+            ItemStack magazine = ItemStack.of(magazineTag);
+            if (magazine.getItem() instanceof MagazineItem magazineItem)
+                list.addAll(magazineItem.getStoredAmmo(magazine));
+            return list;
+        }
     }
 
     public int getLoadedAmmoCount(ItemStack itemStack, LivingEntity entity, boolean countPlusOne) {

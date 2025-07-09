@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.objects.Object2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRenderer;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFEProjectileRenderer;
 
 public class RFEClientContentBuilderRegistry {
@@ -21,6 +22,21 @@ public class RFEClientContentBuilderRegistry {
         if (!PROJECTILE_RENDERER_SERIALIZERS.containsKey(typeLoc))
             throw new IllegalStateException("RFE projectile renderer type '" + typeLoc +"' not present");
         return PROJECTILE_RENDERER_SERIALIZERS.get(typeLoc);
+    }
+
+    private static final Object2ReferenceMap<ResourceLocation, RFEHudOverlayRenderer.Serializer> HUD_OVERLAY_RENDERER_SERIALIZERS = new Object2ReferenceOpenHashMap<>();
+
+    public static void registerHUDOverlayRendererType(ResourceLocation typeLoc, RFEHudOverlayRenderer.Serializer rendererSer) {
+        if (HUD_OVERLAY_RENDERER_SERIALIZERS.containsKey(typeLoc))
+            throw new IllegalStateException("Already registered RFE HUD overlay renderer type with id '" + typeLoc + "'");
+        HUD_OVERLAY_RENDERER_SERIALIZERS.put(typeLoc, rendererSer);
+    }
+
+    @ApiStatus.Internal
+    public static RFEHudOverlayRenderer.Serializer getHUDOverlayRendererType(ResourceLocation typeLoc) {
+        if (!HUD_OVERLAY_RENDERER_SERIALIZERS.containsKey(typeLoc))
+            throw new IllegalStateException("RFE HUD overlay renderer type '" + typeLoc + "' not present");
+        return HUD_OVERLAY_RENDERER_SERIALIZERS.get(typeLoc);
     }
 
 }

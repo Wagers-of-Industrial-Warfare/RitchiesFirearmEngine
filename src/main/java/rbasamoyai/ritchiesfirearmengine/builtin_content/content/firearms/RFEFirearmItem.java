@@ -29,6 +29,7 @@ import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -276,6 +277,27 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
     public boolean isAiming(ItemStack itemStack, LivingEntity entity) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
         return mode.isAiming(itemStack, entity);
+    }
+
+    @Nullable
+    public static List<ItemStack> getAmmoItemsForHUD(ItemStack itemStack) {
+        if (!(itemStack.getItem() instanceof RFEFirearmItem firearm))
+            return null;
+        RFEFirearmMode mode = firearm.getCurrentMode(itemStack);
+        return mode.getLoadedAmmo(itemStack);
+    }
+
+    public static Optional<Integer> getInventoryAmmoCountForHUD(ItemStack itemStack, List<ItemStack> inventory) {
+        if (!(itemStack.getItem() instanceof RFEFirearmItem firearm))
+            return Optional.empty();
+        RFEFirearmMode mode = firearm.getCurrentMode(itemStack);
+        Predicate<ItemStack> pred = RFEUtils.orAllPredicates(mode.getAmmoProperties(itemStack).primaryAmmo().keySet());
+        int count = 0;
+        for (ItemStack ammo : inventory) {
+            if (pred.test(ammo))
+                count += ammo.getCount();
+        }
+        return Optional.of(count);
     }
 
     public enum Action implements StringRepresentable {

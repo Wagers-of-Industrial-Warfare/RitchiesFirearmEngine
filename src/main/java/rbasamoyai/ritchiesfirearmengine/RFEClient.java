@@ -8,6 +8,7 @@ import net.minecraft.ReportedException;
 import net.minecraft.client.Camera;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -25,6 +26,8 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.AmmoPacketI
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRenderer;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRendererPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFEProjectileRenderer;
@@ -154,6 +157,17 @@ public class RFEClient {
                 throw new ReportedException(crashreport);
             }
         }
+    }
+
+    public static void renderHUDOverlay(GuiGraphics graphics, float partialTick) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null)
+            return;
+        ItemStack mainhand = mc.player.getMainHandItem();
+        ItemStack offhand = mc.player.getOffhandItem();
+        RFEHudOverlayRenderer mainhandHud = RFEHudOverlayRendererPacksHandler.getHudOverlayRenderer(mainhand);
+        mainhandHud.renderHUD(graphics, partialTick, mainhand, mc.player, false);
+        // TODO offhand rendering, though prioritize primary. May have something regarding supporting offhand rendering
     }
 
 }

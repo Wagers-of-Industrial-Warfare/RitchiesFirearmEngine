@@ -5,10 +5,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -25,6 +29,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFE
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEProjectileUtils;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 public class RFEBulletProjectileType implements RFEProjectileType {
 
@@ -36,10 +41,11 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     private final boolean rendersInvulnerable;
     private final int maxAge;
     private final RFEProjectileDamageModel damageModel;
+    private final ResourceKey<DamageType> damageTypeKey;
 
     public RFEBulletProjectileType(double muzzleVelocity, double drag, boolean quadraticDrag, double gravity,
                                    boolean ignoresInvulnerability, boolean rendersInvulnerable, int maxAge,
-                                   RFEProjectileDamageModel damageModel) {
+                                   RFEProjectileDamageModel damageModel, ResourceKey<DamageType> damageTypeKey) {
         this.muzzleVelocity = muzzleVelocity;
         this.drag = drag;
         this.quadraticDrag = quadraticDrag;
@@ -48,6 +54,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         this.rendersInvulnerable = rendersInvulnerable;
         this.maxAge = maxAge;
         this.damageModel = damageModel;
+        this.damageTypeKey = damageTypeKey;
     }
 
     @Override
@@ -151,17 +158,15 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         // TODO crits and damage multipliers
         // TODO overpenetration
 
-        // TODO custom damage source
         Entity owner = instance.getOwner();
         DamageSource damagesource;
-        if (owner == null) {
-            damagesource = level.damageSources().generic();
+        Registry<DamageType> reg = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
+        if (owner instanceof LivingEntity livingOwner) {
+            damagesource = reg.getHolder(this.damageTypeKey)
+                    .map(type -> new DamageSource(type, livingOwner))
+                    .orElse(level.damageSources().mobAttack(livingOwner));
         } else {
             damagesource = level.damageSources().generic();
-            if (owner instanceof LivingEntity livingOwner) {
-                livingOwner.setLastHurtMob(entity);
-                damagesource = level.damageSources().mobAttack(livingOwner);
-            }
         }
 
         boolean flag = entity.getType() == EntityType.ENDERMAN;
@@ -271,8 +276,10 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             }
             damageModel.validateDamageModel();
 
+            ResourceKey<DamageType> damageType = ResourceKey.create(Registries.DAMAGE_TYPE, RFEUtils.location(GsonHelper.getAsString(obj, "damage_type")));
+
             return new RFEBulletProjectileType(muzzleVelocity, drag, quadraticDrag, gravity, ignoresInvulnerability,
-                    rendersInvulnerable, maxAge, damageModel);
+                    rendersInvulnerable, maxAge, damageModel, damageType);
         }
 
         @Override
@@ -285,8 +292,9 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             boolean rendersInvulnerable = buf.readBoolean();
             int maxAge = buf.readVarInt();
             RFEProjectileDamageModel damageModel = RFEProjectileDamageModel.fromNetwork(buf);
+            ResourceKey<DamageType> damageType = buf.readResourceKey(Registries.DAMAGE_TYPE);
             return new RFEBulletProjectileType(muzzleVelocity, drag, quadraticDrag, gravity, ignoresInvulnerability,
-                    rendersInvulnerable, maxAge, damageModel);
+                    rendersInvulnerable, maxAge, damageModel, damageType);
         }
 
         @Override
@@ -299,6 +307,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
                     .writeBoolean(type.rendersInvulnerable);
             buf.writeVarInt(type.maxAge);
             RFEProjectileDamageModel.toNetwork(buf, type.damageModel);
+            buf.writeResourceKey(type.damageTypeKey);
         }
     }
 

@@ -1,4 +1,6 @@
 {
+  "death.attack.rfe_builtin.shot": "%s was shot by %s",
+  "death.attack.rfe_builtin.shot.item": "%s was shot by %s using %s",
   "item.rfe_builtin.ammo_packet": "Ammo Packet",
   "item.rfe_builtin.remington_700": "Remington Model 700",
   "item.rfe_builtin.rifle_cartridge": "Rifle Cartridge",

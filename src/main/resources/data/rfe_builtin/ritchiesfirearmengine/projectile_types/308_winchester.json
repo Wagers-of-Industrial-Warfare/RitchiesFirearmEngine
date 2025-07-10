@@ -12,5 +12,6 @@
       "distance": 0,
       "damage": 16
     }
-  ]
+  ],
+  "damage_type": "rfe_builtin:bullet"
 }

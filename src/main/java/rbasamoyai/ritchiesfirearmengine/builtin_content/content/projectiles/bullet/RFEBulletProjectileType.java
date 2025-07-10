@@ -154,7 +154,8 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     protected void onHitEntity(RFEProjectileInstance instance, Level level, EntityHitResult result) {
         Entity entity = result.getEntity();
         float speed = (float) instance.velocity().length();
-        double damage = this.damageModel.getDamage(instance.distanceTravelled());
+        double additionalDisplacement = result.getLocation().subtract(instance.position()).length();
+        double damage = this.damageModel.getDamage(instance.distanceTravelled() + additionalDisplacement);
         // TODO crits and damage multipliers
         // TODO overpenetration
 

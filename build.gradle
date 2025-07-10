@@ -85,6 +85,12 @@ mixin {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
     flatDir {
         dir 'libs'
     }
@@ -103,6 +109,9 @@ dependencies {
     implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixinextras_version}")) {
         jarJar.ranged(it, "[${mixinextras_version},)")
     }
+
+    runtimeOnly(fg.deobf("curse.maven:moonlight-499980:${moonlight_cf_file}"))
+    runtimeOnly(fg.deobf("curse.maven:dummymod-225738:${dummy_mod_cf_file}"))
     //annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 

@@ -158,8 +158,10 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             damagesource = level.damageSources().generic();
         } else {
             damagesource = level.damageSources().generic();
-            if (owner instanceof LivingEntity livingOwner)
+            if (owner instanceof LivingEntity livingOwner) {
                 livingOwner.setLastHurtMob(entity);
+                damagesource = level.damageSources().mobAttack(livingOwner);
+            }
         }
 
         boolean flag = entity.getType() == EntityType.ENDERMAN;

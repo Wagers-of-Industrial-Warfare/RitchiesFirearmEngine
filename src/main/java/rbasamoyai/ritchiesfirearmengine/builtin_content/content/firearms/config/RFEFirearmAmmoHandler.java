@@ -17,7 +17,6 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.AmmoPredicate;
@@ -30,7 +29,9 @@ import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.RFEPacket;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -38,12 +39,10 @@ import java.util.concurrent.Executor;
 public class RFEFirearmAmmoHandler {
 
     private static final Map<Item, RFEFirearmItemAmmoProperties> FIREARM_AMMO_PROPERTIES = new Reference2ObjectOpenHashMap<>();
-
-    private static final Map<Item, RFEFirearmItemAmmoProperties> UNRESOLVED_PROPERTIES = new Reference2ObjectOpenHashMap<>();
-    private static final Map<Item, UnresolvedProjectileTypes> UNRESOLVED_PROJECTILE_TYPES = new Reference2ObjectOpenHashMap<>();
+    private static final Map<Item, UnresolvedItemAmmoProperties> UNRESOLVED_PROPERTIES = new Reference2ObjectOpenHashMap<>();
 
     private static final RFEFirearmModeAmmoProperties EMPTY_MODE = new RFEFirearmModeAmmoProperties(ImmutableMap.of(),
-            ImmutableList.of(), ImmutableList.of(), ImmutableList.of());
+            ImmutableList.of(), ImmutableList.of(), ImmutableList.of(), null);
     private static final RFEFirearmItemAmmoProperties EMPTY = new RFEFirearmItemAmmoProperties(EMPTY_MODE, ImmutableMap.of());
 
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -76,80 +75,21 @@ public class RFEFirearmAmmoHandler {
     private static void clear() {
         FIREARM_AMMO_PROPERTIES.clear();
         UNRESOLVED_PROPERTIES.clear();
-        UNRESOLVED_PROJECTILE_TYPES.clear();
     }
 
     public static void loadProjectileTypes() {
         FIREARM_AMMO_PROPERTIES.clear();
-
-        for (Map.Entry<Item, RFEFirearmItemAmmoProperties> entry : UNRESOLVED_PROPERTIES.entrySet()) {
-            Item item = entry.getKey();
-            if (!UNRESOLVED_PROJECTILE_TYPES.containsKey(item)) {
-                LOGGER.error("Missing projectile types for firearm item {}", BuiltInRegistries.ITEM.getKey(item));
-                continue;
-            }
-            RFEFirearmItemAmmoProperties unresolvedItemProperties = entry.getValue();
-            RFEFirearmModeAmmoProperties oldDefaultProperties = unresolvedItemProperties.defaultProperties();
-            UnresolvedProjectileTypes unresolvedProjectileTypes = UNRESOLVED_PROJECTILE_TYPES.get(item);
-
-            ImmutableMap.Builder<AmmoPredicate, RFEProjectileType> defaultResolvedPrimaryAmmo = ImmutableMap.builder();
-            for (Map.Entry<AmmoPredicate, ResourceLocation> unresolvedPrimaryAmmo : unresolvedProjectileTypes.defaultMode().entrySet()) {
-                RFEProjectileType type = RFEProjectileTypeHandler.getProjectileType(unresolvedPrimaryAmmo.getValue());
-                if (type == null) {
-                    LOGGER.warn("Missing projectile type {} in firearm item ammo properties for firearm item {}, skipping",
-                            unresolvedPrimaryAmmo.getValue(), BuiltInRegistries.ITEM.getKey(item));
-                    continue;
-                }
-                defaultResolvedPrimaryAmmo.put(unresolvedPrimaryAmmo.getKey(), type);
-            }
-            RFEFirearmModeAmmoProperties completeDefaultProperties = new RFEFirearmModeAmmoProperties(defaultResolvedPrimaryAmmo.build(),
-                    oldDefaultProperties.magazines(), oldDefaultProperties.speedloaders(), oldDefaultProperties.secondaryAmmo());
-
-            ImmutableMap<String, RFEFirearmModeAmmoProperties> unresolvedPropertiesByMode = unresolvedItemProperties.propertiesByMode();
-            ImmutableMap.Builder<String, RFEFirearmModeAmmoProperties> completePropertiesByMode = ImmutableMap.builder();
-            for (Map.Entry<String, Map<AmmoPredicate, ResourceLocation>> modeEntry : unresolvedProjectileTypes.otherModes().entrySet()) {
-                String modeName = modeEntry.getKey();
-                RFEFirearmModeAmmoProperties oldModeProperties = unresolvedPropertiesByMode.get(modeName);
-                if (oldModeProperties == null) {
-                    LOGGER.error("Internal error: missing mode {} in firearm item ammo properties for firearm item {}, skipping",
-                            modeName, BuiltInRegistries.ITEM.getKey(item));
-                    continue;
-                }
-                ImmutableMap.Builder<AmmoPredicate, RFEProjectileType> modeResolvedPrimaryAmmo = ImmutableMap.builder();
-                for (Map.Entry<AmmoPredicate, ResourceLocation> unresolvedPrimaryAmmo : modeEntry.getValue().entrySet()) {
-                    RFEProjectileType type = RFEProjectileTypeHandler.getProjectileType(unresolvedPrimaryAmmo.getValue());
-                    if (type == null) {
-                        LOGGER.warn("Missing projectile type {} in firearm item ammo properties for firearm item {}, skipping",
-                                unresolvedPrimaryAmmo.getValue(), BuiltInRegistries.ITEM.getKey(item));
-                        continue;
-                    }
-                    modeResolvedPrimaryAmmo.put(unresolvedPrimaryAmmo.getKey(), type);
-                }
-                completePropertiesByMode.put(modeName, new RFEFirearmModeAmmoProperties(modeResolvedPrimaryAmmo.build(),
-                        oldModeProperties.magazines(), oldModeProperties.speedloaders(), oldModeProperties.secondaryAmmo()));
-            }
-
-            FIREARM_AMMO_PROPERTIES.put(item, new RFEFirearmItemAmmoProperties(completeDefaultProperties, completePropertiesByMode.build()));
-        }
-        UNRESOLVED_PROJECTILE_TYPES.clear();
+        for (Map.Entry<Item, UnresolvedItemAmmoProperties> entry : UNRESOLVED_PROPERTIES.entrySet())
+            FIREARM_AMMO_PROPERTIES.put(entry.getKey(), entry.getValue().resolve(entry.getKey()));
         UNRESOLVED_PROPERTIES.clear();
     }
 
     private static void loadIncomplete(JsonObject obj, Item item) {
         if (!UNRESOLVED_PROPERTIES.containsKey(item))
-            UNRESOLVED_PROPERTIES.put(item, EMPTY);
-        if (!UNRESOLVED_PROJECTILE_TYPES.containsKey(item))
-            UNRESOLVED_PROJECTILE_TYPES.put(item, new UnresolvedProjectileTypes(new Object2ObjectOpenHashMap<>(), new Object2ObjectOpenHashMap<>()));
-        RFEFirearmItemAmmoProperties oldItemProperties = UNRESOLVED_PROPERTIES.get(item);
-        UnresolvedProjectileTypes oldUnresolvedTypes = UNRESOLVED_PROJECTILE_TYPES.get(item);
+            UNRESOLVED_PROPERTIES.put(item, new UnresolvedItemAmmoProperties());
+        UnresolvedItemAmmoProperties properties = UNRESOLVED_PROPERTIES.get(item);
 
-        RFEFirearmModeAmmoProperties defaultModeProperties = loadIncompleteModeProperties(obj, item, oldItemProperties.defaultProperties());
-        Map<AmmoPredicate, ResourceLocation> defaultUnresolvedPrimaryAmmo = loadUnresolvedPrimaryAmmo(obj, item, oldUnresolvedTypes.defaultMode());
-
-        ImmutableMap<String, RFEFirearmModeAmmoProperties> oldPropertiesByMode = oldItemProperties.propertiesByMode();
-        ImmutableMap.Builder<String, RFEFirearmModeAmmoProperties> propertiesByMode = ImmutableMap.builder();
-        propertiesByMode.putAll(oldPropertiesByMode);
-        Map<String, Map<AmmoPredicate, ResourceLocation>> unresolvedPrimaryAmmoByMode = new Object2ObjectOpenHashMap<>(oldUnresolvedTypes.otherModes());
+        loadUnresolvedModeProperties(obj, item, properties.defaultModeProperties);
 
         if (GsonHelper.isObjectNode(obj, "modes")) {
             JsonObject modesObj = GsonHelper.getAsJsonObject(obj, "modes");
@@ -159,75 +99,60 @@ public class RFEFirearmAmmoHandler {
                     throw new JsonParseException("Expected JSON object while parsing mode ammo for item " + BuiltInRegistries.ITEM.getKey(item));
                 JsonObject modeObj = el.getAsJsonObject();
                 String modeName = entry.getKey();
-                propertiesByMode.put(modeName, loadIncompleteModeProperties(modeObj, item, oldPropertiesByMode.getOrDefault(modeName, EMPTY_MODE)));
-                unresolvedPrimaryAmmoByMode.put(modeName, loadUnresolvedPrimaryAmmo(modeObj, item,
-                        unresolvedPrimaryAmmoByMode.getOrDefault(modeName, new Object2ObjectOpenHashMap<>())));
+                loadUnresolvedModeProperties(modeObj, item, properties.modeProperties.getOrDefault(modeName, properties.defaultModeProperties.fork()));
             }
         }
-
-        UNRESOLVED_PROPERTIES.put(item, new RFEFirearmItemAmmoProperties(defaultModeProperties, propertiesByMode.build()));
-        UNRESOLVED_PROJECTILE_TYPES.put(item, new UnresolvedProjectileTypes(defaultUnresolvedPrimaryAmmo, unresolvedPrimaryAmmoByMode));
     }
 
-    private static Map<AmmoPredicate, ResourceLocation> loadUnresolvedPrimaryAmmo(JsonObject obj, Item item, Map<AmmoPredicate, ResourceLocation> unresolvedTypes) {
-        if (!GsonHelper.isArrayNode(obj, "primary_ammo"))
-            return unresolvedTypes;
-        Map<AmmoPredicate, ResourceLocation> newUnresolvedTypes = new Object2ObjectOpenHashMap<>(unresolvedTypes);
-        if (GsonHelper.getAsBoolean(obj, "replace_primary_ammo", false))
-            newUnresolvedTypes.clear();
-        JsonArray arr = GsonHelper.getAsJsonArray(obj, "primary_ammo");
-        for (JsonElement el : arr) {
-            if (!el.isJsonObject())
-                throw new JsonParseException("Expected JSON object while parsing primary ammo for item " + BuiltInRegistries.ITEM.getKey(item));
-            JsonObject primaryObj = el.getAsJsonObject();
-            AmmoPredicate predicate = AmmoPredicate.fromString(GsonHelper.getAsString(primaryObj, "ammo"));
-            ResourceLocation loc = RFEUtils.location(GsonHelper.getAsString(primaryObj, "fires"));
-            newUnresolvedTypes.put(predicate, loc);
+    private static void loadUnresolvedModeProperties(JsonObject obj, Item item, UnresolvedModeAmmoProperties properties) {
+        if (GsonHelper.isArrayNode(obj, "primary_ammo")) {
+            if (GsonHelper.getAsBoolean(obj, "replace_primary_ammo", false))
+                properties.primaryAmmo.clear();
+            JsonArray arr = GsonHelper.getAsJsonArray(obj, "primary_ammo");
+            for (JsonElement el : arr) {
+                if (!el.isJsonObject())
+                    throw new JsonParseException("Expected JSON object while parsing primary ammo for item " + BuiltInRegistries.ITEM.getKey(item));
+                JsonObject primaryObj = el.getAsJsonObject();
+                AmmoPredicate predicate = AmmoPredicate.fromString(GsonHelper.getAsString(primaryObj, "ammo"));
+                ResourceLocation loc = RFEUtils.location(GsonHelper.getAsString(primaryObj, "fires"));
+                properties.primaryAmmo.put(predicate, loc);
+            }
         }
-        return newUnresolvedTypes;
-    }
-
-    private static RFEFirearmModeAmmoProperties loadIncompleteModeProperties(JsonObject obj, Item item, RFEFirearmModeAmmoProperties properties) {
+        if (GsonHelper.getAsBoolean(obj, "no_unlimited_projectile", false)) {
+            properties.unlimitedProjectile = null;
+        } else if (GsonHelper.isStringValue(obj, "unlimited_projectile")) {
+            properties.unlimitedProjectile = RFEUtils.location(GsonHelper.getAsString(obj, "unlimited_projectile"));
+        }
         if (GsonHelper.isArrayNode(obj, "magazines")) {
-            List<AmmoPredicate> magazineList = new ArrayList<>(properties.magazines());
             if (GsonHelper.getAsBoolean(obj, "replace_magazines", false))
-                magazineList.clear();
+                properties.magazines.clear();
             JsonArray arr = GsonHelper.getAsJsonArray(obj, "magazines");
             for (JsonElement el : arr) {
                 if (!GsonHelper.isStringValue(el))
                     throw new JsonParseException("Expected valid item predicate while parsing magazines for item " + BuiltInRegistries.ITEM.getKey(item));
-                magazineList.add(AmmoPredicate.fromString(el.getAsString()));
+                properties.magazines.add(AmmoPredicate.fromString(el.getAsString()));
             }
-            properties = new RFEFirearmModeAmmoProperties(properties.primaryAmmo(), ImmutableList.<AmmoPredicate>builder().addAll(magazineList).build(),
-                    properties.speedloaders(), properties.secondaryAmmo());
         }
         if (GsonHelper.isArrayNode(obj, "speedloaders")) {
-            List<AmmoPredicate> speedloaderList = new ArrayList<>(properties.speedloaders());
             if (GsonHelper.getAsBoolean(obj, "replace_speedloaders", false))
-                speedloaderList.clear();
+                properties.speedloaders.clear();
             JsonArray arr = GsonHelper.getAsJsonArray(obj, "speedloaders");
             for (JsonElement el : arr) {
                 if (!GsonHelper.isStringValue(el))
                     throw new JsonParseException("Expected valid item predicate while parsing speedloaders for item " + BuiltInRegistries.ITEM.getKey(item));
-                speedloaderList.add(AmmoPredicate.fromString(el.getAsString()));
+                properties.speedloaders.add(AmmoPredicate.fromString(el.getAsString()));
             }
-            properties = new RFEFirearmModeAmmoProperties(properties.primaryAmmo(), properties.magazines(),
-                    ImmutableList.<AmmoPredicate>builder().addAll(speedloaderList).build(), properties.secondaryAmmo());
         }
         if (GsonHelper.isArrayNode(obj, "secondary_ammo")) {
-            List<AmmoPredicate> secondaryAmmoList = new ArrayList<>(properties.secondaryAmmo());
             if (GsonHelper.getAsBoolean(obj, "replace_secondary_ammo", false))
-                secondaryAmmoList.clear();
+                properties.secondaryAmmo.clear();
             JsonArray arr = GsonHelper.getAsJsonArray(obj, "secondary_ammo");
             for (JsonElement el : arr) {
                 if (!GsonHelper.isStringValue(el))
                     throw new JsonParseException("Expected valid item predicate while parsing secondary ammo for item " + BuiltInRegistries.ITEM.getKey(item));
-                secondaryAmmoList.add(AmmoPredicate.fromString(el.getAsString()));
+                properties.secondaryAmmo.add(AmmoPredicate.fromString(el.getAsString()));
             }
-            properties = new RFEFirearmModeAmmoProperties(properties.primaryAmmo(), properties.magazines(), properties.speedloaders(),
-                    ImmutableList.<AmmoPredicate>builder().addAll(secondaryAmmoList).build());
         }
-        return properties;
     }
 
     public static RFEFirearmItemAmmoProperties getAmmoProperties(Item item) { return FIREARM_AMMO_PROPERTIES.getOrDefault(item, EMPTY); }
@@ -272,8 +197,67 @@ public class RFEFirearmAmmoHandler {
         }
     }
 
-    private record UnresolvedProjectileTypes(Map<AmmoPredicate, ResourceLocation> defaultMode, Map<String,
-            Map<AmmoPredicate, ResourceLocation>> otherModes) {
+    private static class UnresolvedItemAmmoProperties {
+        public UnresolvedModeAmmoProperties defaultModeProperties = new UnresolvedModeAmmoProperties();
+        public Map<String, UnresolvedModeAmmoProperties> modeProperties = new Object2ObjectOpenHashMap<>();
+
+
+
+        public RFEFirearmItemAmmoProperties resolve(Item item) {
+            ImmutableMap.Builder<String, RFEFirearmModeAmmoProperties> resolvedModeProperties = ImmutableMap.builder();
+            for (Map.Entry<String, UnresolvedModeAmmoProperties> entry : this.modeProperties.entrySet())
+                resolvedModeProperties.put(entry.getKey(), entry.getValue().resolve(item));
+            return new RFEFirearmItemAmmoProperties(this.defaultModeProperties.resolve(item), resolvedModeProperties.build());
+        }
+    }
+
+    private static class UnresolvedModeAmmoProperties {
+        public Map<AmmoPredicate, ResourceLocation> primaryAmmo = new LinkedHashMap<>();
+        public List<AmmoPredicate> magazines = new ArrayList<>();
+        public List<AmmoPredicate> speedloaders = new ArrayList<>();
+        public List<AmmoPredicate> secondaryAmmo = new ArrayList<>();
+        public ResourceLocation unlimitedProjectile = null;
+
+        public UnresolvedModeAmmoProperties fork() {
+            UnresolvedModeAmmoProperties newProperties = new UnresolvedModeAmmoProperties();
+            newProperties.primaryAmmo = new LinkedHashMap<>(this.primaryAmmo);
+            newProperties.magazines = new ArrayList<>(this.magazines);
+            newProperties.speedloaders = new ArrayList<>(this.speedloaders);
+            newProperties.secondaryAmmo = new ArrayList<>(this.secondaryAmmo);
+            newProperties.unlimitedProjectile = this.unlimitedProjectile;
+            return newProperties;
+        }
+
+        public RFEFirearmModeAmmoProperties resolve(Item item) {
+            ImmutableMap.Builder<AmmoPredicate, RFEProjectileType> primaryAmmo = ImmutableMap.builder();
+            for (Map.Entry<AmmoPredicate, ResourceLocation> entry : this.primaryAmmo.entrySet()) {
+                RFEProjectileType projectileType = loadProjectileTypeOrWarnIgnore(entry.getValue(), item);
+                if (projectileType != null)
+                    primaryAmmo.put(entry.getKey(), projectileType);
+            }
+            ImmutableList.Builder<AmmoPredicate> magazines = ImmutableList.builder();
+            magazines.addAll(this.magazines);
+            ImmutableList.Builder<AmmoPredicate> speedloaders = ImmutableList.builder();
+            speedloaders.addAll(this.speedloaders);
+            ImmutableList.Builder<AmmoPredicate> secondaryAmmo = ImmutableList.builder();
+            secondaryAmmo.addAll(this.secondaryAmmo);
+            RFEProjectileType unlimitedProjectile = null;
+            if (this.unlimitedProjectile != null)
+                unlimitedProjectile = loadProjectileTypeOrWarnIgnore(this.unlimitedProjectile, item);
+            return new RFEFirearmModeAmmoProperties(primaryAmmo.build(), magazines.build(), speedloaders.build(), secondaryAmmo.build(), unlimitedProjectile);
+        }
+
+        @Nullable
+        private static RFEProjectileType loadProjectileTypeOrWarnIgnore(ResourceLocation typeId, Item item) {
+            RFEProjectileType type = RFEProjectileTypeHandler.getProjectileType(typeId);
+            if (type == null) {
+                LOGGER.warn("Missing projectile type {} in firearm item ammo properties for firearm item {}, skipping",
+                        typeId, BuiltInRegistries.ITEM.getKey(item));
+                return null;
+            } else {
+                return type;
+            }
+        }
     }
 
 }

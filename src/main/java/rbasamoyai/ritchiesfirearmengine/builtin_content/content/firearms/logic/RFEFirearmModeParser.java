@@ -46,19 +46,22 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
         }
 
         if (GsonHelper.isObjectNode(obj, "ammo")) {
-            // TODO ammo required
             JsonObject ammo = obj.getAsJsonObject("ammo");
-            int internalCapacity = GsonHelper.getAsInt(ammo, "internal_capacity", 0);
-            if (internalCapacity > 0) {
-                builder.internalCapacity(internalCapacity);
-                int nominalCapacity = GsonHelper.getAsInt(ammo, "nominal_capacity", internalCapacity);
-                builder.nominalCapacity(nominalCapacity);
-            } else {
-                boolean plusOneCapacity = GsonHelper.getAsBoolean(ammo, "plus_1_capacity", true);
-                builder.plusOneCapacity(plusOneCapacity);
+            boolean ammoRequired = GsonHelper.getAsBoolean(ammo, "ammo_required", true);
+            builder.ammoRequired(ammoRequired);
+            if (ammoRequired) {
+                int internalCapacity = GsonHelper.getAsInt(ammo, "internal_capacity", 0);
+                if (internalCapacity > 0) {
+                    builder.internalCapacity(internalCapacity);
+                    int nominalCapacity = GsonHelper.getAsInt(ammo, "nominal_capacity", internalCapacity);
+                    builder.nominalCapacity(nominalCapacity);
+                } else {
+                    boolean plusOneCapacity = GsonHelper.getAsBoolean(ammo, "plus_1_capacity", true);
+                    builder.plusOneCapacity(plusOneCapacity);
+                }
+                boolean requiresSecondaryAmmo = GsonHelper.getAsBoolean(ammo, "requires_secondary_ammo", false);
+                builder.requiresSecondaryAmmo(requiresSecondaryAmmo);
             }
-            boolean requiresSecondaryAmmo = GsonHelper.getAsBoolean(ammo, "requires_secondary_ammo", false);
-            builder.requiresSecondaryAmmo(requiresSecondaryAmmo);
         }
 
         if (GsonHelper.isObjectNode(obj, "firing")) {
@@ -69,14 +72,14 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
             if (fireMode != FireMode.SAFETY) {
                 int cooldown = GsonHelper.getAsInt(firing, "cooldown");
                 boolean ammoConsumedLast = GsonHelper.getAsBoolean(firing, "ammo_consumed_last", false);
-                int ammoConsumed = GsonHelper.getAsInt(firing, "ammo_consumed", 1);
+                int shotsFired = GsonHelper.getAsInt(firing, "shots_fired", 1);
                 float verticalRecoil = GsonHelper.getAsFloat(firing, "vertical_recoil", 0);
                 float horizontalRecoil = GsonHelper.getAsFloat(firing, "horizontal_recoil", 0);
                 float spread = GsonHelper.getAsFloat(firing, "spread", 0);
                 float jamChance = GsonHelper.getAsFloat(firing, "jam_chance", 0);
                 builder.firingCooldown(cooldown)
                         .ammoConsumedLast(ammoConsumedLast)
-                        .ammoConsumed(ammoConsumed)
+                        .shotsFired(shotsFired)
                         .verticalRecoil(verticalRecoil)
                         .horizontalRecoil(horizontalRecoil)
                         .spread(spread)

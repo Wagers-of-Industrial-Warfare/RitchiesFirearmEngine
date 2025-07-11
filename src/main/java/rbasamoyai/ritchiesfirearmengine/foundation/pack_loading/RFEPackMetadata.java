@@ -5,10 +5,10 @@ import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 import net.minecraft.util.GsonHelper;
-import org.jetbrains.annotations.Nullable;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEModUtils;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;

@@ -9,12 +9,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 import rbasamoyai.ritchiesfirearmengine.network.RFEClientNetworkHandlers;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.RFEPacket;
 import rbasamoyai.ritchiesfirearmengine.utils.EnvExecute;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.Executor;
 
@@ -66,6 +66,8 @@ public class RFEProjectileManager {
     }
 
     public static void queueAddedProjectile(RFEProjectileInstance instance, Level level) {
+        if (instance.isRemoved())
+            return;
         if (!PROJECTILES_TO_ADD.containsKey(level))
             PROJECTILES_TO_ADD.put(level, new HashMap<>());
         Map<UUID, RFEProjectileInstance> map = PROJECTILES_TO_ADD.get(level);

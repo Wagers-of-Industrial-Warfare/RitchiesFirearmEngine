@@ -47,6 +47,7 @@ public class RFEFirearmMode {
     @Nullable protected final SoundEvent unaimSound;
 
     // Ammo
+    protected final boolean ammoRequired;
     protected final int internalCapacity;
     protected final int nominalCapacity;
     protected final boolean plusOneCapacity;
@@ -56,7 +57,7 @@ public class RFEFirearmMode {
     protected final FireMode fireMode;
     protected final int firingCooldown;
     protected final boolean ammoConsumedLast;
-    protected final int ammoConsumed;
+    protected final int shotsFired;
     protected final int burstRoundCount;
     @Nullable protected final SoundEvent firingSound;
     // Wind-up
@@ -100,6 +101,7 @@ public class RFEFirearmMode {
         this.aimSound = builder.aimSound;
         this.unaimSound = builder.unaimSound;
 
+        this.ammoRequired = builder.ammoRequired;
         this.internalCapacity = builder.internalCapacity;
         this.nominalCapacity = builder.nominalCapacity;
         this.plusOneCapacity = builder.plusOneCapacity;
@@ -108,7 +110,7 @@ public class RFEFirearmMode {
         this.fireMode = builder.fireMode;
         this.firingCooldown = builder.firingCooldown;
         this.ammoConsumedLast = builder.ammoConsumedLast;
-        this.ammoConsumed = builder.ammoConsumed;
+        this.shotsFired = builder.shotsFired;
         this.burstRoundCount = builder.burstRoundCount;
         this.firingSound = builder.firingSound;
         this.windUpTime = builder.windUpTime;
@@ -235,8 +237,12 @@ public class RFEFirearmMode {
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
         if (this.fireMode == FireMode.SAFETY || !FirearmDataUtils.isCharged(modeTag) || FirearmDataUtils.getActionTime(itemStack) > 0)
             return false;
+        if (this.isJammed(itemStack))
+            return false;
+        if (!this.ammoRequired)
+            return true;
         // TODO check for secondary ammo
-        return !this.isJammed(itemStack) && !this.getNextRoundsInItem(itemStack, entity, this.ammoConsumed, false).isEmpty();
+        return !this.getNextRoundsInItem(itemStack, entity, this.shotsFired, false).isEmpty();
     }
 
     public void fireProjectile(ItemStack itemStack, LivingEntity entity) {
@@ -248,8 +254,9 @@ public class RFEFirearmMode {
         Vec3 upDirection = entity.getUpVector(1f);
         Vec3 aimDirection = entity.getViewVector(1f);
 
-        if (this.ammoConsumed > 0) {
-            List<ItemStack> strippedAmmo = this.getNextRoundsInItem(itemStack, entity, this.ammoConsumed, true);
+        // TODO spread, recoil
+        if (this.ammoRequired) {
+            List<ItemStack> strippedAmmo = this.getNextRoundsInItem(itemStack, entity, this.shotsFired, true);
             // TODO consume secondary ammo if required
             for (ItemStack ammoStack : strippedAmmo) {
                 for (Map.Entry<AmmoPredicate, RFEProjectileType> entry : ammoProperties.primaryAmmo().entrySet()) {
@@ -265,8 +272,18 @@ public class RFEFirearmMode {
                 }
             }
         } else {
-            // TODO spawn anyway if ammo not consumed, usable for infinity guns/blasters
-            // TODO Figure out ammo type
+            RFEProjectileType unlimitedProjectile = ammoProperties.unlimitedAmmo();
+            if (unlimitedProjectile != null) {
+                // TODO one-time warning if no projectile?
+                for (int i = 0; i < this.shotsFired; ++i) {
+                    RFEProjectileInstance instance = unlimitedProjectile.createInstance();
+                    // TODO shooter positioning
+                    instance.setOwner(entity);
+                    instance.setPosition(new Vec3(entity.getX(), entity.getEyeY(), entity.getZ()));
+                    instance.shoot(aimDirection.x, aimDirection.y, aimDirection.z);
+                    RFEProjectileManager.queueAddedProjectile(instance, entity.level());
+                }
+            }
         }
         this.playFiringEffects(itemStack, entity);
         if (this.canOverheat) {
@@ -355,6 +372,8 @@ public class RFEFirearmMode {
 
     // TODO secondary ammo
     public boolean tryRunningReloadAction(ItemStack itemStack, LivingEntity entity, ReloadPhase.PhaseType phaseType) {
+        if (!this.ammoRequired)
+            return false;
         if (FirearmDataUtils.getActionTime(itemStack) > 0)
             return false;
         for (ListIterator<ReloadPhase> lister = this.reloadPhases.get(phaseType).listIterator(); lister.hasNext(); ) {
@@ -375,6 +394,11 @@ public class RFEFirearmMode {
 
     public void onTickReload(ItemStack itemStack, LivingEntity entity) {
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        if (!this.ammoRequired) {
+            FirearmDataUtils.cancelReload(itemStack, modeTag);
+            return;
+        }
+
         ReloadPhase.PhaseType phaseType = ReloadPhase.PhaseType.byId(modeTag.getString("ReloadPhase"));
         if (phaseType == null) {
             FirearmDataUtils.cancelReload(itemStack, modeTag);

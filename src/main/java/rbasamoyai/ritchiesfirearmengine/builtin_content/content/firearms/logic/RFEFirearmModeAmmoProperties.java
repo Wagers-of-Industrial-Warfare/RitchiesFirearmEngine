@@ -9,10 +9,12 @@ import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 public record RFEFirearmModeAmmoProperties(ImmutableMap<AmmoPredicate, RFEProjectileType> primaryAmmo, ImmutableList<AmmoPredicate> magazines,
-                                           ImmutableList<AmmoPredicate> speedloaders, ImmutableList<AmmoPredicate> secondaryAmmo) {
+                                           ImmutableList<AmmoPredicate> speedloaders, ImmutableList<AmmoPredicate> secondaryAmmo,
+                                           @Nullable RFEProjectileType unlimitedAmmo) {
 
     public ImmutableCollection<AmmoPredicate> primaryAmmoPredicates() { return this.primaryAmmo.keySet(); }
 
@@ -37,6 +39,14 @@ public record RFEFirearmModeAmmoProperties(ImmutableMap<AmmoPredicate, RFEProjec
         buf.writeVarInt(properties.secondaryAmmo().size());
         for (AmmoPredicate pred : properties.secondaryAmmo())
             AmmoPredicate.writeToNetwork(pred, buf);
+
+        buf.writeBoolean(properties.unlimitedAmmo() != null);
+        if (properties.unlimitedAmmo() != null) {
+            ResourceLocation id = RFEProjectileTypeHandler.getProjectileTypeId(properties.unlimitedAmmo());
+            if (id == null)
+                id = RitchiesFirearmEngine.resource("invalid");
+            buf.writeResourceLocation(id);
+        }
     }
 
     public static RFEFirearmModeAmmoProperties fromNetwork(FriendlyByteBuf buf) {
@@ -64,7 +74,9 @@ public record RFEFirearmModeAmmoProperties(ImmutableMap<AmmoPredicate, RFEProjec
         for (int i = 0; i < secondaryAmmoSz; ++i)
             secondaryAmmo.add(AmmoPredicate.fromNetwork(buf));
 
-        return new RFEFirearmModeAmmoProperties(primaryAmmo.build(), magazines.build(), speedloaders.build(), secondaryAmmo.build());
+        boolean hasUnlimited = buf.readBoolean();
+        RFEProjectileType unlimitedAmmo = hasUnlimited ? RFEProjectileTypeHandler.getProjectileType(buf.readResourceLocation()) : null;
+        return new RFEFirearmModeAmmoProperties(primaryAmmo.build(), magazines.build(), speedloaders.build(), secondaryAmmo.build(), unlimitedAmmo);
     }
 
 }

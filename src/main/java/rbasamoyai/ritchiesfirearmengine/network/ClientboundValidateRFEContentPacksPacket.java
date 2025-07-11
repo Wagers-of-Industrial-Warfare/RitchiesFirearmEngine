@@ -3,9 +3,9 @@ package rbasamoyai.ritchiesfirearmengine.network;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
 import net.minecraft.server.level.ServerPlayer;
-import org.jetbrains.annotations.Nullable;
 import rbasamoyai.ritchiesfirearmengine.utils.EnvExecute;
 
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;

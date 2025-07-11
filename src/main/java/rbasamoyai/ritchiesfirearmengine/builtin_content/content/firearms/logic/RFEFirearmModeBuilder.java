@@ -25,6 +25,7 @@ public class RFEFirearmModeBuilder {
     @Nullable
     protected SoundEvent unaimSound = null;
 
+    protected boolean ammoRequired = true;
     protected int internalCapacity = 0;
     protected int nominalCapacity = 0;
     protected boolean explicitNominalCapacity = false;
@@ -39,7 +40,7 @@ public class RFEFirearmModeBuilder {
     protected float horizontalRecoil = 0; // Datapackable
     protected int firingCooldown = -1;
     protected boolean ammoConsumedLast = false;
-    protected int ammoConsumed = 1;
+    protected int shotsFired = 1;
     protected int burstRoundCount = 3;
     @Nullable
     protected SoundEvent firingSound = null;
@@ -90,6 +91,7 @@ public class RFEFirearmModeBuilder {
         newBuilder.aimSound = this.aimSound;
         newBuilder.unaimSound = this.unaimSound;
 
+        newBuilder.ammoRequired = this.ammoRequired;
         newBuilder.internalCapacity = this.internalCapacity;
         newBuilder.nominalCapacity = this.nominalCapacity;
         newBuilder.explicitNominalCapacity = this.explicitNominalCapacity;
@@ -104,7 +106,7 @@ public class RFEFirearmModeBuilder {
         newBuilder.horizontalRecoil = this.horizontalRecoil;
         newBuilder.firingCooldown = this.firingCooldown;
         newBuilder.ammoConsumedLast = this.ammoConsumedLast;
-        newBuilder.ammoConsumed = this.ammoConsumed;
+        newBuilder.shotsFired = this.shotsFired;
         newBuilder.burstRoundCount = this.burstRoundCount;
         newBuilder.firingSound = this.firingSound;
         newBuilder.windUpTime = this.windUpTime;
@@ -187,6 +189,11 @@ public class RFEFirearmModeBuilder {
         this.plusOneCapacity = false;
     }
 
+    public RFEFirearmModeBuilder ammoRequired(boolean ammoRequired) {
+        this.ammoRequired = ammoRequired;
+        return this;
+    }
+
     public RFEFirearmModeBuilder internalCapacity(int internalCapacity) {
         if (internalCapacity < 1)
             throw new IllegalStateException("Cannot specify internal capacity less than 1");
@@ -265,10 +272,10 @@ public class RFEFirearmModeBuilder {
         return this;
     }
 
-    public RFEFirearmModeBuilder ammoConsumed(int ammoConsumed) {
-        if (ammoConsumed < 0)
-            throw new IllegalStateException("Cannot specify ammo consumed less than 0");
-        this.ammoConsumed = ammoConsumed;
+    public RFEFirearmModeBuilder shotsFired(int shotsFired) {
+        if (shotsFired < 1)
+            throw new IllegalStateException("Cannot specify shots fired less than 1");
+        this.shotsFired = shotsFired;
         return this;
     }
 
@@ -317,7 +324,7 @@ public class RFEFirearmModeBuilder {
         this.horizontalRecoil = 0;
         this.firingCooldown = -1;
         this.ammoConsumedLast = false;
-        this.ammoConsumed = 1;
+        this.shotsFired = 1;
         this.burstRoundCount = 3;
         this.firingSound = null;
         this.windUpTime = 0;

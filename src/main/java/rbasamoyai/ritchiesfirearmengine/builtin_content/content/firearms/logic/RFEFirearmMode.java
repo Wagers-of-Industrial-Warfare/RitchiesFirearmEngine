@@ -713,6 +713,8 @@ public class RFEFirearmMode {
 
     public void onTickSwitchMode(ItemStack itemStack, LivingEntity entity) {
         int actionTime = FirearmDataUtils.getActionTime(itemStack);
+        if (actionTime == this.modeChangeTime)
+            this.playSwitchModeEffects(itemStack, entity);
         if (actionTime > 0)
             --actionTime;
         FirearmDataUtils.setActionTime(itemStack, actionTime);

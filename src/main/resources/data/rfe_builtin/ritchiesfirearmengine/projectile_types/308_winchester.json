@@ -4,9 +4,8 @@
   "drag": 0.0025,
   "quadratic_drag": true,
   "gravity": 0.03,
-  "ignores_invulnerability": true,
-  "renders_invulnerable": false,
   "max_age": 400,
+  "knockback": 0.5,
   "damage_model": [
     {
       "distance": 0,

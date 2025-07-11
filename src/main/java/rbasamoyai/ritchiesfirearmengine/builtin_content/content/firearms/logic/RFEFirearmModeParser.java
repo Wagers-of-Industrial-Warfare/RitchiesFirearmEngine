@@ -54,10 +54,8 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                 int nominalCapacity = GsonHelper.getAsInt(ammo, "nominal_capacity", internalCapacity);
                 builder.nominalCapacity(nominalCapacity);
             } else {
-                boolean canLoadSingleRounds = GsonHelper.getAsBoolean(ammo, "can_load_single_rounds"); // TODO remove
                 boolean plusOneCapacity = GsonHelper.getAsBoolean(ammo, "plus_1_capacity", true);
-                builder.canLoadSingleRounds(canLoadSingleRounds)
-                        .plusOneCapacity(plusOneCapacity);
+                builder.plusOneCapacity(plusOneCapacity);
             }
             boolean requiresSecondaryAmmo = GsonHelper.getAsBoolean(ammo, "requires_secondary_ammo", false);
             builder.requiresSecondaryAmmo(requiresSecondaryAmmo);

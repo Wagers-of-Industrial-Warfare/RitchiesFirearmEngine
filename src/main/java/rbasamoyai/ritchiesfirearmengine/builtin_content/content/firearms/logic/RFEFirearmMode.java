@@ -49,7 +49,6 @@ public class RFEFirearmMode {
     // Ammo
     protected final int internalCapacity;
     protected final int nominalCapacity;
-    protected final boolean canLoadSingleRounds;
     protected final boolean plusOneCapacity;
     protected final boolean requiresSecondaryAmmo;
 
@@ -103,7 +102,6 @@ public class RFEFirearmMode {
 
         this.internalCapacity = builder.internalCapacity;
         this.nominalCapacity = builder.nominalCapacity;
-        this.canLoadSingleRounds = builder.canLoadSingleRounds;
         this.plusOneCapacity = builder.plusOneCapacity;
         this.requiresSecondaryAmmo = builder.requiresSecondaryAmmo;
 
@@ -446,15 +444,13 @@ public class RFEFirearmMode {
         if (this.internalCapacity > 0) {
             ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
             capacity = this.internalCapacity;
-        } else if (this.canLoadSingleRounds) { // TODO switch to else
+        } else {
             CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
             ItemStack magazine = ItemStack.of(magazineTag);
             if (!(magazine.getItem() instanceof MagazineItem magazineItem))
                 return;
             ammoList = magazineItem.getStoredAmmo(magazine);
             capacity = magazineItem.getMagazineCapacity(magazine);
-        } else {
-            return;
         }
         Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
         if (phase.reloadType() == ReloadPhase.ReloadType.ROUNDS) {
@@ -558,14 +554,12 @@ public class RFEFirearmMode {
         List<ItemStack> ammoList;
         if (this.internalCapacity > 0) {
             ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
-        } else if (this.canLoadSingleRounds) {
+        } else {
             CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
             ItemStack magazine = ItemStack.of(magazineTag);
             if (!(magazine.getItem() instanceof MagazineItem magazineItem))
                 return;
             ammoList = magazineItem.getStoredAmmo(magazine);
-        } else {
-            return;
         }
         List<ItemStack> items = FirearmDataUtils.stripMultipleAmmo(ammoList, unloadCount, phase.ammoAddedLast(), false);
         for (ItemStack item : items)

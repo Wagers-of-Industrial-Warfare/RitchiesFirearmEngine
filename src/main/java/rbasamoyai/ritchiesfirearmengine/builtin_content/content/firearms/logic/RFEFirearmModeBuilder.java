@@ -28,7 +28,6 @@ public class RFEFirearmModeBuilder {
     protected int internalCapacity = 0;
     protected int nominalCapacity = 0;
     protected boolean explicitNominalCapacity = false;
-    protected boolean canLoadSingleRounds = false; // TODO remove
     protected boolean plusOneCapacity = false;
     protected boolean requiresSecondaryAmmo = false;
 
@@ -94,7 +93,6 @@ public class RFEFirearmModeBuilder {
         newBuilder.internalCapacity = this.internalCapacity;
         newBuilder.nominalCapacity = this.nominalCapacity;
         newBuilder.explicitNominalCapacity = this.explicitNominalCapacity;
-        newBuilder.canLoadSingleRounds = this.canLoadSingleRounds;
         newBuilder.plusOneCapacity = this.plusOneCapacity;
         newBuilder.requiresSecondaryAmmo = this.requiresSecondaryAmmo;
 
@@ -186,7 +184,6 @@ public class RFEFirearmModeBuilder {
     }
 
     private void resetMagazineOptions() {
-        this.canLoadSingleRounds = false;
         this.plusOneCapacity = false;
     }
 
@@ -206,14 +203,6 @@ public class RFEFirearmModeBuilder {
             throw new IllegalStateException("Cannot specify nominal capacity less than 1");
         this.nominalCapacity = nominalCapacity;
         this.resetMagazineOptions();
-        return this;
-    }
-
-    public RFEFirearmModeBuilder canLoadSingleRounds(boolean canLoadSingleRounds) {
-        if (this.internalCapacity > 0)
-            throw new IllegalStateException("Can only specify single round loading for magazine firearms");
-        this.canLoadSingleRounds = canLoadSingleRounds;
-        this.resetInternalCapacityOptions();
         return this;
     }
 

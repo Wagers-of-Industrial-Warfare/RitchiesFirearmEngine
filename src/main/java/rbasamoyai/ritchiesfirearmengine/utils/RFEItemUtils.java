@@ -64,8 +64,7 @@ public class RFEItemUtils {
             if (take) {
                 addition = s.split(takeAmount);
             } else {
-                addition = s.copy();
-                addition.setCount(takeAmount);
+                addition = s.copyWithCount(takeAmount);
             }
             FirearmDataUtils.addAmmo(list, addition, false);
             return s.isEmpty() ? ItemStack.EMPTY : s;

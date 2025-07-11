@@ -100,8 +100,7 @@ public class FirearmDataUtils {
         if (ammo.isEmpty())
             return ItemStack.EMPTY;
         ItemStack next = last ? ammo.get(ammo.size() - 1) : ammo.get(0);
-        ItemStack ret = next.copy();
-        ret.setCount(1);
+        ItemStack ret = next.copyWithCount(1);
         if (!simulate) {
             next.shrink(1);
             if (next.isEmpty())
@@ -124,9 +123,7 @@ public class FirearmDataUtils {
             int toRemove = Math.min(newCount, stackToRemove.getCount());
             if (toRemove < 1)
                 break;
-            ItemStack copy = stackToRemove.copy();
-            copy.setCount(toRemove);
-            stripped.add(copy);
+            stripped.add(stackToRemove.copyWithCount(toRemove));
             if (!simulate) {
                 stackToRemove.shrink(toRemove);
                 if (stackToRemove.isEmpty())

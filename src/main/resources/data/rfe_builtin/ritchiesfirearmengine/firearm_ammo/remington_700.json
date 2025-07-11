@@ -4,6 +4,10 @@
     {
       "ammo": "rfe_builtin:rifle_cartridge",
       "fires": "rfe_builtin:308_winchester"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_rifle_cartridge",
+      "fires": "rfe_builtin:308_winchester"
     }
   ],
   "replace_magazines": false,

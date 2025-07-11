@@ -62,7 +62,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
      */
     private static float entityAmmoCount(ItemStack itemStack, LivingEntity entity) {
         if (itemStack.getItem() instanceof RFEFirearmItem firearm)
-            return firearm.countAmmo(itemStack, entity);
+            return firearm.countEntityAmmo(itemStack, entity);
         return 0;
     }
 

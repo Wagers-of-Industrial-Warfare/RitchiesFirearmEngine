@@ -23,6 +23,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.F
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEFirearmMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEFirearmModeAmmoProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ReloadPhase;
+import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
@@ -166,10 +167,17 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         firearmMode.onReleaseAttackKey(itemStack, player);
     }
 
-    public int countAmmo(ItemStack itemStack, LivingEntity entity) {
+    public float countEntityAmmo(ItemStack itemStack, LivingEntity entity) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
         RFEFirearmModeAmmoProperties ammoProperties = mode.getAmmoProperties(itemStack);
-        return RFEItemUtils.countItems(RFEItemUtils.getItemsFromEntity(entity, RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates()), 0, false));
+        List<ItemStack> entityAmmo = RFEItemUtils.getItemsFromEntity(entity, RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates()), 0, false);
+        int count = 0;
+        for (ItemStack ammo : entityAmmo) {
+            if (ammo.is(RFEItemTags.INFINITE_AMMO.tag))
+                return Float.POSITIVE_INFINITY;
+            count += ammo.getCount();
+        }
+        return count;
     }
 
     public int freeAmmoSpace(ItemStack itemStack) {

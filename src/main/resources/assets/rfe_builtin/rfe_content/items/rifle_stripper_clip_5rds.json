@@ -6,7 +6,8 @@
   "capacity": 5,
   "reload_cooldown": 5,
   "valid_ammo": [
-    "rfe_builtin:rifle_cartridge"
+    "rfe_builtin:rifle_cartridge",
+    "rfe_builtin:infinite_rifle_cartridge"
   ],
   "valid_speedloaders": [
   ]

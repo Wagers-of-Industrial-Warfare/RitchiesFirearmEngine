@@ -11,6 +11,7 @@ import net.minecraft.world.phys.Vec3;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
@@ -478,8 +479,26 @@ public class RFEFirearmMode {
         }
         Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
         if (phase.reloadType() == ReloadPhase.ReloadType.ROUNDS) {
-            List<ItemStack> foundAmmo = RFEItemUtils.getItemsFromEntity(entity, ammoPred.and(s -> s != itemStack), reloadCount, true);
-            FirearmDataUtils.addMultipleAmmo(ammoList, foundAmmo, phase.ammoAddedLast(), false, capacity);
+            int addable = Mth.clamp(capacity - RFEItemUtils.countItems(ammoList), 0, reloadCount);
+            if (addable > 0) {
+                List<ItemStack> foundAmmo = new LinkedList<>();
+                RFEItemUtils.consumeItemsFromEntity(entity, ammoPred.and(s -> s != itemStack), s -> {
+                    int takeAmount = Math.min(addable - RFEItemUtils.countItems(foundAmmo), s.getMaxStackSize());
+                    ItemStack addition;
+                    if (s.is(RFEItemTags.INFINITE_AMMO.tag)) {
+                        addition = s.copyWithCount(takeAmount);
+                    } else {
+                        addition = s.split(takeAmount);
+                    }
+                    FirearmDataUtils.addAmmo(foundAmmo, addition, false);
+                    return s.isEmpty() ? ItemStack.EMPTY : s;
+                }, () -> foundAmmo.size() >= addable || !foundAmmo.isEmpty() && foundAmmo.get(foundAmmo.size() - 1).is(RFEItemTags.INFINITE_AMMO.tag));
+                if (!foundAmmo.isEmpty()) {
+                    boolean addedLast = phase.ammoAddedLast();
+                    for (ItemStack sourceStack : foundAmmo)
+                        FirearmDataUtils.addAmmo(ammoList, sourceStack, addedLast, 0);
+                }
+            }
         } else {
             Predicate<ItemStack> speedloaderPred = RFEUtils.orAllPredicates(ammoProperties.speedloaders());
             int reloadCount1 = capacity - this.getLoadedAmmoCount(itemStack, entity, false);

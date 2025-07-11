@@ -4,6 +4,7 @@
   "contents": [
     "rfe_builtin:ammo_packet",
     "rfe_builtin:rifle_cartridge",
+    "rfe_builtin:infinite_rifle_cartridge",
     "rfe_builtin:rifle_stripper_clip_5rds",
     "rfe_builtin:rifle_magazine_10rds"
   ]

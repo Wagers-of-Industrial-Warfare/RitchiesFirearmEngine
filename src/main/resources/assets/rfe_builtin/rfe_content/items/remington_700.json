@@ -61,6 +61,7 @@
         "time": 25,
         "reload_type": "rounds",
         "reload_delay": 25,
+        "reload_count": 1,
         "sound": "rfe_builtin:item.generic.rifle.bullet_reload"
       },
       {

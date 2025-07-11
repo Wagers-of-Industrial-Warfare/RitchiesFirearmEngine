@@ -11,6 +11,10 @@
     {
       "ammo": "rfe_builtin:rifle_cartridge",
       "capacity": 10
+    },
+    {
+      "ammo": "rfe_builtin:infinite_rifle_cartridge",
+      "capacity": 10
     }
   ]
 }

@@ -16,6 +16,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.AmmoPredicate;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
+import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
@@ -119,7 +120,8 @@ public class MagazineItem extends Item {
     protected boolean tryReloadForItem(ItemStack magazineStack, List<ItemStack> ammo, ItemStack availableStack) {
         if (this.matchesAmmoItem(magazineStack, availableStack)) {
             int consumed = FirearmDataUtils.addAmmo(ammo, availableStack, false, 1);
-            availableStack.shrink(consumed);
+            if (!availableStack.is(RFEItemTags.INFINITE_AMMO.tag))
+                availableStack.shrink(consumed);
             return true;
         }
         if (availableStack.getItem() instanceof MagazineItem secondary && this.matchesSpeedloaderItem(magazineStack, availableStack)) {

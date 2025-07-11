@@ -18,12 +18,12 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.AmmoPredicate;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
+import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -101,10 +101,8 @@ public class AmmoPacketItem extends Item {
     public void tryReloadingOutsideOfMenu(ItemStack itemStack, LivingEntity entity) {
         if (this.isOnCooldown(entity))
             return;
-        if (!this.getStoredAmmo(itemStack).isEmpty())
-            return;
         boolean split = itemStack.getCount() > 1;
-        List<ItemStack> ammo = new ArrayList<>();
+        List<ItemStack> ammo = this.getStoredAmmo(itemStack);
         RFEItemUtils.consumeItemsFromEntity(entity, s -> {
             return s != itemStack && this.tryReloadForItem(ammo, s);
         }, s -> {
@@ -121,13 +119,18 @@ public class AmmoPacketItem extends Item {
     }
 
     protected boolean tryReloadForItem(List<ItemStack> ammo, ItemStack availableStack) {
+        boolean infinite = availableStack.is(RFEItemTags.INFINITE_AMMO.tag);
         ImmutableMap<AmmoPredicate, Integer> ammoCapacities = this.getAmmoCapacities();
         if (ammo.isEmpty()) {
             for (Map.Entry<AmmoPredicate, Integer> entry : ammoCapacities.entrySet()) {
                 if (!entry.getKey().test(availableStack))
                     continue;
-                int consumed = FirearmDataUtils.addAmmo(ammo, availableStack, false, entry.getValue());
-                availableStack.shrink(consumed);
+                ItemStack toAdd = availableStack;
+                if (infinite)
+                    toAdd = availableStack.copyWithCount(entry.getValue());
+                int consumed = FirearmDataUtils.addAmmo(ammo, toAdd, false, entry.getValue());
+                if (!infinite)
+                    availableStack.shrink(consumed);
                 return true;
             }
         } else {
@@ -141,8 +144,12 @@ public class AmmoPacketItem extends Item {
                 int addable = Math.max(0, entry.getValue() - ammoCount);
                 if (addable < 1)
                     return false;
-                int consumed = FirearmDataUtils.addAmmo(ammo, availableStack, false, addable);
-                availableStack.shrink(consumed);
+                ItemStack toAdd = availableStack;
+                if (infinite)
+                    toAdd = availableStack.copyWithCount(addable);
+                int consumed = FirearmDataUtils.addAmmo(ammo, toAdd, false, addable);
+                if (!infinite)
+                    availableStack.shrink(consumed);
                 return true;
             }
         }

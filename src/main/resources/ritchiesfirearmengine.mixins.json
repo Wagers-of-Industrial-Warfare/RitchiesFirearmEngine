@@ -5,7 +5,8 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "ritchiesfirearmengine.refmap.json",
   "mixins": [
-    "LivingEntityMixin"
+    "LivingEntityMixin",
+    "client.MultiPlayerGameModeMixin"
   ],
   "client": [
     "client.GuiMixin",

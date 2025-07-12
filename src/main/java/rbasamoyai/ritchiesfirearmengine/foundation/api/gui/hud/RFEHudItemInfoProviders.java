@@ -30,6 +30,9 @@ public class RFEHudItemInfoProviders {
         return null;
     }
 
+    /**
+     * Return {@code null} to mark infinite ammo in the gun.
+     */
     @FunctionalInterface
     public interface RFEAmmoInfoProvider extends Function<ItemStack, List<ItemStack>> {
     }

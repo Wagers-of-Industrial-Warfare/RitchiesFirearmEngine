@@ -520,6 +520,8 @@ public class RFEFirearmMode {
     }
 
     public boolean tryRunningUnloadAction(ItemStack itemStack, LivingEntity entity, ReloadPhase.PhaseType phaseType) {
+        if (!this.ammoRequired)
+            return false;
         if (FirearmDataUtils.getActionTime(itemStack) > 0)
             return false;
         for (ListIterator<ReloadPhase> lister = this.unloadPhases.get(phaseType).listIterator(); lister.hasNext(); ) {
@@ -541,6 +543,11 @@ public class RFEFirearmMode {
     // TODO secondary ammo
     public void onTickUnload(ItemStack itemStack, LivingEntity entity) {
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        if (!this.ammoRequired) {
+            FirearmDataUtils.cancelUnload(itemStack, modeTag);
+            return;
+        }
+
         ReloadPhase.PhaseType phaseType = ReloadPhase.PhaseType.byId(modeTag.getString("UnloadPhase"));
         if (phaseType == null) {
             FirearmDataUtils.cancelUnload(itemStack, modeTag);
@@ -961,5 +968,7 @@ public class RFEFirearmMode {
         ItemStack bestSpeedloaderStack = RFEItemUtils.findBestSpeedloader(entity, speedloaderPred, ammoPred, reloadCount1, false);
         return bestSpeedloaderStack.getItem() instanceof MagazineItem magazine ? magazine.countAmmo(bestSpeedloaderStack) : 0;
     }
+
+    public boolean requiresAmmo() { return this.ammoRequired; }
     
 }

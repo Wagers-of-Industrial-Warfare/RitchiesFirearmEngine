@@ -293,7 +293,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         if (!(itemStack.getItem() instanceof RFEFirearmItem firearm))
             return null;
         RFEFirearmMode mode = firearm.getCurrentMode(itemStack);
-        return mode.getLoadedAmmo(itemStack);
+        return mode.requiresAmmo() ? mode.getLoadedAmmo(itemStack) : null;
     }
 
     public static Optional<Integer> getInventoryAmmoCountForHUD(ItemStack itemStack, List<ItemStack> inventory) {

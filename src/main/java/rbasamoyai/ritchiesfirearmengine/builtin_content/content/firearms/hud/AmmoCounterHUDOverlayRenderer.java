@@ -20,16 +20,18 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
 
     protected final Minecraft minecraft;
     protected final Font font;
+    private final boolean hideEntireAmmoCount;
     private final boolean hideFirearmAmmoCount;
     private final boolean enlargeFirearmAmmoCount;
     private final boolean showInventoryCount;
     @Nullable private final RFEHudIcon firearmIcon;
 
-    public AmmoCounterHUDOverlayRenderer(boolean hideFirearmAmmoCount, boolean enlargeFirearmAmmoCount, boolean showInventoryCount,
-                                         @Nullable RFEHudIcon firearmIcon) {
+    public AmmoCounterHUDOverlayRenderer(boolean hideEntireAmmoCount, boolean hideFirearmAmmoCount, boolean enlargeFirearmAmmoCount,
+                                         boolean showInventoryCount, @Nullable RFEHudIcon firearmIcon) {
         this.minecraft = Minecraft.getInstance();
         this.font = this.minecraft.font;
 
+        this.hideEntireAmmoCount = hideEntireAmmoCount;
         this.hideFirearmAmmoCount = hideFirearmAmmoCount;
         this.enlargeFirearmAmmoCount = enlargeFirearmAmmoCount;
         this.showInventoryCount = showInventoryCount;
@@ -46,38 +48,50 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
         int originX = width - 100;
         int originY = height - 80;
 
-        List<ItemStack> ammoList = RFEHudItemInfoProviders.getAmmoStacksFromItem(item);
-        if (ammoList != null) { // if firearm item does not have infinite ammo
-            String countText = this.hideFirearmAmmoCount ? "_" : Integer.toString(RFEItemUtils.countItems(ammoList));
-            int textWidth = this.font.width(countText);
+        if (!this.hideEntireAmmoCount) {
+            List<ItemStack> ammoList = RFEHudItemInfoProviders.getAmmoStacksFromItem(item);
+            if (ammoList != null) { // if firearm item does not have infinite ammo
+                String countText = this.hideFirearmAmmoCount ? "_" : Integer.toString(RFEItemUtils.countItems(ammoList));
+                int textWidth = this.font.width(countText);
 
-            if (this.enlargeFirearmAmmoCount) {
-                poseStack.pushPose();
-                poseStack.scale(2, 2, 2);
-                graphics.drawString(this.font, countText, (originX - textWidth * 2) / 2 - 2, originY / 2, 0xFFFFFF, true);
-                poseStack.popPose();
+                if (this.enlargeFirearmAmmoCount) {
+                    poseStack.pushPose();
+                    poseStack.scale(2, 2, 1);
+                    graphics.drawString(this.font, countText, (originX - textWidth * 2) / 2 - 2, originY / 2, 0xFFFFFF, true);
+                    poseStack.popPose();
+                } else {
+                    countText += " ";
+                    textWidth = this.font.width(countText);
+                    graphics.drawString(this.font, countText, originX - textWidth, originY, 0xFFFFFF, true);
+                }
+                if (this.showInventoryCount) {
+                    int ammoCount = RFEHudItemInfoProviders.getAmmoInventoryCount(item, player);
+                    String inventoryCountText = "/ " + (ammoCount < 0 ? "∞" : Math.min(ammoCount, 9999));
+                    graphics.drawString(this.font, inventoryCountText, originX, originY, 0xFFFFFF, true);
+                }
             } else {
-                countText += " ";
-                textWidth = this.font.width(countText);
-                graphics.drawString(this.font, countText, originX - textWidth, originY, 0xFFFFFF, true);
-            }
-            if (this.showInventoryCount) {
-                int ammoCount = RFEHudItemInfoProviders.getAmmoInventoryCount(item, player);
-                String inventoryCountText = "/ " + (ammoCount < 0 ? "∞" : Math.min(ammoCount, 9999));
-                graphics.drawString(this.font, inventoryCountText, originX, originY, 0xFFFFFF, true);
+                int textWidth = this.font.width("∞");
+                if (this.enlargeFirearmAmmoCount) {
+                    poseStack.pushPose();
+                    poseStack.scale(2, 2, 1);
+                    graphics.drawString(this.font, "∞", (originX - textWidth) / 2, originY / 2, 0xFFFFFF, true);
+                    poseStack.popPose();
+                } else {
+                    graphics.drawString(this.font, "∞", originX - textWidth / 2, originY, 0xFFFFFF, true);
+                }
             }
         }
         if (this.firearmIcon != null) {
             this.firearmIcon.blit(graphics, originX - this.firearmIcon.blitWidth() / 2, originY - this.firearmIcon.blitHeight() - 4);
         }
         // TODO overheating
-        // TODO no ammo
         // TODO secondary ammo
     }
 
     public static class Serializer implements RFEHudOverlayRenderer.Serializer {
         @Override
         public RFEHudOverlayRenderer apply(JsonObject obj) {
+            boolean hideEntireAmmoCount = GsonHelper.getAsBoolean(obj, "hide_entire_ammo_count", false);
             boolean hideFirearmAmmoCount = GsonHelper.getAsBoolean(obj, "hide_firearm_ammo", false);
             boolean enlargeFirearmAmmoCount = GsonHelper.getAsBoolean(obj, "enlarge_firearm_ammo", true);
             boolean showInventoryCount = GsonHelper.getAsBoolean(obj, "show_inventory_ammo", true);
@@ -86,8 +100,8 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
             if (GsonHelper.isObjectNode(obj, "firearm_icon"))
                 firearmIcon = RFEHudIcon.fromJson(GsonHelper.getAsJsonObject(obj, "firearm_icon"));
 
-            return new AmmoCounterHUDOverlayRenderer(hideFirearmAmmoCount, enlargeFirearmAmmoCount, showInventoryCount,
-                    firearmIcon);
+            return new AmmoCounterHUDOverlayRenderer(hideEntireAmmoCount, hideFirearmAmmoCount, enlargeFirearmAmmoCount,
+                    showInventoryCount, firearmIcon);
         }
     }
 

@@ -1,5 +1,6 @@
 {
   "style": "ritchiesfirearmengine:ammo_counter",
+  "hide_entire_ammo_count": false,
   "hide_firearm_ammo": false,
   "enlarge_firearm_ammo": true,
   "show_inventory_ammo": true,

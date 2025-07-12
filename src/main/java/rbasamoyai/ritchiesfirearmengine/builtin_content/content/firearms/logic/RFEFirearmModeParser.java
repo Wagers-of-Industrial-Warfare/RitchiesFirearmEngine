@@ -73,16 +73,11 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                 int cooldown = GsonHelper.getAsInt(firing, "cooldown");
                 boolean ammoConsumedLast = GsonHelper.getAsBoolean(firing, "ammo_consumed_last", false);
                 int shotsFired = GsonHelper.getAsInt(firing, "shots_fired", 1);
-                float verticalRecoil = GsonHelper.getAsFloat(firing, "vertical_recoil", 0);
-                float horizontalRecoil = GsonHelper.getAsFloat(firing, "horizontal_recoil", 0);
-                float spread = GsonHelper.getAsFloat(firing, "spread", 0);
+                // TODO recoil, spread providers
                 float jamChance = GsonHelper.getAsFloat(firing, "jam_chance", 0);
                 builder.firingCooldown(cooldown)
                         .ammoConsumedLast(ammoConsumedLast)
                         .shotsFired(shotsFired)
-                        .verticalRecoil(verticalRecoil)
-                        .horizontalRecoil(horizontalRecoil)
-                        .spread(spread)
                         .jamChance(jamChance);
                 if (fireMode == FireMode.SINGLE_ACTION) {
                     boolean manualCharge = GsonHelper.getAsBoolean(firing, "manual_charge", false);

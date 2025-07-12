@@ -9,6 +9,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.*;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEDefaultFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bullet.RFEBulletProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPlugin;
@@ -55,6 +56,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         registry.accept(RitchiesFirearmEngine.resource("ammo_packet_item_properties"), AmmoPacketItemPropertiesHandler.ReloadListener.INSTANCE);
         registry.accept(RitchiesFirearmEngine.resource("rfe_projectile_types"), RFEProjectileTypeHandler.ReloadListener.INSTANCE);
         registry.accept(RitchiesFirearmEngine.resource("firearm_ammo"), RFEFirearmAmmoHandler.ReloadListener.INSTANCE);
+        registry.accept(RitchiesFirearmEngine.resource("firearm_handling"), RFEFirearmHandlingPropertiesHandler.ReloadListener.INSTANCE);
     }
 
     /**

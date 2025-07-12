@@ -33,11 +33,8 @@ public class RFEFirearmModeBuilder {
     protected boolean requiresSecondaryAmmo = false;
 
     protected FireMode fireMode = null;
-    protected float spread = 0; // Datapackable
     protected float jamChance = 0; // Datapackable
     protected boolean manualCharging = false; // Datapackable
-    protected float verticalRecoil = 0; // Datapackable
-    protected float horizontalRecoil = 0; // Datapackable
     protected int firingCooldown = -1;
     protected boolean ammoConsumedLast = false;
     protected int shotsFired = 1;
@@ -99,11 +96,8 @@ public class RFEFirearmModeBuilder {
         newBuilder.requiresSecondaryAmmo = this.requiresSecondaryAmmo;
 
         newBuilder.fireMode = this.fireMode;
-        newBuilder.spread = this.spread;
         newBuilder.jamChance = this.jamChance;
         newBuilder.manualCharging = this.manualCharging;
-        newBuilder.verticalRecoil = this.verticalRecoil;
-        newBuilder.horizontalRecoil = this.horizontalRecoil;
         newBuilder.firingCooldown = this.firingCooldown;
         newBuilder.ammoConsumedLast = this.ammoConsumedLast;
         newBuilder.shotsFired = this.shotsFired;
@@ -231,22 +225,9 @@ public class RFEFirearmModeBuilder {
         return this;
     }
 
-    public RFEFirearmModeBuilder verticalRecoil(float verticalRecoil) {
-        this.verticalRecoil = verticalRecoil;
-        return this;
-    }
-
-    public RFEFirearmModeBuilder horizontalRecoil(float horizontalRecoil) {
-        this.horizontalRecoil = horizontalRecoil;
-        return this;
-    }
-
-    public RFEFirearmModeBuilder spread(float spread) {
-        this.spread = spread;
-        return this;
-    }
-
     public RFEFirearmModeBuilder jamChance(float jamChance) {
+        if (jamChance < 0 || 1 < jamChance)
+            throw new IllegalStateException("Cannot specify jam chance less than 0 or greater than 1");
         this.jamChance = jamChance;
         return this;
     }
@@ -317,11 +298,8 @@ public class RFEFirearmModeBuilder {
 
     public RFEFirearmModeBuilder resetFiring() {
         this.fireMode = null;
-        this.spread = 0;
         this.jamChance = 0;
         this.manualCharging = false;
-        this.verticalRecoil = 0;
-        this.horizontalRecoil = 0;
         this.firingCooldown = -1;
         this.ammoConsumedLast = false;
         this.shotsFired = 1;
@@ -384,6 +362,8 @@ public class RFEFirearmModeBuilder {
     public RFEFirearmModeBuilder heatCapacity(float heatCapacity) {
         if (!this.canOverheat)
             throw new IllegalStateException("Internal error: cannot set default heat capacity outside of overheating module");
+        if (heatCapacity < 0)
+            throw new IllegalStateException("Cannot specify heat capacity less than 0");
         this.heatCapacity = heatCapacity;
         return this;
     }

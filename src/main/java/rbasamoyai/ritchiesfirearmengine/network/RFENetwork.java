@@ -11,6 +11,7 @@ import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.AmmoPacketItemPropertiesHandler.ClientboundSyncAmmoPacketPropertiesPacket;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItemPropertiesHandler.ClientboundSyncMagazinePropertiesPacket;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler.ClientboundSyncFirearmAmmoPropertiesPacket;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler.ClientboundSyncFirearmHandlingPropertiesPacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager.ClientboundRemoveAllProjectilesPacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager.ClientboundRemoveRFEProjectilePacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager.ClientboundSpawnRFEProjectilePacket;
@@ -45,6 +46,7 @@ public class RFENetwork {
         buildMessage(network, id++, ClientboundRemoveAllProjectilesPacket.class, ClientboundRemoveAllProjectilesPacket::decode);
         buildMessage(network, id++, ClientboundSyncRFEProjectileTypesPacket.class, ClientboundSyncRFEProjectileTypesPacket::decode);
         buildMessage(network, id++, ClientboundSyncFirearmAmmoPropertiesPacket.class, ClientboundSyncFirearmAmmoPropertiesPacket::decode);
+        buildMessage(network, id++, ClientboundSyncFirearmHandlingPropertiesPacket.class, ClientboundSyncFirearmHandlingPropertiesPacket::decode);
 
         return network;
     }

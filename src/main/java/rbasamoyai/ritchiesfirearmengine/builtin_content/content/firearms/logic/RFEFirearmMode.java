@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic;
 
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.sounds.SoundEvent;
@@ -11,6 +12,7 @@ import net.minecraft.world.phys.Vec3;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
@@ -29,7 +31,7 @@ public class RFEFirearmMode {
 
     protected final String modeId;
 
-    protected final FirearmModeDataPackProperties defaultDataPackProperties;
+    protected final RFEFirearmModeHandlingProperties defaultDataPackProperties;
 
     protected final String modeTagId;
 
@@ -87,7 +89,7 @@ public class RFEFirearmMode {
     public RFEFirearmMode(RFEFirearmModeBuilder builder, String modeId) {
         this.modeId = modeId;
 
-        this.defaultDataPackProperties = new FirearmModeDataPackProperties(builder);
+        this.defaultDataPackProperties = RFEFirearmModeHandlingProperties.fromItemDefinition(builder);
 
         this.modeTagId = builder.modeTagId;
 
@@ -128,8 +130,9 @@ public class RFEFirearmMode {
         this.cooldownSound = builder.cooldownSound;
     }
 
-    public FirearmModeDataPackProperties getDataPackProperties() {
-        return this.defaultDataPackProperties; // TODO datapack
+    public RFEFirearmModeHandlingProperties getHandlingProperties(ItemStack itemStack) {
+        ImmutableMap<String, RFEFirearmModeHandlingProperties> handlingPropertiesByMode = RFEFirearmHandlingPropertiesHandler.getHandlingProperties(itemStack);
+        return handlingPropertiesByMode.getOrDefault(this.modeId, this.defaultDataPackProperties);
     }
 
     public RFEFirearmModeAmmoProperties getAmmoProperties(ItemStack itemStack) {
@@ -249,7 +252,7 @@ public class RFEFirearmMode {
     public void fireProjectile(ItemStack itemStack, LivingEntity entity) {
         // TODO windup
         RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
-        FirearmModeDataPackProperties firearmProperties = this.getDataPackProperties();
+        RFEFirearmModeHandlingProperties firearmProperties = this.getHandlingProperties(itemStack);
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
 
         Vec3 upDirection = entity.getUpVector(1f);
@@ -352,7 +355,7 @@ public class RFEFirearmMode {
     }
 
     public boolean automaticSingleActionCycle(ItemStack itemStack, LivingEntity entity) {
-        return this.getDataPackProperties().manualCharging();
+        return !this.getHandlingProperties(itemStack).manualCharging();
     }
 
     public boolean canBurstFire(ItemStack itemStack, LivingEntity entity) {
@@ -675,14 +678,14 @@ public class RFEFirearmMode {
         if (this.canOverheat) {
             CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
             float heat = FirearmDataUtils.getHeat(modeTag);
-            heat -= this.getDataPackProperties().heatRemovedOnCharge();
+            heat -= this.getHandlingProperties(itemStack).heatRemovedOnCharge();
             heat = Math.max(0, heat);
             FirearmDataUtils.setHeat(modeTag, heat);
         }
     }
 
     public boolean shouldJam(ItemStack itemStack, LivingEntity entity) {
-        return entity.getRandom().nextFloat() < this.getDataPackProperties().jamChance();
+        return entity.getRandom().nextFloat() < this.getHandlingProperties(itemStack).jamChance();
     }
 
     public void setJammed(ItemStack itemStack, LivingEntity entity, boolean jammed) {
@@ -805,7 +808,7 @@ public class RFEFirearmMode {
         }
         CompoundTag tag = itemStack.getOrCreateTag();
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
-        FirearmModeDataPackProperties properties = this.getDataPackProperties();
+        RFEFirearmModeHandlingProperties properties = this.getHandlingProperties(itemStack);
 
         RFEFirearmItem.Action action = FirearmDataUtils.getAction(itemStack);
         if (action != null) {

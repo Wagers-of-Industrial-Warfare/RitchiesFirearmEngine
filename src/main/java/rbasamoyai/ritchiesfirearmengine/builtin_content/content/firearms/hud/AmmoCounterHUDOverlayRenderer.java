@@ -63,7 +63,7 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
             }
             if (this.showInventoryCount) {
                 int ammoCount = RFEHudItemInfoProviders.getAmmoInventoryCount(item, player);
-                String inventoryCountText = "/ " + Math.min(ammoCount, 9999);
+                String inventoryCountText = "/ " + (ammoCount < 0 ? "∞" : Math.min(ammoCount, 9999));
                 graphics.drawString(this.font, inventoryCountText, originX, originY, 0xFFFFFF, true);
             }
         }
@@ -71,7 +71,8 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
             this.firearmIcon.blit(graphics, originX - this.firearmIcon.blitWidth() / 2, originY - this.firearmIcon.blitHeight() - 4);
         }
         // TODO overheating
-        // TODO infinite ammo
+        // TODO no ammo
+        // TODO secondary ammo
     }
 
     public static class Serializer implements RFEHudOverlayRenderer.Serializer {

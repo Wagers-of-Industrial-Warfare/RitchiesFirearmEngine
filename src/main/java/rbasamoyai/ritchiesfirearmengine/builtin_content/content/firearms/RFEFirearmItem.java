@@ -19,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.level.Level;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEFirearmMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEFirearmModeAmmoProperties;
@@ -299,12 +300,30 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         if (!(itemStack.getItem() instanceof RFEFirearmItem firearm))
             return Optional.empty();
         RFEFirearmMode mode = firearm.getCurrentMode(itemStack);
-        Predicate<ItemStack> pred = RFEUtils.orAllPredicates(mode.getAmmoProperties(itemStack).primaryAmmo().keySet());
+        RFEFirearmModeAmmoProperties ammoProperties = mode.getAmmoProperties(itemStack);
+        Predicate<ItemStack> primaryAmmoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmo().keySet());
+        Predicate<ItemStack> magazineAndSpeedloaderPred = RFEUtils.orAllPredicates(ammoProperties.magazines())
+                .or(RFEUtils.orAllPredicates(ammoProperties.speedloaders()));
         int count = 0;
-        for (ItemStack ammo : inventory) {
-            if (pred.test(ammo))
-                count += ammo.getCount();
+        for (ItemStack invStack : inventory) {
+            if (primaryAmmoPred.test(invStack)) {
+                if (invStack.is(RFEItemTags.INFINITE_AMMO.tag))
+                    return Optional.of(-1);
+                count += invStack.getCount();
+            } else if (magazineAndSpeedloaderPred.test(invStack) && invStack.getItem() instanceof MagazineItem magazineItem) {
+                List<ItemStack> magAmmo = magazineItem.getStoredAmmo(invStack);
+                int magCount = 0;
+                for (ItemStack magStack : magAmmo) {
+                    if (!primaryAmmoPred.test(magStack)) {
+                        magCount = 0;
+                        break;
+                    }
+                    magCount += magStack.getCount();
+                }
+                count += magCount;
+            }
         }
+        // TODO test magazines and stripper clips
         return Optional.of(count);
     }
 

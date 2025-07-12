@@ -48,6 +48,9 @@ public class RFEHudItemInfoProviders {
         return 0;
     }
 
+    /**
+     * Return {@code Optional.of(-1)} to mark ammo count as infinite.
+     */
     @FunctionalInterface
     public interface RFEAmmoInventoryCountProvider extends BiFunction<ItemStack, List<ItemStack>, Optional<Integer>> {
     }

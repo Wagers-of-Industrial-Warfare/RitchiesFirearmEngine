@@ -25,6 +25,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.R
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEFirearmModeAmmoProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ReloadPhase;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
@@ -58,12 +59,17 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
     @Override
     public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
         super.inventoryTick(itemStack, level, entity, slotId, isSelected);
-        if (level.isClientSide)
-            return; // TODO maybe clientside effects?
-        if (!isSelected)
+        if (!isSelected) {
             FirearmDataUtils.setHoldingAttackKey(itemStack, false);
-        if (entity instanceof LivingEntity living)
-            this.getCurrentMode(itemStack).onTick(itemStack, living, isSelected);
+            if (entity instanceof LivingEntity living) {
+                RFESpreadManager.stopTrackingSpread(living, itemStack);
+            }
+        }
+        if (!level.isClientSide) {
+            if (entity instanceof LivingEntity living)
+                this.getCurrentMode(itemStack).onTick(itemStack, living, isSelected);
+        }
+        // TODO clientside effects?
     }
 
     @Override

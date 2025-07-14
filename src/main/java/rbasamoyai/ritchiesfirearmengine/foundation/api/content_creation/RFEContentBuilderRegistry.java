@@ -8,6 +8,7 @@ import org.jetbrains.annotations.ApiStatus;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.CompareValueSource;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProvider;
 
 public class RFEContentBuilderRegistry {
 
@@ -58,8 +59,30 @@ public class RFEContentBuilderRegistry {
 
     public static ResourceLocation getProjectileTypeSerializerId(RFEProjectileType.Serializer<?> ser) {
         if (!PROJECTILE_TYPE_SERIALIZERS_IDS.containsKey(ser))
-            throw new IllegalStateException("Unknown projectile type serializer " + ser);
+            throw new IllegalStateException("Unknown RFE projectile type serializer " + ser);
         return PROJECTILE_TYPE_SERIALIZERS_IDS.get(ser);
+    }
+
+    private static final Object2ReferenceMap<ResourceLocation, RFESpreadProvider.Serializer<?>> SPREAD_PROVIDER_SERIALIZERS = new Object2ReferenceOpenHashMap<>();
+    private static final Reference2ObjectMap<RFESpreadProvider.Serializer<?>, ResourceLocation> SPREAD_PROVIDER_SERIALIZERS_IDS = new Reference2ObjectOpenHashMap<>();
+
+    public static void registerSpreadProviderSerializer(ResourceLocation id, RFESpreadProvider.Serializer<?> ser) {
+        if (SPREAD_PROVIDER_SERIALIZERS.containsKey(id))
+            throw new IllegalStateException("Already registered RFE spread provider serializer wtih id '" + id + "'");
+        SPREAD_PROVIDER_SERIALIZERS.put(id, ser);
+        SPREAD_PROVIDER_SERIALIZERS_IDS.put(ser, id);
+    }
+
+    public static RFESpreadProvider.Serializer<?> getSpreadProviderSerializer(ResourceLocation id) {
+        if (!SPREAD_PROVIDER_SERIALIZERS.containsKey(id))
+            throw new IllegalStateException("RFE spread provider serializer of type '" + id + "' not present");
+        return SPREAD_PROVIDER_SERIALIZERS.get(id);
+    }
+
+    public static ResourceLocation getSpreadProviderSerializerId(RFESpreadProvider.Serializer<?> ser) {
+        if (!SPREAD_PROVIDER_SERIALIZERS_IDS.containsKey(ser))
+            throw new IllegalStateException("Unknown RFE spread provider serializer " + ser);
+        return SPREAD_PROVIDER_SERIALIZERS_IDS.get(ser);
     }
 
 }

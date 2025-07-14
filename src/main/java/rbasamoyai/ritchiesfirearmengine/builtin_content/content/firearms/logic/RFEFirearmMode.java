@@ -6,9 +6,12 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
@@ -17,6 +20,9 @@ import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProviderPackHandler;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
@@ -255,53 +261,75 @@ public class RFEFirearmMode {
         RFEFirearmModeHandlingProperties firearmProperties = this.getHandlingProperties(itemStack);
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
 
-        Vec3 upDirection = entity.getUpVector(1f);
-        Vec3 aimDirection = entity.getViewVector(1f);
+        // TODO something better probably
+        InteractionHand hand = entity.getMainHandItem() == itemStack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
+
+        RFESpreadInstance spreadInstance = RFESpreadManager.getSpreadInstance(entity, itemStack);
+        if (spreadInstance == null) {
+            spreadInstance = RFESpreadProviderPackHandler.getSpreadProviders(itemStack).getProperties(this.modeId)
+                    .createSpreadInstance(itemStack, entity, entity.getRandom());
+            RFESpreadManager.trackSpread(spreadInstance, entity, itemStack, hand);
+        }
 
         // TODO spread, recoil
+        List<RFEProjectileInstance> toFire = new ArrayList<>();
         if (this.ammoRequired) {
             List<ItemStack> strippedAmmo = this.getNextRoundsInItem(itemStack, entity, this.shotsFired, true);
             // TODO consume secondary ammo if required
             for (ItemStack ammoStack : strippedAmmo) {
                 for (Map.Entry<AmmoPredicate, RFEProjectileType> entry : ammoProperties.primaryAmmo().entrySet()) {
-                    if (!entry.getKey().test(ammoStack))
-                        continue;
-                    RFEProjectileInstance instance = entry.getValue().createInstance();
-                    // TODO shooter positioning
-                    instance.setOwner(entity);
-                    instance.setPosition(new Vec3(entity.getX(), entity.getEyeY(), entity.getZ()));
-                    instance.shoot(aimDirection.x, aimDirection.y, aimDirection.z);
-                    RFEProjectileManager.queueAddedProjectile(instance, entity.level());
-                    break;
+                    if (entry.getKey().test(ammoStack)) {
+                        toFire.add(entry.getValue().createInstance());
+                        break;
+                    }
                 }
             }
         } else {
             RFEProjectileType unlimitedProjectile = ammoProperties.unlimitedAmmo();
             if (unlimitedProjectile != null) {
                 // TODO one-time warning if no projectile?
-                for (int i = 0; i < this.shotsFired; ++i) {
-                    RFEProjectileInstance instance = unlimitedProjectile.createInstance();
-                    // TODO shooter positioning
-                    instance.setOwner(entity);
-                    instance.setPosition(new Vec3(entity.getX(), entity.getEyeY(), entity.getZ()));
-                    instance.shoot(aimDirection.x, aimDirection.y, aimDirection.z);
-                    RFEProjectileManager.queueAddedProjectile(instance, entity.level());
-                }
+                for (int i = 0; i < this.shotsFired; ++i)
+                    toFire.add(unlimitedProjectile.createInstance());
             }
         }
-        this.playFiringEffects(itemStack, entity);
+        Vec3 pos = new Vec3(entity.getX(), entity.getEyeY(), entity.getZ());
+        float xRot = entity.getXRot();
+        float yRot = entity.yHeadRot;
+        for (RFEProjectileInstance instance : toFire) {
+            // TODO shooter positioning
+            Tuple<Float, Float> spread = spreadInstance.getSpread(itemStack, entity);
+            spreadInstance.updateSpread(itemStack, entity);
+            RitchiesFirearmEngine.LOGGER.info("p = {}, y = {}", spread.getA(), spread.getB());
+
+            instance.setOwner(entity);
+            instance.setPosition(pos);
+
+            entity.setXRot(xRot + spread.getA());
+            entity.yHeadRot += spread.getB();
+            Vec3 aimDirection = entity.getViewVector(1f);
+            entity.setXRot(xRot);
+            entity.yHeadRot = yRot;
+
+            instance.shoot(aimDirection.x, aimDirection.y, aimDirection.z);
+            RFEProjectileManager.queueAddedProjectile(instance, entity.level());
+
+            // TODO apply recoil
+        }
+
         if (this.canOverheat) {
             FirearmDataUtils.addHeat(modeTag, firearmProperties.heatAddedOnFiring());
             FirearmDataUtils.setCoolingDelay(modeTag, firearmProperties.coolingDelayTime());
             if (FirearmDataUtils.getHeat(modeTag) > firearmProperties.heatCapacity())
                 FirearmDataUtils.setOverheated(modeTag, true);
         }
+
         this.setCharged(itemStack, entity, false);
         FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.FIRING);
         if (this.firingCooldown > 0)
             FirearmDataUtils.setActionTime(itemStack, this.firingCooldown);
         if (this.fireMode == FireMode.SINGLE_ACTION && !firearmProperties.manualCharging())
             itemStack.getOrCreateTag().putBoolean("HoldAutomaticCycle", true);
+        this.playFiringEffects(itemStack, entity);
     }
 
     public void playFiringEffects(ItemStack itemStack, LivingEntity entity) {

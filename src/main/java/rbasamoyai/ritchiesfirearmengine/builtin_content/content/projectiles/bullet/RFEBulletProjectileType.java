@@ -24,7 +24,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.*;
-import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEProjectileDamageModel;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
@@ -226,7 +225,6 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         // TODO ricochet
         // TODO block breaking
 
-        RitchiesFirearmEngine.LOGGER.info("Travelled {} meters", instance.distanceTravelled());
         BlockState blockstate = level.getBlockState(pResult.getBlockPos());
         //this.lastState = blockstate;
         //blockstate.onProjectileHit(level, blockstate, pResult, this); TODO fake projectile

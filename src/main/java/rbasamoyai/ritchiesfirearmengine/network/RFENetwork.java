@@ -17,6 +17,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectile
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager.ClientboundSpawnRFEProjectilePacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager.ClientboundUpdateRFEProjectilePacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler.ClientboundSyncRFEProjectileTypesPacket;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProviderPackHandler.ClientboundSyncSpreadProvidersPacket;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -47,6 +48,7 @@ public class RFENetwork {
         buildMessage(network, id++, ClientboundSyncRFEProjectileTypesPacket.class, ClientboundSyncRFEProjectileTypesPacket::decode);
         buildMessage(network, id++, ClientboundSyncFirearmAmmoPropertiesPacket.class, ClientboundSyncFirearmAmmoPropertiesPacket::decode);
         buildMessage(network, id++, ClientboundSyncFirearmHandlingPropertiesPacket.class, ClientboundSyncFirearmHandlingPropertiesPacket::decode);
+        buildMessage(network, id++, ClientboundSyncSpreadProvidersPacket.class, ClientboundSyncSpreadProvidersPacket::decode);
 
         return network;
     }

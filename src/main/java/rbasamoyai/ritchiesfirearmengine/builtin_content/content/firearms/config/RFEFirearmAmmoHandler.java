@@ -20,8 +20,8 @@ import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.AmmoPredicate;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEFirearmItemAmmoProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEFirearmModeAmmoProperties;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEFirearmProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.data_packing.RFEJsonResourceReloadListener;
@@ -38,12 +38,12 @@ import java.util.concurrent.Executor;
 
 public class RFEFirearmAmmoHandler {
 
-    private static final Map<Item, RFEFirearmItemAmmoProperties> FIREARM_AMMO_PROPERTIES = new Reference2ObjectOpenHashMap<>();
+    private static final Map<Item, RFEFirearmProperties<RFEFirearmModeAmmoProperties>> FIREARM_AMMO_PROPERTIES = new Reference2ObjectOpenHashMap<>();
     private static final Map<Item, UnresolvedItemAmmoProperties> UNRESOLVED_PROPERTIES = new Reference2ObjectOpenHashMap<>();
 
     private static final RFEFirearmModeAmmoProperties EMPTY_MODE = new RFEFirearmModeAmmoProperties(ImmutableMap.of(),
             ImmutableList.of(), ImmutableList.of(), ImmutableList.of(), null);
-    private static final RFEFirearmItemAmmoProperties EMPTY = new RFEFirearmItemAmmoProperties(EMPTY_MODE, ImmutableMap.of());
+    private static final RFEFirearmProperties<RFEFirearmModeAmmoProperties> EMPTY = new RFEFirearmProperties<>(EMPTY_MODE, ImmutableMap.of());
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -155,9 +155,13 @@ public class RFEFirearmAmmoHandler {
         }
     }
 
-    public static RFEFirearmItemAmmoProperties getAmmoProperties(Item item) { return FIREARM_AMMO_PROPERTIES.getOrDefault(item, EMPTY); }
+    public static RFEFirearmProperties<RFEFirearmModeAmmoProperties> getAmmoProperties(Item item) {
+        return FIREARM_AMMO_PROPERTIES.getOrDefault(item, EMPTY);
+    }
 
-    public static RFEFirearmItemAmmoProperties getAmmoProperties(ItemStack item) { return getAmmoProperties(item.getItem()); }
+    public static RFEFirearmProperties<RFEFirearmModeAmmoProperties> getAmmoProperties(ItemStack item) {
+        return getAmmoProperties(item.getItem());
+    }
 
     public static void syncToAll() {
         RFENetwork.sendToAll(new ClientboundSyncFirearmAmmoPropertiesPacket());
@@ -167,13 +171,13 @@ public class RFEFirearmAmmoHandler {
         RFENetwork.sendToPlayer(new ClientboundSyncFirearmAmmoPropertiesPacket(), player);
     }
 
-    public record ClientboundSyncFirearmAmmoPropertiesPacket(Map<Item, RFEFirearmItemAmmoProperties> properties) implements RFEPacket {
+    public record ClientboundSyncFirearmAmmoPropertiesPacket(Map<Item, RFEFirearmProperties<RFEFirearmModeAmmoProperties>> properties) implements RFEPacket {
         public static ClientboundSyncFirearmAmmoPropertiesPacket decode(FriendlyByteBuf buf) {
-            Map<Item, RFEFirearmItemAmmoProperties> properties = new Reference2ObjectOpenHashMap<>();
+            Map<Item, RFEFirearmProperties<RFEFirearmModeAmmoProperties>> properties = new Reference2ObjectOpenHashMap<>();
             int sz = buf.readVarInt();
             for (int i = 0; i < sz; ++i) {
                 Item item = BuiltInRegistries.ITEM.get(buf.readResourceLocation());
-                RFEFirearmItemAmmoProperties prop = RFEFirearmItemAmmoProperties.fromNetwork(buf);
+                RFEFirearmProperties<RFEFirearmModeAmmoProperties> prop = RFEFirearmProperties.fromNetwork(buf, RFEFirearmModeAmmoProperties::fromNetwork);
                 properties.put(item, prop);
             }
             return new ClientboundSyncFirearmAmmoPropertiesPacket(properties);
@@ -184,9 +188,9 @@ public class RFEFirearmAmmoHandler {
         @Override
         public void rootEncode(FriendlyByteBuf buf) {
             buf.writeVarInt(this.properties.size());
-            for (Map.Entry<Item, RFEFirearmItemAmmoProperties> entry : this.properties.entrySet()) {
+            for (Map.Entry<Item, RFEFirearmProperties<RFEFirearmModeAmmoProperties>> entry : this.properties.entrySet()) {
                 buf.writeResourceLocation(BuiltInRegistries.ITEM.getKey(entry.getKey()));
-                RFEFirearmItemAmmoProperties.toNetwork(buf, entry.getValue());
+                RFEFirearmProperties.toNetwork(buf, entry.getValue(), RFEFirearmModeAmmoProperties::toNetwork);
             }
         }
 
@@ -201,13 +205,11 @@ public class RFEFirearmAmmoHandler {
         public UnresolvedModeAmmoProperties defaultModeProperties = new UnresolvedModeAmmoProperties();
         public Map<String, UnresolvedModeAmmoProperties> modeProperties = new Object2ObjectOpenHashMap<>();
 
-
-
-        public RFEFirearmItemAmmoProperties resolve(Item item) {
+        public RFEFirearmProperties<RFEFirearmModeAmmoProperties> resolve(Item item) {
             ImmutableMap.Builder<String, RFEFirearmModeAmmoProperties> resolvedModeProperties = ImmutableMap.builder();
             for (Map.Entry<String, UnresolvedModeAmmoProperties> entry : this.modeProperties.entrySet())
                 resolvedModeProperties.put(entry.getKey(), entry.getValue().resolve(item));
-            return new RFEFirearmItemAmmoProperties(this.defaultModeProperties.resolve(item), resolvedModeProperties.build());
+            return new RFEFirearmProperties<>(this.defaultModeProperties.resolve(item), resolvedModeProperties.build());
         }
     }
 

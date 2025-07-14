@@ -1,5 +1,8 @@
 package rbasamoyai.ritchiesfirearmengine.utils;
 
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -34,6 +37,20 @@ public class RFEProjectileUtils {
         }
 
         return entity == null ? null : new RFEEntityHitResult(entity, pos);
+    }
+
+    /**
+     *
+     * @param radius radius of spread, in degrees
+     * @param tighten if the spread should be concentrated in the center
+     * @param random random source for generating spread
+     * @return the aim deviation, in degrees; left entry is pitch, right entry is yaw
+     */
+    public static Tuple<Float, Float> standardSpreadAngles(float radius, boolean tighten, RandomSource random) {
+        float angle = random.nextFloat() * Mth.TWO_PI;
+        float radMul = tighten ? random.nextFloat() : Mth.sqrt(random.nextFloat()); // Taken from sym.gg
+        radMul *= radius;
+        return new Tuple<>(radMul * Mth.sin(angle), radMul * Mth.cos(angle));
     }
 
 }

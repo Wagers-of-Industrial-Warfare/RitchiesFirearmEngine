@@ -164,40 +164,130 @@ public class RFEFirearmAmmoHandler {
     }
 
     public static void syncToAll() {
-        RFENetwork.sendToAll(new ClientboundSyncFirearmAmmoPropertiesPacket());
+        RFENetwork.sendToAll(ClientboundSyncFirearmAmmoPropertiesPacket.fromLoadedProperties());
     }
 
     public static void syncToPlayer(ServerPlayer player) {
-        RFENetwork.sendToPlayer(new ClientboundSyncFirearmAmmoPropertiesPacket(), player);
+        RFENetwork.sendToPlayer(ClientboundSyncFirearmAmmoPropertiesPacket.fromLoadedProperties(), player);
     }
 
-    public record ClientboundSyncFirearmAmmoPropertiesPacket(Map<Item, RFEFirearmProperties<RFEFirearmModeAmmoProperties>> properties) implements RFEPacket {
+    public record ClientboundSyncFirearmAmmoPropertiesPacket(Map<Item, RFEFirearmProperties<UnresolvedModeAmmoProperties>> properties) implements RFEPacket {
         public static ClientboundSyncFirearmAmmoPropertiesPacket decode(FriendlyByteBuf buf) {
-            Map<Item, RFEFirearmProperties<RFEFirearmModeAmmoProperties>> properties = new Reference2ObjectOpenHashMap<>();
+            Map<Item, RFEFirearmProperties<UnresolvedModeAmmoProperties>> properties = new Reference2ObjectOpenHashMap<>();
             int sz = buf.readVarInt();
             for (int i = 0; i < sz; ++i) {
                 Item item = BuiltInRegistries.ITEM.get(buf.readResourceLocation());
-                RFEFirearmProperties<RFEFirearmModeAmmoProperties> prop = RFEFirearmProperties.fromNetwork(buf, RFEFirearmModeAmmoProperties::fromNetwork);
+                RFEFirearmProperties<UnresolvedModeAmmoProperties> prop = RFEFirearmProperties.fromNetwork(buf,
+                        ClientboundSyncFirearmAmmoPropertiesPacket::modePropertiesFromNetwork);
                 properties.put(item, prop);
             }
             return new ClientboundSyncFirearmAmmoPropertiesPacket(properties);
         }
 
-        ClientboundSyncFirearmAmmoPropertiesPacket() { this(new Reference2ObjectOpenHashMap<>(FIREARM_AMMO_PROPERTIES)); }
+        static ClientboundSyncFirearmAmmoPropertiesPacket fromLoadedProperties() {
+            Map<Item, RFEFirearmProperties<UnresolvedModeAmmoProperties>> unresolvedPropertiesByItem = new Reference2ObjectOpenHashMap<>();
+
+            for (Map.Entry<Item, RFEFirearmProperties<RFEFirearmModeAmmoProperties>> entry : FIREARM_AMMO_PROPERTIES.entrySet()) {
+                RFEFirearmProperties<RFEFirearmModeAmmoProperties> resolved = entry.getValue();
+                UnresolvedModeAmmoProperties defaultUnresolved = fromResolvedProperties(resolved.defaultProperties());
+                ImmutableMap.Builder<String, UnresolvedModeAmmoProperties> unresolvedByMode = ImmutableMap.builder();
+                for (Map.Entry<String, RFEFirearmModeAmmoProperties> modeEntry : resolved.propertiesByMode().entrySet())
+                    unresolvedByMode.put(modeEntry.getKey(), fromResolvedProperties(modeEntry.getValue()));
+                unresolvedPropertiesByItem.put(entry.getKey(), new RFEFirearmProperties<>(defaultUnresolved, unresolvedByMode.build()));
+            }
+
+            return new ClientboundSyncFirearmAmmoPropertiesPacket(unresolvedPropertiesByItem);
+        }
+
+        private static UnresolvedModeAmmoProperties fromResolvedProperties(RFEFirearmModeAmmoProperties resolved) {
+            UnresolvedModeAmmoProperties unresolved = new UnresolvedModeAmmoProperties();
+            for (Map.Entry<AmmoPredicate, RFEProjectileType> entry : resolved.primaryAmmo().entrySet()) {
+                ResourceLocation loc = RFEProjectileTypeHandler.getProjectileTypeId(entry.getValue());
+                if (loc != null)
+                    unresolved.primaryAmmo.put(entry.getKey(), loc);
+            }
+            unresolved.magazines.addAll(resolved.magazines());
+            unresolved.speedloaders.addAll(resolved.speedloaders());
+            unresolved.secondaryAmmo.addAll(resolved.secondaryAmmo());
+            if (resolved.unlimitedProjectile() != null)
+                unresolved.unlimitedProjectile = RFEProjectileTypeHandler.getProjectileTypeId(resolved.unlimitedProjectile());
+            return unresolved;
+        }
 
         @Override
         public void rootEncode(FriendlyByteBuf buf) {
             buf.writeVarInt(this.properties.size());
-            for (Map.Entry<Item, RFEFirearmProperties<RFEFirearmModeAmmoProperties>> entry : this.properties.entrySet()) {
+            for (Map.Entry<Item, RFEFirearmProperties<UnresolvedModeAmmoProperties>> entry : this.properties.entrySet()) {
                 buf.writeResourceLocation(BuiltInRegistries.ITEM.getKey(entry.getKey()));
-                RFEFirearmProperties.toNetwork(buf, entry.getValue(), RFEFirearmModeAmmoProperties::toNetwork);
+                RFEFirearmProperties.toNetwork(buf, entry.getValue(), ClientboundSyncFirearmAmmoPropertiesPacket::modePropertiesToNetwork);
             }
         }
 
         @Override
         public void handle(Executor exec, PacketListener listener, @Nullable ServerPlayer sender) {
+            RitchiesFirearmEngine.LOGGER.info("Loading firearm ammo properties");
             FIREARM_AMMO_PROPERTIES.clear();
-            FIREARM_AMMO_PROPERTIES.putAll(this.properties);
+            for (Map.Entry<Item, RFEFirearmProperties<UnresolvedModeAmmoProperties>> entry : this.properties.entrySet()) {
+                Item item = entry.getKey();
+                RFEFirearmProperties<UnresolvedModeAmmoProperties> unresolved = entry.getValue();
+
+                ImmutableMap.Builder<String, RFEFirearmModeAmmoProperties> resolvedPropertiesByMode = ImmutableMap.builder();
+                for (Map.Entry<String, UnresolvedModeAmmoProperties> entry1 : unresolved.propertiesByMode().entrySet())
+                    resolvedPropertiesByMode.put(entry1.getKey(), entry1.getValue().resolve(item));
+
+                RFEFirearmProperties<RFEFirearmModeAmmoProperties> resolved = new RFEFirearmProperties<>(unresolved.defaultProperties().resolve(item),
+                        resolvedPropertiesByMode.build());
+                FIREARM_AMMO_PROPERTIES.put(item, resolved);
+            }
+        }
+
+        private static UnresolvedModeAmmoProperties modePropertiesFromNetwork(FriendlyByteBuf buf) {
+            UnresolvedModeAmmoProperties properties = new UnresolvedModeAmmoProperties();
+            int primarySz = buf.readVarInt();
+            for (int i = 0; i < primarySz; ++i)
+                properties.primaryAmmo.put(AmmoPredicate.fromNetwork(buf), buf.readResourceLocation());
+
+            int magazineSz = buf.readVarInt();
+            for (int i = 0; i < magazineSz; ++i)
+                properties.magazines.add(AmmoPredicate.fromNetwork(buf));
+
+            int speedloaderSz = buf.readVarInt();
+            for (int i = 0; i < speedloaderSz; ++i)
+                properties.speedloaders.add(AmmoPredicate.fromNetwork(buf));
+
+            int secondaryAmmoSz = buf.readVarInt();
+            for (int i = 0; i < secondaryAmmoSz; ++i)
+                properties.secondaryAmmo.add(AmmoPredicate.fromNetwork(buf));
+
+            if (buf.readBoolean())
+                properties.unlimitedProjectile = buf.readResourceLocation();
+
+            return properties;
+        }
+
+        private static void modePropertiesToNetwork(FriendlyByteBuf buf, UnresolvedModeAmmoProperties properties) {
+            buf.writeVarInt(properties.primaryAmmo.size());
+            for (Map.Entry<AmmoPredicate, ResourceLocation> entry : properties.primaryAmmo.entrySet()) {
+                ResourceLocation id = entry.getValue();
+                AmmoPredicate.writeToNetwork(entry.getKey(), buf);
+                buf.writeResourceLocation(id);
+            }
+
+            buf.writeVarInt(properties.magazines.size());
+            for (AmmoPredicate pred : properties.magazines)
+                AmmoPredicate.writeToNetwork(pred, buf);
+
+            buf.writeVarInt(properties.speedloaders.size());
+            for (AmmoPredicate pred : properties.speedloaders)
+                AmmoPredicate.writeToNetwork(pred, buf);
+
+            buf.writeVarInt(properties.secondaryAmmo.size());
+            for (AmmoPredicate pred : properties.secondaryAmmo)
+                AmmoPredicate.writeToNetwork(pred, buf);
+
+            buf.writeBoolean(properties.unlimitedProjectile != null);
+            if (properties.unlimitedProjectile != null)
+                buf.writeResourceLocation(properties.unlimitedProjectile);
         }
     }
 

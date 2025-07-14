@@ -285,7 +285,7 @@ public class RFEFirearmMode {
                 }
             }
         } else {
-            RFEProjectileType unlimitedProjectile = ammoProperties.unlimitedAmmo();
+            RFEProjectileType unlimitedProjectile = ammoProperties.unlimitedProjectile();
             if (unlimitedProjectile != null) {
                 // TODO one-time warning if no projectile?
                 for (int i = 0; i < this.shotsFired; ++i)

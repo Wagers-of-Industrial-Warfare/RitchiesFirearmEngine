@@ -6,7 +6,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -17,6 +16,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFire
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
@@ -297,15 +297,15 @@ public class RFEFirearmMode {
         float yRot = entity.yHeadRot;
         for (RFEProjectileInstance instance : toFire) {
             // TODO shooter positioning
-            Tuple<Float, Float> spread = spreadInstance.getSpread(itemStack, entity);
+            RFEAimAngles spread = spreadInstance.getSpread(itemStack, entity);
             spreadInstance.updateSpread(itemStack, entity);
-            RitchiesFirearmEngine.LOGGER.info("p = {}, y = {}", spread.getA(), spread.getB());
+            RitchiesFirearmEngine.LOGGER.info("p = {}, y = {}", spread.pitch(), spread.yaw());
 
             instance.setOwner(entity);
             instance.setPosition(pos);
 
-            entity.setXRot(xRot + spread.getA());
-            entity.yHeadRot += spread.getB();
+            entity.setXRot(xRot + spread.pitch());
+            entity.yHeadRot += spread.yaw();
             Vec3 aimDirection = entity.getViewVector(1f);
             entity.setXRot(xRot);
             entity.yHeadRot = yRot;

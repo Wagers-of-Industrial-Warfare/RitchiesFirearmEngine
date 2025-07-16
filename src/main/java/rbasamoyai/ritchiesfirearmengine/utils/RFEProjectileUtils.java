@@ -2,12 +2,12 @@ package rbasamoyai.ritchiesfirearmengine.utils;
 
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEEntityHitResult;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -46,11 +46,11 @@ public class RFEProjectileUtils {
      * @param random random source for generating spread
      * @return the aim deviation, in degrees; left entry is pitch, right entry is yaw
      */
-    public static Tuple<Float, Float> standardSpreadAngles(float radius, boolean tighten, RandomSource random) {
+    public static RFEAimAngles standardSpreadAngles(float radius, boolean tighten, RandomSource random) {
         float angle = random.nextFloat() * Mth.TWO_PI;
         float radMul = tighten ? random.nextFloat() : Mth.sqrt(random.nextFloat()); // Taken from sym.gg
         radMul *= radius;
-        return new Tuple<>(radMul * Mth.sin(angle), radMul * Mth.cos(angle));
+        return new RFEAimAngles(radMul * Mth.sin(angle), radMul * Mth.cos(angle));
     }
 
 }

@@ -1,9 +1,9 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.spread.random;
 
-import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEProjectileUtils;
 
@@ -20,7 +20,7 @@ public class SimpleSpreadInstance implements RFESpreadInstance {
     }
 
     @Override
-    public Tuple<Float, Float> getSpread(ItemStack itemStack, LivingEntity entity) {
+    public RFEAimAngles getSpread(ItemStack itemStack, LivingEntity entity) {
         float radius = FirearmDataUtils.isAiming(itemStack) ? this.radius : this.unaimedRadius;
         return RFEProjectileUtils.standardSpreadAngles(radius, this.tighten, entity.getRandom());
     }

@@ -240,6 +240,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         return true; // TODO melee?
     }
 
+    @Nullable public Action getCurrentAction(ItemStack itemStack) { return FirearmDataUtils.getAction(itemStack); }
+
     @Override
     public float getFov(ItemStack itemStack, Player player, float currentFovModifier, float partialTicks) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);

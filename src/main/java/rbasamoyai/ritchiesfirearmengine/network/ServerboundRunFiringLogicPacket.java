@@ -5,10 +5,10 @@ import net.minecraft.network.PacketListener;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.IFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEFiringInput;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;

@@ -55,6 +55,21 @@ public class RFEClient {
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("aiming"), (itemStack, level, entity, seed) -> {
            return FirearmDataUtils.isAiming(itemStack) ? 1 : 0;
         });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("has_magazine"), (itemStack, level, entity, seed) -> {
+            return itemStack.getItem() instanceof RFEFirearmItem firearm && firearm.hasMagazine(itemStack) ? 1 : 0;
+        });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_reloading"), (itemStack, level, entity, seed) -> {
+            return itemStack.getItem() instanceof RFEFirearmItem firearm
+                    && firearm.getCurrentAction(itemStack) == RFEFirearmItem.Action.RELOAD ? 1 : 0;
+        });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_unloading"), (itemStack, level, entity, seed) -> {
+            return itemStack.getItem() instanceof RFEFirearmItem firearm
+                    && firearm.getCurrentAction(itemStack) == RFEFirearmItem.Action.UNLOAD ? 1 : 0;
+        });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_charging"), (itemStack, level, entity, seed) -> {
+            return itemStack.getItem() instanceof RFEFirearmItem firearm
+                    && firearm.getCurrentAction(itemStack) == RFEFirearmItem.Action.CHARGING ? 1 : 0;
+        });
     }
 
     public static void onMouseInput(int button, int action, int modifiers) {

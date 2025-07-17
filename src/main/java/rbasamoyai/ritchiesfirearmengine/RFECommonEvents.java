@@ -12,6 +12,8 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProviderPackHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProviderPackHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.pack_loading.RFEPackLoader;
@@ -28,6 +30,7 @@ public class RFECommonEvents {
         loadTagsAndTypes();
         RFEProjectileManager.clearAllProjectiles();
         RFESpreadManager.clearTrackedSpread();
+        RFERecoilManager.clearTrackedRecoil();
         RFENetwork.sendToAll(new RFEProjectileManager.ClientboundRemoveAllProjectilesPacket());
 
         if (singleplayer)
@@ -38,6 +41,7 @@ public class RFECommonEvents {
         RFEFirearmAmmoHandler.syncToAll();
         RFEFirearmHandlingPropertiesHandler.syncToAll();
         RFESpreadProviderPackHandler.syncToAll();
+        RFERecoilProviderPackHandler.syncToAll();
     }
 
     public static void onDatapackSync(ServerPlayer player, boolean singleplayer) {
@@ -49,6 +53,7 @@ public class RFECommonEvents {
         RFEFirearmAmmoHandler.syncToPlayer(player);
         RFEFirearmHandlingPropertiesHandler.syncToPlayer(player);
         RFESpreadProviderPackHandler.syncToPlayer(player);
+        RFERecoilProviderPackHandler.syncToPlayer(player);
     }
 
     public static void onLevelLoad(LevelAccessor level) {
@@ -66,8 +71,10 @@ public class RFECommonEvents {
     }
 
     public static void onEntityRemoved(Entity entity) {
-        if (entity instanceof LivingEntity living)
+        if (entity instanceof LivingEntity living) {
             RFESpreadManager.stopTrackingEntity(living);
+            RFERecoilManager.stopTrackingEntity(living);
+        }
     }
 
     public static void onPlayerLoggedIn(Player entity) {
@@ -77,7 +84,8 @@ public class RFECommonEvents {
 
     public static void onLevelTick(Level level) {
         RFEProjectileManager.tick(level);
-        RFESpreadManager.tick();
+        RFESpreadManager.tick(level);
+        RFERecoilManager.tick(level);
     }
 
 }

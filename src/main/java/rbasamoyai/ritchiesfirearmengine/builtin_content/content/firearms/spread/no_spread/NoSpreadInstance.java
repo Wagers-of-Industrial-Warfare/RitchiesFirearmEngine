@@ -9,11 +9,9 @@ public class NoSpreadInstance implements RFESpreadInstance {
 
     public static final NoSpreadInstance INSTANCE = new NoSpreadInstance();
 
-    private static final RFEAimAngles ZERO_SPREAD = new RFEAimAngles(0f, 0f);
-
     private NoSpreadInstance() {}
 
-    @Override public RFEAimAngles getSpread(ItemStack itemStack, LivingEntity entity) { return ZERO_SPREAD; }
+    @Override public RFEAimAngles getSpread(ItemStack itemStack, LivingEntity entity) { return RFEAimAngles.ZERO_ANGLES; }
 
     @Override public void updateSpread(ItemStack itemStack, LivingEntity entity) {}
 

@@ -22,6 +22,9 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectile
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilInstance;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProviderPackHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProviderPackHandler;
@@ -342,9 +345,15 @@ public class RFEFirearmMode {
                 // TODO warn once if missing?
                 firingInputs.add(new RFEFiringInput(typeId, aimDirection, pos));
             }
-
-            // TODO apply recoil?
         }
+
+        RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(entity);
+        if (recoilInstance == null) {
+            recoilInstance = RFERecoilProviderPackHandler.getRecoilProviders(itemStack).getProperties(this.modeId)
+                    .createRecoilInstance(itemStack, entity, entity.getRandom());
+            RFERecoilManager.trackRecoil(recoilInstance, entity);
+        }
+        recoilInstance.updateRecoil(itemStack, entity);
 
         RFENetwork.sendToServer(new ServerboundRunFiringLogicPacket(firingInputs, hand));
     }

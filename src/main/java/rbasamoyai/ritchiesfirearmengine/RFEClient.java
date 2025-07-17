@@ -26,12 +26,15 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.AmmoPacketI
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRenderer;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRendererPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFEProjectileRenderer;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFEProjectileRendererPacksHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilInstance;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundFirearmActionPacket;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundReleaseAttackKeyPacket;
@@ -111,6 +114,24 @@ public class RFEClient {
         return itemStack.getItem() instanceof FovModifyingItem fovModifier ? fovModifier.getFov(itemStack, player, currentFovModifier, partialTicks) : currentFovModifier;
     }
 
+    public static void modifyCameraAngles(SetCameraAngles setCameraAngles) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.isPaused() && mc.hasSingleplayerServer())
+            return;
+        RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(mc.player);
+        if (recoilInstance != null) {
+            float dt = mc.getDeltaFrameTime();
+            RFEAimAngles aimRecoil = recoilInstance.getAimRecoil(dt);
+            RFEAimAngles cameraRecoil = recoilInstance.getCameraRecoil(dt);
+            float cameraRoll = recoilInstance.getCameraRoll(dt);
+
+            mc.player.turn(aimRecoil.yaw() / 0.15f, -aimRecoil.pitch() / 0.15f);
+            setCameraAngles.setPitch(setCameraAngles.getPitch() - cameraRecoil.pitch());
+            setCameraAngles.setYaw(setCameraAngles.getYaw() + cameraRecoil.yaw());
+            setCameraAngles.setRoll(setCameraAngles.getRoll() + cameraRoll);
+        }
+    }
+
     public static void onClientLogout() {
         RFEProjectileManager.clearAllProjectiles();
     }
@@ -168,6 +189,17 @@ public class RFEClient {
         RFEHudOverlayRenderer mainhandHud = RFEHudOverlayRendererPacksHandler.getHudOverlayRenderer(mainhand);
         mainhandHud.renderHUD(graphics, partialTick, mainhand, mc.player, false);
         // TODO offhand rendering, though prioritize primary. May have something regarding supporting offhand rendering
+    }
+
+    public interface SetCameraAngles {
+        float getPitch();
+        void setPitch(float pitch);
+
+        float getYaw();
+        void setYaw(float yaw);
+
+        float getRoll();
+        void setRoll(float roll);
     }
 
 }

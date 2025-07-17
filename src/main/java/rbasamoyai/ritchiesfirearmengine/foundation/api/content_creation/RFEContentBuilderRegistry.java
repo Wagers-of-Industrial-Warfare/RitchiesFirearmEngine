@@ -8,6 +8,7 @@ import org.jetbrains.annotations.ApiStatus;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.CompareValueSource;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProvider;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProvider;
 
 public class RFEContentBuilderRegistry {
@@ -83,6 +84,28 @@ public class RFEContentBuilderRegistry {
         if (!SPREAD_PROVIDER_SERIALIZERS_IDS.containsKey(ser))
             throw new IllegalStateException("Unknown RFE spread provider serializer " + ser);
         return SPREAD_PROVIDER_SERIALIZERS_IDS.get(ser);
+    }
+
+    private static final Object2ReferenceMap<ResourceLocation, RFERecoilProvider.Serializer<?>> RECOIL_PROVIDER_SERIALIZERS = new Object2ReferenceOpenHashMap<>();
+    private static final Reference2ObjectMap<RFERecoilProvider.Serializer<?>, ResourceLocation> RECOIL_PROVIDER_SERIALIZERS_IDS = new Reference2ObjectOpenHashMap<>();
+
+    public static void registerRecoilProviderSerializer(ResourceLocation id, RFERecoilProvider.Serializer<?> ser) {
+        if (RECOIL_PROVIDER_SERIALIZERS.containsKey(id))
+            throw new IllegalStateException("Already registered RFE recoil provider serializer wtih id '" + id + "'");
+        RECOIL_PROVIDER_SERIALIZERS.put(id, ser);
+        RECOIL_PROVIDER_SERIALIZERS_IDS.put(ser, id);
+    }
+
+    public static RFERecoilProvider.Serializer<?> getRecoilProviderSerializer(ResourceLocation id) {
+        if (!RECOIL_PROVIDER_SERIALIZERS.containsKey(id))
+            throw new IllegalStateException("RFE recoil provider serializer of type '" + id + "' not present");
+        return RECOIL_PROVIDER_SERIALIZERS.get(id);
+    }
+
+    public static ResourceLocation getRecoilProviderSerializerId(RFERecoilProvider.Serializer<?> ser) {
+        if (!RECOIL_PROVIDER_SERIALIZERS_IDS.containsKey(ser))
+            throw new IllegalStateException("Unknown RFE recoil provider serializer " + ser);
+        return RECOIL_PROVIDER_SERIALIZERS_IDS.get(ser);
     }
 
 }

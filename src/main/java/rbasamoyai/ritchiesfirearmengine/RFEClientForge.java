@@ -19,6 +19,7 @@ public class RFEClientForge {
         forgeBus.addListener(RFEClientForge::onClientLogout);
         forgeBus.addListener(RFEClientForge::onRenderLevel);
         forgeBus.addListener(RFEClientForge::onRenderGuiOverlay);
+        forgeBus.addListener(RFEClientForge::onSetupCamera);
     }
 
     private static void onClientSetup(final FMLClientSetupEvent event) {
@@ -61,6 +62,21 @@ public class RFEClientForge {
             RFEClient.renderHUDOverlay(event.getGuiGraphics(), event.getPartialTick());
         }
         // TODO crosshair
+    }
+
+    private static void onSetupCamera(final ViewportEvent.ComputeCameraAngles event) {
+        RFEClient.modifyCameraAngles(new ForgeSetCameraAngles(event));
+    }
+
+    private record ForgeSetCameraAngles(ViewportEvent.ComputeCameraAngles event) implements RFEClient.SetCameraAngles {
+        @Override public float getPitch() { return this.event.getPitch(); }
+        @Override public void setPitch(float pitch) { this.event.setPitch(pitch); }
+
+        @Override public float getYaw() { return this.event.getYaw(); }
+        @Override public void setYaw(float yaw) { this.event.setYaw(yaw); }
+
+        @Override public float getRoll() { return this.event.getRoll(); }
+        @Override public void setRoll(float roll) { this.event.setRoll(roll); }
     }
 
 }

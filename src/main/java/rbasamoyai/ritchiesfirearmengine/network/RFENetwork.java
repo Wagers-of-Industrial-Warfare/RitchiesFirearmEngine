@@ -17,6 +17,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectile
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager.ClientboundSpawnRFEProjectilePacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager.ClientboundUpdateRFEProjectilePacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler.ClientboundSyncRFEProjectileTypesPacket;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProviderPackHandler.ClientboundSyncRecoilProvidersPacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProviderPackHandler.ClientboundSyncSpreadProvidersPacket;
 
 import java.util.function.Function;
@@ -39,6 +40,7 @@ public class RFENetwork {
         buildMessage(network, id++, ClientboundValidateRFEContentPacksPacket.class, ClientboundValidateRFEContentPacksPacket::decode);
         buildMessage(network, id++, ServerboundFirearmActionPacket.class, ServerboundFirearmActionPacket::new);
         buildMessage(network, id++, ServerboundReleaseAttackKeyPacket.class, ServerboundReleaseAttackKeyPacket::new);
+        buildMessage(network, id++, ServerboundRunFiringLogicPacket.class, ServerboundRunFiringLogicPacket::decode);
         buildMessage(network, id++, ClientboundSyncMagazinePropertiesPacket.class, ClientboundSyncMagazinePropertiesPacket::decode);
         buildMessage(network, id++, ClientboundSyncAmmoPacketPropertiesPacket.class, ClientboundSyncAmmoPacketPropertiesPacket::decode);
         buildMessage(network, id++, ClientboundSpawnRFEProjectilePacket.class, ClientboundSpawnRFEProjectilePacket::decode);
@@ -49,7 +51,7 @@ public class RFENetwork {
         buildMessage(network, id++, ClientboundSyncFirearmAmmoPropertiesPacket.class, ClientboundSyncFirearmAmmoPropertiesPacket::decode);
         buildMessage(network, id++, ClientboundSyncFirearmHandlingPropertiesPacket.class, ClientboundSyncFirearmHandlingPropertiesPacket::decode);
         buildMessage(network, id++, ClientboundSyncSpreadProvidersPacket.class, ClientboundSyncSpreadProvidersPacket::decode);
-        buildMessage(network, id++, ServerboundRunFiringLogicPacket.class, ServerboundRunFiringLogicPacket::decode);
+        buildMessage(network, id++, ClientboundSyncRecoilProvidersPacket.class, ClientboundSyncRecoilProvidersPacket::decode);
 
         return network;
     }

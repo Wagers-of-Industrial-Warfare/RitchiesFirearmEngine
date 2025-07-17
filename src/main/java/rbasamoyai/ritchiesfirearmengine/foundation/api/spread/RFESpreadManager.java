@@ -5,6 +5,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -17,13 +18,15 @@ public class RFESpreadManager {
         SPREAD_INSTANCES.clear();
     }
 
-    public static void tick() {
+    public static void tick(Level level) {
         for (var iter = SPREAD_INSTANCES.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry<LivingEntity, Map<InteractionHand, TaggedSpreadInstance>> entry = iter.next();
             if (entry.getKey().isRemoved()) {
                 iter.remove();
                 continue;
             }
+            if (entry.getKey().level() != level)
+                continue;
             Map<InteractionHand, TaggedSpreadInstance> instances = entry.getValue();
             for (Iterator<TaggedSpreadInstance> iter1 = instances.values().iterator(); iter1.hasNext(); ) {
                 RFESpreadInstance instance = iter1.next().instance();

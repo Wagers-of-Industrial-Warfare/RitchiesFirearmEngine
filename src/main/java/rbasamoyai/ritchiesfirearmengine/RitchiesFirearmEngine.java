@@ -108,7 +108,8 @@ public class RitchiesFirearmEngine {
     }
 
     private void onLevelTick(final TickEvent.LevelTickEvent event) {
-        RFECommonEvents.onLevelTick(event.level);
+        if (event.phase == TickEvent.Phase.END)
+            RFECommonEvents.onLevelTick(event.level);
     }
 
     public static ResourceLocation resource(String path) { return RFEUtils.location(MOD_ID, path); }

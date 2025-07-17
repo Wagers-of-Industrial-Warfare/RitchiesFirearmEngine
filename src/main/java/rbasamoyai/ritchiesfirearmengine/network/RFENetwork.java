@@ -49,6 +49,7 @@ public class RFENetwork {
         buildMessage(network, id++, ClientboundSyncFirearmAmmoPropertiesPacket.class, ClientboundSyncFirearmAmmoPropertiesPacket::decode);
         buildMessage(network, id++, ClientboundSyncFirearmHandlingPropertiesPacket.class, ClientboundSyncFirearmHandlingPropertiesPacket::decode);
         buildMessage(network, id++, ClientboundSyncSpreadProvidersPacket.class, ClientboundSyncSpreadProvidersPacket::decode);
+        buildMessage(network, id++, ServerboundRunFiringLogicPacket.class, ServerboundRunFiringLogicPacket::decode);
 
         return network;
     }

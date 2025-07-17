@@ -7,7 +7,7 @@ import net.minecraft.world.phys.AABB;
 
 public interface RFEProjectileType {
 
-    void shoot(RFEProjectileInstance instance, double dx, double dy, double dz /* TODO spread provider */);
+    void shoot(RFEProjectileInstance instance, double dx, double dy, double dz);
 
     void tick(Level level, RFEProjectileInstance instance);
 

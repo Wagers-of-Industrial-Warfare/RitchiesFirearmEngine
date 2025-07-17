@@ -20,10 +20,7 @@ import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.level.Level;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEFirearmMode;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEFirearmModeAmmoProperties;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ReloadPhase;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.*;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
@@ -65,10 +62,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
                 RFESpreadManager.stopTrackingSpread(living, itemStack);
             }
         }
-        if (!level.isClientSide) {
-            if (entity instanceof LivingEntity living)
-                this.getCurrentMode(itemStack).onTick(itemStack, living, isSelected);
-        }
+        if (entity instanceof LivingEntity living)
+            this.getCurrentMode(itemStack).onTick(itemStack, living, isSelected);
         // TODO clientside effects?
     }
 
@@ -97,16 +92,21 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
     }
 
     public boolean commonOnEntitySwing(ItemStack stack, LivingEntity entity) {
-        if (entity.level().isClientSide)
-            return true;
         FirearmDataUtils.setHoldingAttackKey(stack, true);
         RFEFirearmMode firearmMode = this.getCurrentMode(stack);
         if (firearmMode.canFireProjectile(stack, entity)) {
-            firearmMode.fireProjectile(stack, entity);
+            firearmMode.fireFirearm(stack, entity);
         } else if (firearmMode.canCharge(stack, entity)) {
             firearmMode.onCharge(stack, entity);
         }
+        // TODO alternative API for entity interaction
         return true;
+    }
+
+    @Override
+    public void handleClientFireInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        mode.handleFiringInputOnServer(itemStack, entity, firingInputs);
     }
 
     public void onReload(ItemStack stack, LivingEntity entity) {

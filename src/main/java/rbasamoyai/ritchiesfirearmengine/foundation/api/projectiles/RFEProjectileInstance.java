@@ -89,7 +89,7 @@ public class RFEProjectileInstance {
         ++this.age;
     }
 
-    public void shoot(double dx, double dy, double dz /* TODO spread provider */) {
+    public void shoot(double dx, double dy, double dz) {
         this.projectileType.shoot(this, dx, dy, dz);
     }
 

@@ -3,14 +3,15 @@ package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
@@ -20,9 +21,12 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProviderPackHandler;
+import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
+import rbasamoyai.ritchiesfirearmengine.network.ServerboundRunFiringLogicPacket;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
@@ -255,66 +259,16 @@ public class RFEFirearmMode {
         return !this.getNextRoundsInItem(itemStack, entity, this.shotsFired, false).isEmpty();
     }
 
-    public void fireProjectile(ItemStack itemStack, LivingEntity entity) {
+    public void fireFirearm(ItemStack itemStack, LivingEntity entity) {
         // TODO windup
-        RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
+
+        if (entity instanceof Player && entity.level().isClientSide) {
+            this.handlePlayerAmmoAndShootingOnClient(itemStack, entity);
+            return;
+        }
+
         RFEFirearmModeHandlingProperties firearmProperties = this.getHandlingProperties(itemStack);
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
-
-        // TODO something better probably
-        InteractionHand hand = entity.getMainHandItem() == itemStack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
-
-        RFESpreadInstance spreadInstance = RFESpreadManager.getSpreadInstance(entity, itemStack);
-        if (spreadInstance == null) {
-            spreadInstance = RFESpreadProviderPackHandler.getSpreadProviders(itemStack).getProperties(this.modeId)
-                    .createSpreadInstance(itemStack, entity, entity.getRandom());
-            RFESpreadManager.trackSpread(spreadInstance, entity, itemStack, hand);
-        }
-
-        // TODO spread, recoil
-        List<RFEProjectileInstance> toFire = new ArrayList<>();
-        if (this.ammoRequired) {
-            List<ItemStack> strippedAmmo = this.getNextRoundsInItem(itemStack, entity, this.shotsFired, true);
-            // TODO consume secondary ammo if required
-            for (ItemStack ammoStack : strippedAmmo) {
-                for (Map.Entry<AmmoPredicate, RFEProjectileType> entry : ammoProperties.primaryAmmo().entrySet()) {
-                    if (entry.getKey().test(ammoStack)) {
-                        toFire.add(entry.getValue().createInstance());
-                        break;
-                    }
-                }
-            }
-        } else {
-            RFEProjectileType unlimitedProjectile = ammoProperties.unlimitedProjectile();
-            if (unlimitedProjectile != null) {
-                // TODO one-time warning if no projectile?
-                for (int i = 0; i < this.shotsFired; ++i)
-                    toFire.add(unlimitedProjectile.createInstance());
-            }
-        }
-        Vec3 pos = new Vec3(entity.getX(), entity.getEyeY(), entity.getZ());
-        float xRot = entity.getXRot();
-        float yRot = entity.yHeadRot;
-        for (RFEProjectileInstance instance : toFire) {
-            // TODO shooter positioning
-            RFEAimAngles spread = spreadInstance.getSpread(itemStack, entity);
-            spreadInstance.updateSpread(itemStack, entity);
-            RitchiesFirearmEngine.LOGGER.info("p = {}, y = {}", spread.pitch(), spread.yaw());
-
-            instance.setOwner(entity);
-            instance.setPosition(pos);
-
-            entity.setXRot(xRot + spread.pitch());
-            entity.yHeadRot += spread.yaw();
-            Vec3 aimDirection = entity.getViewVector(1f);
-            entity.setXRot(xRot);
-            entity.yHeadRot = yRot;
-
-            instance.shoot(aimDirection.x, aimDirection.y, aimDirection.z);
-            RFEProjectileManager.queueAddedProjectile(instance, entity.level());
-
-            // TODO apply recoil
-        }
 
         if (this.canOverheat) {
             FirearmDataUtils.addHeat(modeTag, firearmProperties.heatAddedOnFiring());
@@ -330,6 +284,91 @@ public class RFEFirearmMode {
         if (this.fireMode == FireMode.SINGLE_ACTION && !firearmProperties.manualCharging())
             itemStack.getOrCreateTag().putBoolean("HoldAutomaticCycle", true);
         this.playFiringEffects(itemStack, entity);
+    }
+
+    protected void handlePlayerAmmoAndShootingOnClient(ItemStack itemStack, LivingEntity entity) {
+        RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
+
+        // TODO recoil
+        List<RFEProjectileType> toFire = new ArrayList<>();
+        if (this.ammoRequired) {
+            List<ItemStack> strippedAmmo = this.getNextRoundsInItem(itemStack, entity, this.shotsFired, false);
+            // TODO consume secondary ammo if required
+            for (ItemStack ammoStack : strippedAmmo) {
+                for (Map.Entry<AmmoPredicate, RFEProjectileType> entry : ammoProperties.primaryAmmo().entrySet()) {
+                    if (entry.getKey().test(ammoStack)) {
+                        toFire.add(entry.getValue());
+                        break;
+                    }
+                }
+            }
+        } else {
+            RFEProjectileType unlimitedProjectile = ammoProperties.unlimitedProjectile();
+            if (unlimitedProjectile != null) {
+                // TODO one-time warning if no projectile?
+                for (int i = 0; i < this.shotsFired; ++i)
+                    toFire.add(unlimitedProjectile);
+            }
+        }
+
+        // TODO something better probably
+        InteractionHand hand = entity.getMainHandItem() == itemStack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
+        RFESpreadInstance spreadInstance = RFESpreadManager.getSpreadInstance(entity, itemStack);
+        if (spreadInstance == null) {
+            spreadInstance = RFESpreadProviderPackHandler.getSpreadProviders(itemStack).getProperties(this.modeId)
+                    .createSpreadInstance(itemStack, entity, entity.getRandom());
+            RFESpreadManager.trackSpread(spreadInstance, entity, itemStack, hand);
+        }
+
+        Vec3 pos = new Vec3(entity.getX(), entity.getEyeY(), entity.getZ());
+        float xRot = entity.getXRot();
+        float yRot = entity.yHeadRot;
+
+        List<RFEFiringInput> firingInputs = new ArrayList<>();
+
+        for (RFEProjectileType type : toFire) {
+            // TODO shooter positioning
+            RFEAimAngles spread = spreadInstance.getSpread(itemStack, entity);
+            spreadInstance.updateSpread(itemStack, entity);
+
+            entity.setXRot(xRot + spread.pitch());
+            entity.yHeadRot += spread.yaw();
+            Vec3 aimDirection = entity.getViewVector(1f);
+            entity.setXRot(xRot);
+            entity.yHeadRot = yRot;
+
+            ResourceLocation typeId = RFEProjectileTypeHandler.getProjectileTypeId(type);
+            if (typeId != null) {
+                // TODO warn once if missing?
+                firingInputs.add(new RFEFiringInput(typeId, aimDirection, pos));
+            }
+
+            // TODO apply recoil?
+        }
+
+        RFENetwork.sendToServer(new ServerboundRunFiringLogicPacket(firingInputs, hand));
+    }
+
+    public void handleFiringInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs) {
+        if (this.ammoRequired)
+            this.getNextRoundsInItem(itemStack, entity, firingInputs.size(), true);
+
+        for (RFEFiringInput input : firingInputs) {
+            RFEProjectileType type = RFEProjectileTypeHandler.getProjectileType(input.projectile());
+            if (type == null) {
+                // TODO warn once?
+                continue;
+            }
+            RFEProjectileInstance projectile = type.createInstance();
+            projectile.setOwner(entity);
+            projectile.setPosition(input.pos());
+
+            Vec3 aimDirection = input.aim();
+            projectile.shoot(aimDirection.x, aimDirection.y, aimDirection.z);
+            RFEProjectileManager.queueAddedProjectile(projectile, entity.level());
+        }
+
+        this.fireFirearm(itemStack, entity);
     }
 
     public void playFiringEffects(ItemStack itemStack, LivingEntity entity) {
@@ -373,12 +412,12 @@ public class RFEFirearmMode {
             if (tag.contains("StopAutoFire")) {
                 tag.remove("StopAutoFire");
             } else {
-                this.fireProjectile(itemStack, entity);
+                this.fireFirearm(itemStack, entity);
             }
             return;
         }
         if (this.fireMode == FireMode.BURST && this.canBurstFire(itemStack, entity) && this.canFireProjectile(itemStack, entity)) {
-            this.fireProjectile(itemStack, entity);
+            this.fireFirearm(itemStack, entity);
         }
     }
 
@@ -425,6 +464,8 @@ public class RFEFirearmMode {
     }
 
     public void onTickReload(ItemStack itemStack, LivingEntity entity) {
+        if (entity.level().isClientSide)
+            return;
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
         if (!this.ammoRequired) {
             FirearmDataUtils.cancelReload(itemStack, modeTag);
@@ -573,6 +614,8 @@ public class RFEFirearmMode {
 
     // TODO secondary ammo
     public void onTickUnload(ItemStack itemStack, LivingEntity entity) {
+        if (entity.level().isClientSide)
+            return;
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
         if (!this.ammoRequired) {
             FirearmDataUtils.cancelUnload(itemStack, modeTag);
@@ -678,6 +721,8 @@ public class RFEFirearmMode {
     }
 
     public void onCharge(ItemStack itemStack, LivingEntity entity) {
+        if (entity.level().isClientSide)
+            return;
         for (ChargeAction action : this.chargeActions) {
             if (action.tryExecute(itemStack, entity))
                 return;
@@ -862,29 +907,31 @@ public class RFEFirearmMode {
             }
         }
 
-        if (this.isAiming(itemStack, entity) && !this.canAim(itemStack, entity)) {
-            this.stopAiming(itemStack, entity);
-        }
-        int aimingTime = this.getAimingTime(itemStack, entity);
-        if (aimingTime > 0) {
-            --aimingTime;
-            this.setAimingTime(itemStack, entity, aimingTime);
-        }
+        if (!entity.level().isClientSide) {
+            if (this.isAiming(itemStack, entity) && !this.canAim(itemStack, entity)) {
+                this.stopAiming(itemStack, entity);
+            }
+            int aimingTime = this.getAimingTime(itemStack, entity);
+            if (aimingTime > 0) {
+                --aimingTime;
+                this.setAimingTime(itemStack, entity, aimingTime);
+            }
 
-        // TODO secondary ammo:
-        //      TODO tick ammo slots
-        //      TODO tick non-ammo slot
+            // TODO secondary ammo:
+            //      TODO tick ammo slots
+            //      TODO tick non-ammo slot
 
-        if (this.canOverheat && !FirearmDataUtils.isOverheated(modeTag)) {
-            int cooldownDelay = FirearmDataUtils.getCoolingDelay(modeTag);
-            if (cooldownDelay > 0) {
-                --cooldownDelay;
-                FirearmDataUtils.setCoolingDelay(modeTag, cooldownDelay);
-            } else {
-                float heat = FirearmDataUtils.getHeat(modeTag);
-                heat -= properties.heatRemovedPerTick();
-                heat = Math.max(0, heat);
-                FirearmDataUtils.setHeat(modeTag, heat);
+            if (this.canOverheat && !FirearmDataUtils.isOverheated(modeTag)) {
+                int cooldownDelay = FirearmDataUtils.getCoolingDelay(modeTag);
+                if (cooldownDelay > 0) {
+                    --cooldownDelay;
+                    FirearmDataUtils.setCoolingDelay(modeTag, cooldownDelay);
+                } else {
+                    float heat = FirearmDataUtils.getHeat(modeTag);
+                    heat -= properties.heatRemovedPerTick();
+                    heat = Math.max(0, heat);
+                    FirearmDataUtils.setHeat(modeTag, heat);
+                }
             }
         }
     }

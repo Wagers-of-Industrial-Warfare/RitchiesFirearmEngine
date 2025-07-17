@@ -262,11 +262,12 @@ public class RFEFirearmMode {
         return !this.getNextRoundsInItem(itemStack, entity, this.shotsFired, false).isEmpty();
     }
 
-    public void fireFirearm(ItemStack itemStack, LivingEntity entity) {
+    public void fireFirearm(ItemStack itemStack, LivingEntity entity, boolean playerInput) {
         // TODO windup
 
-        if (entity instanceof Player && entity.level().isClientSide) {
-            this.handlePlayerAmmoAndShootingOnClient(itemStack, entity);
+        if (entity instanceof Player && playerInput) {
+            if (entity.level().isClientSide)
+                this.handlePlayerAmmoAndShootingOnClient(itemStack, entity);
             return;
         }
 
@@ -377,7 +378,7 @@ public class RFEFirearmMode {
             RFEProjectileManager.queueAddedProjectile(projectile, entity.level());
         }
 
-        this.fireFirearm(itemStack, entity);
+        this.fireFirearm(itemStack, entity, false);
     }
 
     public void playFiringEffects(ItemStack itemStack, LivingEntity entity) {
@@ -417,16 +418,17 @@ public class RFEFirearmMode {
                 this.finishCharge(itemStack, entity);
             }
         }
+        boolean isPlayer = entity instanceof Player;
         if (this.fireMode == FireMode.FULL_AUTO && this.canFireProjectile(itemStack, entity)) {
             if (tag.contains("StopAutoFire")) {
                 tag.remove("StopAutoFire");
             } else {
-                this.fireFirearm(itemStack, entity);
+                this.fireFirearm(itemStack, entity, isPlayer);
             }
             return;
         }
         if (this.fireMode == FireMode.BURST && this.canBurstFire(itemStack, entity) && this.canFireProjectile(itemStack, entity)) {
-            this.fireFirearm(itemStack, entity);
+            this.fireFirearm(itemStack, entity, isPlayer);
         }
     }
 

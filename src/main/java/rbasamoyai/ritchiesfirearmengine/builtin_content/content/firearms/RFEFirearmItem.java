@@ -95,7 +95,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         FirearmDataUtils.setHoldingAttackKey(stack, true);
         RFEFirearmMode firearmMode = this.getCurrentMode(stack);
         if (firearmMode.canFireProjectile(stack, entity)) {
-            firearmMode.fireFirearm(stack, entity);
+            firearmMode.fireFirearm(stack, entity, entity instanceof Player);
         } else if (firearmMode.canCharge(stack, entity)) {
             firearmMode.onCharge(stack, entity);
         }

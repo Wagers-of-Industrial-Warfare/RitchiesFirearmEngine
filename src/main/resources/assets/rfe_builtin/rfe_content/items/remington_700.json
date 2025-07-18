@@ -16,8 +16,6 @@
   "firing": {
     "fire_mode": "single_action",
     "cooldown": 50,
-    "vertical_recoil": 3,
-    "horizontal_recoil": 1,
     "sound": "rfe_builtin:item.generic.rifle.shot"
   },
   "reload": {

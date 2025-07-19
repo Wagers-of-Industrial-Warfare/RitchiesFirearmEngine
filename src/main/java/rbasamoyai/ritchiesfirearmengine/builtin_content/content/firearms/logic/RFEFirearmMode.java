@@ -424,9 +424,8 @@ public class RFEFirearmMode {
             }
             return;
         }
-        if (this.fireMode == FireMode.BURST && this.canBurstFire(itemStack, entity) && this.canFireProjectile(itemStack, entity)) {
+        if (this.fireMode == FireMode.BURST && this.canBurstFire(itemStack, entity))
             this.fireFirearm(itemStack, entity, isPlayer);
-        }
     }
 
     public boolean automaticSingleActionCycle(ItemStack itemStack, LivingEntity entity) {
@@ -440,7 +439,7 @@ public class RFEFirearmMode {
         if (!modeTag.contains("BurstFireCount"))
             modeTag.putInt("BurstFireCount", this.burstRoundCount);
         int burstFireCount = modeTag.getInt("BurstFireCount") - 1;
-        if (burstFireCount <= 0) {
+        if (burstFireCount <= 0 || !this.canFireProjectile(itemStack, entity)) {
             modeTag.remove("BurstFireCount");
             return false;
         } else {
@@ -969,10 +968,12 @@ public class RFEFirearmMode {
     public void onReleaseAttackKey(ItemStack itemStack, LivingEntity entity) {
         RFEFirearmItem.Action action = FirearmDataUtils.getAction(itemStack);
         CompoundTag tag = itemStack.getOrCreateTag();
-        if (this.fireMode == FireMode.SINGLE_ACTION) {
-            tag.remove("HoldAutomaticCycle");
-        } else if (this.fireMode == FireMode.FULL_AUTO) {
-            tag.putBoolean("StopAutoFire", true);
+        if (action == RFEFirearmItem.Action.FIRING) {
+            if (this.fireMode == FireMode.SINGLE_ACTION) {
+                tag.remove("HoldAutomaticCycle");
+            } else if (this.fireMode == FireMode.FULL_AUTO) {
+                tag.putBoolean("StopAutoFire", true);
+            }
         }
     }
 

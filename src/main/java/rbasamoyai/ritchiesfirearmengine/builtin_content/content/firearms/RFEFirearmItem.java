@@ -104,9 +104,9 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
     }
 
     @Override
-    public void handleClientFireInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs) {
+    public void handleClientFireInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs, boolean jam) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
-        mode.handleFiringInputOnServer(itemStack, entity, firingInputs);
+        mode.handleFiringInputOnServer(itemStack, entity, firingInputs, jam);
     }
 
     public void onReload(ItemStack stack, LivingEntity entity) {

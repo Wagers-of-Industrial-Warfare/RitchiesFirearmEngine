@@ -13,6 +13,6 @@ public interface IFirearmItem extends SimultaneousUseAndAttack, HoldAttackKeyInt
 
     boolean isAiming(ItemStack itemStack, LivingEntity entity);
 
-    void handleClientFireInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs);
+    void handleClientFireInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs, boolean jam);
 
 }

@@ -13,15 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-public record ServerboundRunFiringLogicPacket(List<RFEFiringInput> firingInputs, InteractionHand hand) implements RFEPacket {
+public record ServerboundRunFiringLogicPacket(List<RFEFiringInput> firingInputs, boolean jam, InteractionHand hand) implements RFEPacket {
 
     public static ServerboundRunFiringLogicPacket decode(FriendlyByteBuf buf) {
         int sz = buf.readVarInt();
         List<RFEFiringInput> firingInputs = new ArrayList<>();
         for (int i = 0; i < sz; ++i)
             firingInputs.add(RFEFiringInput.fromNetwork(buf));
+        boolean jam = buf.readBoolean();
         InteractionHand hand = buf.readEnum(InteractionHand.class);
-        return new ServerboundRunFiringLogicPacket(firingInputs, hand);
+        return new ServerboundRunFiringLogicPacket(firingInputs, jam, hand);
     }
 
     @Override
@@ -29,6 +30,7 @@ public record ServerboundRunFiringLogicPacket(List<RFEFiringInput> firingInputs,
         buf.writeVarInt(this.firingInputs.size());
         for (RFEFiringInput input : this.firingInputs)
             RFEFiringInput.toNetwork(buf, input);
+        buf.writeBoolean(this.jam);
         buf.writeEnum(this.hand);
     }
 
@@ -38,7 +40,7 @@ public record ServerboundRunFiringLogicPacket(List<RFEFiringInput> firingInputs,
             return;
         ItemStack itemStack = sender.getItemInHand(this.hand);
         if (itemStack.getItem() instanceof IFirearmItem firearm)
-            firearm.handleClientFireInputOnServer(itemStack, sender, this.firingInputs);
+            firearm.handleClientFireInputOnServer(itemStack, sender, this.firingInputs, this.jam);
     }
 
 }

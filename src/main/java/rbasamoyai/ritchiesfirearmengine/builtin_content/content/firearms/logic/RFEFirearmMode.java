@@ -3,7 +3,6 @@ package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -415,8 +414,6 @@ public class RFEFirearmMode {
         if (this.fireMode.isSelfLoading()) {
             boolean isPlayer = entity instanceof Player;
             if (isPlayer && this.isJammed(itemStack) || !isPlayer && this.shouldJam(itemStack, entity)) {
-                if (isPlayer)
-                    ((Player) entity).displayClientMessage(Component.literal("Jammed"), true);
                 this.setJammed(itemStack, entity, true);
                 return;
             } else {

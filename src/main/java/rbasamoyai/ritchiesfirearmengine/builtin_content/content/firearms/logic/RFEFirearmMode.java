@@ -1077,7 +1077,7 @@ public class RFEFirearmMode {
         RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
         Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
         Predicate<ItemStack> speedloaderPred = RFEUtils.orAllPredicates(ammoProperties.speedloaders());
-        int reloadCount1 = this.getNominalCapacity(itemStack, entity);
+        int reloadCount1 = this.countFreeAmmoSpaces(itemStack);
         ItemStack bestSpeedloaderStack = RFEItemUtils.findBestSpeedloader(entity, speedloaderPred, ammoPred, reloadCount1, false);
         return bestSpeedloaderStack.getItem() instanceof MagazineItem magazine ? magazine.countAmmo(bestSpeedloaderStack) : 0;
     }

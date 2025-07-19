@@ -136,7 +136,7 @@ public class RFEItemUtils {
             int ammoCount = countItems(storedAmmo);
             if (ammoCount == bestCount)
                 return itemStack;
-            if (ammoCount <= largestCount)
+            if (ammoCount > bestCount || ammoCount <= largestCount)
                 continue;
             largestCount = ammoCount;
             bestStack = itemStack;

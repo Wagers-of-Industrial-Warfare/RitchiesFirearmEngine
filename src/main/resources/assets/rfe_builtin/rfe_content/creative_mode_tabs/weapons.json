@@ -2,6 +2,7 @@
   "title": "itemGroup.rfe_builtin.weapons",
   "icon": "rfe_builtin:remington_700",
   "contents": [
-    "rfe_builtin:remington_700"
+    "rfe_builtin:remington_700",
+    "rfe_builtin:mas_49_56"
   ]
 }

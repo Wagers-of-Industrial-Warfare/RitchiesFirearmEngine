@@ -3,6 +3,7 @@
   "death.attack.rfe_builtin.shot.item": "%s was shot by %s using %s",
   "item.rfe_builtin.ammo_packet": "Ammo Packet",
   "item.rfe_builtin.infinite_rifle_cartridge": "Infinite Rifle Cartridge",
+  "item.rfe_builtin.mas_49_56": "MAS-49/56",
   "item.rfe_builtin.remington_700": "Remington Model 700",
   "item.rfe_builtin.rifle_cartridge": "Rifle Cartridge",
   "item.rfe_builtin.rifle_magazine_10rds": "Rifle Magazine (10 rds)",
@@ -14,5 +15,9 @@
   "subtitles.rfe_builtin.item.generic.rifle.bullet_reload": "Rifle bullet loaded",
   "subtitles.rfe_builtin.item.generic.rifle.bullet_unload": "Rifle unloaded",
   "subtitles.rfe_builtin.item.generic.rifle.draw": "Rifle equipped",
-  "subtitles.rfe_builtin.item.generic.rifle.shot": "Rifle shot"
+  "subtitles.rfe_builtin.item.generic.rifle.magazine.reload": "Rifle magazine reloaded",
+  "subtitles.rfe_builtin.item.generic.rifle.magazine.unload": "Rifle magazine unloaded",
+  "subtitles.rfe_builtin.item.generic.rifle.rack": "Rifle racked",
+  "subtitles.rfe_builtin.item.generic.rifle.shot": "Rifle shot",
+  "subtitles.rfe_builtin.item.generic.rifle.stripper_clip": "Rifle stripper clip loaded"
 }

@@ -72,6 +72,18 @@ public class RFEItemUtils {
         return list;
     }
 
+    /**
+     * Returns the same item stack objects.
+     */
+    private static List<ItemStack> getDirectItemsFromEntity(LivingEntity entity, Predicate<ItemStack> predicate) {
+        List<ItemStack> list = new LinkedList<>();
+        consumeItemsFromEntity(entity, predicate, s -> {
+            list.add(0, s);
+            return s.isEmpty() ? ItemStack.EMPTY : s;
+        }, () -> false);
+        return list;
+    }
+
     public static List<ItemStack> getEntityInventory(LivingEntity entity) {
         // TODO handlers
         List<ItemStack> list = new LinkedList<>();
@@ -101,7 +113,7 @@ public class RFEItemUtils {
                                                 Predicate<ItemStack> ammoPredicate, int bestCount, boolean take) {
         if (bestCount <= 0)
             return ItemStack.EMPTY;
-        List<ItemStack> list = getItemsFromEntity(entity, speedloaderPredicate, 0, take);
+        List<ItemStack> list = getDirectItemsFromEntity(entity, speedloaderPredicate);
         if (list.isEmpty())
             return ItemStack.EMPTY;
         int largestCount = 0;
@@ -129,11 +141,11 @@ public class RFEItemUtils {
             largestCount = ammoCount;
             bestStack = itemStack;
         }
-        return bestStack;
+        return take ? bestStack.split(bestStack.getCount()) : bestStack.copy();
     }
 
     public static ItemStack findFullestMagazine(LivingEntity entity, Predicate<ItemStack> magazinePredicate, Predicate<ItemStack> ammoPredicate, boolean take) {
-        List<ItemStack> list = getItemsFromEntity(entity, magazinePredicate, 0, take);
+        List<ItemStack> list = getDirectItemsFromEntity(entity, magazinePredicate);
         if (list.isEmpty())
             return ItemStack.EMPTY;
         ItemStack bestStack = ItemStack.EMPTY;
@@ -157,7 +169,7 @@ public class RFEItemUtils {
                 bestStack = itemStack;
             }
         }
-        return bestStack;
+        return take ? bestStack.split(bestStack.getCount()) : bestStack.copy();
     }
 
     private RFEItemUtils() {}

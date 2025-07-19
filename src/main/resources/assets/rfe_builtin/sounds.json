@@ -135,6 +135,96 @@
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.rifle.draw"
   },
+  "item.generic.rifle.magazine.reload": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/magazine_reload",
+        "volume": 0.25,
+        "pitch": 0.9
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.magazine.reload"
+  },
+  "item.generic.rifle.magazine.reload_full": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/magazine_reload_full",
+        "volume": 0.25,
+        "pitch": 0.9
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.magazine.reload"
+  },
+  "item.generic.rifle.magazine.unload": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/magazine_unload",
+        "volume": 0.25,
+        "pitch": 0.9
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.magazine.unload"
+  },
+  "item.generic.rifle.rack": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 1.25
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 1.23
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 1.21
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.rack"
+  },
+  "item.generic.rifle.rack_end": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 1.25
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 1.23
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 1.21
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.rack"
+  },
+  "item.generic.rifle.rack_start": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 1.25
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 1.23
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 1.21
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.rack"
+  },
   "item.generic.rifle.shot": {
     "sounds": [
       {
@@ -154,6 +244,26 @@
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.rifle.shot"
   },
+  "item.generic.rifle.stripper_clip.5rds": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/stripper_clip_5rds",
+        "volume": 0.25,
+        "pitch": 0.9
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/stripper_clip_5rds",
+        "volume": 0.25,
+        "pitch": 0.88
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/stripper_clip_5rds",
+        "volume": 0.25,
+        "pitch": 0.86
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.stripper_clip"
+  },
   "item.generic.rifle.unaim": {
     "sounds": [
       {
@@ -162,5 +272,24 @@
         "pitch": 0.6
       }
     ]
+  },
+  "item.generic.semi_auto_rifle.shot": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/semi_auto_rifle/shot",
+        "volume": 4.0
+      },
+      {
+        "name": "rfe_builtin:item/generic/semi_auto_rifle/shot",
+        "volume": 4.0,
+        "pitch": 0.98
+      },
+      {
+        "name": "rfe_builtin:item/generic/semi_auto_rifle/shot",
+        "volume": 4.0,
+        "pitch": 0.97
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.shot"
   }
 }

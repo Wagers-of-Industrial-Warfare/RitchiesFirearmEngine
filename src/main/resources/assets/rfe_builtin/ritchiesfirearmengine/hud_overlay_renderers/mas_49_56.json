@@ -5,7 +5,7 @@
   "enlarge_firearm_ammo": true,
   "show_inventory_ammo": true,
   "firearm_icon": {
-    "texture": "rfe_builtin:textures/gui/hud/weapon_icon/remington_700.png",
+    "texture": "rfe_builtin:textures/gui/hud/weapon_icon/mas_49_56.png",
     "width": 64,
     "height": 16
   }

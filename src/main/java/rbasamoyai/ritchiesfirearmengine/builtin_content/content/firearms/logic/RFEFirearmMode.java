@@ -12,6 +12,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.HoldAttackKeyInteraction;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
@@ -422,11 +423,8 @@ public class RFEFirearmMode {
         }
         boolean isPlayer = entity instanceof Player;
         if (this.fireMode == FireMode.FULL_AUTO && this.canFireProjectile(itemStack, entity)) {
-            if (tag.contains("StopAutoFire")) {
-                tag.remove("StopAutoFire");
-            } else {
+            if (!(itemStack.getItem() instanceof HoldAttackKeyInteraction holdAttackKey) || holdAttackKey.isHoldingAttackKey(itemStack, entity))
                 this.fireFirearm(itemStack, entity, isPlayer);
-            }
             return;
         }
         if (this.fireMode == FireMode.BURST && this.canBurstFire(itemStack, entity))
@@ -451,6 +449,13 @@ public class RFEFirearmMode {
             modeTag.putInt("BurstFireCount", burstFireCount);
             return true;
         }
+    }
+
+    public boolean isBurstFiring(ItemStack itemStack, LivingEntity entity) {
+        if (this.burstRoundCount <= 1 || this.fireMode != FireMode.BURST)
+            return false;
+        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        return modeTag.getInt("BurstFireCount") > 0;
     }
 
     // TODO secondary ammo
@@ -976,8 +981,6 @@ public class RFEFirearmMode {
         if (action == RFEFirearmItem.Action.FIRING) {
             if (this.fireMode == FireMode.SINGLE_ACTION) {
                 tag.remove("HoldAutomaticCycle");
-            } else if (this.fireMode == FireMode.FULL_AUTO) {
-                tag.putBoolean("StopAutoFire", true);
             }
         }
     }

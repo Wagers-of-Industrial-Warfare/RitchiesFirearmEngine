@@ -95,7 +95,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         FirearmDataUtils.setHoldingAttackKey(stack, true);
         RFEFirearmMode firearmMode = this.getCurrentMode(stack);
         if (firearmMode.canFireProjectile(stack, entity)) {
-            firearmMode.fireFirearm(stack, entity, entity instanceof Player);
+            if (!firearmMode.isBurstFiring(stack, entity))
+                firearmMode.fireFirearm(stack, entity, entity instanceof Player);
         } else if (firearmMode.canCharge(stack, entity)) {
             firearmMode.onCharge(stack, entity);
         }
@@ -163,15 +164,15 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
     }
 
     @Override
-    public boolean isHoldingAttackKey(ItemStack itemStack, Player player) {
+    public boolean isHoldingAttackKey(ItemStack itemStack, LivingEntity player) {
         return FirearmDataUtils.isHoldingAttackKey(itemStack);
     }
 
     @Override
-    public void onReleaseAttackKey(ItemStack itemStack, Player player) {
+    public void onReleaseAttackKey(ItemStack itemStack, LivingEntity entity) {
         FirearmDataUtils.setHoldingAttackKey(itemStack, false);
         RFEFirearmMode firearmMode = this.getCurrentMode(itemStack);
-        firearmMode.onReleaseAttackKey(itemStack, player);
+        firearmMode.onReleaseAttackKey(itemStack, entity);
     }
 
     public float countEntityAmmo(ItemStack itemStack, LivingEntity entity) {

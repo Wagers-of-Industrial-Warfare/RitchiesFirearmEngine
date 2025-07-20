@@ -10,6 +10,7 @@
   "gui.ritchiesfirearmengine.pack_mismatch.open.packs": "Open rfe_packs folder",
   "gui.ritchiesfirearmengine.mode.burst": "Burst fire",
   "gui.ritchiesfirearmengine.mode.full_auto": "Fully automatic",
+  "gui.ritchiesfirearmengine.mode.locked_safety": "Locked safety",
   "gui.ritchiesfirearmengine.mode.safety": "Safety",
   "gui.ritchiesfirearmengine.mode.single_action": "Single-action",
   "gui.ritchiesfirearmengine.mode.semi_auto": "Semi-automatic",

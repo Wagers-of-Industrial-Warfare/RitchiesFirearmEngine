@@ -10,15 +10,9 @@ import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
 
-    protected abstract T getBuilder(String modeId);
+    public abstract T getBuilder(String modeId);
 
-    public final RFEFirearmMode fromJson(JsonObject obj, String modeId) {
-        T builder = this.getBuilder(modeId);
-        this.modifyBuilder(builder, obj, modeId);
-        return builder.build();
-    }
-
-    protected void modifyBuilder(T builder, JsonObject obj, String modeId) {
+    public T modifyBuilder(T builder, JsonObject obj, String modeId) {
         if (GsonHelper.isStringValue(obj, "mode_tag")) {
             String modeTag = GsonHelper.getAsString(obj, "mode_tag");
             builder.modeTag(modeTag);
@@ -165,6 +159,8 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                 this.cooldownEffects(builder, overheating, modeId);
             }
         }
+
+        return builder;
     }
 
     protected void drawingEffects(T builder, JsonObject drawingObj, String modeId) {

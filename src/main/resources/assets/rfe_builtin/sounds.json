@@ -19,6 +19,16 @@
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.ammo_packet.unwrap"
   },
+  "item.generic.firearm.mode_change.switch": {
+    "sounds": [
+      {
+        "name": "minecraft:random/click",
+        "volume": 0.25,
+        "pitch": 1.5
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.firearm.mode_change.switch"
+  },
   "item.generic.rifle.aim": {
     "sounds": [
       {

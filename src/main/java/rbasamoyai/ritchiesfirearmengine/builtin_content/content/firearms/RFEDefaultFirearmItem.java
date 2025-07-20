@@ -29,16 +29,18 @@ public class RFEDefaultFirearmItem extends RFEFirearmItem {
             modeOrder.add("default");
 
             Map<String, RFEFirearmMode> firearmModes = new HashMap<>();
-            RFEFirearmMode defaultMode = modeParser.fromJson(obj, "default");
+            RFEFirearmModeBuilder rootBuilder = modeParser.modifyBuilder(modeParser.getBuilder("default"), obj, "default");
+            RFEFirearmMode defaultMode = rootBuilder.build();
             firearmModes.put("default", defaultMode);
 
             if (GsonHelper.isObjectNode(obj, "modes")) {
                 JsonObject modes = obj.getAsJsonObject("modes");
-                for (String modeName : modes.keySet()) {
-                    JsonElement modeEl = modes.get(modeName);
+                for (Map.Entry<String, JsonElement> entry : modes.entrySet()) {
+                    String modeName = entry.getKey();
+                    JsonElement modeEl = entry.getValue();
                     if (!modeEl.isJsonObject())
                         throw new JsonParseException("Invalid mode format, must be a JSON object");
-                    RFEFirearmMode mode = modeParser.fromJson(modeEl.getAsJsonObject(), modeName);
+                    RFEFirearmMode mode = modeParser.modifyBuilder(rootBuilder.forkBuilder(modeName), modeEl.getAsJsonObject(), modeName).build();
                     firearmModes.put(modeName, mode);
                     modeOrder.add(modeName);
                 }

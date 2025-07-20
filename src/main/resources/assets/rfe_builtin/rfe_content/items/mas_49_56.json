@@ -4,6 +4,10 @@
     "draw_time": 18,
     "sound": "rfe_builtin:item.generic.rifle.draw"
   },
+  "mode_change": {
+    "mode_change_time": 1,
+    "sound": "rfe_builtin:item.generic.firearm.mode_change.switch"
+  },
   "aiming": {
     "aim_time": 5,
     "aim_sound": "rfe_builtin:item.generic.rifle.aim",
@@ -380,5 +384,12 @@
         "sound": "rfe_builtin:item.generic.rifle.rack"
       }
     ]
+  },
+  "modes": {
+    "safety": {
+      "firing": {
+        "fire_mode": "safety"
+      }
+    }
   }
 }

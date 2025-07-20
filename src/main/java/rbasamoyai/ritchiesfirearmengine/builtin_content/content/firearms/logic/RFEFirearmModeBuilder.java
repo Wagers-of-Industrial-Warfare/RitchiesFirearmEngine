@@ -423,7 +423,7 @@ public class RFEFirearmModeBuilder {
     public RFEFirearmMode build() {
         Objects.requireNonNull(this.fireMode, "Fire mode must be specified, must be one of 'safety', 'single_action', 'semi_auto', 'full_auto', or 'burst'");
 
-        if (this.firingCooldown < 0)
+        if (this.fireMode != FireMode.SAFETY && this.firingCooldown < 0)
             throw new IllegalStateException("Must specify firing cooldown");
         if (this.canOverheat && this.cooldownTime < 0)
             throw new IllegalStateException("Must specify cooldown time");
@@ -456,7 +456,7 @@ public class RFEFirearmModeBuilder {
 
     public static class Parser extends RFEFirearmModeParser<RFEFirearmModeBuilder> {
         @Override
-        protected RFEFirearmModeBuilder getBuilder(String modeId) {
+        public RFEFirearmModeBuilder getBuilder(String modeId) {
             return new RFEFirearmModeBuilder(modeId);
         }
     }

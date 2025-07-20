@@ -11,6 +11,7 @@
   "itemGroup.rfe_builtin.base": "Ritchie's Firearms Engine Content",
   "itemGroup.rfe_builtin.weapons": "Ritchie's Firearms Engine Example Weapons",
   "subtitles.rfe_builtin.item.generic.ammo_packet.unwrap": "Ammo packet unwrapped",
+  "subtitles.rfe_builtin.item.generic.firearm.mode_change.switch": "Firearm mode switched",
   "subtitles.rfe_builtin.item.generic.rifle.bolt_cycle": "Bolt-action rifle cycled",
   "subtitles.rfe_builtin.item.generic.rifle.bullet_reload": "Rifle bullet loaded",
   "subtitles.rfe_builtin.item.generic.rifle.bullet_unload": "Rifle unloaded",

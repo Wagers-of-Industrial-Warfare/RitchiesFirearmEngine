@@ -10,6 +10,8 @@
     "height": 16
   },
   "mode_translations": {
-    "default": "gui.ritchiesfirearmengine.mode.single_action"
+    "default": "gui.ritchiesfirearmengine.mode.single_action",
+    "safety": "gui.ritchiesfirearmengine.mode.safety",
+    "locked_safety": "gui.ritchiesfirearmengine.mode.locked_safety"
   }
 }

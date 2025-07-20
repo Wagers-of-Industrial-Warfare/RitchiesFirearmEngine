@@ -84,7 +84,7 @@ public class ReloadPhase {
         builder.phaseType(phaseType);
 
         if (GsonHelper.isObjectNode(obj, "condition")) {
-            FirearmCondition condition = FirearmCondition.fromJson(obj.getAsJsonObject("condition"));
+            FirearmCondition condition = FirearmCondition.fromJson(obj.getAsJsonObject("condition"), true);
             builder.condition(condition);
         } else {
             builder.condition(FirearmCondition.AlwaysTrue.ALWAYS_TRUE);

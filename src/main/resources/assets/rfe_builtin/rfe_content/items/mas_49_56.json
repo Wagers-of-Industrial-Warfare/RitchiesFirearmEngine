@@ -15,7 +15,7 @@
   },
   "ammo": {
     "ammo_required": true,
-    "plus_1_capacity": true
+    "detachable_capacity": true
   },
   "firing": {
     "fire_mode": "semi_auto",
@@ -28,23 +28,7 @@
         "phase": "prepare",
         "condition": {
           "and": [
-            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            {
-              "or": [
-                {
-                  "and": [
-                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 2 },
-                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 }
-                  ]
-                },
-                {
-                  "and": [
-                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 1 },
-                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 }
-                  ]
-                }
-              ]
-            },
+            { "macro": "rfe_builtin:can_load_1_detachable" },
             {
               "or": [
                 { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 },
@@ -79,26 +63,7 @@
       {
         "phase": "reload",
         "condition": {
-          "and": [
-            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            {
-              "or": [
-                {
-                  "and": [
-                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 5 },
-                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 }
-                  ]
-                },
-                {
-                  "and": [
-                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 6 },
-                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 }
-                  ]
-                }
-              ]
-            },
-            { "compare": "ritchiesfirearmengine:best_speedloader_ammo_count", "operator": "equals", "value": 5 }
-          ]
+          "macro": "rfe_builtin:can_strip_5_detachable"
         },
         "time": 25,
         "reload_type": "speedloaders",
@@ -109,26 +74,7 @@
       {
         "phase": "reload",
         "condition": {
-          "and": [
-            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            {
-              "or": [
-                {
-                  "and": [
-                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 4 },
-                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 }
-                  ]
-                },
-                {
-                  "and": [
-                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 5 },
-                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 }
-                  ]
-                }
-              ]
-            },
-            { "compare": "ritchiesfirearmengine:best_speedloader_ammo_count", "operator": "equals", "value": 4 }
-          ]
+          "macro": "rfe_builtin:can_strip_4_detachable"
         },
         "time": 25,
         "reload_type": "speedloaders",
@@ -140,26 +86,7 @@
       {
         "phase": "reload",
         "condition": {
-          "and": [
-            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            {
-              "or": [
-                {
-                  "and": [
-                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 3 },
-                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 }
-                  ]
-                },
-                {
-                  "and": [
-                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 4 },
-                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 }
-                  ]
-                }
-              ]
-            },
-            { "compare": "ritchiesfirearmengine:best_speedloader_ammo_count", "operator": "equals", "value": 3 }
-          ]
+          "macro": "rfe_builtin:can_strip_3_detachable"
         },
         "time": 25,
         "reload_type": "speedloaders",
@@ -171,26 +98,7 @@
       {
         "phase": "reload",
         "condition": {
-          "and": [
-            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            {
-              "or": [
-                {
-                  "and": [
-                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 2 },
-                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 }
-                  ]
-                },
-                {
-                  "and": [
-                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 3 },
-                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 }
-                  ]
-                }
-              ]
-            },
-            { "compare": "ritchiesfirearmengine:best_speedloader_ammo_count", "operator": "equals", "value": 2 }
-          ]
+          "macro": "rfe_builtin:can_strip_2_detachable"
         },
         "time": 25,
         "reload_type": "speedloaders",
@@ -202,26 +110,7 @@
       {
         "phase": "reload",
         "condition": {
-          "and": [
-            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            {
-              "or": [
-                {
-                  "and": [
-                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 1 },
-                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 }
-                  ]
-                },
-                {
-                  "and": [
-                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 2 },
-                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 }
-                  ]
-                }
-              ]
-            },
-            { "compare": "ritchiesfirearmengine:best_speedloader_ammo_count", "operator": "equals", "value": 1 }
-          ]
+          "macro": "rfe_builtin:can_strip_1_detachable"
         },
         "time": 25,
         "reload_type": "speedloaders",
@@ -235,22 +124,7 @@
         "condition": {
           "and": [
             { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            {
-              "or": [
-                {
-                  "and": [
-                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 1 },
-                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 }
-                  ]
-                },
-                {
-                  "and": [
-                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 2 },
-                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 }
-                  ]
-                }
-              ]
-            },
+            { "macro": "rfe_builtin:can_load_1_detachable" },
             { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
           ]
         },

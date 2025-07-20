@@ -118,7 +118,7 @@ public abstract sealed class FirearmCondition implements BiPredicate<ItemStack, 
         }
     }
 
-    public static FirearmCondition fromJson(JsonObject obj) {
+    public static FirearmCondition fromJson(JsonObject obj, boolean macroEnabled) {
         if (GsonHelper.isStringValue(obj, "compare")) {
             ResourceLocation sourceLoc = RFEUtils.location(GsonHelper.getAsString(obj, "compare"));
             CompareValueSource source = RFEContentBuilderRegistry.getCompareValueSource(sourceLoc);
@@ -136,17 +136,23 @@ public abstract sealed class FirearmCondition implements BiPredicate<ItemStack, 
             List<FirearmCondition> conditions = new LinkedList<>();
             JsonArray arr = GsonHelper.getAsJsonArray(obj, "and");
             for (JsonElement el : arr)
-                conditions.add(fromJson(el.getAsJsonObject()));
+                conditions.add(fromJson(el.getAsJsonObject(), macroEnabled));
             return new And(conditions);
         }
         if (GsonHelper.isArrayNode(obj, "or")) {
             List<FirearmCondition> conditions = new LinkedList<>();
             JsonArray arr = GsonHelper.getAsJsonArray(obj, "or");
             for (JsonElement el : arr)
-                conditions.add(fromJson(el.getAsJsonObject()));
+                conditions.add(fromJson(el.getAsJsonObject(), macroEnabled));
             return new Or(conditions);
         }
-        throw new JsonParseException("Invalid firearm condition type, must be one of 'compare', 'and', 'or'");
+        if (GsonHelper.isStringValue(obj, "macro")) {
+            if (!macroEnabled)
+                throw new IllegalStateException("Cannot use macro in firearm condition macro definition");
+            ResourceLocation macroLoc = RFEUtils.location(GsonHelper.getAsString(obj, "macro"));
+            return FirearmCondtionMacroHandler.getMacro(macroLoc);
+        }
+        throw new JsonParseException("Invalid firearm condition type, must be one of 'compare', 'and', 'or'" + (macroEnabled ? ", 'macro" : ""));
     }
 
 }

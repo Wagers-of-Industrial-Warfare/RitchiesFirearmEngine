@@ -9,6 +9,8 @@ public interface RFEPlugin {
 
     default void register() {}
 
+    default void afterPackLoading() {}
+
     default void registerResourceListeners(BiConsumer<ResourceLocation, PreparableReloadListener> registry) {}
 
     record Info(String modId, String classPath) {

@@ -57,9 +57,14 @@ public class RFEPluginManager {
         }
     }
 
+    public static void afterPackLoading() {
+        for (RFEPlugin plugin : PLUGINS.values())
+            plugin.afterPackLoading();
+    }
+
     public static void registerResourceListeners(BiConsumer<ResourceLocation, PreparableReloadListener> registry) {
-        for (Map.Entry<String, RFEPlugin> entry : PLUGINS.entrySet())
-            entry.getValue().registerResourceListeners(registry);
+        for (RFEPlugin plugin : PLUGINS.values())
+            plugin.registerResourceListeners(registry);
     }
 
     private RFEPluginManager() {}

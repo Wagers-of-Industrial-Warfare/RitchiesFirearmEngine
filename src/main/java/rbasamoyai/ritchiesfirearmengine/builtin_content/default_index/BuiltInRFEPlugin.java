@@ -10,6 +10,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEDefa
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.condition.FirearmCondtionMacroHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.recoil.no_recoil.NoRecoilProvider;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.recoil.simple.SimpleRecoilProvider;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.spread.no_spread.NoSpreadProvider;
@@ -58,6 +59,11 @@ public class BuiltInRFEPlugin implements RFEPlugin {
 
         RFEHudItemInfoProviders.registerAmmoProvider(RFEFirearmItem::getAmmoItemsForHUD);
         RFEHudItemInfoProviders.registerAmmoInventoryCountProvider(RFEFirearmItem::getInventoryAmmoCountForHUD);
+    }
+
+    @Override
+    public void afterPackLoading() {
+        FirearmCondtionMacroHandler.loadMacros();
     }
 
     @Override

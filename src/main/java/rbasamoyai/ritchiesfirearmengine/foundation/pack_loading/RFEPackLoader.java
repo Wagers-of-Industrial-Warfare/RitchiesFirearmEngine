@@ -67,6 +67,8 @@ public class RFEPackLoader {
         loadModBuiltInPacks();
         loadLocalPacks();
         LOGGER.info("Successfully loaded {} RFE content packs", LOADED_CONTENT_PACKS.size());
+
+        RFEPluginManager.afterPackLoading();
     }
 
     private static void findResources() {
@@ -328,6 +330,14 @@ public class RFEPackLoader {
         for (RFEContentPack pack : LOADED_CONTENT_PACKS.values())
             versions.put(pack.metadata().namespace(), pack.metadata().version());
         return versions;
+    }
+
+    public static boolean isPackLoaded(String id) { return LOADED_CONTENT_PACKS.containsKey(id); }
+
+    public static RFEPackMetadata getMetadata(String packId) {
+        if (!FOUND_METADATA_BY_PATH.containsKey(packId))
+            throw new IllegalStateException("No metadata associated with pack " + packId);
+        return FOUND_METADATA_BY_PATH.get(packId);
     }
 
     private record RFEContentPack(RFEPackMetadata metadata, RFEContentData contentData, Pack resourcePack, Pack dataPack) {

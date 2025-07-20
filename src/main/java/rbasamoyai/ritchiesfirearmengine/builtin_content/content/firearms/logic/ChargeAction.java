@@ -39,7 +39,7 @@ public class ChargeAction {
     }
 
     public static ChargeAction fromJson(JsonObject obj) {
-        FirearmCondition condition = GsonHelper.isObjectNode(obj, "condition") ? FirearmCondition.fromJson(obj.getAsJsonObject("condition"))
+        FirearmCondition condition = GsonHelper.isObjectNode(obj, "condition") ? FirearmCondition.fromJson(obj.getAsJsonObject("condition"), true)
                 : FirearmCondition.AlwaysTrue.ALWAYS_TRUE;
         int time = GsonHelper.getAsInt(obj, "time");
         if (time < 1)

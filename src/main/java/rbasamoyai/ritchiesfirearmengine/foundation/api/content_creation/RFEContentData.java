@@ -56,10 +56,10 @@ public record RFEContentData(RFEPackMetadata metadata, Map<String, JsonObject> i
             try (Reader reader = entry.getValue().openAsReader()) {
                 JsonElement readElement = GsonHelper.fromJson(GSON, reader, JsonElement.class);
                 if (!readElement.isJsonObject())
-                    throw new IllegalStateException("Non-JSON object data file ignored with ID " + objectId);
+                    throw new IllegalStateException("Non-JSON object data file with ID " + objectId);
                 JsonElement preExistingElement = output.put(objectId.getPath(), readElement.getAsJsonObject());
                 if (preExistingElement != null)
-                    throw new IllegalStateException("Duplicate data file ignored with ID " + objectId);
+                    throw new IllegalStateException("Duplicate data file with ID " + objectId);
             } catch (IllegalArgumentException | IOException | JsonParseException jsonparseexception) {
                 LOGGER.error("Could not parse RFE data file {} from {}", objectId, fileId, jsonparseexception);
             }

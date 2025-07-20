@@ -144,6 +144,8 @@ public class RFEFirearmMode {
         this.cooldownSound = builder.cooldownSound;
     }
 
+    public String getModeId() { return this.modeId; }
+
     public RFEFirearmModeHandlingProperties getHandlingProperties(ItemStack itemStack) {
         ImmutableMap<String, RFEFirearmModeHandlingProperties> handlingPropertiesByMode = RFEFirearmHandlingPropertiesHandler.getHandlingProperties(itemStack);
         return handlingPropertiesByMode.getOrDefault(this.modeId, this.defaultDataPackProperties);

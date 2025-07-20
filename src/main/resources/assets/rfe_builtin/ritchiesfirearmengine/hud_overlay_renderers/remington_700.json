@@ -8,5 +8,8 @@
     "texture": "rfe_builtin:textures/gui/hud/weapon_icon/remington_700.png",
     "width": 64,
     "height": 16
+  },
+  "mode_translations": {
+    "default": "gui.ritchiesfirearmengine.mode.single_action"
   }
 }

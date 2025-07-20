@@ -5,13 +5,13 @@
   },
   "rfe_pack": {
     "namespace": "rfe_builtin",
-    "version": "1.0.0",
+    "version": "0.2.0",
     "display_name": "Ritchie's Firearm Engine Built-In Pack",
     "dependencies": [
       {
         "content": "mod",
         "id": "ritchiesfirearmengine",
-        "forge_version": "[0.0.1,)",
+        "forge_version": "[0.1.0,)",
         "relation": "required"
       }
     ],

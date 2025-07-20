@@ -561,6 +561,7 @@ public class RFEFirearmMode {
             return;
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
         boolean addedLast = phase.ammoAddedLast();
+        boolean replaceChamberedRound = phase.replaceChamberedRound();
         List<ItemStack> ammoList;
         int capacity;
         if (this.internalCapacity > 0) {
@@ -573,7 +574,7 @@ public class RFEFirearmMode {
                 return;
             ammoList = magazineItem.getStoredAmmo(magazine);
             capacity = magazineItem.getMagazineCapacity(magazine);
-            if (this.plusOneCapacity && !addedLast) {
+            if (this.plusOneCapacity && !addedLast && replaceChamberedRound) {
                 ItemStack loadedRound = this.getLoadedRound(itemStack);
                 if (!loadedRound.isEmpty()) {
                     FirearmDataUtils.addAmmo(ammoList, loadedRound, false, 0);
@@ -581,6 +582,7 @@ public class RFEFirearmMode {
                 }
             }
         }
+        ItemStack chambered = replaceChamberedRound ? ItemStack.EMPTY : FirearmDataUtils.stripAmmo(ammoList, false, true);
         Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
         if (phase.reloadType() == ReloadPhase.ReloadType.ROUNDS) {
             int addable = Mth.clamp(capacity - RFEItemUtils.countItems(ammoList), 0, reloadCount);
@@ -614,6 +616,8 @@ public class RFEFirearmMode {
                 RFEItemUtils.addItemToEntity(bestSpeedloaderStack, entity);
             }
         }
+        if (!chambered.isEmpty())
+            FirearmDataUtils.addAmmo(ammoList, chambered, false);
         if (this.internalCapacity > 0) {
             FirearmDataUtils.saveRounds(modeTag, "InternalRounds", ammoList);
         } else {

@@ -35,9 +35,39 @@
               "value": 1
             },
             {
-              "source": "ritchiesfirearmengine:free_ammo_space",
-              "operator": "greater_than",
-              "value": 0
+              "type": "or",
+              "conditions": [
+                {
+                  "type": "and",
+                  "conditions": [
+                    {
+                      "source": "ritchiesfirearmengine:free_ammo_space",
+                      "operator": "greater_than_or_equal_to",
+                      "value": 2
+                    },
+                    {
+                      "source": "ritchiesfirearmengine:has_chambered_round",
+                      "operator": "equals",
+                      "value": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "and",
+                  "conditions": [
+                    {
+                      "source": "ritchiesfirearmengine:free_ammo_space",
+                      "operator": "greater_than_or_equal_to",
+                      "value": 1
+                    },
+                    {
+                      "source": "ritchiesfirearmengine:has_chambered_round",
+                      "operator": "equals",
+                      "value": 0
+                    }
+                  ]
+                }
+              ]
             },
             {
               "type": "or",
@@ -109,36 +139,39 @@
               "value": 1
             },
             {
-              "source": "ritchiesfirearmengine:free_ammo_space",
-              "operator": "greater_than",
-              "value": 0
-            },
-            {
-              "source": "ritchiesfirearmengine:entity_ammo_count",
-              "operator": "greater_than",
-              "value": 0
-            }
-          ]
-        },
-        "time": 25,
-        "reload_type": "rounds",
-        "reload_count": 1,
-        "sound": "rfe_builtin:item.generic.rifle.bullet_reload"
-      },
-      {
-        "phase": "reload",
-        "condition": {
-          "type": "and",
-          "conditions": [
-            {
-              "source": "ritchiesfirearmengine:firearm_has_magazine",
-              "operator": "equals",
-              "value": 1
-            },
-            {
-              "source": "ritchiesfirearmengine:free_ammo_space",
-              "operator": "greater_than_or_equal_to",
-              "value": 5
+              "type": "or",
+              "conditions": [
+                {
+                  "type": "and",
+                  "conditions": [
+                    {
+                      "source": "ritchiesfirearmengine:free_ammo_space",
+                      "operator": "greater_than_or_equal_to",
+                      "value": 5
+                    },
+                    {
+                      "source": "ritchiesfirearmengine:has_chambered_round",
+                      "operator": "equals",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "and",
+                  "conditions": [
+                    {
+                      "source": "ritchiesfirearmengine:free_ammo_space",
+                      "operator": "greater_than_or_equal_to",
+                      "value": 6
+                    },
+                    {
+                      "source": "ritchiesfirearmengine:has_chambered_round",
+                      "operator": "equals",
+                      "value": 1
+                    }
+                  ]
+                }
+              ]
             },
             {
               "source": "ritchiesfirearmengine:best_speedloader_ammo_count",
@@ -150,6 +183,7 @@
         "time": 25,
         "reload_type": "speedloaders",
         "reload_count": 5,
+        "replace_chambered_round": true,
         "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds"
       },
       {
@@ -163,9 +197,39 @@
               "value": 1
             },
             {
-              "source": "ritchiesfirearmengine:free_ammo_space",
-              "operator": "greater_than_or_equal_to",
-              "value": 4
+              "type": "or",
+              "conditions": [
+                {
+                  "type": "and",
+                  "conditions": [
+                    {
+                      "source": "ritchiesfirearmengine:free_ammo_space",
+                      "operator": "greater_than_or_equal_to",
+                      "value": 4
+                    },
+                    {
+                      "source": "ritchiesfirearmengine:has_chambered_round",
+                      "operator": "equals",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "and",
+                  "conditions": [
+                    {
+                      "source": "ritchiesfirearmengine:free_ammo_space",
+                      "operator": "greater_than_or_equal_to",
+                      "value": 5
+                    },
+                    {
+                      "source": "ritchiesfirearmengine:has_chambered_round",
+                      "operator": "equals",
+                      "value": 1
+                    }
+                  ]
+                }
+              ]
             },
             {
               "source": "ritchiesfirearmengine:best_speedloader_ammo_count",
@@ -176,7 +240,9 @@
         },
         "time": 25,
         "reload_type": "speedloaders",
-        "reload_count": 5,
+        "reload_count": 4,
+        "reload_delay": 20,
+        "replace_chambered_round": true,
         "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds"
       },
       {
@@ -190,9 +256,39 @@
               "value": 1
             },
             {
-              "source": "ritchiesfirearmengine:free_ammo_space",
-              "operator": "greater_than_or_equal_to",
-              "value": 3
+              "type": "or",
+              "conditions": [
+                {
+                  "type": "and",
+                  "conditions": [
+                    {
+                      "source": "ritchiesfirearmengine:free_ammo_space",
+                      "operator": "greater_than_or_equal_to",
+                      "value": 3
+                    },
+                    {
+                      "source": "ritchiesfirearmengine:has_chambered_round",
+                      "operator": "equals",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "and",
+                  "conditions": [
+                    {
+                      "source": "ritchiesfirearmengine:free_ammo_space",
+                      "operator": "greater_than_or_equal_to",
+                      "value": 4
+                    },
+                    {
+                      "source": "ritchiesfirearmengine:has_chambered_round",
+                      "operator": "equals",
+                      "value": 1
+                    }
+                  ]
+                }
+              ]
             },
             {
               "source": "ritchiesfirearmengine:best_speedloader_ammo_count",
@@ -204,6 +300,8 @@
         "time": 25,
         "reload_type": "speedloaders",
         "reload_count": 3,
+        "reload_delay": 20,
+        "replace_chambered_round": true,
         "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds"
       },
       {
@@ -217,9 +315,39 @@
               "value": 1
             },
             {
-              "source": "ritchiesfirearmengine:free_ammo_space",
-              "operator": "greater_than_or_equal_to",
-              "value": 2
+              "type": "or",
+              "conditions": [
+                {
+                  "type": "and",
+                  "conditions": [
+                    {
+                      "source": "ritchiesfirearmengine:free_ammo_space",
+                      "operator": "greater_than_or_equal_to",
+                      "value": 2
+                    },
+                    {
+                      "source": "ritchiesfirearmengine:has_chambered_round",
+                      "operator": "equals",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "and",
+                  "conditions": [
+                    {
+                      "source": "ritchiesfirearmengine:free_ammo_space",
+                      "operator": "greater_than_or_equal_to",
+                      "value": 3
+                    },
+                    {
+                      "source": "ritchiesfirearmengine:has_chambered_round",
+                      "operator": "equals",
+                      "value": 1
+                    }
+                  ]
+                }
+              ]
             },
             {
               "source": "ritchiesfirearmengine:best_speedloader_ammo_count",
@@ -231,6 +359,8 @@
         "time": 25,
         "reload_type": "speedloaders",
         "reload_count": 2,
+        "reload_delay": 20,
+        "replace_chambered_round": true,
         "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds"
       },
       {
@@ -244,9 +374,39 @@
               "value": 1
             },
             {
-              "source": "ritchiesfirearmengine:free_ammo_space",
-              "operator": "greater_than_or_equal_to",
-              "value": 1
+              "type": "or",
+              "conditions": [
+                {
+                  "type": "and",
+                  "conditions": [
+                    {
+                      "source": "ritchiesfirearmengine:free_ammo_space",
+                      "operator": "greater_than_or_equal_to",
+                      "value": 1
+                    },
+                    {
+                      "source": "ritchiesfirearmengine:has_chambered_round",
+                      "operator": "equals",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "and",
+                  "conditions": [
+                    {
+                      "source": "ritchiesfirearmengine:free_ammo_space",
+                      "operator": "greater_than_or_equal_to",
+                      "value": 2
+                    },
+                    {
+                      "source": "ritchiesfirearmengine:has_chambered_round",
+                      "operator": "equals",
+                      "value": 1
+                    }
+                  ]
+                }
+              ]
             },
             {
               "source": "ritchiesfirearmengine:best_speedloader_ammo_count",
@@ -258,7 +418,68 @@
         "time": 25,
         "reload_type": "speedloaders",
         "reload_count": 1,
+        "reload_delay": 20,
+        "replace_chambered_round": true,
         "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds"
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "type": "and",
+          "conditions": [
+            {
+              "source": "ritchiesfirearmengine:firearm_has_magazine",
+              "operator": "equals",
+              "value": 1
+            },
+            {
+              "type": "or",
+              "conditions": [
+                {
+                  "type": "and",
+                  "conditions": [
+                    {
+                      "source": "ritchiesfirearmengine:free_ammo_space",
+                      "operator": "greater_than_or_equal_to",
+                      "value": 1
+                    },
+                    {
+                      "source": "ritchiesfirearmengine:has_chambered_round",
+                      "operator": "equals",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "and",
+                  "conditions": [
+                    {
+                      "source": "ritchiesfirearmengine:free_ammo_space",
+                      "operator": "greater_than_or_equal_to",
+                      "value": 2
+                    },
+                    {
+                      "source": "ritchiesfirearmengine:has_chambered_round",
+                      "operator": "equals",
+                      "value": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "source": "ritchiesfirearmengine:entity_ammo_count",
+              "operator": "greater_than",
+              "value": 0
+            }
+          ]
+        },
+        "time": 25,
+        "reload_type": "rounds",
+        "reload_count": 1,
+        "reload_delay": 12,
+        "replace_chambered_round": true,
+        "sound": "rfe_builtin:item.generic.rifle.bullet_reload"
       },
       {
         "phase": "reload",
@@ -279,6 +500,7 @@
         },
         "time": 28,
         "reload_type": "magazines",
+        "reload_delay": 15,
         "sound": "rfe_builtin:item.generic.rifle.magazine.reload"
       },
       {
@@ -301,6 +523,7 @@
         "time": 58,
         "reload_type": "magazines",
         "unload_time": 20,
+        "reload_time": 45,
         "sound": "rfe_builtin:item.generic.rifle.magazine.reload_full"
       },
       {

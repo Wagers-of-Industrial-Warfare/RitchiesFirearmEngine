@@ -27,6 +27,7 @@ public class ReloadPhase {
     protected final boolean chargeFirearm;
     protected final ReloadType reloadType;
     protected final boolean ammoAddedLast;
+    protected final boolean replaceChamberedRound;
     protected final boolean blockMagazineReloads;
     protected final boolean endReload;
     protected final Int2IntOpenHashMap reloadDelays;
@@ -41,6 +42,7 @@ public class ReloadPhase {
         this.chargeFirearm = builder.chargeFirearm;
         this.reloadType = builder.reloadType;
         this.ammoAddedLast = builder.ammoAddedLast;
+        this.replaceChamberedRound = builder.replaceChamberedRound;
         this.blockMagazineReloads = builder.blockMagazineReloads;
         this.endReload = builder.endReload;
         this.reloadDelays = builder.finalMultipleReloadDelays;
@@ -62,6 +64,7 @@ public class ReloadPhase {
     public boolean chargeFirearm() { return this.chargeFirearm; }
     public ReloadType reloadType() { return this.reloadType; }
     public boolean ammoAddedLast() { return this.ammoAddedLast; }
+    public boolean replaceChamberedRound() { return this.replaceChamberedRound; }
     public boolean blockMagazineReloads() { return this.blockMagazineReloads; }
     public boolean endReload() { return this.endReload; }
     public int reloadsAtTime(int time) { return this.reloadDelays.getOrDefault(time, 0); }
@@ -113,8 +116,11 @@ public class ReloadPhase {
             if (reloadType != ReloadType.MAGAZINES) {
                 int reloadCount = obj.has(reloadKey + "_count") ? GsonHelper.getAsInt(obj, reloadKey + "_count") : 1;
                 boolean ammoAddedLast = GsonHelper.getAsBoolean(obj, unload ? "ammo_removed_last" : "ammo_added_last", false);
+                boolean replaceChamberedRound = !unload && GsonHelper.getAsBoolean(obj, "replace_chambered_round", !ammoAddedLast);
                 builder.reloadCount(reloadCount)
                         .ammoAddedLast(ammoAddedLast);
+                if (!unload)
+                        builder.replaceChamberedRound(replaceChamberedRound);
                 if (obj.has(reloadKey + "_delay")) {
                     int reloadDelay = GsonHelper.getAsInt(obj, reloadKey + "_delay");
                     builder.reloadDelay(reloadDelay);
@@ -194,6 +200,7 @@ public class ReloadPhase {
         private boolean setSingleDelay = false;
         protected int reloadCount = 1;
         protected boolean ammoAddedLast = false;
+        protected boolean replaceChamberedRound = false;
         protected boolean blockMagazineReloads = false;
         protected boolean endReload = false;
         protected List<Integer> multipleReloadDelays = new ArrayList<>();
@@ -248,7 +255,21 @@ public class ReloadPhase {
             return this;
         }
 
-        public Builder ammoAddedLast(boolean ammoAddedLast) { this.ammoAddedLast = ammoAddedLast; return this; }
+        public Builder ammoAddedLast(boolean ammoAddedLast) {
+            this.ammoAddedLast = ammoAddedLast;
+            if (this.ammoAddedLast)
+                this.replaceChamberedRound = false;
+            return this;
+        }
+
+        public Builder replaceChamberedRound(boolean replaceChamberedRound) {
+            if (this.ammoAddedLast && replaceChamberedRound)
+                throw new IllegalStateException("Cannot replace chambered round if ammo added last");
+            if (this.unload)
+                throw new IllegalStateException("Cannot define replace chambered round for unloading");
+            this.replaceChamberedRound = replaceChamberedRound;
+            return this;
+        }
 
         public Builder blockMagazineReloads(boolean blockMagazineReloads) { this.blockMagazineReloads = blockMagazineReloads; return this; }
 

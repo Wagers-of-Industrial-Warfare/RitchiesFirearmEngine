@@ -1,4 +1,4 @@
-package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic;
+package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode;
 
 import net.minecraft.network.FriendlyByteBuf;
 

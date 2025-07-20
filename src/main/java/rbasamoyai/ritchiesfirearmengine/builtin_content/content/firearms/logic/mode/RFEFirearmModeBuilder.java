@@ -1,7 +1,10 @@
-package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic;
+package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode;
 
 import net.minecraft.sounds.SoundEvent;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ChargeAction;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FireMode;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ReloadPhase;
 
 import javax.annotation.Nullable;
 import java.util.*;

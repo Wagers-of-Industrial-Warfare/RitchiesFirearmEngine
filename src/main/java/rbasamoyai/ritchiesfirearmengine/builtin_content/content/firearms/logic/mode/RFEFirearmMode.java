@@ -1,4 +1,4 @@
-package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic;
+package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.nbt.CompoundTag;
@@ -17,6 +17,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineIte
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.*;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;

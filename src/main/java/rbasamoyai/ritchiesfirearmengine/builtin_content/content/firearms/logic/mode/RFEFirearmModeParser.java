@@ -1,4 +1,4 @@
-package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic;
+package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -6,6 +6,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.GsonHelper;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ChargeAction;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FireMode;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ReloadPhase;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {

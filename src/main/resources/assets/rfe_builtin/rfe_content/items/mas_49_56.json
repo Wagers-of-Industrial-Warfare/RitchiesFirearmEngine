@@ -27,61 +27,28 @@
       {
         "phase": "prepare",
         "condition": {
-          "type": "and",
-          "conditions": [
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
             {
-              "source": "ritchiesfirearmengine:firearm_has_magazine",
-              "operator": "equals",
-              "value": 1
-            },
-            {
-              "type": "or",
-              "conditions": [
+              "or": [
                 {
-                  "type": "and",
-                  "conditions": [
-                    {
-                      "source": "ritchiesfirearmengine:free_ammo_space",
-                      "operator": "greater_than_or_equal_to",
-                      "value": 2
-                    },
-                    {
-                      "source": "ritchiesfirearmengine:has_chambered_round",
-                      "operator": "equals",
-                      "value": 1
-                    }
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 2 },
+                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 }
                   ]
                 },
                 {
-                  "type": "and",
-                  "conditions": [
-                    {
-                      "source": "ritchiesfirearmengine:free_ammo_space",
-                      "operator": "greater_than_or_equal_to",
-                      "value": 1
-                    },
-                    {
-                      "source": "ritchiesfirearmengine:has_chambered_round",
-                      "operator": "equals",
-                      "value": 0
-                    }
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 1 },
+                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 }
                   ]
                 }
               ]
             },
             {
-              "type": "or",
-              "conditions": [
-                {
-                  "source": "ritchiesfirearmengine:entity_ammo_count",
-                  "operator": "greater_than",
-                  "value": 0
-                },
-                {
-                  "source": "ritchiesfirearmengine:best_speedloader_ammo_count",
-                  "operator": "greater_than",
-                  "value": 0
-                }
+              "or": [
+                { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 },
+                { "compare": "ritchiesfirearmengine:best_speedloader_ammo_count", "operator": "greater_than", "value": 0 }
               ]
             }
           ]
@@ -92,34 +59,15 @@
       {
         "phase": "prepare",
         "condition": {
-          "type": "and",
-          "conditions": [
+          "and": [
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
             {
-              "source": "ritchiesfirearmengine:entity_has_magazine",
-              "operator": "equals",
-              "value": 1
-            },
-            {
-              "type": "or",
-              "conditions": [
+              "or": [
+                { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 0 },
                 {
-                  "source": "ritchiesfirearmengine:firearm_has_magazine",
-                  "operator": "equals",
-                  "value": 0
-                },
-                {
-                  "type": "and",
-                  "conditions": [
-                    {
-                      "source": "ritchiesfirearmengine:firearm_has_magazine",
-                      "operator": "equals",
-                      "value": 1
-                    },
-                    {
-                      "source": "ritchiesfirearmengine:free_ammo_space",
-                      "operator": "greater_than",
-                      "value": 0
-                    }
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than", "value": 0 }
                   ]
                 }
               ]
@@ -131,53 +79,25 @@
       {
         "phase": "reload",
         "condition": {
-          "type": "and",
-          "conditions": [
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
             {
-              "source": "ritchiesfirearmengine:firearm_has_magazine",
-              "operator": "equals",
-              "value": 1
-            },
-            {
-              "type": "or",
-              "conditions": [
+              "or": [
                 {
-                  "type": "and",
-                  "conditions": [
-                    {
-                      "source": "ritchiesfirearmengine:free_ammo_space",
-                      "operator": "greater_than_or_equal_to",
-                      "value": 5
-                    },
-                    {
-                      "source": "ritchiesfirearmengine:has_chambered_round",
-                      "operator": "equals",
-                      "value": 0
-                    }
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 5 },
+                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 }
                   ]
                 },
                 {
-                  "type": "and",
-                  "conditions": [
-                    {
-                      "source": "ritchiesfirearmengine:free_ammo_space",
-                      "operator": "greater_than_or_equal_to",
-                      "value": 6
-                    },
-                    {
-                      "source": "ritchiesfirearmengine:has_chambered_round",
-                      "operator": "equals",
-                      "value": 1
-                    }
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 6 },
+                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 }
                   ]
                 }
               ]
             },
-            {
-              "source": "ritchiesfirearmengine:best_speedloader_ammo_count",
-              "operator": "equals",
-              "value": 5
-            }
+            { "compare": "ritchiesfirearmengine:best_speedloader_ammo_count", "operator": "equals", "value": 5 }
           ]
         },
         "time": 25,
@@ -189,53 +109,25 @@
       {
         "phase": "reload",
         "condition": {
-          "type": "and",
-          "conditions": [
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
             {
-              "source": "ritchiesfirearmengine:firearm_has_magazine",
-              "operator": "equals",
-              "value": 1
-            },
-            {
-              "type": "or",
-              "conditions": [
+              "or": [
                 {
-                  "type": "and",
-                  "conditions": [
-                    {
-                      "source": "ritchiesfirearmengine:free_ammo_space",
-                      "operator": "greater_than_or_equal_to",
-                      "value": 4
-                    },
-                    {
-                      "source": "ritchiesfirearmengine:has_chambered_round",
-                      "operator": "equals",
-                      "value": 0
-                    }
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 4 },
+                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 }
                   ]
                 },
                 {
-                  "type": "and",
-                  "conditions": [
-                    {
-                      "source": "ritchiesfirearmengine:free_ammo_space",
-                      "operator": "greater_than_or_equal_to",
-                      "value": 5
-                    },
-                    {
-                      "source": "ritchiesfirearmengine:has_chambered_round",
-                      "operator": "equals",
-                      "value": 1
-                    }
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 5 },
+                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 }
                   ]
                 }
               ]
             },
-            {
-              "source": "ritchiesfirearmengine:best_speedloader_ammo_count",
-              "operator": "equals",
-              "value": 4
-            }
+            { "compare": "ritchiesfirearmengine:best_speedloader_ammo_count", "operator": "equals", "value": 4 }
           ]
         },
         "time": 25,
@@ -248,53 +140,25 @@
       {
         "phase": "reload",
         "condition": {
-          "type": "and",
-          "conditions": [
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
             {
-              "source": "ritchiesfirearmengine:firearm_has_magazine",
-              "operator": "equals",
-              "value": 1
-            },
-            {
-              "type": "or",
-              "conditions": [
+              "or": [
                 {
-                  "type": "and",
-                  "conditions": [
-                    {
-                      "source": "ritchiesfirearmengine:free_ammo_space",
-                      "operator": "greater_than_or_equal_to",
-                      "value": 3
-                    },
-                    {
-                      "source": "ritchiesfirearmengine:has_chambered_round",
-                      "operator": "equals",
-                      "value": 0
-                    }
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 3 },
+                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 }
                   ]
                 },
                 {
-                  "type": "and",
-                  "conditions": [
-                    {
-                      "source": "ritchiesfirearmengine:free_ammo_space",
-                      "operator": "greater_than_or_equal_to",
-                      "value": 4
-                    },
-                    {
-                      "source": "ritchiesfirearmengine:has_chambered_round",
-                      "operator": "equals",
-                      "value": 1
-                    }
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 4 },
+                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 }
                   ]
                 }
               ]
             },
-            {
-              "source": "ritchiesfirearmengine:best_speedloader_ammo_count",
-              "operator": "equals",
-              "value": 3
-            }
+            { "compare": "ritchiesfirearmengine:best_speedloader_ammo_count", "operator": "equals", "value": 3 }
           ]
         },
         "time": 25,
@@ -307,53 +171,25 @@
       {
         "phase": "reload",
         "condition": {
-          "type": "and",
-          "conditions": [
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
             {
-              "source": "ritchiesfirearmengine:firearm_has_magazine",
-              "operator": "equals",
-              "value": 1
-            },
-            {
-              "type": "or",
-              "conditions": [
+              "or": [
                 {
-                  "type": "and",
-                  "conditions": [
-                    {
-                      "source": "ritchiesfirearmengine:free_ammo_space",
-                      "operator": "greater_than_or_equal_to",
-                      "value": 2
-                    },
-                    {
-                      "source": "ritchiesfirearmengine:has_chambered_round",
-                      "operator": "equals",
-                      "value": 0
-                    }
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 2 },
+                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 }
                   ]
                 },
                 {
-                  "type": "and",
-                  "conditions": [
-                    {
-                      "source": "ritchiesfirearmengine:free_ammo_space",
-                      "operator": "greater_than_or_equal_to",
-                      "value": 3
-                    },
-                    {
-                      "source": "ritchiesfirearmengine:has_chambered_round",
-                      "operator": "equals",
-                      "value": 1
-                    }
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 3 },
+                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 }
                   ]
                 }
               ]
             },
-            {
-              "source": "ritchiesfirearmengine:best_speedloader_ammo_count",
-              "operator": "equals",
-              "value": 2
-            }
+            { "compare": "ritchiesfirearmengine:best_speedloader_ammo_count", "operator": "equals", "value": 2 }
           ]
         },
         "time": 25,
@@ -366,53 +202,25 @@
       {
         "phase": "reload",
         "condition": {
-          "type": "and",
-          "conditions": [
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
             {
-              "source": "ritchiesfirearmengine:firearm_has_magazine",
-              "operator": "equals",
-              "value": 1
-            },
-            {
-              "type": "or",
-              "conditions": [
+              "or": [
                 {
-                  "type": "and",
-                  "conditions": [
-                    {
-                      "source": "ritchiesfirearmengine:free_ammo_space",
-                      "operator": "greater_than_or_equal_to",
-                      "value": 1
-                    },
-                    {
-                      "source": "ritchiesfirearmengine:has_chambered_round",
-                      "operator": "equals",
-                      "value": 0
-                    }
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 1 },
+                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 }
                   ]
                 },
                 {
-                  "type": "and",
-                  "conditions": [
-                    {
-                      "source": "ritchiesfirearmengine:free_ammo_space",
-                      "operator": "greater_than_or_equal_to",
-                      "value": 2
-                    },
-                    {
-                      "source": "ritchiesfirearmengine:has_chambered_round",
-                      "operator": "equals",
-                      "value": 1
-                    }
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 2 },
+                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 }
                   ]
                 }
               ]
             },
-            {
-              "source": "ritchiesfirearmengine:best_speedloader_ammo_count",
-              "operator": "equals",
-              "value": 1
-            }
+            { "compare": "ritchiesfirearmengine:best_speedloader_ammo_count", "operator": "equals", "value": 1 }
           ]
         },
         "time": 25,
@@ -425,53 +233,25 @@
       {
         "phase": "reload",
         "condition": {
-          "type": "and",
-          "conditions": [
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
             {
-              "source": "ritchiesfirearmengine:firearm_has_magazine",
-              "operator": "equals",
-              "value": 1
-            },
-            {
-              "type": "or",
-              "conditions": [
+              "or": [
                 {
-                  "type": "and",
-                  "conditions": [
-                    {
-                      "source": "ritchiesfirearmengine:free_ammo_space",
-                      "operator": "greater_than_or_equal_to",
-                      "value": 1
-                    },
-                    {
-                      "source": "ritchiesfirearmengine:has_chambered_round",
-                      "operator": "equals",
-                      "value": 0
-                    }
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 1 },
+                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 }
                   ]
                 },
                 {
-                  "type": "and",
-                  "conditions": [
-                    {
-                      "source": "ritchiesfirearmengine:free_ammo_space",
-                      "operator": "greater_than_or_equal_to",
-                      "value": 2
-                    },
-                    {
-                      "source": "ritchiesfirearmengine:has_chambered_round",
-                      "operator": "equals",
-                      "value": 1
-                    }
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 2 },
+                    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 }
                   ]
                 }
               ]
             },
-            {
-              "source": "ritchiesfirearmengine:entity_ammo_count",
-              "operator": "greater_than",
-              "value": 0
-            }
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
           ]
         },
         "time": 25,
@@ -484,18 +264,9 @@
       {
         "phase": "reload",
         "condition": {
-          "type": "and",
-          "conditions": [
-            {
-              "source": "ritchiesfirearmengine:firearm_has_magazine",
-              "operator": "equals",
-              "value": 0
-            },
-            {
-              "source": "ritchiesfirearmengine:entity_has_magazine",
-              "operator": "equals",
-              "value": 1
-            }
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 0 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 }
           ]
         },
         "time": 28,
@@ -506,18 +277,9 @@
       {
         "phase": "reload",
         "condition": {
-          "type": "and",
-          "conditions": [
-            {
-              "source": "ritchiesfirearmengine:firearm_has_magazine",
-              "operator": "equals",
-              "value": 1
-            },
-            {
-              "source": "ritchiesfirearmengine:entity_has_magazine",
-              "operator": "equals",
-              "value": 1
-            }
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 }
           ]
         },
         "time": 58,
@@ -539,29 +301,16 @@
       {
         "phase": "prepare",
         "condition": {
-          "type": "or",
-          "conditions": [
-            {
-              "source": "ritchiesfirearmengine:firearm_has_magazine",
-              "operator": "equals",
-              "value": 1
-            },
-            {
-              "source": "ritchiesfirearmengine:has_chambered_round",
-              "operator": "equals",
-              "value": 1
-            }
+          "or": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 }
           ]
         },
         "time": 1
       },
       {
         "phase": "unload",
-        "condition": {
-          "source": "ritchiesfirearmengine:has_chambered_round",
-          "operator": "equals",
-          "value": 1
-        },
+        "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
         "time": 25,
         "unload_type": "rounds",
         "unload_count": 1,
@@ -569,11 +318,7 @@
       },
       {
         "phase": "unload",
-        "condition": {
-          "source": "ritchiesfirearmengine:firearm_has_magazine",
-          "operator": "equals",
-          "value": 1
-        },
+        "condition": { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
         "time": 30,
         "unload_type": "magazines",
         "unload_delay": 20,
@@ -589,18 +334,9 @@
     "actions": [
       {
         "condition": {
-          "type": "or",
-          "conditions": [
-            {
-              "source": "ritchiesfirearmengine:is_charged",
-              "operator": "equals",
-              "value": 0
-            },
-            {
-              "source": "ritchiesfirearmengine:is_jammed",
-              "operator": "equals",
-              "value": 1
-            }
+          "or": [
+            { "compare": "ritchiesfirearmengine:is_charged", "operator": "equals", "value": 0 },
+            { "compare": "ritchiesfirearmengine:is_jammed", "operator": "equals", "value": 1 }
           ]
         },
         "time": 25,

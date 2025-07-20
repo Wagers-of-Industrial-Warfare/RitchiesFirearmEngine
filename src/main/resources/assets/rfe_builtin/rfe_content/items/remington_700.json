@@ -27,18 +27,9 @@
       {
         "phase": "prepare",
         "condition": {
-          "type": "and",
-          "conditions": [
-            {
-              "source": "ritchiesfirearmengine:free_ammo_space",
-              "operator": "greater_than",
-              "value": 0
-            },
-            {
-              "source": "ritchiesfirearmengine:entity_ammo_count",
-              "operator": "greater_than",
-              "value": 0
-            }
+          "and": [
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than", "value": 0 },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
           ]
         },
         "time": 15,
@@ -47,18 +38,9 @@
       {
         "phase": "reload",
         "condition": {
-          "type": "and",
-          "conditions": [
-            {
-              "source": "ritchiesfirearmengine:free_ammo_space",
-              "operator": "greater_than",
-              "value": 0
-            },
-            {
-              "source": "ritchiesfirearmengine:entity_ammo_count",
-              "operator": "greater_than",
-              "value": 0
-            }
+          "and": [
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than", "value": 0 },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
           ]
         },
         "time": 25,
@@ -79,21 +61,13 @@
     "phases": [
       {
         "phase": "prepare",
-        "condition": {
-          "source": "ritchiesfirearmengine:free_ammo_space",
-          "operator": "less_than",
-          "value": 5
-        },
+        "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than", "value": 5 },
         "time": 15,
         "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_start"
       },
       {
         "phase": "unload",
-        "condition": {
-          "source": "ritchiesfirearmengine:free_ammo_space",
-          "operator": "equals",
-          "value": 4
-        },
+        "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 4 },
         "time": 10,
         "unload_type": "rounds",
         "end_unload": true,
@@ -102,11 +76,7 @@
       },
       {
         "phase": "unload",
-        "condition": {
-          "source": "ritchiesfirearmengine:free_ammo_space",
-          "operator": "less_than_or_equal_to",
-          "value": 3
-        },
+        "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 3 },
         "time": 20,
         "unload_type": "rounds",
         "end_unload": true,
@@ -125,18 +95,9 @@
     "actions": [
       {
         "condition": {
-          "type": "or",
-          "conditions": [
-            {
-              "source": "ritchiesfirearmengine:is_charged",
-              "operator": "equals",
-              "value": 0
-            },
-            {
-              "source": "ritchiesfirearmengine:is_jammed",
-              "operator": "equals",
-              "value": 1
-            }
+          "or": [
+            { "compare": "ritchiesfirearmengine:is_charged", "operator": "equals", "value": 0 },
+            { "compare": "ritchiesfirearmengine:is_jammed", "operator": "equals", "value": 1 }
           ]
         },
         "time": 25,
@@ -162,20 +123,12 @@
         "phases": [
           {
             "phase": "prepare",
-            "condition": {
-              "source": "ritchiesfirearmengine:free_ammo_space",
-              "operator": "less_than",
-              "value": 4
-            },
+            "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than", "value": 4 },
             "time": 15
           },
           {
             "phase": "unload",
-            "condition": {
-              "source": "ritchiesfirearmengine:free_ammo_space",
-              "operator": "equals",
-              "value": 3
-            },
+            "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 3 },
             "time": 20,
             "unload_type": "rounds",
             "end_unload": true,
@@ -186,11 +139,7 @@
           },
           {
             "phase": "unload",
-            "condition": {
-              "source": "ritchiesfirearmengine:free_ammo_space",
-              "operator": "equals",
-              "value": 2
-            },
+            "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 2 },
             "time": 20,
             "unload_type": "rounds",
             "end_unload": true,
@@ -201,11 +150,7 @@
           },
           {
             "phase": "unload",
-            "condition": {
-              "source": "ritchiesfirearmengine:free_ammo_space",
-              "operator": "equals",
-              "value": 1
-            },
+            "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 1 },
             "time": 20,
             "unload_type": "rounds",
             "end_unload": true,
@@ -216,11 +161,7 @@
           },
           {
             "phase": "unload",
-            "condition": {
-              "source": "ritchiesfirearmengine:free_ammo_space",
-              "operator": "equals",
-              "value": 0
-            },
+            "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 0 },
             "time": 20,
             "unload_type": "rounds",
             "end_unload": true,

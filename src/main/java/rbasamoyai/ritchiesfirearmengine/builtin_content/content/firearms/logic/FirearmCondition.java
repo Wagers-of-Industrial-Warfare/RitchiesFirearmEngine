@@ -118,47 +118,34 @@ public abstract sealed class FirearmCondition implements BiPredicate<ItemStack, 
     }
 
     public static FirearmCondition fromJson(JsonObject obj) {
-        String typeString = GsonHelper.getAsString(obj, "type", "compare");
-        Type type = Type.byId(typeString);
-        if (type == null)
-            throw new JsonParseException("Invalid firearm condition type '" + typeString + "', must be one of 'compare', 'and', 'or' (can omit for 'compare')");
-        return switch (type) {
-            case COMPARE -> {
-                ResourceLocation sourceLoc = RFEUtils.location(GsonHelper.getAsString(obj, "source"));
-                CompareValueSource source = RFEContentBuilderRegistry.getCompareValueSource(sourceLoc);
-                String operatorString = GsonHelper.getAsString(obj, "operator");
-                Compare.Operator operator = Compare.Operator.byId(operatorString);
-                if (operator == null) {
-                    String str = "'" + String.join("', '", Arrays.stream(Compare.Operator.values())
-                            .map(Compare.Operator::getSerializedName).toList()) + "'";
-                    throw new JsonParseException("Invalid firearm condition operator type '" + operatorString + "', must be one of " + str);
-                }
-                float compareTo = GsonHelper.getAsFloat(obj, "value");
-                yield new Compare(operator, source, compareTo);
+        if (GsonHelper.isStringValue(obj, "compare")) {
+            ResourceLocation sourceLoc = RFEUtils.location(GsonHelper.getAsString(obj, "compare"));
+            CompareValueSource source = RFEContentBuilderRegistry.getCompareValueSource(sourceLoc);
+            String operatorString = GsonHelper.getAsString(obj, "operator");
+            Compare.Operator operator = Compare.Operator.byId(operatorString);
+            if (operator == null) {
+                String str = "'" + String.join("', '", Arrays.stream(Compare.Operator.values())
+                        .map(Compare.Operator::getSerializedName).toList()) + "'";
+                throw new JsonParseException("Invalid firearm condition operator type '" + operatorString + "', must be one of " + str);
             }
-            case AND, OR -> {
-                List<FirearmCondition> conditions = new LinkedList<>();
-                JsonArray arr = GsonHelper.getAsJsonArray(obj, "conditions");
-                for (JsonElement el : arr)
-                    conditions.add(fromJson(el.getAsJsonObject()));
-                yield type == Type.AND ? new And(conditions) : new Or(conditions);
-            }
-        };
-    }
-
-    public enum Type implements StringRepresentable {
-        COMPARE,
-        AND,
-        OR;
-
-        private static final Map<String, Type> BY_ID = Arrays.stream(values())
-                .collect(Collectors.toMap(Type::getSerializedName, Function.identity()));
-
-        private final String id = this.name().toLowerCase(Locale.ROOT);
-
-        @Override public String getSerializedName() { return this.id; }
-
-        @Nullable public static Type byId(String id) { return BY_ID.get(id); }
+            float compareTo = GsonHelper.getAsFloat(obj, "value");
+            return new Compare(operator, source, compareTo);
+        }
+        if (GsonHelper.isArrayNode(obj, "and")) {
+            List<FirearmCondition> conditions = new LinkedList<>();
+            JsonArray arr = GsonHelper.getAsJsonArray(obj, "and");
+            for (JsonElement el : arr)
+                conditions.add(fromJson(el.getAsJsonObject()));
+            return new And(conditions);
+        }
+        if (GsonHelper.isArrayNode(obj, "or")) {
+            List<FirearmCondition> conditions = new LinkedList<>();
+            JsonArray arr = GsonHelper.getAsJsonArray(obj, "or");
+            for (JsonElement el : arr)
+                conditions.add(fromJson(el.getAsJsonObject()));
+            return new Or(conditions);
+        }
+        throw new JsonParseException("Invalid firearm condition type, must be one of 'compare', 'and', 'or'");
     }
 
 }

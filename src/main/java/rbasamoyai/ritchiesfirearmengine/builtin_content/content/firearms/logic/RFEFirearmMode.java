@@ -560,6 +560,7 @@ public class RFEFirearmMode {
         if (reloadCount < 1)
             return;
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        boolean addedLast = phase.ammoAddedLast();
         List<ItemStack> ammoList;
         int capacity;
         if (this.internalCapacity > 0) {
@@ -572,6 +573,13 @@ public class RFEFirearmMode {
                 return;
             ammoList = magazineItem.getStoredAmmo(magazine);
             capacity = magazineItem.getMagazineCapacity(magazine);
+            if (this.plusOneCapacity && !addedLast) {
+                ItemStack loadedRound = this.getLoadedRound(itemStack);
+                if (!loadedRound.isEmpty()) {
+                    FirearmDataUtils.addAmmo(ammoList, loadedRound, false, 0);
+                    this.setLoadedRound(itemStack, ItemStack.EMPTY);
+                }
+            }
         }
         Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
         if (phase.reloadType() == ReloadPhase.ReloadType.ROUNDS) {
@@ -590,7 +598,6 @@ public class RFEFirearmMode {
                     return s.isEmpty() ? ItemStack.EMPTY : s;
                 }, () -> foundAmmo.size() >= addable || !foundAmmo.isEmpty() && foundAmmo.get(foundAmmo.size() - 1).is(RFEItemTags.INFINITE_AMMO.tag));
                 if (!foundAmmo.isEmpty()) {
-                    boolean addedLast = phase.ammoAddedLast();
                     for (ItemStack sourceStack : foundAmmo)
                         FirearmDataUtils.addAmmo(ammoList, sourceStack, addedLast, 0);
                 }
@@ -601,7 +608,7 @@ public class RFEFirearmMode {
             ItemStack bestSpeedloaderStack = RFEItemUtils.findBestSpeedloader(entity, speedloaderPred, ammoPred, reloadCount1, true);
             if (bestSpeedloaderStack.getItem() instanceof MagazineItem magazineItem) {
                 List<ItemStack> strippedAmmo = magazineItem.getStoredAmmo(bestSpeedloaderStack);
-                int consumed = FirearmDataUtils.addMultipleAmmo(ammoList, strippedAmmo, phase.ammoAddedLast(), false, capacity);
+                int consumed = FirearmDataUtils.addMultipleAmmo(ammoList, strippedAmmo, addedLast, false, capacity);
                 FirearmDataUtils.stripMultipleAmmo(strippedAmmo, consumed, false, false);
                 magazineItem.writeStoredAmmo(bestSpeedloaderStack, strippedAmmo);
                 RFEItemUtils.addItemToEntity(bestSpeedloaderStack, entity);

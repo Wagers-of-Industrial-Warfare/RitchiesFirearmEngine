@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.GsonHelper;
@@ -59,7 +60,11 @@ public class ReloadPhase {
 
     public PhaseType phaseType() { return this.phaseType; }
 
-    public boolean test(ItemStack itemStack, LivingEntity entity) { return this.condition.test(itemStack, entity); }
+    public boolean test(Map<ResourceLocation, Float> context) { return this.condition.test(context); }
+
+    public void getCompareValueSources(Map<ResourceLocation, CompareValueSource> toEvaluate) {
+        this.condition.getCompareValueSources(toEvaluate);
+    }
 
     public int time() { return this.time; }
     public boolean chargeFirearm() { return this.chargeFirearm; }

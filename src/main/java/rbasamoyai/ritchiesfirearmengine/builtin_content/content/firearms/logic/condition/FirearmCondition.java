@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import it.unimi.dsi.fastutil.objects.Object2FloatLinkedOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.StringRepresentable;
@@ -15,29 +16,38 @@ import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public abstract sealed class FirearmCondition implements BiPredicate<ItemStack, LivingEntity> {
+public abstract sealed class FirearmCondition implements Predicate<Map<ResourceLocation, Float>> {
 
     private FirearmCondition() {
     }
 
+    public abstract void getCompareValueSources(Map<ResourceLocation, CompareValueSource> toEvaluate);
+
     public static final class Compare extends FirearmCondition {
+        private final ResourceLocation sourceId;
         private final Operator operator;
         private final CompareValueSource valueSource;
         private final float compareTo;
 
-        public Compare(Operator operator, CompareValueSource valueSource, float compareTo) {
+        public Compare(ResourceLocation sourceId, Operator operator, CompareValueSource valueSource, float compareTo) {
+            this.sourceId = sourceId;
             this.operator = operator;
             this.valueSource = valueSource;
             this.compareTo = compareTo;
         }
 
         @Override
-        public boolean test(ItemStack itemStack, LivingEntity entity) {
-            return this.operator.compareValues(this.valueSource.getValue(itemStack, entity), this.compareTo);
+        public void getCompareValueSources(Map<ResourceLocation, CompareValueSource> toEvaluate) {
+            toEvaluate.put(this.sourceId, this.valueSource);
+        }
+
+        @Override
+        public boolean test(Map<ResourceLocation, Float> context) {
+            return this.operator.compareValues(context.getOrDefault(this.sourceId, 0f), this.compareTo);
         }
 
         public enum Operator implements StringRepresentable {
@@ -81,9 +91,15 @@ public abstract sealed class FirearmCondition implements BiPredicate<ItemStack, 
         }
 
         @Override
-        public boolean test(ItemStack itemStack, LivingEntity entity) {
+        public void getCompareValueSources(Map<ResourceLocation, CompareValueSource> toEvaluate) {
+            for (FirearmCondition condition : this.children)
+                condition.getCompareValueSources(toEvaluate);
+        }
+
+        @Override
+        public boolean test(Map<ResourceLocation, Float> context) {
             for (FirearmCondition condition : this.children) {
-                if (!condition.test(itemStack, entity))
+                if (!condition.test(context))
                     return false;
             }
             return true;
@@ -98,9 +114,15 @@ public abstract sealed class FirearmCondition implements BiPredicate<ItemStack, 
         }
 
         @Override
-        public boolean test(ItemStack itemStack, LivingEntity entity) {
+        public void getCompareValueSources(Map<ResourceLocation, CompareValueSource> toEvaluate) {
+            for (FirearmCondition condition : this.children)
+                condition.getCompareValueSources(toEvaluate);
+        }
+
+        @Override
+        public boolean test(Map<ResourceLocation, Float> context) {
             for (FirearmCondition condition : this.children) {
-                if (condition.test(itemStack, entity))
+                if (condition.test(context))
                     return true;
             }
             return false;
@@ -112,10 +134,9 @@ public abstract sealed class FirearmCondition implements BiPredicate<ItemStack, 
 
         private AlwaysTrue() {}
 
-        @Override
-        public boolean test(ItemStack itemStack, LivingEntity entity) {
-            return true;
-        }
+        @Override public void getCompareValueSources(Map<ResourceLocation, CompareValueSource> toEvaluate) {}
+
+        @Override public boolean test(Map<ResourceLocation, Float> context) { return true; }
     }
 
     public static FirearmCondition fromJson(JsonObject obj, boolean macroEnabled) {
@@ -130,7 +151,7 @@ public abstract sealed class FirearmCondition implements BiPredicate<ItemStack, 
                 throw new JsonParseException("Invalid firearm condition operator type '" + operatorString + "', must be one of " + str);
             }
             float compareTo = GsonHelper.getAsFloat(obj, "value");
-            return new Compare(operator, source, compareTo);
+            return new Compare(sourceLoc, operator, source, compareTo);
         }
         if (GsonHelper.isArrayNode(obj, "and")) {
             List<FirearmCondition> conditions = new LinkedList<>();
@@ -153,6 +174,14 @@ public abstract sealed class FirearmCondition implements BiPredicate<ItemStack, 
             return FirearmCondtionMacroHandler.getMacro(macroLoc);
         }
         throw new JsonParseException("Invalid firearm condition type, must be one of 'compare', 'and', 'or'" + (macroEnabled ? ", 'macro" : ""));
+    }
+
+    public static Map<ResourceLocation, Float> evaluateCompareValueSources(Map<ResourceLocation, CompareValueSource> toEvaluate,
+                                                                           ItemStack itemStack, LivingEntity entity) {
+        Map<ResourceLocation, Float> context = new Object2FloatLinkedOpenHashMap<>();
+        for (Map.Entry<ResourceLocation, CompareValueSource> entry : toEvaluate.entrySet())
+            context.put(entry.getKey(), entry.getValue().getValue(itemStack, entity));
+        return context;
     }
 
 }

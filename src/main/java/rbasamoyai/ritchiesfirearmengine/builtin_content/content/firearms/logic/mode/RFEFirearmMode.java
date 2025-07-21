@@ -18,6 +18,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFire
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.*;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.condition.FirearmCondition;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
@@ -87,14 +88,15 @@ public class RFEFirearmMode {
 
     // Reloading
     protected final Map<ReloadPhase.PhaseType, List<ReloadPhase>> reloadPhases;
-    // TODO secondary reload phases
+    protected final Map<ResourceLocation, CompareValueSource> reloadingCompareValues;
 
     // Unloading
     protected final Map<ReloadPhase.PhaseType, List<ReloadPhase>> unloadPhases;
-    // TODO secondary reload phases
+    protected final Map<ResourceLocation, CompareValueSource> unloadingCompareValues;
 
     // Charging
     protected final List<ChargeAction> chargeActions;
+    protected final Map<ResourceLocation, CompareValueSource> chargingCompareValues;
 
     // Overheating
     protected final boolean canOverheat;
@@ -139,6 +141,10 @@ public class RFEFirearmMode {
         this.reloadPhases = builder.finalReloadPhases;
         this.unloadPhases = builder.finalUnloadPhases;
         this.chargeActions = builder.chargeActions;
+
+        this.reloadingCompareValues = builder.reloadingCompareValues;
+        this.unloadingCompareValues = builder.unloadingCompareValues;
+        this.chargingCompareValues = builder.chargingCompareValues;
 
         this.canOverheat = builder.canOverheat;
         this.cooldownTime = builder.cooldownTime;
@@ -467,10 +473,11 @@ public class RFEFirearmMode {
             return false;
         if (FirearmDataUtils.getActionTime(itemStack) > 0)
             return false;
+        Map<ResourceLocation, Float> compareContext = FirearmCondition.evaluateCompareValueSources(this.reloadingCompareValues, itemStack, entity);
         for (ListIterator<ReloadPhase> lister = this.reloadPhases.get(phaseType).listIterator(); lister.hasNext(); ) {
             int index = lister.nextIndex();
             ReloadPhase phase = lister.next();
-            if (!phase.test(itemStack, entity))
+            if (!phase.test(compareContext))
                 continue;
             if (phaseType == ReloadPhase.PhaseType.RELOAD && phase.reloadType() == ReloadPhase.ReloadType.MAGAZINES && blockMagazineReload)
                 continue;
@@ -635,10 +642,11 @@ public class RFEFirearmMode {
             return false;
         if (FirearmDataUtils.getActionTime(itemStack) > 0)
             return false;
+        Map<ResourceLocation, Float> compareContext = FirearmCondition.evaluateCompareValueSources(this.unloadingCompareValues, itemStack, entity);
         for (ListIterator<ReloadPhase> lister = this.unloadPhases.get(phaseType).listIterator(); lister.hasNext(); ) {
             int index = lister.nextIndex();
             ReloadPhase phase = lister.next();
-            if (!phase.test(itemStack, entity))
+            if (!phase.test(compareContext))
                 continue;
             FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.UNLOAD);
             FirearmDataUtils.setActionTime(itemStack, phase.time());
@@ -773,8 +781,9 @@ public class RFEFirearmMode {
     public void onCharge(ItemStack itemStack, LivingEntity entity) {
         if (entity.level().isClientSide)
             return;
+        Map<ResourceLocation, Float> compareContext = FirearmCondition.evaluateCompareValueSources(this.chargingCompareValues, itemStack, entity);
         for (ChargeAction action : this.chargeActions) {
-            if (action.tryExecute(itemStack, entity))
+            if (action.tryExecute(itemStack, entity, compareContext))
                 return;
         }
     }

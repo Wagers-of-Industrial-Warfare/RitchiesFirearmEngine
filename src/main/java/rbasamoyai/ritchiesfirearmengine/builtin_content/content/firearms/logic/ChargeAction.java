@@ -1,6 +1,7 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic;
 
 import com.google.gson.JsonObject;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.GsonHelper;
@@ -11,6 +12,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.c
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 
 public class ChargeAction {
 
@@ -24,8 +26,8 @@ public class ChargeAction {
         this.sound = sound;
     }
 
-    public boolean tryExecute(ItemStack itemStack, LivingEntity entity) {
-        if (!this.firearmCondition.test(itemStack, entity))
+    public boolean tryExecute(ItemStack itemStack, LivingEntity entity, Map<ResourceLocation, Float> context) {
+        if (!this.firearmCondition.test(context))
             return false;
         FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.CHARGING);
         FirearmDataUtils.setActionTime(itemStack, this.time);
@@ -36,6 +38,10 @@ public class ChargeAction {
     protected void playEffects(ItemStack itemStack, LivingEntity entity) {
         if (this.sound != null)
             entity.level().playSound(null, entity.blockPosition(), this.sound, SoundSource.NEUTRAL, 1f, 1f);
+    }
+
+    public void getCompareValueSources(Map<ResourceLocation, CompareValueSource> toEvaluate) {
+        this.firearmCondition.getCompareValueSources(toEvaluate);
     }
 
     public static ChargeAction fromJson(JsonObject obj) {

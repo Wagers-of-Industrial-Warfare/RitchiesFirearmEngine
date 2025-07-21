@@ -1,8 +1,11 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode;
 
+import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ChargeAction;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.CompareValueSource;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FireMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ReloadPhase;
 
@@ -53,11 +56,14 @@ public class RFEFirearmModeBuilder {
 
     protected List<ReloadPhase> reloadPhases = new LinkedList<>();
     protected final Map<ReloadPhase.PhaseType, List<ReloadPhase>> finalReloadPhases = new EnumMap<>(ReloadPhase.PhaseType.class);
+    protected Map<ResourceLocation, CompareValueSource> reloadingCompareValues = new Object2ReferenceOpenHashMap<>();
 
     protected List<ReloadPhase> unloadPhases = new LinkedList<>();
     protected final Map<ReloadPhase.PhaseType, List<ReloadPhase>> finalUnloadPhases = new EnumMap<>(ReloadPhase.PhaseType.class);
+    protected Map<ResourceLocation, CompareValueSource> unloadingCompareValues = new Object2ReferenceOpenHashMap<>();
 
     protected List<ChargeAction> chargeActions = new LinkedList<>();
+    protected Map<ResourceLocation, CompareValueSource> chargingCompareValues = new Object2ReferenceOpenHashMap<>();
 
     protected boolean canOverheat = false;
     protected int cooldownTime = -1;
@@ -317,31 +323,37 @@ public class RFEFirearmModeBuilder {
 
     public RFEFirearmModeBuilder addReloadPhase(ReloadPhase phase) {
         this.reloadPhases.add(phase);
+        phase.getCompareValueSources(this.reloadingCompareValues);
         return this;
     }
 
     public RFEFirearmModeBuilder resetReloadPhases() {
         this.reloadPhases.clear();
+        this.reloadingCompareValues.clear();
         return this;
     }
 
     public RFEFirearmModeBuilder addUnloadPhase(ReloadPhase phase) {
         this.unloadPhases.add(phase);
+        phase.getCompareValueSources(this.unloadingCompareValues);
         return this;
     }
 
     public RFEFirearmModeBuilder resetUnloadPhases() {
         this.unloadPhases.clear();
+        this.unloadingCompareValues.clear();
         return this;
     }
 
     public RFEFirearmModeBuilder addChargeAction(ChargeAction action) {
         this.chargeActions.add(action);
+        action.getCompareValueSources(this.chargingCompareValues);
         return this;
     }
 
     public RFEFirearmModeBuilder resetChargeActions() {
         this.chargeActions.clear();
+        this.chargingCompareValues.clear();
         return this;
     }
 

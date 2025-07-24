@@ -3,10 +3,13 @@
   "icon": "rfe_builtin:remington_700",
   "contents": [
     "rfe_builtin:remington_700",
-    "rfe_builtin:mas_49_56",
+    {
+      "item": "rfe_builtin:mas_49_56",
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_10rds\",Count:1b,tag:{Rounds:[]}}}}"
+    },
     {
       "item": "rfe_builtin:lee_enfield_no_4",
-      "tag": "{MainMode:{Charged:1b,DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_10rds\",Count:1b,tag:{Rounds:[]}}}}"
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_10rds\",Count:1b,tag:{Rounds:[]}}}}"
     }
   ]
 }

@@ -42,7 +42,7 @@
             }
           ]
         },
-        "time": 7,
+        "time": 14,
         "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_start"
       },
       {
@@ -217,9 +217,14 @@
       },
       {
         "phase": "finish",
-        "time": 7,
+        "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 },
+        "time": 14,
         "charge_firearm": true,
         "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_end"
+      },
+      {
+        "phase": "finish",
+        "time": 1
       }
     ]
   },

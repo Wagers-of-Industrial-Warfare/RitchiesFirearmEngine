@@ -123,7 +123,6 @@
         "phase": "reload",
         "condition": {
           "and": [
-            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
             { "macro": "rfe_builtin:can_load_1_detachable" },
             { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
           ]

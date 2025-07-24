@@ -280,7 +280,7 @@
           ]
         },
         "time": 15,
-        "sound": "rfe_builtin:item.generic.rifle.rack"
+        "sound": "rfe_builtin:item.generic.rifle.bolt_cycle"
       }
     ]
   },

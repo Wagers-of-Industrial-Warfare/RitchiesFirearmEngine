@@ -15,7 +15,7 @@
   },
   "ammo": {
     "ammo_required": true,
-    "detachable_capacity": true
+    "plus_1_capacity": true
   },
   "firing": {
     "fire_mode": "semi_auto",

@@ -121,6 +121,10 @@ public class RFEFirearmModeBuilder {
         newBuilder.unloadPhases = new LinkedList<>(this.unloadPhases);
         newBuilder.chargeActions = new LinkedList<>(this.chargeActions);
 
+        newBuilder.reloadingCompareValues = new Object2ReferenceOpenHashMap<>(this.reloadingCompareValues);
+        newBuilder.unloadingCompareValues = new Object2ReferenceOpenHashMap<>(this.unloadingCompareValues);
+        newBuilder.chargingCompareValues = new Object2ReferenceOpenHashMap<>(this.chargingCompareValues);
+
         newBuilder.canOverheat = this.canOverheat;
         newBuilder.cooldownTime = this.cooldownTime;
         newBuilder.cooldownSound = this.cooldownSound;

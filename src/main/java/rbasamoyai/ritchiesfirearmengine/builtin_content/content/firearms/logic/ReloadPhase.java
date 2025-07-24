@@ -1,5 +1,8 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -35,7 +38,7 @@ public class ReloadPhase {
     protected final Int2IntOpenHashMap reloadDelays;
     protected final int unloadMagTime;
     protected final int reloadMagTime;
-    @Nullable protected final SoundEvent sound;
+    protected final ImmutableMultimap<Integer, SoundEvent> soundTimeline;
 
     public ReloadPhase(Builder builder) {
         this.phaseType = builder.phaseType;
@@ -50,12 +53,12 @@ public class ReloadPhase {
         this.reloadDelays = builder.finalMultipleReloadDelays;
         this.unloadMagTime = builder.unloadMagTime;
         this.reloadMagTime = builder.reloadMagTime;
-        this.sound = builder.sound;
+        this.soundTimeline = ImmutableMultimap.<Integer, SoundEvent>builder().putAll(builder.soundTimeline).build();
     }
 
-    public void playEffects(ItemStack itemStack, LivingEntity entity) {
-        if (this.sound != null)
-            entity.level().playSound(null, entity.blockPosition(), this.sound, SoundSource.NEUTRAL, 1f, 1f);
+    public void playEffects(ItemStack itemStack, LivingEntity entity, int time) {
+        for (SoundEvent evt : this.soundTimeline.get(time))
+            entity.level().playSound(null, entity.blockPosition(), evt, SoundSource.NEUTRAL, 1f, 1f);
     }
 
     public PhaseType phaseType() { return this.phaseType; }
@@ -96,16 +99,25 @@ public class ReloadPhase {
         }
 
         int time = GsonHelper.getAsInt(obj, "time");
-        builder.time(time);
-        if (!unload) {
-            boolean chargeFirearm = GsonHelper.getAsBoolean(obj, "charge_firearm", false);
-            builder.chargeFirearm(chargeFirearm);
-        }
+        boolean chargeFirearm = GsonHelper.getAsBoolean(obj, "charge_firearm", false);
+        builder.time(time)
+                .chargeFirearm(chargeFirearm);
 
         if (GsonHelper.isStringValue(obj, "sound")) {
             String str = GsonHelper.getAsString(obj, "sound");
             SoundEvent evt = SoundEvent.createVariableRangeEvent(RFEUtils.location(str));
-            builder.sound(evt);
+            builder.sound(0, evt);
+        } else if (GsonHelper.isArrayNode(obj, "sounds")) {
+            JsonArray sounds = GsonHelper.getAsJsonArray(obj, "sounds");
+            for (JsonElement el : sounds) {
+                if (!el.isJsonObject())
+                    throw new JsonParseException("Sound timeline object must be a JSON object");
+                JsonObject soundObj = el.getAsJsonObject();
+                int soundTime = GsonHelper.getAsInt(soundObj, "time");
+                String str = GsonHelper.getAsString(soundObj, "sound");
+                SoundEvent evt = SoundEvent.createVariableRangeEvent(RFEUtils.location(str));
+                builder.sound(soundTime, evt);
+            }
         }
 
         if (phaseType == PhaseType.RELOAD) {
@@ -213,7 +225,7 @@ public class ReloadPhase {
         protected Int2IntOpenHashMap finalMultipleReloadDelays = new Int2IntOpenHashMap();
         protected int unloadMagTime = -1;
         protected int reloadMagTime = -1;
-        @Nullable protected SoundEvent sound = null;
+        protected Multimap<Integer, SoundEvent> soundTimeline = HashMultimap.create();
 
         public Builder(boolean unload) {
             this.unload = unload;
@@ -231,8 +243,6 @@ public class ReloadPhase {
         }
 
         public Builder chargeFirearm(boolean chargeFirearm) {
-            if (this.unload)
-                throw new IllegalStateException("Cannot set charge firearm for unload");
             this.chargeFirearm = chargeFirearm;
             return this;
         }
@@ -308,7 +318,12 @@ public class ReloadPhase {
             return this;
         }
 
-        public Builder sound(SoundEvent sound) { this.sound = sound; return this; }
+        public Builder sound(int time, SoundEvent sound) {
+            if (time < 0)
+                throw new IllegalStateException("Cannot have sound event time less than 0");
+            this.soundTimeline.put(time, sound);
+            return this;
+        }
 
         // TODO secondaries
         public ReloadPhase build() {

@@ -1,0 +1,16 @@
+{
+  "style": "ritchiesfirearmengine:ammo_counter",
+  "hide_entire_ammo_count": false,
+  "hide_firearm_ammo": false,
+  "enlarge_firearm_ammo": true,
+  "show_inventory_ammo": true,
+  "firearm_icon": {
+    "texture": "rfe_builtin:textures/gui/hud/weapon_icon/lee_enfield_no_4.png",
+    "width": 64,
+    "height": 16
+  },
+  "mode_translations": {
+    "default": "gui.ritchiesfirearmengine.mode.single_action",
+    "safety": "gui.ritchiesfirearmengine.mode.safety"
+  }
+}

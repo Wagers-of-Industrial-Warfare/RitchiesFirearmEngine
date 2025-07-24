@@ -1,0 +1,68 @@
+{
+	"parent": "rfe_builtin:item/lee_enfield_no_4_empty",
+	"overrides": [
+		{
+			"predicate": { "ritchiesfirearmengine:aiming": 1 },
+			"model": "rfe_builtin:item/lee_enfield_no_4_empty_aimed"
+		},
+		{
+			"predicate": { "ritchiesfirearmengine:has_magazine": 1 },
+			"model": "rfe_builtin:item/lee_enfield_no_4_magazine"
+		},
+		{
+			"predicate": {
+				"ritchiesfirearmengine:has_magazine": 1,
+				"ritchiesfirearmengine:aiming": 1
+			},
+			"model": "rfe_builtin:item/lee_enfield_no_4_magazine_aimed"
+		},
+		{
+			"predicate": { "ritchiesfirearmengine:is_charging": 1 },
+			"model": "rfe_builtin:item/lee_enfield_no_4_empty_charge"
+		},
+		{
+			"predicate": {
+				"ritchiesfirearmengine:is_charging": 1,
+				"ritchiesfirearmengine:aiming": 1
+			},
+			"model": "rfe_builtin:item/lee_enfield_no_4_empty_charge_aimed"
+		},
+		{
+			"predicate": {
+				"ritchiesfirearmengine:is_charging": 1,
+				"ritchiesfirearmengine:has_magazine": 1
+			},
+			"model": "rfe_builtin:item/lee_enfield_no_4_magazine_charge"
+		},
+		{
+			"predicate": {
+				"ritchiesfirearmengine:is_charging": 1,
+				"ritchiesfirearmengine:aiming": 1,
+				"ritchiesfirearmengine:has_magazine": 1
+			},
+			"model": "rfe_builtin:item/lee_enfield_no_4_magazine_charge_aimed"
+		},
+		{
+			"predicate": { "ritchiesfirearmengine:is_reloading": 1 },
+			"model": "rfe_builtin:item/lee_enfield_no_4_empty_charge"
+		},
+		{
+			"predicate": {
+				"ritchiesfirearmengine:has_magazine": 1,
+				"ritchiesfirearmengine:is_reloading": 1
+			},
+			"model": "rfe_builtin:item/lee_enfield_no_4_magazine_charge"
+		},
+		{
+			"predicate": { "ritchiesfirearmengine:is_unloading": 1 },
+			"model": "rfe_builtin:item/lee_enfield_no_4_empty_charge"
+		},
+		{
+			"predicate": {
+				"ritchiesfirearmengine:has_magazine": 1,
+				"ritchiesfirearmengine:is_unloading": 1
+			},
+			"model": "rfe_builtin:item/lee_enfield_no_4_magazine_charge"
+		}
+	]
+}

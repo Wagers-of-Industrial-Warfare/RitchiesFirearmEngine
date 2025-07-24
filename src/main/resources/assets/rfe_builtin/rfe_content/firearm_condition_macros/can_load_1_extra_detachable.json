@@ -1,0 +1,7 @@
+{
+  "and": [
+    { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+    { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
+    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 1 }
+  ]
+}

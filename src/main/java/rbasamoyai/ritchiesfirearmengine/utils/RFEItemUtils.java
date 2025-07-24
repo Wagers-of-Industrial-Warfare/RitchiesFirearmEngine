@@ -59,7 +59,7 @@ public class RFEItemUtils {
     public static List<ItemStack> getItemsFromEntity(LivingEntity entity, Predicate<ItemStack> predicate, int maxCount, boolean take) {
         List<ItemStack> list = new LinkedList<>();
         consumeItemsFromEntity(entity, predicate, s -> {
-            int takeAmount = maxCount > 0 ? Math.min(maxCount - countItems(list), s.getMaxStackSize()) : s.getMaxStackSize();
+            int takeAmount = maxCount > 0 ? Math.min(maxCount - countItems(list), s.getMaxStackSize()) : s.getCount();
             ItemStack addition;
             if (take) {
                 addition = s.split(takeAmount);

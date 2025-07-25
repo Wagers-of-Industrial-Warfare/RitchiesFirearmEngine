@@ -1,0 +1,25 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:rifle_cartridge",
+      "fires": "rfe_builtin:792x57mm_mauser"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_rifle_cartridge",
+      "fires": "rfe_builtin:792x57mm_mauser"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+    "rfe_builtin:rifle_stripper_clip_5rds"
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "modes": {
+  }
+}

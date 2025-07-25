@@ -483,6 +483,8 @@ public class RFEFirearmMode {
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
         if (onInput && this.isBusyWithStagedAction(itemStack))
             return false;
+        if (!this.reloadPhases.containsKey(phaseType))
+            return false;
         Map<ResourceLocation, Float> compareContext = FirearmCondition.evaluateCompareValueSources(this.reloadingCompareValues, itemStack, entity);
         for (ListIterator<ReloadPhase> lister = this.reloadPhases.get(phaseType).listIterator(); lister.hasNext(); ) {
             int index = lister.nextIndex();
@@ -659,6 +661,8 @@ public class RFEFirearmMode {
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
         if (onInput && this.isBusyWithStagedAction(itemStack))
             return false;
+        if (!this.unloadPhases.containsKey(phaseType))
+            return false;
         Map<ResourceLocation, Float> compareContext = FirearmCondition.evaluateCompareValueSources(this.unloadingCompareValues, itemStack, entity);
         for (ListIterator<ReloadPhase> lister = this.unloadPhases.get(phaseType).listIterator(); lister.hasNext(); ) {
             int index = lister.nextIndex();
@@ -794,7 +798,15 @@ public class RFEFirearmMode {
     }
 
     public boolean canCharge(ItemStack itemStack, LivingEntity entity) {
-        return this.fireMode != FireMode.SAFETY && FirearmDataUtils.getActionTime(itemStack) <= 0 && !this.isCharged(itemStack);
+        if (this.fireMode == FireMode.SAFETY || FirearmDataUtils.getActionTime(itemStack) > 0)
+            return false;
+        boolean charged = this.isCharged(itemStack);
+        if (this.plusOneCapacity) {
+            ItemStack loadedRound = this.getLoadedRound(itemStack);
+            return loadedRound.isEmpty() && this.hasAmmo(itemStack) || !loadedRound.isEmpty() && !charged;
+        } else {
+            return this.hasAmmo(itemStack) && !charged;
+        }
     }
 
     public void onCharge(ItemStack itemStack, LivingEntity entity) {
@@ -986,6 +998,16 @@ public class RFEFirearmMode {
                     && !holdingKey && this.canCharge(itemStack, entity)) {
                 this.onCharge(itemStack, entity);
             }
+        }
+
+        action = FirearmDataUtils.getAction(itemStack);
+        if (action != RFEFirearmItem.Action.RELOAD) {
+            modeTag.remove("ReloadPhase");
+            modeTag.remove("ReloadPhaseIndex");
+        }
+        if (action != RFEFirearmItem.Action.UNLOAD) {
+            modeTag.remove("UnloadPhase");
+            modeTag.remove("UnloadPhaseIndex");
         }
 
         if (!entity.level().isClientSide) {

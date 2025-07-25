@@ -948,7 +948,7 @@ public class RFEFirearmMode {
     }
 
     public boolean isAiming(ItemStack itemStack, LivingEntity entity) {
-        return FirearmDataUtils.isAiming(itemStack);
+        return entity instanceof Player ? entity.isUsingItem() : FirearmDataUtils.isAiming(itemStack);
     }
 
     public int getAimingTime(ItemStack itemStack, LivingEntity entity) {

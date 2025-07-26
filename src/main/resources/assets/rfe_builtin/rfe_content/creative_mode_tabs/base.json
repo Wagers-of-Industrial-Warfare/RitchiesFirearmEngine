@@ -14,6 +14,15 @@
     {
       "item": "rfe_builtin:rifle_magazine_10rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:10b}]}"
+    },
+    "rfe_builtin:intermediate_cartridge",
+    "rfe_builtin:infinite_intermediate_cartridge",
+    "rfe_builtin:handgun_cartridge",
+    "rfe_builtin:infinite_handgun_cartridge",
+    "rfe_builtin:pistol_magazine_7rds",
+    {
+      "item": "rfe_builtin:pistol_magazine_7rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:handgun_cartridge\",Count:7b}]}"
     }
   ]
 }

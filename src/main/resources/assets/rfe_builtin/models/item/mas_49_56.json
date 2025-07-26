@@ -3,40 +3,40 @@
   "overrides": [
     {
       "predicate": { "ritchiesfirearmengine:aiming": 1 },
-      "model": "rfe_builtin:item/mas_49_56_empty_aimed"
+      "model": "rfe_builtin:item/mas_49_56/mas_49_56_empty_aimed"
     },
     {
       "predicate": { "ritchiesfirearmengine:has_magazine": 1 },
-      "model": "rfe_builtin:item/mas_49_56_magazine"
+      "model": "rfe_builtin:item/mas_49_56/mas_49_56_magazine"
     },
     {
       "predicate": {
         "ritchiesfirearmengine:has_magazine": 1,
         "ritchiesfirearmengine:aiming": 1
       },
-      "model": "rfe_builtin:item/mas_49_56_magazine_aimed"
+      "model": "rfe_builtin:item/mas_49_56/mas_49_56_magazine_aimed"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
-      "model": "rfe_builtin:item/mas_49_56_empty_open"
+      "model": "rfe_builtin:item/mas_49_56/mas_49_56_empty_open"
     },
     {
       "predicate": {
         "ritchiesfirearmengine:has_magazine": 1,
         "ritchiesfirearmengine:is_reloading": 1
       },
-      "model": "rfe_builtin:item/mas_49_56_magazine_open"
+      "model": "rfe_builtin:item/mas_49_56/mas_49_56_magazine_open"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
-      "model": "rfe_builtin:item/mas_49_56_empty_open"
+      "model": "rfe_builtin:item/mas_49_56/mas_49_56_empty_open"
     },
     {
       "predicate": {
         "ritchiesfirearmengine:has_magazine": 1,
         "ritchiesfirearmengine:is_unloading": 1
       },
-      "model": "rfe_builtin:item/mas_49_56_magazine_open"
+      "model": "rfe_builtin:item/mas_49_56/mas_49_56_magazine_open"
     }
   ]
 }

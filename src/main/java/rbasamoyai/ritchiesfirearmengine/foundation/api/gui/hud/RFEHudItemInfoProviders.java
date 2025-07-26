@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -41,10 +40,10 @@ public class RFEHudItemInfoProviders {
 
     public static void registerAmmoInventoryCountProvider(RFEAmmoInventoryCountProvider prov) { AMMO_INVENTORY_COUNT_PROVIDERS.add(prov); }
 
-    public static int getAmmoInventoryCount(ItemStack itemStack, LivingEntity entity) {
+    public static int getAmmoInventoryCount(ItemStack itemStack, LivingEntity entity, boolean countLooseRounds) {
         List<ItemStack> items = RFEItemUtils.getEntityInventory(entity);
         for (RFEAmmoInventoryCountProvider prov : AMMO_INVENTORY_COUNT_PROVIDERS) {
-            Optional<Integer> op = prov.apply(itemStack, items);
+            Optional<Integer> op = prov.apply(itemStack, items, countLooseRounds);
             if (op.isPresent())
                 return op.get();
         }
@@ -55,7 +54,8 @@ public class RFEHudItemInfoProviders {
      * Return {@code Optional.of(-1)} to mark ammo count as infinite.
      */
     @FunctionalInterface
-    public interface RFEAmmoInventoryCountProvider extends BiFunction<ItemStack, List<ItemStack>, Optional<Integer>> {
+    public interface RFEAmmoInventoryCountProvider {
+        Optional<Integer> apply(ItemStack itemStack, List<ItemStack> inventory, boolean countLooseRounds);
     }
 
     private RFEHudItemInfoProviders() {}

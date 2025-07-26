@@ -309,7 +309,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         return mode.requiresAmmo() ? mode.getLoadedAmmo(itemStack) : null;
     }
 
-    public static Optional<Integer> getInventoryAmmoCountForHUD(ItemStack itemStack, List<ItemStack> inventory) {
+    public static Optional<Integer> getInventoryAmmoCountForHUD(ItemStack itemStack, List<ItemStack> inventory, boolean countLooseRounds) {
         if (!(itemStack.getItem() instanceof RFEFirearmItem firearm))
             return Optional.empty();
         RFEFirearmMode mode = firearm.getCurrentMode(itemStack);
@@ -319,7 +319,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
                 .or(RFEUtils.orAllPredicates(ammoProperties.speedloaders()));
         int count = 0;
         for (ItemStack invStack : inventory) {
-            if (primaryAmmoPred.test(invStack)) {
+            if (countLooseRounds && primaryAmmoPred.test(invStack)) {
                 if (invStack.is(RFEItemTags.INFINITE_AMMO.tag))
                     return Optional.of(-1);
                 count += invStack.getCount();
@@ -336,7 +336,6 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
                 count += magCount;
             }
         }
-        // TODO test magazines and stripper clips
         return Optional.of(count);
     }
 

@@ -11,6 +11,7 @@
       "item": "rfe_builtin:lee_enfield_no_4",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_10rds\",Count:1b,tag:{Rounds:[]}}}}"
     },
-    "rfe_builtin:kar98k"
+    "rfe_builtin:kar98k",
+    "rfe_builtin:colt_m1911"
   ]
 }

@@ -23,6 +23,21 @@
     {
       "item": "rfe_builtin:pistol_magazine_7rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:handgun_cartridge\",Count:7b}]}"
+    },
+    "rfe_builtin:pistol_magazine_8rds",
+    {
+      "item": "rfe_builtin:pistol_magazine_8rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:handgun_cartridge\",Count:8b}]}"
+    },
+    "rfe_builtin:pistol_magazine_9rds",
+    {
+      "item": "rfe_builtin:pistol_magazine_9rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:handgun_cartridge\",Count:9b}]}"
+    },
+    "rfe_builtin:pistol_magazine_10rds",
+    {
+      "item": "rfe_builtin:pistol_magazine_10rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:handgun_cartridge\",Count:10b}]}"
     }
   ]
 }

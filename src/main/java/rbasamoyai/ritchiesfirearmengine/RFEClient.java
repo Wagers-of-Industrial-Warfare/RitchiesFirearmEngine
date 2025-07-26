@@ -70,6 +70,10 @@ public class RFEClient {
             return itemStack.getItem() instanceof RFEFirearmItem firearm
                     && firearm.getCurrentAction(itemStack) == RFEFirearmItem.Action.CHARGING ? 1 : 0;
         });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_firing"), (itemStack, level, entity, seed) -> {
+            return itemStack.getItem() instanceof RFEFirearmItem firearm
+                    && firearm.getCurrentAction(itemStack) == RFEFirearmItem.Action.FIRING ? 1 : 0;
+        });
     }
 
     public static void onMouseInput(int button, int action, int modifiers) {

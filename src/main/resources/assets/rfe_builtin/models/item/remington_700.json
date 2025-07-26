@@ -3,7 +3,7 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [64, 64],
 	"textures": {
-		"0": "rfe_builtin:item/remington_700"
+		"0": "rfe_builtin:item/remington_700/remington_700"
 	},
 	"elements": [
 		{
@@ -392,19 +392,19 @@
 	"overrides": [
 		{
 			"predicate": { "ritchiesfirearmengine:aiming": 1 },
-			"model": "rfe_builtin:item/remington_700_aimed"
+			"model": "rfe_builtin:item/remington_700/remington_700_aimed"
 		},
 		{
 			"predicate": { "ritchiesfirearmengine:is_reloading": 1 },
-			"model": "rfe_builtin:item/remington_700_open"
+			"model": "rfe_builtin:item/remington_700/remington_700_open"
 		},
 		{
 			"predicate": { "ritchiesfirearmengine:is_unloading": 1 },
-			"model": "rfe_builtin:item/remington_700_open"
+			"model": "rfe_builtin:item/remington_700/remington_700_open"
 		},
 		{
 			"predicate": { "ritchiesfirearmengine:is_charging": 1 },
-			"model": "rfe_builtin:item/remington_700_open"
+			"model": "rfe_builtin:item/remington_700/remington_700_open"
 		}
 	]
 }

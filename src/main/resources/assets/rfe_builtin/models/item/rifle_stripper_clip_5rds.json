@@ -1,25 +1,25 @@
 {
-  "parent": "rfe_builtin:item/rifle_stripper_clip_5rds0",
+  "parent": "rfe_builtin:item/rifle_stripper_clip_5rds/rifle_stripper_clip_5rds0",
   "overrides": [
     {
       "predicate": { "ritchiesfirearmengine:round_count": 1 },
-      "model": "rfe_builtin:item/rifle_stripper_clip_5rds1"
+      "model": "rfe_builtin:item/rifle_stripper_clip_5rds/rifle_stripper_clip_5rds1"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 2 },
-      "model": "rfe_builtin:item/rifle_stripper_clip_5rds2"
+      "model": "rfe_builtin:item/rifle_stripper_clip_5rds/rifle_stripper_clip_5rds2"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 3 },
-      "model": "rfe_builtin:item/rifle_stripper_clip_5rds3"
+      "model": "rfe_builtin:item/rifle_stripper_clip_5rds/rifle_stripper_clip_5rds3"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 4 },
-      "model": "rfe_builtin:item/rifle_stripper_clip_5rds4"
+      "model": "rfe_builtin:item/rifle_stripper_clip_5rds/rifle_stripper_clip_5rds4"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 5 },
-      "model": "rfe_builtin:item/rifle_stripper_clip_5rds5"
+      "model": "rfe_builtin:item/rifle_stripper_clip_5rds/rifle_stripper_clip_5rds5"
     }
   ]
 }

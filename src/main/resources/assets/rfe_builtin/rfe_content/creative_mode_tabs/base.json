@@ -12,10 +12,18 @@
       "item": "rfe_builtin:rifle_stripper_clip_5rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:5b}]}"
     },
+    {
+      "item": "rfe_builtin:rifle_stripper_clip_5rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:5b}]}"
+    },
     "rfe_builtin:rifle_magazine_10rds",
     {
       "item": "rfe_builtin:rifle_magazine_10rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:10b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_magazine_10rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:10b}]}"
     },
     "rfe_builtin:rifle_en_bloc_clip_5rds",
     {

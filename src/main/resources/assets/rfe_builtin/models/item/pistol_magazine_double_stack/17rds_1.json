@@ -1,0 +1,6 @@
+{
+  "parent": "rfe_builtin:item/pistol_magazine_double_stack/1rds",
+  "textures": {
+    "ammo_count": "rfe_builtin:item/capacity_counters/17rds"
+  }
+}

@@ -1,9 +1,0 @@
-{
-  "sources": [
-    {
-      "type": "directory",
-      "source": "rfe_builtin:items/capacity_counters",
-      "prefix": "item/capacity_counters"
-    }
-  ]
-}

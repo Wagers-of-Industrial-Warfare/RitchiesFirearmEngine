@@ -1,0 +1,40 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench",
+	"parent": "rfe_builtin:item/pistol_magazine_long_double_stack/root",
+	"elements": [
+		{
+			"from": [7, 2, 6.25],
+			"to": [9, 2, 9.25],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7, 2, 6.25]},
+			"faces": {
+				"up": {"uv": [14, 3, 12, 0], "texture": "#0"},
+				"down": {"uv": [14, 4, 12, 7], "texture": "#0"}
+			}
+		},
+		{
+			"from": [7, 2, 7],
+			"to": [9, 14, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7, 4, 7]},
+			"faces": {
+				"north": {"uv": [0, 0, 2, 12], "texture": "#0"},
+				"east": {"uv": [3, 0, 5, 12], "texture": "#0"},
+				"south": {"uv": [6, 0, 8, 12], "texture": "#0"},
+				"west": {"uv": [9, 0, 11, 12], "texture": "#0"},
+				"up": {"uv": [5, 15, 3, 13], "texture": "#0"}
+			}
+		},
+		{
+			"from": [7.25, 13.25, 7.025],
+			"to": [8.25, 14.25, 8.975],
+			"rotation": {"angle": 0, "axis": "y", "origin": [6.25, 13.25, 7]},
+			"faces": {
+				"north": {"uv": [15, 5, 16, 6], "texture": "#0"},
+				"east": {"uv": [0, 13, 2, 14], "texture": "#0"},
+				"south": {"uv": [15, 3, 16, 4], "texture": "#0"},
+				"west": {"uv": [12, 11, 14, 12], "texture": "#0"},
+				"up": {"uv": [16, 2, 15, 0], "texture": "#0"}
+			}
+		}
+	]
+}

@@ -48,6 +48,16 @@
     {
       "item": "rfe_builtin:pistol_magazine_17rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:handgun_cartridge\",Count:17b}]}"
+    },
+    "rfe_builtin:pistol_magazine_20rds",
+    {
+      "item": "rfe_builtin:pistol_magazine_20rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:handgun_cartridge\",Count:20b}]}"
+    },
+    "rfe_builtin:pistol_magazine_30rds",
+    {
+      "item": "rfe_builtin:pistol_magazine_30rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:handgun_cartridge\",Count:30b}]}"
     }
   ]
 }

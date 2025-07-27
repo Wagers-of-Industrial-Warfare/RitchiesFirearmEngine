@@ -104,11 +104,11 @@ public class RFEClient {
             ItemStack useStack = mc.player.getMainHandItem();
             if (useStack.getItem() instanceof RFEFirearmItem || useStack.getItem() instanceof MagazineItem
                 || useStack.getItem() instanceof AmmoPacketItem) {
-                if (RELOAD_FIREARM.consumeClick()) {
+                if (RELOAD_FIREARM.isDown()) {
                     RFENetwork.sendToServer(new ServerboundFirearmActionPacket(RFEFirearmItem.Action.RELOAD));
-                } else if (UNLOAD_FIREARM.consumeClick()) {
+                } else if (UNLOAD_FIREARM.isDown()) {
                     RFENetwork.sendToServer(new ServerboundFirearmActionPacket(RFEFirearmItem.Action.UNLOAD));
-                } else if (SWITCH_MODE.consumeClick()) {
+                } else if (SWITCH_MODE.isDown()) {
                     RFENetwork.sendToServer(new ServerboundFirearmActionPacket(RFEFirearmItem.Action.SWITCH_MODE));
                 }
             }

@@ -1,0 +1,16 @@
+{
+  "type": "ritchiesfirearmengine:magazine",
+  "stacks_to": 64,
+  "rarity": "common",
+  "glint": false,
+  "capacity": 5,
+  "reload_cooldown": 5,
+  "valid_ammo": [
+    "rfe_builtin:rifle_cartridge",
+    "rfe_builtin:infinite_rifle_cartridge",
+    "rfe_builtin:intermediate_cartridge",
+    "rfe_builtin:infinite_intermediate_cartridge"
+  ],
+  "valid_speedloaders": [
+  ]
+}

@@ -5,6 +5,8 @@
     "rfe_builtin:ammo_packet",
     "rfe_builtin:rifle_cartridge",
     "rfe_builtin:infinite_rifle_cartridge",
+    "rfe_builtin:intermediate_cartridge",
+    "rfe_builtin:infinite_intermediate_cartridge",
     "rfe_builtin:rifle_stripper_clip_5rds",
     {
       "item": "rfe_builtin:rifle_stripper_clip_5rds",
@@ -15,8 +17,15 @@
       "item": "rfe_builtin:rifle_magazine_10rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:10b}]}"
     },
-    "rfe_builtin:intermediate_cartridge",
-    "rfe_builtin:infinite_intermediate_cartridge",
+    "rfe_builtin:rifle_en_bloc_clip_5rds",
+    {
+      "item": "rfe_builtin:rifle_en_bloc_clip_5rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:5b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_en_bloc_clip_5rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:5b}]}"
+    },
     "rfe_builtin:handgun_cartridge",
     "rfe_builtin:infinite_handgun_cartridge",
     "rfe_builtin:pistol_magazine_7rds",

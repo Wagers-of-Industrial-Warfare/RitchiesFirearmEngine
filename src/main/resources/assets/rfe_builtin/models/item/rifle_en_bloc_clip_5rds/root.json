@@ -1,0 +1,6 @@
+{
+  "textures": {
+    "0": "rfe_builtin:item/rifle_en_bloc_clip_5rds",
+    "ritchiesfirearmengine:slot_overlay0": "rfe_builtin:item/capacity_counters/5rds"
+  }
+}

@@ -1,8 +1,6 @@
 {
 	"credit": "Made with Blockbench",
-	"textures": {
-		"0": "rfe_builtin:item/rifle_magazine_10rds"
-	},
+	"parent": "rfe_builtin:item/rifle_magazine_10rds/root",
 	"elements": [
 		{
 			"from": [7.02, 3, 8],

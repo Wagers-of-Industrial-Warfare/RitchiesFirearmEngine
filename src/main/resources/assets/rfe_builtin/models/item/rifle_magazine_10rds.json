@@ -1,13 +1,13 @@
 {
-  "parent": "rfe_builtin:item/rifle_magazine_10rds/rifle_magazine_10rds0",
+  "parent": "rfe_builtin:item/rifle_magazine_10rds/0rds",
   "overrides": [
     {
       "predicate": { "ritchiesfirearmengine:round_count": 1 },
-      "model": "rfe_builtin:item/rifle_magazine_10rds/rifle_magazine_10rds1"
+      "model": "rfe_builtin:item/rifle_magazine_10rds/1rds"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 2 },
-      "model": "rfe_builtin:item/rifle_magazine_10rds/rifle_magazine_10rds2"
+      "model": "rfe_builtin:item/rifle_magazine_10rds/2rds"
     }
   ]
 }

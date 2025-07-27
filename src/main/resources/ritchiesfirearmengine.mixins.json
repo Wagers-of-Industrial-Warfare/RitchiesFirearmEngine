@@ -9,9 +9,12 @@
     "client.MultiPlayerGameModeMixin"
   ],
   "client": [
+    "client.BlockModelMixin",
+    "client.GuiGraphicsMixin",
     "client.GuiMixin",
     "client.ItemEntityRendererMixin",
-    "client.ItemInHandRendererMixin"
+    "client.ItemInHandRendererMixin",
+    "client.ModelManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

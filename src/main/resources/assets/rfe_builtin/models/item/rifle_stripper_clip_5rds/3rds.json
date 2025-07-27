@@ -1,8 +1,6 @@
 {
 	"credit": "Made with Blockbench",
-	"textures": {
-		"0": "rfe_builtin:item/rifle_stripper_clip_5rds"
-	},
+	"parent": "rfe_builtin:item/rifle_stripper_clip_5rds/root",
 	"elements": [
 		{
 			"from": [7.375, 6, 10.1],

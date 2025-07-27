@@ -2,7 +2,8 @@
 	"format_version": "1.21.6",
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "rfe_builtin:item/pistol_magazine_single_stack"
+		"0": "rfe_builtin:item/pistol_magazine_single_stack",
+		"ritchiesfirearmengine:slot_overlay0": "#ammo_count"
 	},
 	"elements": [
 		{

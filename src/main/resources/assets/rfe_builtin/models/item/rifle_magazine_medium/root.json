@@ -4,6 +4,7 @@
     "0": "rfe_builtin:item/rifle_magazine_medium",
     "ritchiesfirearmengine:slot_overlay0": "#ammo_count"
   },
+  "gui_light": "front",
   "display": {
     "thirdperson_righthand": {
       "rotation": [0, -90, 0],

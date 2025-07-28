@@ -4,6 +4,7 @@
     "0": "rfe_builtin:item/rifle_magazine_5rds",
     "ritchiesfirearmengine:slot_overlay0": "rfe_builtin:item/capacity_counters/5rds"
   },
+  "gui_light": "front",
   "display": {
     "thirdperson_righthand": {
       "rotation": [0, -90, 0],

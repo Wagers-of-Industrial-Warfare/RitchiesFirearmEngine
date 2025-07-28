@@ -28,7 +28,12 @@
         "phase": "prepare",
         "condition": {
           "and": [
-            { "macro": "rfe_builtin:can_load_1_detachable" },
+            {
+              "or": [
+                { "macro": "rfe_builtin:can_load_1_detachable" },
+                { "macro": "rfe_builtin:can_load_1_extra_detachable" }
+              ]
+            },
             {
               "or": [
                 { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 },
@@ -37,7 +42,7 @@
             }
           ]
         },
-        "time": 25,
+        "time": 13,
         "sound": "rfe_builtin:item.generic.rifle.rack_start"
       },
       {
@@ -123,7 +128,61 @@
         "phase": "reload",
         "condition": {
           "and": [
+            { "macro": "rfe_builtin:can_load_3_detachable" },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than_or_equal_to", "value": 3 }
+          ]
+        },
+        "time": 35,
+        "reload_type": "rounds",
+        "reload_count": 3,
+        "reload_delays": [12, 17, 22],
+        "replace_chambered_round": true,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" },
+          { "time": 15, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" },
+          { "time": 20, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" }
+        ]
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_2_detachable" },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than_or_equal_to", "value": 2 }
+          ]
+        },
+        "time": 30,
+        "reload_type": "rounds",
+        "reload_count": 2,
+        "reload_delays": [12, 17],
+        "replace_chambered_round": true,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" },
+          { "time": 15, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" }
+        ]
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
             { "macro": "rfe_builtin:can_load_1_detachable" },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than_or_equal_to", "value": 1 }
+          ]
+        },
+        "time": 25,
+        "reload_type": "rounds",
+        "reload_count": 1,
+        "reload_delay": 12,
+        "replace_chambered_round": true,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" }
+        ]
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1_extra_detachable" },
             { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
           ]
         },
@@ -163,7 +222,7 @@
       },
       {
         "phase": "finish",
-        "time": 25,
+        "time": 13,
         "charge_firearm": true,
         "sound": "rfe_builtin:item.generic.rifle.rack_end"
       }

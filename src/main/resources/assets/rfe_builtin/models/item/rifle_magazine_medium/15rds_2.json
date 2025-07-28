@@ -1,0 +1,6 @@
+{
+  "parent": "rfe_builtin:item/rifle_magazine_medium/2rds",
+  "textures": {
+    "ammo_count": "rfe_builtin:item/capacity_counters/15rds"
+  }
+}

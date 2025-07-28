@@ -8,11 +8,11 @@ import net.minecraft.world.item.Rarity;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
-public class AmmoItem extends Item {
+public class RFEBasicItem extends Item {
 
     private final boolean glint;
 
-    public AmmoItem(Properties properties, boolean glint) {
+    public RFEBasicItem(Properties properties, boolean glint) {
         super(properties);
         this.glint = glint;
     }
@@ -30,7 +30,7 @@ public class AmmoItem extends Item {
                 throw new IllegalStateException("'stacks_to' must be at least 1");
             Rarity rarity = RFEUtils.getRarityFromString(GsonHelper.getAsString(obj, "rarity", "common"));
             boolean glint = GsonHelper.getAsBoolean(obj, "glint", false);
-            return new AmmoItem(new Properties().stacksTo(stacksTo).rarity(rarity), glint);
+            return new RFEBasicItem(new Properties().stacksTo(stacksTo).rarity(rarity), glint);
         }
     }
 

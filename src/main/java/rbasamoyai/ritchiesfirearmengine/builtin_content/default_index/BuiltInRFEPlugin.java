@@ -35,7 +35,8 @@ public class BuiltInRFEPlugin implements RFEPlugin {
 
     @Override
     public void register() {
-        RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("ammo"), new AmmoItem.Builder());
+        RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("basic"), new RFEBasicItem.Builder());
+        RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("ammo"), new RFEBasicItem.Builder()); // Alias of basic
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("magazine"), new MagazineItem.Builder());
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("speedloader"), new MagazineItem.Builder()); // Alias of magazine
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("ammo_packet"), new AmmoPacketItem.Builder());

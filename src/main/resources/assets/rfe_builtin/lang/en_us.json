@@ -26,6 +26,8 @@
   "item.rfe_builtin.rifle_magazine_10rds": "Rifle Magazine (10 rds)",
   "item.rfe_builtin.rifle_magazine_15rds": "Rifle Magazine (15 rds)",
   "item.rfe_builtin.rifle_magazine_20rds": "Rifle Magazine (20 rds)",
+  "item.rfe_builtin.rifle_magazine_25rds": "Rifle Magazine (25 rds)",
+  "item.rfe_builtin.rifle_magazine_30rds": "Rifle Magazine (30 rds)",
   "item.rfe_builtin.rifle_stripper_clip_5rds": "Rifle Stripper Clip (5 rds)",
   "itemGroup.rfe_builtin.base": "Ritchie's Firearms Engine Content",
   "itemGroup.rfe_builtin.weapons": "Ritchie's Firearms Engine Example Weapons",

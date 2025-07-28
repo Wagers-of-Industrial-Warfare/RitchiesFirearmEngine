@@ -52,6 +52,24 @@
       "item": "rfe_builtin:rifle_magazine_20rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:20b}]}"
     },
+    "rfe_builtin:rifle_magazine_25rds",
+    {
+      "item": "rfe_builtin:rifle_magazine_25rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:25b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_magazine_25rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:25b}]}"
+    },
+    "rfe_builtin:rifle_magazine_30rds",
+    {
+      "item": "rfe_builtin:rifle_magazine_30rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:30b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_magazine_30rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:30b}]}"
+    },
     "rfe_builtin:rifle_en_bloc_clip_5rds",
     {
       "item": "rfe_builtin:rifle_en_bloc_clip_5rds",

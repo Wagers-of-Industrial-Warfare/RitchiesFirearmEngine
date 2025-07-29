@@ -8,6 +8,14 @@
     {
       "ammo": "rfe_builtin:infinite_rifle_cartridge",
       "fires": "rfe_builtin:303_british"
+    },
+    {
+      "ammo": "rfe_builtin:black_powder_rifle_cartridge",
+      "fires": "rfe_builtin:303_british_bp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_black_powder_rifle_cartridge",
+      "fires": "rfe_builtin:303_british_bp"
     }
   ],
   "replace_magazines": false,

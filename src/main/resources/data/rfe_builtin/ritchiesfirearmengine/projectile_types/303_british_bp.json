@@ -1,0 +1,28 @@
+{
+  "type": "ritchiesfirearmengine:bullet",
+  "muzzle_velocity": 22,
+  "drag": 0.0025,
+  "quadratic_drag": true,
+  "gravity": 0.03,
+  "max_age": 400,
+  "knockback": 0.5,
+  "damage_model": [
+    {
+      "distance": 10,
+      "damage": 18
+    },
+    {
+      "distance": 20,
+      "damage": 20
+    },
+    {
+      "distance": 50,
+      "damage": 20
+    },
+    {
+      "distance": 110,
+      "damage": 14
+    }
+  ],
+  "damage_type": "rfe_builtin:bullet"
+}

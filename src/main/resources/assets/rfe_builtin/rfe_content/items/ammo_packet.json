@@ -13,6 +13,14 @@
     { "ammo": "rfe_builtin:intermediate_cartridge", "capacity": 15 },
     { "ammo": "rfe_builtin:infinite_intermediate_cartridge", "capacity": 15 },
     { "ammo": "rfe_builtin:handgun_cartridge", "capacity": 20 },
-    { "ammo": "rfe_builtin:infinite_handgun_cartridge", "capacity": 20 }
+    { "ammo": "rfe_builtin:infinite_handgun_cartridge", "capacity": 20 },
+    { "ammo": "rfe_builtin:black_powder_rifle_cartridge", "capacity": 10 },
+    { "ammo": "rfe_builtin:infinite_black_powder_rifle_cartridge", "capacity": 10 },
+    { "ammo": "rfe_builtin:black_powder_handgun_cartridge", "capacity": 20 },
+    { "ammo": "rfe_builtin:infinite_black_powder_handgun_cartridge", "capacity": 20 },
+    { "ammo": "rfe_builtin:musket_cartridge", "capacity": 10 },
+    { "ammo": "rfe_builtin:infinite_musket_cartridge", "capacity": 10 },
+    { "ammo": "rfe_builtin:paper_handgun_cartridge", "capacity": 20 },
+    { "ammo": "rfe_builtin:infinite_paper_handgun_cartridge", "capacity": 20 }
   ]
 }

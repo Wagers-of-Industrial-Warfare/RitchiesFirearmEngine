@@ -9,7 +9,9 @@
     "rfe_builtin:rifle_cartridge",
     "rfe_builtin:infinite_rifle_cartridge",
     "rfe_builtin:intermediate_cartridge",
-    "rfe_builtin:infinite_intermediate_cartridge"
+    "rfe_builtin:infinite_intermediate_cartridge",
+    "rfe_builtin:black_powder_rifle_cartridge",
+    "rfe_builtin:infinite_black_powder_rifle_cartridge"
   ],
   "valid_speedloaders": [
   ]

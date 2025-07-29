@@ -91,7 +91,7 @@
   "item.generic.pistol.magazine.reload": {
     "sounds": [
       {
-        "name": "rfe_builtin:item/generic/rifle/magazine_reload",
+        "name": "rfe_builtin:item/generic/firearm/magazine_reload",
         "volume": 0.25,
         "pitch": 1.2
       }
@@ -101,7 +101,7 @@
   "item.generic.pistol.magazine.reload.full": {
     "sounds": [
       {
-        "name": "rfe_builtin:item/generic/rifle/magazine_reload_full",
+        "name": "rfe_builtin:item/generic/firearm/magazine_reload_full",
         "volume": 0.25,
         "pitch": 1.2
       }
@@ -111,7 +111,7 @@
   "item.generic.pistol.magazine.unload": {
     "sounds": [
       {
-        "name": "rfe_builtin:item/generic/rifle/magazine_unload",
+        "name": "rfe_builtin:item/generic/firearm/magazine_unload",
         "volume": 0.25,
         "pitch": 1.2
       }
@@ -325,7 +325,7 @@
   "item.generic.rifle.magazine.reload": {
     "sounds": [
       {
-        "name": "rfe_builtin:item/generic/rifle/magazine_reload",
+        "name": "rfe_builtin:item/generic/firearm/magazine_reload",
         "volume": 0.25,
         "pitch": 0.9
       }
@@ -335,7 +335,7 @@
   "item.generic.rifle.magazine.reload_full": {
     "sounds": [
       {
-        "name": "rfe_builtin:item/generic/rifle/magazine_reload_full",
+        "name": "rfe_builtin:item/generic/firearm/magazine_reload_full",
         "volume": 0.25,
         "pitch": 0.9
       }
@@ -345,7 +345,7 @@
   "item.generic.rifle.magazine.unload": {
     "sounds": [
       {
-        "name": "rfe_builtin:item/generic/rifle/magazine_unload",
+        "name": "rfe_builtin:item/generic/firearm/magazine_unload",
         "volume": 0.25,
         "pitch": 0.9
       }
@@ -478,5 +478,162 @@
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.rifle.shot"
+  },
+  "item.generic.smg.aim": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/aim",
+        "volume": 0.25,
+        "pitch": 1
+      }
+    ]
+  },
+  "item.generic.smg.bullet.unload": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/bullet_unload",
+        "volume": 0.25,
+        "pitch": 1.2
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.smg.bullet_unload"
+  },
+  "item.generic.smg.draw": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/draw",
+        "volume": 0.25,
+        "pitch": 1
+      },
+      {
+        "name": "rfe_builtin:item/generic/firearm/draw",
+        "volume": 0.25,
+        "pitch": 1.02
+      },
+      {
+        "name": "rfe_builtin:item/generic/firearm/draw",
+        "volume": 0.25,
+        "pitch": 1.04
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.smg.draw"
+  },
+  "item.generic.smg.magazine.reload": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_reload",
+        "volume": 0.25,
+        "pitch": 1
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.smg.magazine.reload"
+  },
+  "item.generic.smg.magazine.reload.full": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_reload_full",
+        "volume": 0.25,
+        "pitch": 1
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.smg.magazine.reload"
+  },
+  "item.generic.smg.magazine.unload": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_unload",
+        "volume": 0.25,
+        "pitch": 1
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.smg.magazine.unload"
+  },
+  "item.generic.smg.rack": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 1.45
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 1.43
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 1.41
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.smg.rack"
+  },
+  "item.generic.smg.rack.end": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 1.45
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 1.43
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 1.41
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.smg.rack"
+  },
+  "item.generic.smg.rack.start": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 1.45
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 1.43
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 1.41
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.smg.rack"
+  },
+  "item.generic.smg.shot": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/smg/shot",
+        "volume": 4.0
+      },
+      {
+        "name": "rfe_builtin:item/generic/smg/shot",
+        "volume": 4.0,
+        "pitch": 0.98
+      },
+      {
+        "name": "rfe_builtin:item/generic/smg/shot",
+        "volume": 4.0,
+        "pitch": 0.97
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.smg.shot"
+  },
+  "item.generic.smg.unaim": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/aim",
+        "volume": 0.25,
+        "pitch": 0.7
+      }
+    ]
   }
 }

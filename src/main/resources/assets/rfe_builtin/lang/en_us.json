@@ -17,6 +17,7 @@
   "item.rfe_builtin.kar98k": "Karabiner 98k",
   "item.rfe_builtin.lee_enfield_no_4": "Lee-Enfield No. 4 Mk I",
   "item.rfe_builtin.mas_49_56": "MAS-49/56",
+  "item.rfe_builtin.mat_49": "MAT-49",
   "item.rfe_builtin.musket_cartridge": "Musket Cartridge",
   "item.rfe_builtin.paper_handgun_cartridge": "Paper Handgun Cartridge",
   "item.rfe_builtin.pistol_magazine_7rds": "Pistol Magazine (7 rds)",
@@ -27,6 +28,8 @@
   "item.rfe_builtin.pistol_magazine_17rds": "Pistol Magazine (17 rds)",
   "item.rfe_builtin.pistol_magazine_20rds": "Pistol Magazine (20 rds)",
   "item.rfe_builtin.pistol_magazine_30rds": "Pistol Magazine (30 rds)",
+  "item.rfe_builtin.pistol_magazine_32rds": "Pistol Magazine (32 rds)",
+  "item.rfe_builtin.pistol_magazine_35rds": "Pistol Magazine (35 rds)",
   "item.rfe_builtin.remington_700": "Remington Model 700",
   "item.rfe_builtin.rifle_cartridge": "Rifle Cartridge",
   "item.rfe_builtin.rifle_en_bloc_clip_5rds": "Rifle En Bloc Clip (5 rds)",
@@ -57,5 +60,11 @@
   "subtitles.rfe_builtin.item.generic.rifle.magazine.unload": "Rifle magazine unloaded",
   "subtitles.rfe_builtin.item.generic.rifle.rack": "Rifle racked",
   "subtitles.rfe_builtin.item.generic.rifle.shot": "Rifle shot",
-  "subtitles.rfe_builtin.item.generic.rifle.stripper_clip": "Rifle stripper clip loaded"
+  "subtitles.rfe_builtin.item.generic.rifle.stripper_clip": "Rifle stripper clip loaded",
+  "subtitles.rfe_builtin.item.generic.smg.bullet.unload": "Submachine gun unloaded",
+  "subtitles.rfe_builtin.item.generic.smg.draw": "Submachine gun equipped",
+  "subtitles.rfe_builtin.item.generic.smg.magazine.reload": "Submachine gun magazine reloaded",
+  "subtitles.rfe_builtin.item.generic.smg.magazine.unload": "Submachine gun magazine unloaded",
+  "subtitles.rfe_builtin.item.generic.smg.rack": "Submachine gun racked",
+  "subtitles.rfe_builtin.item.generic.smg.shot": "Submachine gun shot"
 }

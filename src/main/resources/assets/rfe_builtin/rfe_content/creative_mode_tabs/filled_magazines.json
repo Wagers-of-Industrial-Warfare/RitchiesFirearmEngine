@@ -132,6 +132,14 @@
     {
       "item": "rfe_builtin:pistol_magazine_30rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:handgun_cartridge\",Count:30b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_32rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:handgun_cartridge\",Count:32b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_35rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:handgun_cartridge\",Count:35b}]}"
     }
   ]
 }

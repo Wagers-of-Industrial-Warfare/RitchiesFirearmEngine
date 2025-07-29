@@ -12,6 +12,10 @@
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_10rds\",Count:1b,tag:{Rounds:[]}}}}"
     },
     "rfe_builtin:kar98k",
-    "rfe_builtin:colt_m1911"
+    "rfe_builtin:colt_m1911",
+    {
+      "item": "rfe_builtin:mat_49",
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_32rds\",Count:1b,tag:{Rounds:[]}}}}"
+    }
   ]
 }

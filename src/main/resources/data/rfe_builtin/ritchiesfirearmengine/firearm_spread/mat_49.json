@@ -1,0 +1,6 @@
+{
+  "type": "ritchiesfirearmengine:simple",
+  "spread": 0.3,
+  "unaimed_spread": 1,
+  "tighten": false
+}

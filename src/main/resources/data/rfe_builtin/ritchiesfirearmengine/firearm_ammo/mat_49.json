@@ -1,0 +1,31 @@
+
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+    "rfe_builtin:pistol_magazine_15rds",
+    "rfe_builtin:pistol_magazine_17rds",
+    "rfe_builtin:pistol_magazine_20rds",
+    "rfe_builtin:pistol_magazine_30rds",
+    "rfe_builtin:pistol_magazine_32rds",
+    "rfe_builtin:pistol_magazine_35rds"
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "modes": {
+  }
+}

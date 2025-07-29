@@ -7,6 +7,16 @@
     "rfe_builtin:infinite_rifle_cartridge",
     "rfe_builtin:intermediate_cartridge",
     "rfe_builtin:infinite_intermediate_cartridge",
+    "rfe_builtin:handgun_cartridge",
+    "rfe_builtin:infinite_handgun_cartridge",
+    "rfe_builtin:black_powder_rifle_cartridge",
+    "rfe_builtin:infinite_black_powder_rifle_cartridge",
+    "rfe_builtin:black_powder_handgun_cartridge",
+    "rfe_builtin:infinite_black_powder_handgun_cartridge",
+    "rfe_builtin:musket_cartridge",
+    "rfe_builtin:infinite_musket_cartridge",
+    "rfe_builtin:paper_handgun_cartridge",
+    "rfe_builtin:infinite_paper_handgun_cartridge",
     "rfe_builtin:rifle_stripper_clip_5rds",
     {
       "item": "rfe_builtin:rifle_stripper_clip_5rds",
@@ -79,8 +89,6 @@
       "item": "rfe_builtin:rifle_en_bloc_clip_5rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:5b}]}"
     },
-    "rfe_builtin:handgun_cartridge",
-    "rfe_builtin:infinite_handgun_cartridge",
     "rfe_builtin:pistol_magazine_7rds",
     {
       "item": "rfe_builtin:pistol_magazine_7rds",

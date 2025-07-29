@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "rfe_builtin:item/black_powder_rifle_cartridge",
+    "ritchiesfirearmengine:slot_overlay0": "rfe_builtin:item/capacity_counters/infinite"
+  }
+}

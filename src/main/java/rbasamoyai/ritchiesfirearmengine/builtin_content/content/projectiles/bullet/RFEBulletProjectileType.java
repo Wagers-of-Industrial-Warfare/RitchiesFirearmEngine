@@ -18,6 +18,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -26,8 +27,11 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.*;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEProjectileDamageModel;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEMathUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEProjectileUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
@@ -55,8 +59,13 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     }
 
     @Override
-    public void shoot(RFEProjectileInstance instance, double dx, double dy, double dz) {
-        instance.setVelocity(new Vec3(dx, dy, dz).normalize().scale(this.muzzleVelocity));
+    public void shoot(RFEProjectileInstance instance, double dx, double dy, double dz, ItemStack itemStack,
+                      LivingEntity entity, RFESpreadInstance spread) {
+        Vec3 aimDir = new Vec3(dx, dy, dz);
+        RFEAimAngles aimAngles = RFEMathUtils.getAnglesFromVec(aimDir, entity.getXRot(), entity.yHeadRot);
+        RFEAimAngles spreadAngles = spread.getSpread(itemStack, entity);
+        Vec3 finalAimDir = RFEMathUtils.calculateAimVector(aimAngles.pitch() + spreadAngles.pitch(), aimAngles.yaw() + spreadAngles.yaw());
+        instance.setVelocity(finalAimDir.normalize().scale(this.muzzleVelocity));
     }
 
     @Override

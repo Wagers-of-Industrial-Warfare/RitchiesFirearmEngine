@@ -3,9 +3,12 @@ package rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
@@ -89,8 +92,8 @@ public class RFEProjectileInstance {
         ++this.age;
     }
 
-    public void shoot(double dx, double dy, double dz) {
-        this.projectileType.shoot(this, dx, dy, dz);
+    public void shoot(double dx, double dy, double dz, ItemStack itemStack, LivingEntity entity, RFESpreadInstance spreadInstance) {
+        this.projectileType.shoot(this, dx, dy, dz, itemStack, entity, spreadInstance);
     }
 
 }

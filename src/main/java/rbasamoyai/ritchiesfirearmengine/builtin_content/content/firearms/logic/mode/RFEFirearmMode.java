@@ -20,7 +20,6 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.*;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.condition.FirearmCondition;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
@@ -329,30 +328,14 @@ public class RFEFirearmMode {
 
         // TODO something better probably
         InteractionHand hand = entity.getMainHandItem() == itemStack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
-        RFESpreadInstance spreadInstance = RFESpreadManager.getSpreadInstance(entity, itemStack);
-        if (spreadInstance == null) {
-            spreadInstance = RFESpreadProviderPackHandler.getSpreadProviders(itemStack).getProperties(this.modeId)
-                    .createSpreadInstance(itemStack, entity, entity.getRandom());
-            RFESpreadManager.trackSpread(spreadInstance, entity, itemStack, hand);
-        }
 
         Vec3 pos = new Vec3(entity.getX(), entity.getEyeY(), entity.getZ());
-        float xRot = entity.getXRot();
-        float yRot = entity.yHeadRot;
 
         List<RFEFiringInput> firingInputs = new ArrayList<>();
 
         for (RFEProjectileType type : toFire) {
             // TODO shooter positioning
-            RFEAimAngles spread = spreadInstance.getSpread(itemStack, entity);
-            spreadInstance.updateSpread(itemStack, entity);
-
-            entity.setXRot(xRot + spread.pitch());
-            entity.yHeadRot += spread.yaw();
             Vec3 aimDirection = entity.getViewVector(1f);
-            entity.setXRot(xRot);
-            entity.yHeadRot = yRot;
-
             ResourceLocation typeId = RFEProjectileTypeHandler.getProjectileTypeId(type);
             if (typeId != null) {
                 // TODO warn once if missing?
@@ -371,17 +354,22 @@ public class RFEFirearmMode {
         boolean jam = this.fireMode.isSelfLoading() && this.shouldJam(itemStack, entity);
         this.setJammed(itemStack, entity, jam);
 
-        UUID spreadUUID = RFESpreadManager.getSpreadId(itemStack);
         UUID recoilUUID = RFERecoilManager.getRecoilId(itemStack);
-        RFENetwork.sendToServer(new ServerboundRunFiringLogicPacket(firingInputs, jam, hand, spreadUUID, recoilUUID));
+        RFENetwork.sendToServer(new ServerboundRunFiringLogicPacket(firingInputs, jam, hand, recoilUUID));
     }
 
     public void handleFiringInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs,
-                                          boolean jam, @Nullable UUID spreadUUID, @Nullable UUID recoilUUID) {
-        RFESpreadManager.setSpreadId(itemStack, spreadUUID);
+                                          boolean jam, @Nullable UUID recoilUUID, InteractionHand hand) {
         RFERecoilManager.setRecoilId(itemStack, recoilUUID);
         if (this.ammoRequired)
             this.getNextRoundsInItem(itemStack, entity, firingInputs.size(), true);
+
+        RFESpreadInstance spreadInstance = RFESpreadManager.getSpreadInstance(entity, itemStack);
+        if (spreadInstance == null) {
+            spreadInstance = RFESpreadProviderPackHandler.getSpreadProviders(itemStack).getProperties(this.modeId)
+                    .createSpreadInstance(itemStack, entity, entity.getRandom());
+            RFESpreadManager.trackSpread(spreadInstance, entity, itemStack, hand);
+        }
 
         for (RFEFiringInput input : firingInputs) {
             RFEProjectileType type = RFEProjectileTypeHandler.getProjectileType(input.projectile());
@@ -394,7 +382,8 @@ public class RFEFirearmMode {
             projectile.setPosition(input.pos());
 
             Vec3 aimDirection = input.aim();
-            projectile.shoot(aimDirection.x, aimDirection.y, aimDirection.z);
+            projectile.shoot(aimDirection.x, aimDirection.y, aimDirection.z, itemStack, entity, spreadInstance);
+            spreadInstance.updateSpread(itemStack, entity);
             RFEProjectileManager.queueAddedProjectile(projectile, entity.level());
         }
 

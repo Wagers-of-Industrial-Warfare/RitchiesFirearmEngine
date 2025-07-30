@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms;
 
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.FovModifyingItem;
@@ -16,6 +17,6 @@ public interface IFirearmItem extends SimultaneousUseAndAttack, HoldAttackKeyInt
     boolean isAiming(ItemStack itemStack, LivingEntity entity);
 
     void handleClientFireInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs, boolean jam,
-                                       @Nullable UUID spreadUUID, @Nullable UUID recoilUUID);
+                                       @Nullable UUID recoilUUID, InteractionHand hand);
 
 }

@@ -1,7 +1,6 @@
 {
   "replace": false,
   "hit_multipliers": {
-    "ritchiesfirearmengine:armor_piercing": 1.5,
     "ritchiesfirearmengine:headshot_gore": 2
   }
 }

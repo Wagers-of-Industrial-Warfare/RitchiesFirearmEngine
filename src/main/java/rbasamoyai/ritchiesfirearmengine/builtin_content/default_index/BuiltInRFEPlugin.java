@@ -20,6 +20,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.armor_piercing.ArmorPiercingHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.body_parts.HeadshotHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.body_parts.HeadshotHitMultiplierGore;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.fixed.FixedHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bullet.RFEBulletProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPlugin;
@@ -209,11 +210,13 @@ public class BuiltInRFEPlugin implements RFEPlugin {
     }
 
     public static class HitMultipliers {
+        public static final RFEHitMultiplier.Provider FIXED = FixedHitMultiplier::new;
         public static final RFEHitMultiplier.Provider ARMOR_PIERCING = ArmorPiercingHitMultiplier::new;
         public static final RFEHitMultiplier.Provider HEADSHOT = HeadshotHitMultiplier::new;
         public static final RFEHitMultiplier.Provider HEADSHOT_GORE = HeadshotHitMultiplierGore::new;
 
         public static void register() {
+            RFEContentBuilderRegistry.registerHitMultiplierProvider(RitchiesFirearmEngine.resource("fixed"), FIXED);
             RFEContentBuilderRegistry.registerHitMultiplierProvider(RitchiesFirearmEngine.resource("armor_piercing"), ARMOR_PIERCING);
             RFEContentBuilderRegistry.registerHitMultiplierProvider(RitchiesFirearmEngine.resource("headshot"), HEADSHOT);
             RFEContentBuilderRegistry.registerHitMultiplierProvider(RitchiesFirearmEngine.resource("headshot_gore"), HEADSHOT_GORE);

@@ -19,8 +19,8 @@ public record HeadshotHitMultiplier(float multiplier) implements RFEHitMultiplie
         if (!target.getType().is(HUMANOID))
             return damage;
         double yHit = hitResult.getLocation().y;
-        double headHalf = target.getBbHeight() - target.getEyeHeight();
-        if (Math.abs(yHit - target.getEyeY()) <= headHalf)
+        double headHalf = Math.abs(target.getBbHeight() - target.getEyeHeight());
+        if (target.getEyeY() - yHit <= headHalf || yHit - target.getEyeY() < headHalf + 0.1f)
             damage *= this.multiplier;
         return damage;
     }

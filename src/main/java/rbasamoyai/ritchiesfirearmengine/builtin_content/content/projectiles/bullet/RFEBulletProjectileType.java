@@ -66,6 +66,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         RFEAimAngles spreadAngles = spread.getSpread(itemStack, entity);
         Vec3 finalAimDir = RFEMathUtils.calculateAimVector(aimAngles.pitch() + spreadAngles.pitch(), aimAngles.yaw() + spreadAngles.yaw());
         instance.setVelocity(finalAimDir.normalize().scale(this.muzzleVelocity));
+        this.tick(entity.level(), instance);
     }
 
     @Override

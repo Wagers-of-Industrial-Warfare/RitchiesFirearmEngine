@@ -25,6 +25,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.*;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.RFEHitMultiplier;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.RFEHitMultiplierHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEProjectileDamageModel;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
@@ -167,7 +169,11 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         Entity entity = result.getEntity();
         float speed = (float) instance.velocity().length();
         double additionalDisplacement = result.getLocation().subtract(instance.position()).length();
-        double damage = this.damageModel.getDamage(instance.distanceTravelled() + additionalDisplacement);
+
+        float damage = (float) this.damageModel.getDamage(instance.distanceTravelled() + additionalDisplacement);
+        for (RFEHitMultiplier mul : RFEHitMultiplierHandler.getHitMultipliers(this))
+            damage = mul.multiplyDamage(entity, instance, result, damage);
+
         // TODO crits and damage multipliers
         // TODO overpenetration
 
@@ -185,7 +191,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         boolean flag = entity.getType() == EntityType.ENDERMAN;
 
         Vec3 oldVel = entity.getDeltaMovement();
-        if (entity.hurt(damagesource, (float) damage)) {
+        if (entity.hurt(damagesource, damage)) {
             if (flag)
                 return;
             entity.setDeltaMovement(oldVel);

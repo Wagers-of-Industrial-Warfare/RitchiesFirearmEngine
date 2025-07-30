@@ -15,6 +15,9 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.recoil.
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.recoil.simple.SimpleRecoilProvider;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.spread.no_spread.NoSpreadProvider;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.spread.random.SimpleSpreadProvider;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.RFEHitMultiplier;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.RFEHitMultiplierHandler;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.armor_piercing.ArmorPiercingHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bullet.RFEBulletProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPlugin;
@@ -46,6 +49,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         ProjectileTypes.register();
         SpreadProviders.register();
         RecoilProviders.register();
+        HitMultipliers.register();
 
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("entity_ammo_count"), BuiltInRFEPlugin::entityAmmoCount);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("free_ammo_space"), BuiltInRFEPlugin::freeAmmoSpace);
@@ -76,6 +80,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         registry.accept(RitchiesFirearmEngine.resource("firearm_handling"), RFEFirearmHandlingPropertiesHandler.ReloadListener.INSTANCE);
         registry.accept(RitchiesFirearmEngine.resource("firearm_spread"), RFESpreadProviderPackHandler.ReloadListener.INSTANCE);
         registry.accept(RitchiesFirearmEngine.resource("firearm_recoil"), RFERecoilProviderPackHandler.ReloadListener.INSTANCE);
+        registry.accept(RitchiesFirearmEngine.resource("hit_multipliers"), RFEHitMultiplierHandler.ReloadListener.INSTANCE);
     }
 
     /**
@@ -198,6 +203,14 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         public static void register() {
             RFEContentBuilderRegistry.registerRecoilProviderSerializer(RitchiesFirearmEngine.resource("no_recoil"), NO_RECOIL);
             RFEContentBuilderRegistry.registerRecoilProviderSerializer(RitchiesFirearmEngine.resource("simple"), SIMPLE);
+        }
+    }
+
+    public static class HitMultipliers {
+        public static final RFEHitMultiplier.Provider ARMOR_PIERCING = ArmorPiercingHitMultiplier::new;
+
+        public static void register() {
+            RFEContentBuilderRegistry.registerHitMultiplierProvider(RitchiesFirearmEngine.resource("armor_piercing"), ARMOR_PIERCING);
         }
     }
 

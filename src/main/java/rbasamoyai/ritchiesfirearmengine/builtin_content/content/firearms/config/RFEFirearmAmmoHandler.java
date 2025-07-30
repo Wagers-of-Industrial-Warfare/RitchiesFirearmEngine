@@ -225,7 +225,6 @@ public class RFEFirearmAmmoHandler {
 
         @Override
         public void handle(Executor exec, PacketListener listener, @Nullable ServerPlayer sender) {
-            RitchiesFirearmEngine.LOGGER.info("Loading firearm ammo properties");
             FIREARM_AMMO_PROPERTIES.clear();
             for (Map.Entry<Item, RFEFirearmProperties<UnresolvedModeAmmoProperties>> entry : this.properties.entrySet()) {
                 Item item = entry.getKey();

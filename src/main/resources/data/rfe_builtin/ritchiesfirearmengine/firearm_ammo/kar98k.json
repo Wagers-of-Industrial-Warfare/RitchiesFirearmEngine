@@ -8,6 +8,14 @@
     {
       "ammo": "rfe_builtin:infinite_rifle_cartridge",
       "fires": "rfe_builtin:792x57mm_mauser"
+    },
+    {
+      "ammo": "rfe_builtin:ap_rifle_cartridge",
+      "fires": "rfe_builtin:792x57mm_mauser_ap"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_ap_rifle_cartridge",
+      "fires": "rfe_builtin:792x57mm_mauser_ap"
     }
   ],
   "replace_magazines": false,

@@ -17,6 +17,8 @@
     "rfe_builtin:infinite_musket_cartridge",
     "rfe_builtin:paper_handgun_cartridge",
     "rfe_builtin:infinite_paper_handgun_cartridge",
+    "rfe_builtin:ap_rifle_cartridge",
+    "rfe_builtin:infinite_ap_rifle_cartridge",
     "rfe_builtin:rifle_stripper_clip_5rds",
     "rfe_builtin:rifle_en_bloc_clip_5rds",
     "rfe_builtin:rifle_magazine_5rds",

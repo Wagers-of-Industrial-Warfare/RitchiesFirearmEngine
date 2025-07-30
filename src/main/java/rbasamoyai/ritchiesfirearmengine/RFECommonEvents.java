@@ -10,6 +10,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.AmmoPacketI
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItemPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.RFEHitMultiplierHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
@@ -24,6 +25,7 @@ public class RFECommonEvents {
 
     public static void loadTagsAndTypes() {
         RFEFirearmAmmoHandler.loadProjectileTypes();
+        RFEHitMultiplierHandler.loadProjectileTypes();
     }
 
     public static void onDatapackReload(boolean singleplayer) {
@@ -39,6 +41,7 @@ public class RFECommonEvents {
         MagazineItemPropertiesHandler.syncToAll();
         AmmoPacketItemPropertiesHandler.syncToAll();
         RFEFirearmAmmoHandler.syncToAll();
+        RFEHitMultiplierHandler.syncToAll();
         RFEFirearmHandlingPropertiesHandler.syncToAll();
         RFESpreadProviderPackHandler.syncToAll();
         RFERecoilProviderPackHandler.syncToAll();
@@ -51,6 +54,7 @@ public class RFECommonEvents {
         MagazineItemPropertiesHandler.syncToPlayer(player);
         AmmoPacketItemPropertiesHandler.syncToPlayer(player);
         RFEFirearmAmmoHandler.syncToPlayer(player);
+        RFEHitMultiplierHandler.syncToPlayer(player);
         RFEFirearmHandlingPropertiesHandler.syncToPlayer(player);
         RFESpreadProviderPackHandler.syncToPlayer(player);
         RFERecoilProviderPackHandler.syncToPlayer(player);

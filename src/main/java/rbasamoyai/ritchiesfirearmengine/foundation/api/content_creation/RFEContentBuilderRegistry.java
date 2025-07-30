@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.ApiStatus;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.CompareValueSource;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.RFEHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProvider;
@@ -106,6 +107,28 @@ public class RFEContentBuilderRegistry {
         if (!RECOIL_PROVIDER_SERIALIZERS_IDS.containsKey(ser))
             throw new IllegalStateException("Unknown RFE recoil provider serializer " + ser);
         return RECOIL_PROVIDER_SERIALIZERS_IDS.get(ser);
+    }
+
+    private static final Object2ReferenceMap<ResourceLocation, RFEHitMultiplier.Provider> HIT_MULTIPLIER_PROVIDERS = new Object2ReferenceOpenHashMap<>();
+    private static final Reference2ObjectMap<RFEHitMultiplier.Provider, ResourceLocation> HIT_MULTIPLIER_PROVIDERS_IDS = new Reference2ObjectOpenHashMap<>();
+
+    public static void registerHitMultiplierProvider(ResourceLocation id, RFEHitMultiplier.Provider prov) {
+        if (HIT_MULTIPLIER_PROVIDERS.containsKey(id))
+            throw new IllegalStateException("Already registered RFE hit multiplier provider with id '" + id + "'");
+        HIT_MULTIPLIER_PROVIDERS.put(id, prov);
+        HIT_MULTIPLIER_PROVIDERS_IDS.put(prov, id);
+    }
+
+    public static RFEHitMultiplier.Provider getHitMultiplierProvider(ResourceLocation id) {
+        if (!HIT_MULTIPLIER_PROVIDERS.containsKey(id))
+            throw new IllegalStateException("RFE hit multiplier provider of type '" + id + "' not present");
+        return HIT_MULTIPLIER_PROVIDERS.get(id);
+    }
+
+    public static ResourceLocation getHitMultiplierProviderId(RFEHitMultiplier.Provider prov) {
+        if (!HIT_MULTIPLIER_PROVIDERS_IDS.containsKey(prov))
+            throw new IllegalStateException("Unknown RFE hit multiplier provider " + prov);
+        return HIT_MULTIPLIER_PROVIDERS_IDS.get(prov);
     }
 
 }

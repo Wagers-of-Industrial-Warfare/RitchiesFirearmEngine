@@ -105,6 +105,20 @@ public class RFESpreadManager {
         return tag.getUUID("ritchiesfirearmengine:spread_identifier");
     }
 
+    @Nullable
+    public static UUID getSpreadId(ItemStack itemStack) {
+        CompoundTag tag = itemStack.getOrCreateTag();
+        return tag.contains("ritchiesfirearmengine:spread_identifier") ? tag.getUUID("ritchiesfirearmengine:spread_identifier") : null;
+    }
+
+    public static void setSpreadId(ItemStack itemStack, @Nullable UUID uuid) {
+        if (uuid == null) {
+            itemStack.getOrCreateTag().remove("ritchiesfirearmengine:spread_identifier");
+        } else {
+            itemStack.getOrCreateTag().putUUID("ritchiesfirearmengine:spread_identifier", uuid);
+        }
+    }
+
     private record TaggedSpreadInstance(UUID uuid, RFESpreadInstance instance) {
     }
 

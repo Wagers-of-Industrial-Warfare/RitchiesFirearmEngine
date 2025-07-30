@@ -26,6 +26,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.R
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmModeAmmoProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
@@ -64,6 +65,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
             FirearmDataUtils.setHoldingAttackKey(itemStack, false);
             if (entity instanceof LivingEntity living) {
                 RFESpreadManager.stopTrackingSpread(living, itemStack);
+                RFERecoilManager.stopTrackingRecoil(living, itemStack);
             }
         }
         if (entity instanceof LivingEntity living)
@@ -109,9 +111,10 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
     }
 
     @Override
-    public void handleClientFireInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs, boolean jam) {
+    public void handleClientFireInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs,
+                                              boolean jam, @Nullable UUID spreadUUID, @Nullable UUID recoilUUID) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
-        mode.handleFiringInputOnServer(itemStack, entity, firingInputs, jam);
+        mode.handleFiringInputOnServer(itemStack, entity, firingInputs, jam, spreadUUID, recoilUUID);
     }
 
     public void onReload(ItemStack stack, LivingEntity entity) {

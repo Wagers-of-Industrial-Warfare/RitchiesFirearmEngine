@@ -7,12 +7,15 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.HoldAttackKeyInt
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.SimultaneousUseAndAttack;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEFiringInput;
 
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.UUID;
 
 public interface IFirearmItem extends SimultaneousUseAndAttack, HoldAttackKeyInteraction, FovModifyingItem {
 
     boolean isAiming(ItemStack itemStack, LivingEntity entity);
 
-    void handleClientFireInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs, boolean jam);
+    void handleClientFireInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs, boolean jam,
+                                       @Nullable UUID spreadUUID, @Nullable UUID recoilUUID);
 
 }

@@ -137,18 +137,36 @@ public class RFEClient {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.isPaused() && mc.hasSingleplayerServer())
             return;
-        RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(mc.player);
-        if (recoilInstance != null) {
-            float dt = mc.getDeltaFrameTime();
-            RFEAimAngles aimRecoil = recoilInstance.getAimRecoil(dt);
-            RFEAimAngles cameraRecoil = recoilInstance.getCameraRecoil(dt);
-            float cameraRoll = recoilInstance.getCameraRoll(dt);
-
-            mc.player.turn(aimRecoil.yaw() / 0.15f, -aimRecoil.pitch() / 0.15f);
-            setCameraAngles.setPitch(setCameraAngles.getPitch() - cameraRecoil.pitch());
-            setCameraAngles.setYaw(setCameraAngles.getYaw() + cameraRecoil.yaw());
-            setCameraAngles.setRoll(setCameraAngles.getRoll() + cameraRoll);
+        float dt = mc.getDeltaFrameTime();
+        float dCamPitch = 0;
+        float dCamYaw = 0;
+        float dCamRoll = 0;
+        float dAimPitch = 0;
+        float dAimYaw = 0;
+        RFERecoilInstance mainhandRecoilInstance = RFERecoilManager.getRecoilInstance(mc.player, mc.player.getMainHandItem());
+        if (mainhandRecoilInstance != null) {
+            RFEAimAngles aimRecoil = mainhandRecoilInstance.getAimRecoil(dt);
+            RFEAimAngles cameraRecoil = mainhandRecoilInstance.getCameraRecoil(dt);
+            dCamRoll += mainhandRecoilInstance.getCameraRoll(dt);
+            dCamPitch += cameraRecoil.pitch();
+            dCamYaw += cameraRecoil.yaw();
+            dAimPitch += aimRecoil.pitch();
+            dAimYaw += aimRecoil.yaw();
         }
+        RFERecoilInstance offhandRecoilInstance = RFERecoilManager.getRecoilInstance(mc.player, mc.player.getOffhandItem());
+        if (offhandRecoilInstance != null) {
+            RFEAimAngles aimRecoil = offhandRecoilInstance.getAimRecoil(dt);
+            RFEAimAngles cameraRecoil = offhandRecoilInstance.getCameraRecoil(dt);
+            dCamRoll += offhandRecoilInstance.getCameraRoll(dt);
+            dCamPitch += cameraRecoil.pitch();
+            dCamYaw += cameraRecoil.yaw();
+            dAimPitch += aimRecoil.pitch();
+            dAimYaw += aimRecoil.yaw();
+        }
+        mc.player.turn(dAimYaw / 0.15f, -dAimPitch / 0.15f);
+        setCameraAngles.setPitch(setCameraAngles.getPitch() - dCamPitch);
+        setCameraAngles.setYaw(setCameraAngles.getYaw() + dCamYaw);
+        setCameraAngles.setRoll(setCameraAngles.getRoll() + dCamRoll);
     }
 
     public static void onClientLogout() {

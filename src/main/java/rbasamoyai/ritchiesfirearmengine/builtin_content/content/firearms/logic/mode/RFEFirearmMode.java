@@ -360,21 +360,26 @@ public class RFEFirearmMode {
             }
         }
 
-        RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(entity);
+        RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(entity, itemStack);
         if (recoilInstance == null) {
             recoilInstance = RFERecoilProviderPackHandler.getRecoilProviders(itemStack).getProperties(this.modeId)
                     .createRecoilInstance(itemStack, entity, entity.getRandom());
-            RFERecoilManager.trackRecoil(recoilInstance, entity);
+            RFERecoilManager.trackRecoil(recoilInstance, entity, itemStack, hand);
         }
         recoilInstance.updateRecoil(itemStack, entity);
 
         boolean jam = this.fireMode.isSelfLoading() && this.shouldJam(itemStack, entity);
         this.setJammed(itemStack, entity, jam);
 
-        RFENetwork.sendToServer(new ServerboundRunFiringLogicPacket(firingInputs, jam, hand));
+        UUID spreadUUID = RFESpreadManager.getSpreadId(itemStack);
+        UUID recoilUUID = RFERecoilManager.getRecoilId(itemStack);
+        RFENetwork.sendToServer(new ServerboundRunFiringLogicPacket(firingInputs, jam, hand, spreadUUID, recoilUUID));
     }
 
-    public void handleFiringInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs, boolean jam) {
+    public void handleFiringInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs,
+                                          boolean jam, @Nullable UUID spreadUUID, @Nullable UUID recoilUUID) {
+        RFESpreadManager.setSpreadId(itemStack, spreadUUID);
+        RFERecoilManager.setRecoilId(itemStack, recoilUUID);
         if (this.ammoRequired)
             this.getNextRoundsInItem(itemStack, entity, firingInputs.size(), true);
 

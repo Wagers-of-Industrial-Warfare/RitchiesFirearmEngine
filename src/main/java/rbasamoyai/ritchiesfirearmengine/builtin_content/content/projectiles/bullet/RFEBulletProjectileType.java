@@ -37,6 +37,7 @@ import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 public class RFEBulletProjectileType implements RFEProjectileType {
 
+    private final boolean fullHitscan;
     private final double muzzleVelocity;
     private final double drag;
     private final boolean quadraticDrag;
@@ -46,8 +47,10 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     private final RFEProjectileDamageModel damageModel;
     private final ResourceKey<DamageType> damageTypeKey;
 
-    public RFEBulletProjectileType(double muzzleVelocity, double drag, boolean quadraticDrag, double gravity, int maxAge, float knockback,
-                                   RFEProjectileDamageModel damageModel, ResourceKey<DamageType> damageTypeKey) {
+    public RFEBulletProjectileType(boolean fullHitscan, double muzzleVelocity, double drag, boolean quadraticDrag,
+                                   double gravity, int maxAge, float knockback, RFEProjectileDamageModel damageModel,
+                                   ResourceKey<DamageType> damageTypeKey) {
+        this.fullHitscan = fullHitscan;
         this.muzzleVelocity = muzzleVelocity;
         this.drag = drag;
         this.quadraticDrag = quadraticDrag;
@@ -67,6 +70,8 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         Vec3 finalAimDir = RFEMathUtils.calculateAimVector(aimAngles.pitch() + spreadAngles.pitch(), aimAngles.yaw() + spreadAngles.yaw());
         instance.setVelocity(finalAimDir.normalize().scale(this.muzzleVelocity));
         this.tick(entity.level(), instance);
+        if (this.fullHitscan)
+            instance.setRemoved();
     }
 
     @Override
@@ -263,11 +268,12 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     public static class Serializer implements RFEProjectileType.Serializer<RFEBulletProjectileType> {
         @Override
         public RFEBulletProjectileType fromJson(JsonObject obj) {
-            double muzzleVelocity = GsonHelper.getAsDouble(obj, "muzzle_velocity");
-            double drag = Mth.clamp(GsonHelper.getAsDouble(obj, "drag"), 0, 1);
-            boolean quadraticDrag = GsonHelper.getAsBoolean(obj, "quadratic_drag", true);
-            double gravity = GsonHelper.getAsDouble(obj, "gravity");
-            int maxAge = GsonHelper.getAsInt(obj, "max_age", 400);
+            boolean fullHitscan = GsonHelper.getAsBoolean(obj, "full_hitscan", false);
+            double muzzleVelocity = GsonHelper.getAsDouble(obj, fullHitscan ? "hitscan_range" : "muzzle_velocity");
+            double drag = fullHitscan ? 0 : Mth.clamp(GsonHelper.getAsDouble(obj, "drag"), 0, 1);
+            boolean quadraticDrag = !fullHitscan && GsonHelper.getAsBoolean(obj, "quadratic_drag", true);
+            double gravity = fullHitscan ? 0 : GsonHelper.getAsDouble(obj, "gravity");
+            int maxAge = fullHitscan ? 0 : GsonHelper.getAsInt(obj, "max_age", 400);
             float knockback = Math.max(GsonHelper.getAsFloat(obj, "knockback", 0), 0);
 
             RFEProjectileDamageModel damageModel = new RFEProjectileDamageModel();
@@ -284,11 +290,12 @@ public class RFEBulletProjectileType implements RFEProjectileType {
 
             ResourceKey<DamageType> damageType = ResourceKey.create(Registries.DAMAGE_TYPE, RFEUtils.location(GsonHelper.getAsString(obj, "damage_type")));
 
-            return new RFEBulletProjectileType(muzzleVelocity, drag, quadraticDrag, gravity, maxAge, knockback, damageModel, damageType);
+            return new RFEBulletProjectileType(fullHitscan, muzzleVelocity, drag, quadraticDrag, gravity, maxAge, knockback, damageModel, damageType);
         }
 
         @Override
         public RFEBulletProjectileType fromNetwork(FriendlyByteBuf buf) {
+            boolean fullHitscan = buf.readBoolean();
             double muzzleVelocity = buf.readDouble();
             double drag = buf.readDouble();
             boolean quadraticDrag = buf.readBoolean();
@@ -297,12 +304,13 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             float knockback = buf.readFloat();
             RFEProjectileDamageModel damageModel = RFEProjectileDamageModel.fromNetwork(buf);
             ResourceKey<DamageType> damageType = buf.readResourceKey(Registries.DAMAGE_TYPE);
-            return new RFEBulletProjectileType(muzzleVelocity, drag, quadraticDrag, gravity, maxAge, knockback, damageModel, damageType);
+            return new RFEBulletProjectileType(fullHitscan, muzzleVelocity, drag, quadraticDrag, gravity, maxAge, knockback, damageModel, damageType);
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf buf, RFEBulletProjectileType type) {
-            buf.writeDouble(type.muzzleVelocity)
+            buf.writeBoolean(type.fullHitscan)
+                    .writeDouble(type.muzzleVelocity)
                     .writeDouble(type.drag)
                     .writeBoolean(type.quadraticDrag)
                     .writeDouble(type.gravity);

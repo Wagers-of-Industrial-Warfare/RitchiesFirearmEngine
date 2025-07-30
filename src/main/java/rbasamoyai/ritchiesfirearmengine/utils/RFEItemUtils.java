@@ -78,7 +78,7 @@ public class RFEItemUtils {
     private static List<ItemStack> getDirectItemsFromEntity(LivingEntity entity, Predicate<ItemStack> predicate) {
         List<ItemStack> list = new LinkedList<>();
         consumeItemsFromEntity(entity, predicate, s -> {
-            list.add(0, s);
+            list.add(s);
             return s.isEmpty() ? ItemStack.EMPTY : s;
         }, () -> false);
         return list;

@@ -156,32 +156,21 @@
     "phases": [
       {
         "phase": "prepare",
-        "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than", "value": 5 },
-        "time": 20,
+        "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
+        "time": 12,
         "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_start"
       },
       {
         "phase": "unload",
-        "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 4 },
-        "time": 10,
+        "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
+        "time": 1,
         "unload_type": "rounds",
         "end_unload": true,
-        "unload_delay": 5,
         "sound": "rfe_builtin:item.generic.rifle.bullet_unload"
       },
       {
-        "phase": "unload",
-        "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 3 },
-        "time": 25,
-        "unload_type": "rounds",
-        "end_unload": true,
-        "unload_count": 5,
-        "unload_delays": [1, 15, 15, 15, 15],
-        "sound": "rfe_builtin:item.generic.rifle.bullets_unload"
-      },
-      {
         "phase": "finish",
-        "time": 20,
+        "time": 12,
         "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_end"
       }
     ]
@@ -216,59 +205,6 @@
       },
       "unload": {
         "phases": [
-          {
-            "phase": "prepare",
-            "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than", "value": 4 },
-            "time": 1
-          },
-          {
-            "phase": "unload",
-            "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 3 },
-            "time": 25,
-            "unload_type": "rounds",
-            "end_unload": true,
-            "unload_count": 1,
-            "unload_delay": 15,
-            "ammo_removed_last": true,
-            "sound": "rfe_builtin:item.generic.rifle.bullet_unload"
-          },
-          {
-            "phase": "unload",
-            "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 2 },
-            "time": 25,
-            "unload_type": "rounds",
-            "end_unload": true,
-            "unload_count": 2,
-            "unload_delay": 15,
-            "ammo_removed_last": true,
-            "sound": "rfe_builtin:item.generic.rifle.bullets_unload"
-          },
-          {
-            "phase": "unload",
-            "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 1 },
-            "time": 25,
-            "unload_type": "rounds",
-            "end_unload": true,
-            "unload_count": 3,
-            "unload_delay": 15,
-            "ammo_removed_last": true,
-            "sound": "rfe_builtin:item.generic.rifle.bullets_unload"
-          },
-          {
-            "phase": "unload",
-            "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 0 },
-            "time": 25,
-            "unload_type": "rounds",
-            "end_unload": true,
-            "unload_count": 4,
-            "unload_delay": 15,
-            "ammo_removed_last": true,
-            "sound": "rfe_builtin:item.generic.rifle.bullets_unload"
-          },
-          {
-            "phase": "finish",
-            "time": 15
-          }
         ]
       },
       "charge": {

@@ -8,6 +8,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.AmmoPacketItemPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItemPropertiesHandler;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.RFEHitMultiplierHandler;
@@ -90,6 +91,11 @@ public class RFECommonEvents {
         RFEProjectileManager.tick(level);
         RFESpreadManager.tick(level);
         RFERecoilManager.tick(level);
+    }
+
+    public static boolean onLeftClickBlock(Player player) {
+        // TODO attachments
+        return player.getMainHandItem().getItem() instanceof RFEFirearmItem || player.getOffhandItem().getItem() instanceof RFEFirearmItem;
     }
 
 }

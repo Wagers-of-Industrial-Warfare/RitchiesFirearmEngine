@@ -12,6 +12,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
@@ -48,6 +49,7 @@ public class RitchiesFirearmEngine {
         forgeBus.addListener(this::onEntityLeaveLevel);
         forgeBus.addListener(this::onPlayerLoggedIn);
         forgeBus.addListener(this::onLevelTick);
+        forgeBus.addListener(this::onLeftClickBlock);
 
         RFEConfig.registerConfigs(modBus);
 
@@ -110,6 +112,11 @@ public class RitchiesFirearmEngine {
     private void onLevelTick(final TickEvent.LevelTickEvent event) {
         if (event.phase == TickEvent.Phase.END)
             RFECommonEvents.onLevelTick(event.level);
+    }
+
+    private void onLeftClickBlock(final PlayerInteractEvent.LeftClickBlock event) {
+        if (event.isCancelable() && RFECommonEvents.onLeftClickBlock(event.getEntity()))
+            event.setCanceled(true);
     }
 
     public static ResourceLocation resource(String path) { return RFEUtils.location(MOD_ID, path); }

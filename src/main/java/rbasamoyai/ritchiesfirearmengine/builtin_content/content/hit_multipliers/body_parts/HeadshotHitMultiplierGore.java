@@ -29,9 +29,9 @@ public record HeadshotHitMultiplierGore(float multiplier) implements RFEHitMulti
     public float multiplyDamage(Entity target, RFEProjectileInstance projectile, EntityHitResult hitResult, float damage) {
         if (!target.getType().is(HUMANOID))
             return damage;
-        double yHit = hitResult.getLocation().y;
+        double diff = hitResult.getLocation().y - target.getEyeY();
         double headHalf = Math.abs(target.getBbHeight() - target.getEyeHeight());
-        if (target.getEyeY() - yHit <= headHalf || yHit - target.getEyeY() < headHalf + 0.1f) {
+        if (diff < 0 && -diff <= headHalf || diff >= 0 && diff < headHalf + 0.1f) {
             damage *= this.multiplier;
             if (target instanceof LivingEntity living && damage >= living.getHealth()) {
                 Level level = target.level();

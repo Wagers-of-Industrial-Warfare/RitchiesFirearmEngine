@@ -933,20 +933,20 @@ public class RFEFirearmMode {
 
     public void startAiming(ItemStack itemStack, LivingEntity entity) {
         FirearmDataUtils.setAiming(itemStack, true);
-        int currentUnaimingTime = FirearmDataUtils.getAimingTime(itemStack);
+        int currentUnaimingTime = this.getAimingTime(itemStack, entity);
         float frac = this.unaimTime == 0 ? 0 : (float) currentUnaimingTime / (float) this.unaimTime;
         frac = 1f - frac;
-        FirearmDataUtils.setAimingTime(itemStack, Mth.ceil(this.aimTime * frac));
+        this.setAimingTime(itemStack, entity, Mth.ceil(this.aimTime * frac));
         if (this.aimSound != null)
             entity.level().playSound(entity, entity.blockPosition(), this.aimSound, SoundSource.NEUTRAL, 1f, 1f);
     }
 
     public void stopAiming(ItemStack itemStack, LivingEntity entity) {
         FirearmDataUtils.setAiming(itemStack, false);
-        int currentAimingTime = FirearmDataUtils.getAimingTime(itemStack);
+        int currentAimingTime = this.getAimingTime(itemStack, entity);;
         float frac = this.aimTime == 0 ? 0 : (float) currentAimingTime / (float) this.aimTime;
         frac = 1f - frac;
-        FirearmDataUtils.setAimingTime(itemStack, Mth.ceil(this.unaimTime * frac));
+        this.setAimingTime(itemStack, entity, Mth.ceil(this.unaimTime * frac));
         entity.stopUsingItem();
         if (this.unaimSound != null)
             entity.level().playSound(entity, entity.blockPosition(), this.unaimSound, SoundSource.NEUTRAL, 1f, 1f);
@@ -1015,16 +1015,16 @@ public class RFEFirearmMode {
             modeTag.remove("UnloadPhaseIndex");
         }
 
-        if (!entity.level().isClientSide) {
-            if (this.isAiming(itemStack, entity) && !this.canAim(itemStack, entity)) {
-                this.stopAiming(itemStack, entity);
-            }
-            int aimingTime = this.getAimingTime(itemStack, entity);
-            if (aimingTime > 0) {
-                --aimingTime;
-                this.setAimingTime(itemStack, entity, aimingTime);
-            }
+        if (this.isAiming(itemStack, entity) && !this.canAim(itemStack, entity)) {
+            this.stopAiming(itemStack, entity);
+        }
+        int aimingTime = this.getAimingTime(itemStack, entity);
+        if (aimingTime > 0) {
+            --aimingTime;
+            this.setAimingTime(itemStack, entity, aimingTime);
+        }
 
+        if (!entity.level().isClientSide) {
             // TODO secondary ammo:
             //      TODO tick ammo slots
             //      TODO tick non-ammo slot

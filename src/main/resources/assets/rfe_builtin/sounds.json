@@ -19,6 +19,26 @@
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.ammo_packet.unwrap"
   },
+  "item.generic.assault_rifle.shot": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/shot",
+        "volume": 4.0,
+        "pitch": 1.5
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/shot",
+        "volume": 4.0,
+        "pitch": 1.48
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/shot",
+        "volume": 4.0,
+        "pitch": 1.47
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.assault_rifle.shot"
+  },
   "item.generic.firearm.mode_change.switch": {
     "sounds": [
       {

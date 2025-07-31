@@ -1,0 +1,31 @@
+
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:intermediate_cartridge",
+      "fires": "rfe_builtin:792x33mm_kurz"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_intermediate_cartridge",
+      "fires": "rfe_builtin:792x33mm_kurz"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+    "rfe_builtin:rifle_magazine_5rds",
+    "rfe_builtin:rifle_magazine_10rds",
+    "rfe_builtin:rifle_magazine_15rds",
+    "rfe_builtin:rifle_magazine_20rds",
+    "rfe_builtin:rifle_magazine_25rds",
+    "rfe_builtin:rifle_magazine_30rds"
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "modes": {
+  }
+}

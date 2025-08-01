@@ -193,7 +193,7 @@
         },
         "time": 26,
         "reload_type": "magazines",
-        "reload_delay": 18,
+        "reload_time": 18,
         "sounds": [
           { "time": 10, "sound": "rfe_builtin:item.generic.rifle.magazine.reload" }
         ]
@@ -254,7 +254,7 @@
         "condition": { "macro": "rfe_builtin:has_empty_magazine" },
         "time": 26,
         "unload_type": "magazines",
-        "unload_delay": 18,
+        "unload_time": 18,
         "sound": "rfe_builtin:item.generic.rifle.magazine.unload"
       },
       {

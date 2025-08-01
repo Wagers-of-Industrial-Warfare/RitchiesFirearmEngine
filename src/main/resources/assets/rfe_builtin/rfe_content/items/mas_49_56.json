@@ -203,7 +203,7 @@
         },
         "time": 28,
         "reload_type": "magazines",
-        "reload_delay": 15,
+        "reload_time": 15,
         "sound": "rfe_builtin:item.generic.rifle.magazine.reload"
       },
       {
@@ -253,7 +253,7 @@
         "condition": { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
         "time": 30,
         "unload_type": "magazines",
-        "unload_delay": 20,
+        "unload_time": 20,
         "sound": "rfe_builtin:item.generic.rifle.magazine.unload"
       },
       {

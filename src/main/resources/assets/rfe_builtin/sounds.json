@@ -39,6 +39,26 @@
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.assault_rifle.shot"
   },
+  "item.generic.battle_rifle.shot": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/semi_auto_rifle/shot",
+        "volume": 4.0,
+        "pitch": 1.3
+      },
+      {
+        "name": "rfe_builtin:item/generic/semi_auto_rifle/shot",
+        "volume": 4.0,
+        "pitch": 1.28
+      },
+      {
+        "name": "rfe_builtin:item/generic/semi_auto_rifle/shot",
+        "volume": 4.0,
+        "pitch": 1.27
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.battle_rifle.shot"
+  },
   "item.generic.firearm.mode_change.switch": {
     "sounds": [
       {

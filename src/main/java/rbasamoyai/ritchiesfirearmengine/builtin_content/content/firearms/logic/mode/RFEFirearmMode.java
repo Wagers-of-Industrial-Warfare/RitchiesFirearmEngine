@@ -302,6 +302,8 @@ public class RFEFirearmMode {
     }
 
     protected void handlePlayerAmmoAndShootingOnClient(ItemStack itemStack, LivingEntity entity) {
+        if (!FirearmDataUtils.isHoldingAttackKey(itemStack))
+            return;
         RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
 
         // TODO recoil

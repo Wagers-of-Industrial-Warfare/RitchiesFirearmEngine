@@ -5,14 +5,13 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.FovModifyingItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.HoldAttackKeyInteraction;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.SimultaneousUseAndAttack;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEFiringInput;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-public interface IFirearmItem extends SimultaneousUseAndAttack, HoldAttackKeyInteraction, FovModifyingItem {
+public interface IFirearmItem extends HoldAttackKeyInteraction, FovModifyingItem {
 
     boolean isAiming(ItemStack itemStack, LivingEntity entity);
 

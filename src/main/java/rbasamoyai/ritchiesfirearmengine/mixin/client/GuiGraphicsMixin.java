@@ -7,7 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import rbasamoyai.ritchiesfirearmengine.utils.RFEClientRemix;
+import rbasamoyai.ritchiesfirearmengine.remix.RFEClientRemix;
 
 import javax.annotation.Nullable;
 

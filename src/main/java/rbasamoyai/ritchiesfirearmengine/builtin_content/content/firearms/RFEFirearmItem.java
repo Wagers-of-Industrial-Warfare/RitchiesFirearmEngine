@@ -75,7 +75,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
 
     @Override
     public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
-        return this.commonOnEntitySwing(stack, entity);
+        return true; // TODO other swinging
     }
 
     @Override
@@ -97,7 +97,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         return this.baseFirearmModes.get(this.defaultMode);
     }
 
-    public boolean commonOnEntitySwing(ItemStack stack, LivingEntity entity) {
+    @Override
+    public boolean onPressAttackKey(ItemStack stack, LivingEntity entity) {
         FirearmDataUtils.setHoldingAttackKey(stack, true);
         RFEFirearmMode firearmMode = this.getCurrentMode(stack);
         if (firearmMode.canFireProjectile(stack, entity)) {

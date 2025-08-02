@@ -10,7 +10,7 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
-import rbasamoyai.ritchiesfirearmengine.utils.RFEClientRemix;
+import rbasamoyai.ritchiesfirearmengine.remix.RFEClientRemix;
 
 import java.util.function.Function;
 

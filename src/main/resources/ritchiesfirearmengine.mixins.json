@@ -14,6 +14,7 @@
     "client.GuiMixin",
     "client.ItemEntityRendererMixin",
     "client.ItemInHandRendererMixin",
+    "client.MinecraftMixin",
     "client.ModelManagerMixin"
   ],
   "injectors": {

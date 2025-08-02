@@ -12,7 +12,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -21,7 +20,6 @@ import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.FovModifyingItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.HoldAttackKeyInteraction;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.SimultaneousUseAndAttack;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.AmmoPacketItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
@@ -37,7 +35,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundFirearmActionPacket;
-import rbasamoyai.ritchiesfirearmengine.network.ServerboundReleaseAttackKeyPacket;
+import rbasamoyai.ritchiesfirearmengine.network.ServerboundSetAttackKeyPacket;
 
 import java.util.Collection;
 import java.util.function.Consumer;
@@ -80,20 +78,13 @@ public class RFEClient {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
 
-        ItemStack useStack = mc.player.getUseItem();
-        InteractionHand useHand = mc.player.getUsedItemHand();
-        if (useHand == InteractionHand.MAIN_HAND) {
-            if (useStack.getItem() instanceof SimultaneousUseAndAttack) {
-                while (mc.options.keyAttack.consumeClick()) {
-                    mc.player.swing(useHand);
-                }
-            }
-        }
-
+        boolean attacking = mc.options.keyAttack.isDown();
         ItemStack mainhandItem = mc.player.getMainHandItem();
         if (mainhandItem.getItem() instanceof HoldAttackKeyInteraction holdAttackKeyInteraction) {
-            if (holdAttackKeyInteraction.isHoldingAttackKey(mainhandItem, mc.player) && !mc.options.keyAttack.isDown())
-                RFENetwork.sendToServer(new ServerboundReleaseAttackKeyPacket());
+            if (button == 0 && attacking) {
+                RFENetwork.sendToServer(new ServerboundSetAttackKeyPacket(false));
+                holdAttackKeyInteraction.onReleaseAttackKey(mainhandItem, mc.player);
+            }
         }
     }
 

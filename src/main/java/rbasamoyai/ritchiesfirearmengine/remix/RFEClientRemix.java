@@ -1,4 +1,4 @@
-package rbasamoyai.ritchiesfirearmengine.utils;
+package rbasamoyai.ritchiesfirearmengine.remix;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -10,7 +10,10 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.world.item.ItemStack;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.HoldAttackKeyInteraction;
 import rbasamoyai.ritchiesfirearmengine.foundation.gui.RFEItemSlotTextureDecorations;
+import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
+import rbasamoyai.ritchiesfirearmengine.network.ServerboundSetAttackKeyPacket;
 
 import java.util.function.Function;
 
@@ -30,6 +33,28 @@ public class RFEClientRemix {
         Material slotOverlay0 = model.getMaterial(RFEItemSlotTextureDecorations.SLOT_OVERLAY0);
         if (!MISSING_BLOCK_TEXTURE.equals(slotOverlay0))
             RFEItemSlotTextureDecorations.registerSlotOverlay0(baked, spriteGetter.apply(slotOverlay0));
+    }
+
+    public static void handleAttackKeybinds() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+
+        ItemStack mainhandItem = mc.player.getMainHandItem();
+        if (mainhandItem.getItem() instanceof HoldAttackKeyInteraction holdAttackKeyInteraction) {
+            RFENetwork.sendToServer(new ServerboundSetAttackKeyPacket(true));
+            holdAttackKeyInteraction.onPressAttackKey(mainhandItem, mc.player);
+        }
+    }
+
+    public static void interruptAttack() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+
+        ItemStack mainhandItem = mc.player.getMainHandItem();
+        if (mainhandItem.getItem() instanceof HoldAttackKeyInteraction holdAttackKeyInteraction) {
+            RFENetwork.sendToServer(new ServerboundSetAttackKeyPacket(false));
+            holdAttackKeyInteraction.onReleaseAttackKey(mainhandItem, mc.player);
+        }
     }
 
     private RFEClientRemix() {}

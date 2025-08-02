@@ -40,7 +40,7 @@ public class RFENetwork {
 
         buildMessage(network, id++, ClientboundValidateRFEContentPacksPacket.class, ClientboundValidateRFEContentPacksPacket::decode);
         buildMessage(network, id++, ServerboundFirearmActionPacket.class, ServerboundFirearmActionPacket::new);
-        buildMessage(network, id++, ServerboundReleaseAttackKeyPacket.class, ServerboundReleaseAttackKeyPacket::new);
+        buildMessage(network, id++, ServerboundSetAttackKeyPacket.class, ServerboundSetAttackKeyPacket::new);
         buildMessage(network, id++, ServerboundRunFiringLogicPacket.class, ServerboundRunFiringLogicPacket::decode);
         buildMessage(network, id++, ClientboundSyncMagazinePropertiesPacket.class, ClientboundSyncMagazinePropertiesPacket::decode);
         buildMessage(network, id++, ClientboundSyncAmmoPacketPropertiesPacket.class, ClientboundSyncAmmoPacketPropertiesPacket::decode);

@@ -9,19 +9,26 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.HoldAttackKeyInt
 import javax.annotation.Nullable;
 import java.util.concurrent.Executor;
 
-public final class ServerboundReleaseAttackKeyPacket implements RFEPacket {
+public record ServerboundSetAttackKeyPacket(boolean down) implements RFEPacket {
 
-    public ServerboundReleaseAttackKeyPacket() {}
-    public ServerboundReleaseAttackKeyPacket(FriendlyByteBuf buf) {}
+    public ServerboundSetAttackKeyPacket(FriendlyByteBuf buf) { this(buf.readBoolean()); }
 
-    @Override public void rootEncode(FriendlyByteBuf buf) {}
+    @Override
+    public void rootEncode(FriendlyByteBuf buf) {
+        buf.writeBoolean(this.down);
+    }
 
     @Override
     public void handle(Executor exec, PacketListener listener, @Nullable ServerPlayer sender) {
         if (sender == null)
             return;
         ItemStack mainhandItem = sender.getMainHandItem();
-        if (mainhandItem.getItem() instanceof HoldAttackKeyInteraction interactable)
-            interactable.onReleaseAttackKey(mainhandItem, sender);
+        if (mainhandItem.getItem() instanceof HoldAttackKeyInteraction interactable) {
+            if (this.down) {
+                interactable.onPressAttackKey(mainhandItem, sender);
+            } else {
+                interactable.onReleaseAttackKey(mainhandItem, sender);
+            }
+        }
     }
 }

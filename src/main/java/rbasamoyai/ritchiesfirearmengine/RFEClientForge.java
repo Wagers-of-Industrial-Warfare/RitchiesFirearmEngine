@@ -30,7 +30,7 @@ public class RFEClientForge {
         RFEClientPluginManager.registerResourceListeners((id, listener) -> event.registerReloadListener(listener));
     }
 
-    private static void onMouseInput(final InputEvent.MouseButton inputEvent) {
+    private static void onMouseInput(final InputEvent.MouseButton.Pre inputEvent) {
         RFEClient.onMouseInput(inputEvent.getButton(), inputEvent.getButton(), inputEvent.getModifiers());
     }
 

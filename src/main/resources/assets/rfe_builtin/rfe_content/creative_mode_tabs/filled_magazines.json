@@ -5,65 +5,117 @@
     "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:5b}]}"
   },
   "contents": [
+    "rfe_builtin:rifle_cartridge",
     {
       "item": "rfe_builtin:rifle_stripper_clip_5rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:5b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_stripper_clip_5rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:5b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_stripper_clip_5rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:black_powder_rifle_cartridge\",Count:5b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_stripper_clip_5rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:ap_rifle_cartridge\",Count:5b}]}"
     },
     {
       "item": "rfe_builtin:rifle_en_bloc_clip_5rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:5b}]}"
     },
     {
-      "item": "rfe_builtin:rifle_en_bloc_clip_5rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:5b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_en_bloc_clip_5rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:black_powder_rifle_cartridge\",Count:5b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_en_bloc_clip_5rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:ap_rifle_cartridge\",Count:5b}]}"
-    },
-    {
       "item": "rfe_builtin:rifle_magazine_5rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:5b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_magazine_5rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:5b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_magazine_5rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:black_powder_rifle_cartridge\",Count:5b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_magazine_5rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:ap_rifle_cartridge\",Count:5b}]}"
     },
     {
       "item": "rfe_builtin:rifle_magazine_10rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:10b}]}"
     },
     {
+      "item": "rfe_builtin:rifle_magazine_15rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:15b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_magazine_20rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:20b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_magazine_25rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:25b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_magazine_30rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:30b}]}"
+    },
+    "rfe_builtin:intermediate_cartridge",
+    {
+      "item": "rfe_builtin:rifle_stripper_clip_5rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:5b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_en_bloc_clip_5rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:5b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_magazine_5rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:5b}]}"
+    },
+    {
       "item": "rfe_builtin:rifle_magazine_10rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:10b}]}"
     },
     {
+      "item": "rfe_builtin:rifle_magazine_15rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:15b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_magazine_20rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:20b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_magazine_25rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:25b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_magazine_30rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:30b}]}"
+    },
+    "rfe_builtin:black_powder_rifle_cartridge",
+    {
+      "item": "rfe_builtin:rifle_stripper_clip_5rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:black_powder_rifle_cartridge\",Count:5b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_en_bloc_clip_5rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:black_powder_rifle_cartridge\",Count:5b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_magazine_5rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:black_powder_rifle_cartridge\",Count:5b}]}"
+    },
+    {
       "item": "rfe_builtin:rifle_magazine_10rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:black_powder_rifle_cartridge\",Count:10b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_magazine_15rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:black_powder_rifle_cartridge\",Count:15b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_magazine_20rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:black_powder_rifle_cartridge\",Count:20b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_magazine_25rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:black_powder_rifle_cartridge\",Count:25b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_magazine_30rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:black_powder_rifle_cartridge\",Count:30b}]}"
+    },
+    "rfe_builtin:ap_rifle_cartridge",
+    {
+      "item": "rfe_builtin:rifle_stripper_clip_5rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:ap_rifle_cartridge\",Count:5b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_en_bloc_clip_5rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:ap_rifle_cartridge\",Count:5b}]}"
+    },
+    {
+      "item": "rfe_builtin:rifle_magazine_5rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:ap_rifle_cartridge\",Count:5b}]}"
     },
     {
       "item": "rfe_builtin:rifle_magazine_10rds",
@@ -71,31 +123,7 @@
     },
     {
       "item": "rfe_builtin:rifle_magazine_15rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:15b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_magazine_15rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:15b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_magazine_15rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:black_powder_rifle_cartridge\",Count:15b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_magazine_15rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:ap_rifle_cartridge\",Count:15b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_magazine_20rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:20b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_magazine_20rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:20b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_magazine_20rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:black_powder_rifle_cartridge\",Count:20b}]}"
     },
     {
       "item": "rfe_builtin:rifle_magazine_20rds",
@@ -103,36 +131,13 @@
     },
     {
       "item": "rfe_builtin:rifle_magazine_25rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:25b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_magazine_25rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:25b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_magazine_25rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:black_powder_rifle_cartridge\",Count:25b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_magazine_25rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:ap_rifle_cartridge\",Count:25b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_magazine_30rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:rifle_cartridge\",Count:30b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_magazine_30rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:intermediate_cartridge\",Count:30b}]}"
-    },
-    {
-      "item": "rfe_builtin:rifle_magazine_30rds",
-      "tag": "{Rounds:[{id:\"rfe_builtin:black_powder_rifle_cartridge\",Count:30b}]}"
     },
     {
       "item": "rfe_builtin:rifle_magazine_30rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:ap_rifle_cartridge\",Count:30b}]}"
     },
+    "rfe_builtin:handgun_cartridge",
     {
       "item": "rfe_builtin:pistol_magazine_7rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:handgun_cartridge\",Count:7b}]}"

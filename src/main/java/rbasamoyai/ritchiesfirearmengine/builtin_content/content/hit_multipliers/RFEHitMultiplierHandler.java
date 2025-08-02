@@ -127,6 +127,7 @@ public class RFEHitMultiplierHandler {
             HIT_MULTIPLIERS.clear();
             UNRESOLVED_HIT_MULTIPLIERS.clear();
             UNRESOLVED_HIT_MULTIPLIERS.putAll(this.hitMultipliers);
+            loadProjectileTypes();
         }
     }
 

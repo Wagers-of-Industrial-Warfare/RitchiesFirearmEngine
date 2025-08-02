@@ -7,7 +7,7 @@
   "count_loose_rounds": false,
   "firearm_icon": {
     "texture": "rfe_builtin:textures/gui/hud/weapon_icon/hk_g3a3.png",
-    "width": 40,
+    "width": 64,
     "height": 16
   },
   "mode_translations": {

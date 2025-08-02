@@ -3,6 +3,7 @@ package rbasamoyai.ritchiesfirearmengine;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
@@ -81,7 +82,8 @@ public class RitchiesFirearmEngine {
     }
 
     private void onSyncDatapack(final OnDatapackSyncEvent event) {
-        boolean singleplayer = event.getPlayerList().getServer().isSingleplayer();
+        MinecraftServer server = event.getPlayerList().getServer();
+        boolean singleplayer = server.isSingleplayer() && !server.isPublished();
         if (event.getPlayer() == null) {
             RFECommonEvents.onDatapackReload(singleplayer);
         } else {

@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "rfe_builtin:ap_rifle_cartridge",
+    "rfe_builtin:black_powder_rifle_cartridge",
+    "rfe_builtin:infinite_ap_rifle_cartridge",
+    "rfe_builtin:infinite_black_powder_rifle_cartridge",
+    "rfe_builtin:infinite_rifle_cartridge",
+    "rfe_builtin:rifle_cartridge"
+  ]
+}

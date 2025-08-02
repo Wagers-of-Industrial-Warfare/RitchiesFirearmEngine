@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "rfe_builtin:pistol_magazine_7rds",
+    "rfe_builtin:pistol_magazine_8rds",
+    "rfe_builtin:pistol_magazine_9rds",
+    "rfe_builtin:pistol_magazine_10rds"
+  ]
+}

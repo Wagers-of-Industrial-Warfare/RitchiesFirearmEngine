@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "#rfe_builtin:rifle_cartridges",
+    "#rfe_builtin:intermediate_cartridges"
+  ]
+}

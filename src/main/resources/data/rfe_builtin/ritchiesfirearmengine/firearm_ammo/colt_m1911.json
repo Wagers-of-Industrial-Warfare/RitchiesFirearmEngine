@@ -12,10 +12,7 @@
   ],
   "replace_magazines": false,
   "magazines": [
-    "rfe_builtin:pistol_magazine_7rds",
-    "rfe_builtin:pistol_magazine_8rds",
-    "rfe_builtin:pistol_magazine_9rds",
-    "rfe_builtin:pistol_magazine_10rds"
+    "#rfe_builtin:single_stack_pistol_magazines"
   ],
   "replace_speedloaders": false,
   "speedloaders": [

@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "rfe_builtin:infinite_intermediate_cartridge",
+    "rfe_builtin:intermediate_cartridge"
+  ]
+}

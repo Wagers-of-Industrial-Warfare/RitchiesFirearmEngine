@@ -12,12 +12,7 @@
   ],
   "replace_magazines": false,
   "magazines": [
-    "rfe_builtin:rifle_magazine_5rds",
-    "rfe_builtin:rifle_magazine_10rds",
-    "rfe_builtin:rifle_magazine_15rds",
-    "rfe_builtin:rifle_magazine_20rds",
-    "rfe_builtin:rifle_magazine_25rds",
-    "rfe_builtin:rifle_magazine_30rds"
+    "#rfe_builtin:rifle_magazines"
   ],
   "replace_speedloaders": false,
   "speedloaders": [

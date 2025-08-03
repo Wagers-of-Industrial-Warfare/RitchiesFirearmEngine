@@ -1,8 +1,0 @@
-{
-  "renderer": "ritchiesfirearmengine:bullet",
-  "color": 16772864,
-  "color1": 16766208,
-  "trail_multiplier": 0.015,
-  "tracer_light": true,
-  "thickness": 0.15
-}

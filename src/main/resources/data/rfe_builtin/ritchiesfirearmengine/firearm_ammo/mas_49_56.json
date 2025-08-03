@@ -8,6 +8,14 @@
     {
       "ammo": "rfe_builtin:infinite_rifle_cartridge",
       "fires": "rfe_builtin:75x54mm_french_semi"
+    },
+    {
+      "ammo": "rfe_builtin:tracer_rifle_cartridge",
+      "fires": "rfe_builtin:75x54mm_french_semi_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_tracer_rifle_cartridge",
+      "fires": "rfe_builtin:75x54mm_french_semi_tracer"
     }
   ],
   "replace_magazines": false,

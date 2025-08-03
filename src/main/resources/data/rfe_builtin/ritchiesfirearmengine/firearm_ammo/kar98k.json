@@ -10,6 +10,14 @@
       "fires": "rfe_builtin:792x57mm_mauser"
     },
     {
+      "ammo": "rfe_builtin:tracer_rifle_cartridge",
+      "fires": "rfe_builtin:792x57mm_mauser_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_tracer_rifle_cartridge",
+      "fires": "rfe_builtin:792x57mm_mauser_tracer"
+    },
+    {
       "ammo": "rfe_builtin:ap_rifle_cartridge",
       "fires": "rfe_builtin:792x57mm_mauser_ap"
     },

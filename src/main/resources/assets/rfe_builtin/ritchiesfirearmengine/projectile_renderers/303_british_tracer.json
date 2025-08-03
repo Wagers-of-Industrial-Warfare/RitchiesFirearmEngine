@@ -3,6 +3,6 @@
   "color": 16772864,
   "color1": 16766208,
   "trail_multiplier": 0.015,
-  "tracer_light": true,
+  "tracer_light": false,
   "thickness": 0.125
 }

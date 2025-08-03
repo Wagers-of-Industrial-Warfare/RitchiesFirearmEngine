@@ -9,7 +9,7 @@
   "damage_model": [
     {
       "distance": 0,
-      "damage": 16
+      "damage": 20.5
     }
   ],
   "damage_type": "rfe_builtin:bullet"

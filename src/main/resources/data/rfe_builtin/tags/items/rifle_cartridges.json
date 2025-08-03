@@ -3,9 +3,15 @@
   "values": [
     "rfe_builtin:ap_rifle_cartridge",
     "rfe_builtin:black_powder_rifle_cartridge",
+    "rfe_builtin:hp_rifle_cartridge",
     "rfe_builtin:infinite_ap_rifle_cartridge",
     "rfe_builtin:infinite_black_powder_rifle_cartridge",
+    "rfe_builtin:infinite_hp_rifle_cartridge",
     "rfe_builtin:infinite_rifle_cartridge",
-    "rfe_builtin:rifle_cartridge"
+    "rfe_builtin:infinite_sp_rifle_cartridge",
+    "rfe_builtin:infinite_tracer_rifle_cartridge",
+    "rfe_builtin:rifle_cartridge",
+    "rfe_builtin:sp_rifle_cartridge",
+    "rfe_builtin:tracer_rifle_cartridge"
   ]
 }

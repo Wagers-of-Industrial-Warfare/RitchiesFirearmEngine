@@ -276,6 +276,170 @@
     {
       "item": "rfe_builtin:pistol_magazine_35rds",
       "tag": "{Rounds:[{id:\"rfe_builtin:handgun_cartridge\",Count:35b}]}"
+    },
+    "rfe_builtin:tracer_handgun_cartridge",
+    {
+      "item": "rfe_builtin:pistol_magazine_7rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:tracer_handgun_cartridge\",Count:7b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_8rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:tracer_handgun_cartridge\",Count:8b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_9rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:tracer_handgun_cartridge\",Count:9b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_10rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:tracer_handgun_cartridge\",Count:10b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_15rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:tracer_handgun_cartridge\",Count:15b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_17rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:tracer_handgun_cartridge\",Count:17b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_20rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:tracer_handgun_cartridge\",Count:20b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_30rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:tracer_handgun_cartridge\",Count:30b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_32rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:tracer_handgun_cartridge\",Count:32b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_35rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:tracer_handgun_cartridge\",Count:35b}]}"
+    },
+    "rfe_builtin:ap_handgun_cartridge",
+    {
+      "item": "rfe_builtin:pistol_magazine_7rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:ap_handgun_cartridge\",Count:7b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_8rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:ap_handgun_cartridge\",Count:8b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_9rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:ap_handgun_cartridge\",Count:9b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_10rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:ap_handgun_cartridge\",Count:10b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_15rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:ap_handgun_cartridge\",Count:15b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_17rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:ap_handgun_cartridge\",Count:17b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_20rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:ap_handgun_cartridge\",Count:20b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_30rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:ap_handgun_cartridge\",Count:30b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_32rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:ap_handgun_cartridge\",Count:32b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_35rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:ap_handgun_cartridge\",Count:35b}]}"
+    },
+    "rfe_builtin:sp_handgun_cartridge",
+    {
+      "item": "rfe_builtin:pistol_magazine_7rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:sp_handgun_cartridge\",Count:7b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_8rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:sp_handgun_cartridge\",Count:8b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_9rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:sp_handgun_cartridge\",Count:9b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_10rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:sp_handgun_cartridge\",Count:10b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_15rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:sp_handgun_cartridge\",Count:15b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_17rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:sp_handgun_cartridge\",Count:17b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_20rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:sp_handgun_cartridge\",Count:20b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_30rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:sp_handgun_cartridge\",Count:30b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_32rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:sp_handgun_cartridge\",Count:32b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_35rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:sp_handgun_cartridge\",Count:35b}]}"
+    },
+    "rfe_builtin:hp_handgun_cartridge",
+    {
+      "item": "rfe_builtin:pistol_magazine_7rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:hp_handgun_cartridge\",Count:7b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_8rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:hp_handgun_cartridge\",Count:8b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_9rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:hp_handgun_cartridge\",Count:9b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_10rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:hp_handgun_cartridge\",Count:10b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_15rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:hp_handgun_cartridge\",Count:15b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_17rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:hp_handgun_cartridge\",Count:17b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_20rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:hp_handgun_cartridge\",Count:20b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_30rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:hp_handgun_cartridge\",Count:30b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_32rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:hp_handgun_cartridge\",Count:32b}]}"
+    },
+    {
+      "item": "rfe_builtin:pistol_magazine_35rds",
+      "tag": "{Rounds:[{id:\"rfe_builtin:hp_handgun_cartridge\",Count:35b}]}"
     }
   ]
 }

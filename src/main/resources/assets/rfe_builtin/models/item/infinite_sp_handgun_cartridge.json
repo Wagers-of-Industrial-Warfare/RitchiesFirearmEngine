@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "rfe_builtin:item/sp_handgun_cartridge",
+    "ritchiesfirearmengine:slot_overlay0": "rfe_builtin:item/capacity_counters/infinite"
+  }
+}

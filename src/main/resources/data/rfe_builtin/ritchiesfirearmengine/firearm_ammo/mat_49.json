@@ -8,6 +8,38 @@
     {
       "ammo": "rfe_builtin:infinite_handgun_cartridge",
       "fires": "rfe_builtin:9x19mm_parabellum_smg"
+    },
+    {
+      "ammo": "rfe_builtin:tracer_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_tracer_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:ap_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg_ap"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_ap_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg_ap"
+    },
+    {
+      "ammo": "rfe_builtin:sp_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg_sp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_sp_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg_sp"
+    },
+    {
+      "ammo": "rfe_builtin:hp_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg_hp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_hp_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg_hp"
     }
   ],
   "replace_magazines": false,

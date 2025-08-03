@@ -8,6 +8,38 @@
     {
       "ammo": "rfe_builtin:infinite_handgun_cartridge",
       "fires": "rfe_builtin:45_acp"
+    },
+    {
+      "ammo": "rfe_builtin:tracer_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_tracer_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:ap_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_ap"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_ap_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_ap"
+    },
+    {
+      "ammo": "rfe_builtin:sp_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_sp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_sp_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_sp"
+    },
+    {
+      "ammo": "rfe_builtin:hp_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_hp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_hp_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_hp"
     }
   ],
   "replace_magazines": false,

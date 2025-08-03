@@ -420,7 +420,7 @@ public class RFEFirearmMode {
         }
         if (this.fireMode == FireMode.SINGLE_ACTION
                 && this.automaticSingleActionCycle(itemStack, entity)
-                && this.canCharge(itemStack, entity)) {
+                && this.canChargeInternal(itemStack, entity)) {
             this.onCharge(itemStack, entity);
             return;
         }
@@ -793,16 +793,8 @@ public class RFEFirearmMode {
         FirearmDataUtils.setCharged(this.getOrCreateModeTag(itemStack), charged);
     }
 
-    public boolean canCharge(ItemStack itemStack, LivingEntity entity) {
-        if (this.fireMode == FireMode.SAFETY || FirearmDataUtils.getActionTime(itemStack) > 0)
-            return false;
-        boolean charged = this.isCharged(itemStack);
-        if (this.plusOneCapacity) {
-            ItemStack loadedRound = this.getLoadedRound(itemStack);
-            return loadedRound.isEmpty() && this.hasAmmo(itemStack) || !loadedRound.isEmpty() && !charged;
-        } else {
-            return this.hasAmmo(itemStack) && !charged;
-        }
+    public boolean canChargeInternal(ItemStack itemStack, LivingEntity entity) {
+        return !this.isBusyWithStagedAction(itemStack) && FirearmDataUtils.getActionTime(itemStack) <= 0;
     }
 
     public void onCharge(ItemStack itemStack, LivingEntity entity) {
@@ -991,7 +983,7 @@ public class RFEFirearmMode {
                 FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.COOLDOWN);
                 FirearmDataUtils.setActionTime(itemStack, this.cooldownTime);
             } else if (this.fireMode == FireMode.SINGLE_ACTION && !properties.manualCharging()
-                    && !holdingKey && this.canCharge(itemStack, entity)) {
+                    && !holdingKey && this.canChargeInternal(itemStack, entity)) {
                 this.onCharge(itemStack, entity);
             }
         }

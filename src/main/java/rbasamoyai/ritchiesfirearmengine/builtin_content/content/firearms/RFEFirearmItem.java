@@ -104,7 +104,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         if (firearmMode.canFireProjectile(stack, entity)) {
             if (!firearmMode.isBurstFiring(stack, entity))
                 firearmMode.fireFirearm(stack, entity, entity instanceof Player);
-        } else if (firearmMode.canCharge(stack, entity)) {
+        } else if (firearmMode.canChargeInternal(stack, entity)) {
             firearmMode.onCharge(stack, entity);
         }
         // TODO alternative API for entity interaction

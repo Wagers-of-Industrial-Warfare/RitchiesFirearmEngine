@@ -1,7 +1,15 @@
 {
   "replace": false,
   "values": [
+    "rfe_builtin:ap_intermediate_cartridge",
+    "rfe_builtin:hp_intermediate_cartridge",
+    "rfe_builtin:infinite_ap_intermediate_cartridge",
+    "rfe_builtin:infinite_hp_intermediate_cartridge",
     "rfe_builtin:infinite_intermediate_cartridge",
-    "rfe_builtin:intermediate_cartridge"
+    "rfe_builtin:infinite_sp_intermediate_cartridge",
+    "rfe_builtin:infinite_tracer_intermediate_cartridge",
+    "rfe_builtin:intermediate_cartridge",
+    "rfe_builtin:sp_intermediate_cartridge",
+    "rfe_builtin:tracer_intermediate_cartridge"
   ]
 }

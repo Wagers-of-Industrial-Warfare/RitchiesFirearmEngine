@@ -2,19 +2,23 @@
   "replace": false,
   "values": [
     "rfe_builtin:infinite_ap_handgun_cartridge",
+    "rfe_builtin:infinite_ap_intermediate_cartridge",
     "rfe_builtin:infinite_ap_rifle_cartridge",
     "rfe_builtin:infinite_black_powder_handgun_cartridge",
     "rfe_builtin:infinite_black_powder_rifle_cartridge",
     "rfe_builtin:infinite_handgun_cartridge",
     "rfe_builtin:infinite_hp_handgun_cartridge",
+    "rfe_builtin:infinite_hp_intermediate_cartridge",
     "rfe_builtin:infinite_hp_rifle_cartridge",
     "rfe_builtin:infinite_intermediate_cartridge",
     "rfe_builtin:infinite_musket_cartridge",
     "rfe_builtin:infinite_paper_handgun_cartridge",
     "rfe_builtin:infinite_rifle_cartridge",
     "rfe_builtin:infinite_sp_handgun_cartridge",
+    "rfe_builtin:infinite_sp_intermediate_cartridge",
     "rfe_builtin:infinite_sp_rifle_cartridge",
     "rfe_builtin:infinite_tracer_handgun_cartridge",
+    "rfe_builtin:infinite_tracer_intermediate_cartridge",
     "rfe_builtin:infinite_tracer_rifle_cartridge"
   ]
 }

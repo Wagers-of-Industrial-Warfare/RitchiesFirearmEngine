@@ -178,12 +178,7 @@
   "charge": {
     "actions": [
       {
-        "condition": {
-          "or": [
-            { "compare": "ritchiesfirearmengine:is_charged", "operator": "equals", "value": 0 },
-            { "compare": "ritchiesfirearmengine:is_jammed", "operator": "equals", "value": 1 }
-          ]
-        },
+        "condition": { "macro": "rfe_builtin:can_charge" },
         "time": 22,
         "sound": "rfe_builtin:item.generic.rifle.bolt_cycle"
       }

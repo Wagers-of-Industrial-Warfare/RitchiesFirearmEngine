@@ -265,18 +265,7 @@
   "charge": {
     "actions": [
       {
-        "condition": {
-          "or": [
-            {
-              "and": [
-                { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 },
-                { "compare": "ritchiesfirearmengine:firearm_has_ammo", "operator": "equals", "value": 1 }
-              ]
-            },
-            { "compare": "ritchiesfirearmengine:is_charged", "operator": "equals", "value": 0 },
-            { "compare": "ritchiesfirearmengine:is_jammed", "operator": "equals", "value": 1 }
-          ]
-        },
+        "condition": { "macro": "rfe_builtin:can_charge" },
         "time": 25,
         "sound": "rfe_builtin:item.generic.rifle.rack"
       }

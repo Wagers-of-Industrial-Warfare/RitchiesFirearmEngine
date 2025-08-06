@@ -5,29 +5,29 @@
     "rfe_builtin:remington_700",
     {
       "item": "rfe_builtin:mas_49_56",
-      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_10rds\",Count:1b,tag:{Rounds:[]}}}}"
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_10rds\",Count:1b}}}"
     },
     {
       "item": "rfe_builtin:lee_enfield_no_4",
-      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_10rds\",Count:1b,tag:{Rounds:[]}}}}"
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_10rds\",Count:1b}}}"
     },
     "rfe_builtin:kar98k",
     "rfe_builtin:colt_m1911",
     {
       "item": "rfe_builtin:mat_49",
-      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_32rds\",Count:1b,tag:{Rounds:[]}}}}"
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_32rds\",Count:1b}}}"
     },
     {
       "item": "rfe_builtin:stg_44",
-      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_30rds\",Count:1b,tag:{Rounds:[]}}}}"
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_30rds\",Count:1b}}}"
     },
     {
       "item": "rfe_builtin:hk_g3a3",
-      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_20rds\",Count:1b,tag:{Rounds:[]}}}}"
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_20rds\",Count:1b}}}"
     },
     {
       "item": "rfe_builtin:ak_47",
-      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_30rds\",Count:1b,tag:{Rounds:[]}}}}"
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_30rds\",Count:1b}}}"
     }
   ]
 }

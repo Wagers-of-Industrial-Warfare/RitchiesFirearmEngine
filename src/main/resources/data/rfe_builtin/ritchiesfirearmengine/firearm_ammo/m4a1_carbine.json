@@ -1,0 +1,33 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:intermediate_cartridge",
+      "fires": "rfe_builtin:556x45mm_nato_m4_carbine"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_intermediate_cartridge",
+      "fires": "rfe_builtin:556x45mm_nato_m4_carbine"
+    },
+    {
+      "ammo": "rfe_builtin:tracer_intermediate_cartridge",
+      "fires": "rfe_builtin:556x45mm_nato_m4_carbine_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:tracer_infinite_intermediate_cartridge",
+      "fires": "rfe_builtin:556x45mm_nato_m4_carbine_tracer"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+    "#rfe_builtin:rifle_magazines"
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "modes": {
+  }
+}

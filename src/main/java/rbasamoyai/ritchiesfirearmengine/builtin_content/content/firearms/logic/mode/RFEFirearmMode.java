@@ -302,7 +302,7 @@ public class RFEFirearmMode {
     }
 
     protected void handlePlayerAmmoAndShootingOnClient(ItemStack itemStack, LivingEntity entity) {
-        if (!FirearmDataUtils.isHoldingAttackKey(itemStack))
+        if (!FirearmDataUtils.isHoldingAttackKey(itemStack) && this.fireMode == FireMode.FULL_AUTO)
             return;
         RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
 
@@ -468,6 +468,10 @@ public class RFEFirearmMode {
             return false;
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
         return modeTag.getInt("BurstFireCount") > 0;
+    }
+
+    public void clearBurstFiring(ItemStack itemStack) {
+        this.getOrCreateModeTag(itemStack).remove("BurstFireCount");
     }
 
     // TODO secondary ammo
@@ -958,6 +962,7 @@ public class RFEFirearmMode {
         if (!selected) {
             FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.DRAW);
             FirearmDataUtils.setActionTime(itemStack, this.drawTime);
+            this.clearBurstFiring(itemStack);
             return;
         }
         CompoundTag tag = itemStack.getOrCreateTag();
@@ -968,6 +973,8 @@ public class RFEFirearmMode {
 
         boolean holdingKey = itemStack.getItem() instanceof HoldAttackKeyInteraction holdAttackKeyInteraction
                 && holdAttackKeyInteraction.isHoldingAttackKey(itemStack, entity);
+        if (action != RFEFirearmItem.Action.FIRING)
+            this.clearBurstFiring(itemStack);
         if (action != null) {
             switch (action) {
                 case RELOAD -> this.onTickReload(itemStack, entity);

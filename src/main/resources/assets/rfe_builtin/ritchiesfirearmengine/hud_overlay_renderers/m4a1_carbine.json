@@ -1,0 +1,18 @@
+{
+  "style": "ritchiesfirearmengine:ammo_counter",
+  "hide_entire_ammo_count": false,
+  "hide_firearm_ammo": false,
+  "enlarge_firearm_ammo": true,
+  "show_inventory_ammo": true,
+  "count_loose_rounds": false,
+  "firearm_icon": {
+    "texture": "rfe_builtin:textures/gui/hud/weapon_icon/m4a1_carbine.png",
+    "width": 40,
+    "height": 16
+  },
+  "mode_translations": {
+    "default": "gui.ritchiesfirearmengine.mode.full_auto",
+    "semi_auto": "gui.ritchiesfirearmengine.mode.semi_auto",
+    "safety": "gui.ritchiesfirearmengine.mode.safety"
+  }
+}

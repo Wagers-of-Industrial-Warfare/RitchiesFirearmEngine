@@ -28,6 +28,14 @@
     {
       "item": "rfe_builtin:ak_47",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_30rds\",Count:1b}}}"
+    },
+    {
+      "item": "rfe_builtin:m4_carbine",
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_30rds\",Count:1b}}}"
+    },
+    {
+      "item": "rfe_builtin:m4a1_carbine",
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_30rds\",Count:1b}}}"
     }
   ]
 }

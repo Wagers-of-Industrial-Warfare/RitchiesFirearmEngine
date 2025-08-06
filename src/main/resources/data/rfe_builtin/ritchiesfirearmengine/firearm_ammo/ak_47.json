@@ -3,19 +3,19 @@
   "primary_ammo": [
     {
       "ammo": "rfe_builtin:intermediate_cartridge",
-      "fires": "rfe_builtin:762x39mm_wp"
+      "fires": "rfe_builtin:762x39mm_wp_ak_47"
     },
     {
       "ammo": "rfe_builtin:infinite_intermediate_cartridge",
-      "fires": "rfe_builtin:762x39mm_wp"
+      "fires": "rfe_builtin:762x39mm_wp_ak_47"
     },
     {
       "ammo": "rfe_builtin:tracer_intermediate_cartridge",
-      "fires": "rfe_builtin:762x39mm_wp_tracer"
+      "fires": "rfe_builtin:762x39mm_wp_ak_47_tracer"
     },
     {
       "ammo": "rfe_builtin:tracer_infinite_intermediate_cartridge",
-      "fires": "rfe_builtin:762x39mm_wp_tracer"
+      "fires": "rfe_builtin:762x39mm_wp_ak_47_tracer"
     }
   ],
   "replace_magazines": false,

@@ -120,7 +120,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
 
     public void onReload(ItemStack stack, LivingEntity entity) {
         RFEFirearmMode firearmMode = this.getCurrentMode(stack);
-        firearmMode.tryRunningReloadAction(stack, entity, ReloadPhase.PhaseType.PREPARE, true, false);
+        firearmMode.tryRunningReloadAction(stack, entity, ReloadPhase.PhaseType.PREPARE, true, false, false);
     }
 
     public void onUnload(ItemStack itemStack, LivingEntity entity) {

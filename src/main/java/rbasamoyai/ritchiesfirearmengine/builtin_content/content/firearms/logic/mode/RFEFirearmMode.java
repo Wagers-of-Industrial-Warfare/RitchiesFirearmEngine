@@ -471,7 +471,8 @@ public class RFEFirearmMode {
     }
 
     // TODO secondary ammo
-    public boolean tryRunningReloadAction(ItemStack itemStack, LivingEntity entity, ReloadPhase.PhaseType phaseType, boolean onInput, boolean blockMagazineReload) {
+    public boolean tryRunningReloadAction(ItemStack itemStack, LivingEntity entity, ReloadPhase.PhaseType phaseType,
+                                          boolean onInput, boolean blockMagazineReload, boolean firstReload) {
         if (!this.ammoRequired)
             return false;
         if (FirearmDataUtils.getActionTime(itemStack) > 0)
@@ -485,9 +486,11 @@ public class RFEFirearmMode {
         for (ListIterator<ReloadPhase> lister = this.reloadPhases.get(phaseType).listIterator(); lister.hasNext(); ) {
             int index = lister.nextIndex();
             ReloadPhase phase = lister.next();
-            if (!phase.test(compareContext))
-                continue;
             if (phaseType == ReloadPhase.PhaseType.RELOAD && phase.reloadType() == ReloadPhase.ReloadType.MAGAZINES && blockMagazineReload)
+                continue;
+            if (phaseType == ReloadPhase.PhaseType.RELOAD && !firstReload && phase.firstReloadOnly())
+                continue;
+            if (!phase.test(compareContext))
                 continue;
             FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.RELOAD);
             FirearmDataUtils.setActionTime(itemStack, phase.time());
@@ -533,18 +536,18 @@ public class RFEFirearmMode {
         if (phase.chargeFirearm())
             this.finishCharge(itemStack, entity);
         boolean blockMagazineReloads = phase.blockMagazineReloads() && phaseType == ReloadPhase.PhaseType.RELOAD;
-        if (phaseType == ReloadPhase.PhaseType.PREPARE && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.RELOAD, false, false)) {
+        if (phaseType == ReloadPhase.PhaseType.PREPARE && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.RELOAD, false, false, true)) {
             FirearmDataUtils.cancelReload(itemStack, modeTag);
             return;
         }
         if (phase.endReload()) {
-            if (!this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.FINISH, false, false))
+            if (!this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.FINISH, false, false, false))
                 FirearmDataUtils.cancelReload(itemStack, modeTag);
             return;
         }
         if (phaseType == ReloadPhase.PhaseType.RELOAD
-            && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.RELOAD, false, blockMagazineReloads)
-            && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.FINISH, false, false)) {
+            && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.RELOAD, false, blockMagazineReloads, false)
+            && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.FINISH, false, false, false)) {
             FirearmDataUtils.cancelReload(itemStack, modeTag);
             return;
         }

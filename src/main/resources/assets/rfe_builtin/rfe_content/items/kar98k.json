@@ -15,7 +15,8 @@
   },
   "ammo": {
     "ammo_required": true,
-    "internal_capacity": 5
+    "internal_capacity": 6,
+    "nominal_capacity": 5
   },
   "firing": {
     "fire_mode": "single_action",
@@ -28,7 +29,12 @@
         "phase": "prepare",
         "condition": {
           "and": [
-            { "macro": "rfe_builtin:can_load_1" },
+            {
+              "or": [
+                { "macro": "rfe_builtin:can_load_1" },
+                { "macro": "rfe_builtin:can_load_1_extra" }
+              ]
+            },
             {
               "or": [
                 { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 },
@@ -140,6 +146,25 @@
         "reload_count": 1,
         "reload_delay": 12,
         "replace_chambered_round": true,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" }
+        ]
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1_extra" },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than_or_equal_to", "value": 1 }
+          ]
+        },
+        "time": 29,
+        "reload_type": "rounds",
+        "reload_count": 1,
+        "reload_delay": 12,
+        "replace_chambered_round": true,
+        "first_reload_only": true,
+        "end_reload": true,
         "sounds": [
           { "time": 10, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" }
         ]

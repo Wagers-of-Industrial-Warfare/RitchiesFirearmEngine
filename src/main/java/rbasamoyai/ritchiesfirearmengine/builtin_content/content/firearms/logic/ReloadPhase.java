@@ -35,6 +35,7 @@ public class ReloadPhase {
     protected final boolean replaceChamberedRound;
     protected final boolean blockMagazineReloads;
     protected final boolean endReload;
+    protected final boolean firstReloadOnly;
     protected final Int2IntOpenHashMap reloadDelays;
     protected final int unloadMagTime;
     protected final int reloadMagTime;
@@ -50,6 +51,7 @@ public class ReloadPhase {
         this.replaceChamberedRound = builder.replaceChamberedRound;
         this.blockMagazineReloads = builder.blockMagazineReloads;
         this.endReload = builder.endReload;
+        this.firstReloadOnly = builder.firstReloadOnly;
         this.reloadDelays = builder.finalMultipleReloadDelays;
         this.unloadMagTime = builder.unloadMagTime;
         this.reloadMagTime = builder.reloadMagTime;
@@ -76,6 +78,7 @@ public class ReloadPhase {
     public boolean replaceChamberedRound() { return this.replaceChamberedRound; }
     public boolean blockMagazineReloads() { return this.blockMagazineReloads; }
     public boolean endReload() { return this.endReload; }
+    public boolean firstReloadOnly() { return this.firstReloadOnly; }
     public int reloadsAtTime(int time) { return this.reloadDelays.getOrDefault(time, 0); }
 
     public int unloadMagazineTime() { return this.unloadMagTime; }
@@ -131,6 +134,10 @@ public class ReloadPhase {
             builder.reloadType(reloadType)
                     .endReload(endReload)
                     .blockMagazineReloads(blockMagazineReloads);
+            if (!unload) {
+                boolean firstReloadOnly = GsonHelper.getAsBoolean(obj, "first_reload_only", false);
+                builder.firstReloadOnly(firstReloadOnly);
+            }
             if (reloadType != ReloadType.MAGAZINES) {
                 int reloadCount = obj.has(reloadKey + "_count") ? GsonHelper.getAsInt(obj, reloadKey + "_count") : 1;
                 boolean ammoAddedLast = GsonHelper.getAsBoolean(obj, unload ? "ammo_removed_last" : "ammo_added_last", false);
@@ -221,6 +228,7 @@ public class ReloadPhase {
         protected boolean replaceChamberedRound = false;
         protected boolean blockMagazineReloads = false;
         protected boolean endReload = false;
+        protected boolean firstReloadOnly = false;
         protected List<Integer> multipleReloadDelays = new ArrayList<>();
         protected Int2IntOpenHashMap finalMultipleReloadDelays = new Int2IntOpenHashMap();
         protected int unloadMagTime = -1;
@@ -290,6 +298,8 @@ public class ReloadPhase {
         public Builder blockMagazineReloads(boolean blockMagazineReloads) { this.blockMagazineReloads = blockMagazineReloads; return this; }
 
         public Builder endReload(boolean endReload) { this.endReload = endReload; return this; }
+
+        public Builder firstReloadOnly(boolean firstReloadOnly) { this.firstReloadOnly = firstReloadOnly; return this; }
 
         public Builder reloadDelays(List<Integer> delays) {
             if (this.setSingleDelay)

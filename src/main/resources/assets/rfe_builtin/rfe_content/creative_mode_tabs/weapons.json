@@ -24,6 +24,10 @@
     {
       "item": "rfe_builtin:hk_g3a3",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_20rds\",Count:1b,tag:{Rounds:[]}}}}"
+    },
+    {
+      "item": "rfe_builtin:ak_47",
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_30rds\",Count:1b,tag:{Rounds:[]}}}}"
     }
   ]
 }

@@ -69,7 +69,10 @@
         "reload_type": "magazines",
         "unload_time": 12,
         "reload_time": 31,
-        "sound": "rfe_builtin:item.generic.rifle.magazine.reload_full"
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.rifle.magazine.unload" },
+          { "time": 27, "sound": "rfe_builtin:item.generic.rifle.magazine.reload" }
+        ]
       },
       {
         "phase": "finish",

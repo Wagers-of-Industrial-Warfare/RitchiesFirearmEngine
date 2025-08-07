@@ -16,6 +16,7 @@ plugins {
     id 'net.neoforged.gradle' version '[6.0.16,6.2)'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
     id 'org.spongepowered.mixin' version '0.7.+'
+    id 'io.github.p03w.machete' version '2.0.+'
 }
 
 group = mod_group_id

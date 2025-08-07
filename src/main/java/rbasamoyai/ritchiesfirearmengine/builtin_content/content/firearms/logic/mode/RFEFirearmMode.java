@@ -486,16 +486,13 @@ public class RFEFirearmMode {
     }
 
     public void tryStartBurstFire(ItemStack itemStack, LivingEntity entity) {
-        if (!entity.level().isClientSide && this.fireMode == FireMode.BURST && this.burstRoundCount > 1 && !this.isBurstFiring(itemStack, entity)) {
-            //RitchiesFirearmEngine.LOGGER.info("start burst firing");
+        if (!entity.level().isClientSide && this.fireMode == FireMode.BURST && this.burstRoundCount > 1 && !this.isBurstFiring(itemStack, entity))
             this.getOrCreateModeTag(itemStack).putInt("BurstFireCount", this.burstRoundCount - 1);
-        }
     }
 
     public void decrementBurstFire(ItemStack itemStack, LivingEntity entity) {
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
         int dec = modeTag.getInt("BurstFireCount") - 1;
-        //RitchiesFirearmEngine.LOGGER.info("dec = {}", dec);
         modeTag.putInt("BurstFireCount", dec);
     }
 

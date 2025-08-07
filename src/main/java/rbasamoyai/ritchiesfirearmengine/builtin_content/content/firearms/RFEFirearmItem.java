@@ -26,6 +26,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.R
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmModeAmmoProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilClientImpulse;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
@@ -103,7 +104,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         RFEFirearmMode firearmMode = this.getCurrentMode(stack);
         if (firearmMode.canFireProjectile(stack, entity)) {
             if (!firearmMode.isBurstFiring(stack, entity))
-                firearmMode.fireFirearm(stack, entity, entity instanceof Player);
+                firearmMode.fireFirearm(stack, entity, RFEFirearmMode.FiringType.CLICK);
         } else if (firearmMode.canChargeInternal(stack, entity)) {
             firearmMode.onCharge(stack, entity);
         }
@@ -116,6 +117,13 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
                                               boolean jam, @Nullable UUID recoilUUID, InteractionHand hand) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
         mode.handleFiringInputOnServer(itemStack, entity, firingInputs, jam, recoilUUID, hand);
+    }
+
+    @Override
+    public void handleServerAutomaticFireOnClient(ItemStack itemStack, LivingEntity entity, InteractionHand hand, RFERecoilClientImpulse recoil) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        mode.handleServerRecoil(itemStack, entity, hand, recoil);
+        mode.fireFirearm(itemStack, entity, RFEFirearmMode.FiringType.AUTOMATIC);
     }
 
     public void onReload(ItemStack stack, LivingEntity entity) {

@@ -5,6 +5,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilClientImpulse;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilInstance;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEMathUtils;
 
@@ -55,7 +56,7 @@ public class SimpleRecoilInstance implements RFERecoilInstance {
     }
 
     @Override
-    public void updateRecoil(ItemStack itemStack, LivingEntity entity) {
+    public RFERecoilClientImpulse updateRecoil(ItemStack itemStack, LivingEntity entity) {
         this.pitchO = 0;
         this.yawO = 0;
         this.rollO = this.roll;
@@ -69,6 +70,20 @@ public class SimpleRecoilInstance implements RFERecoilInstance {
         if (random.nextBoolean())
             this.roll *= -1;
 
+        this.age = -1;
+
+        return new RFERecoilClientImpulse(new RFEAimAngles(this.pitch, this.yaw), RFEAimAngles.ZERO_ANGLES, this.roll);
+    }
+
+    @Override
+    public void updateRecoilWithImpulse(ItemStack itemStack, LivingEntity entity, RFERecoilClientImpulse recoil) {
+        this.pitchO = 0;
+        this.yawO = 0;
+        this.rollO = this.roll;
+
+        this.pitch = recoil.aimRecoil().pitch();
+        this.yaw = recoil.aimRecoil().yaw();
+        this.roll = recoil.cameraRoll();
         this.age = -1;
     }
 

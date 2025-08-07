@@ -7,7 +7,9 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.IFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.pack_compatibility.RFEPackMismatchDisconnectScreen;
 import rbasamoyai.ritchiesfirearmengine.foundation.pack_loading.RFEPackLoader;
@@ -64,6 +66,15 @@ public class RFEClientNetworkHandlers {
         }
 
         mc.setScreen(new RFEPackMismatchDisconnectScreen(new JoinMultiplayerScreen(new TitleScreen()), CommonComponents.CONNECT_FAILED, reason, mismatched));
+    }
+
+    public static void handleAutomaticFire(ClientboundRunFiringLogicPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null)
+            return;
+        ItemStack itemStack = mc.player.getItemInHand(packet.hand());
+        if (itemStack.getItem() instanceof IFirearmItem firearm)
+            firearm.handleServerAutomaticFireOnClient(itemStack, mc.player, packet.hand(), packet.recoil());
     }
 
 }

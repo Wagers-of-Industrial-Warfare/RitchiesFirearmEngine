@@ -54,6 +54,7 @@ public class RFENetwork {
         buildMessage(network, id++, ClientboundSyncSpreadProvidersPacket.class, ClientboundSyncSpreadProvidersPacket::decode);
         buildMessage(network, id++, ClientboundSyncRecoilProvidersPacket.class, ClientboundSyncRecoilProvidersPacket::decode);
         buildMessage(network, id++, ClientboundSyncHitMultipliersPacket.class, ClientboundSyncHitMultipliersPacket::decode);
+        buildMessage(network, id++, ClientboundRunFiringLogicPacket.class, ClientboundRunFiringLogicPacket::decode);
 
         return network;
     }

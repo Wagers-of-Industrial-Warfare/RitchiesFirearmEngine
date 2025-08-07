@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -24,12 +25,14 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectile
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilClientImpulse;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProviderPackHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProviderPackHandler;
+import rbasamoyai.ritchiesfirearmengine.network.ClientboundRunFiringLogicPacket;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundRunFiringLogicPacket;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
@@ -275,14 +278,20 @@ public class RFEFirearmMode {
         return !this.getNextRoundsInItem(itemStack, entity, this.shotsFired, false).isEmpty();
     }
 
-    public void fireFirearm(ItemStack itemStack, LivingEntity entity, boolean playerInput) {
+    public void fireFirearm(ItemStack itemStack, LivingEntity entity, FiringType firing) {
+        InteractionHand hand = entity.getMainHandItem() == itemStack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
+        boolean client = entity.level().isClientSide;
+
         // TODO windup
 
-        if (entity instanceof Player && playerInput) {
-            if (entity.level().isClientSide)
+        if (entity instanceof Player && firing != FiringType.NON_PLAYER_AND_EFFECTS) {
+            if (client && firing == FiringType.CLICK || !client && firing == FiringType.AUTOMATIC)
                 this.handlePlayerAmmoAndShootingOnClient(itemStack, entity);
             return;
         } // TODO other entities
+
+        if (!client)
+            this.tryStartBurstFire(itemStack, entity);
 
         RFEFirearmModeHandlingProperties firearmProperties = this.getHandlingProperties(itemStack);
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
@@ -351,13 +360,28 @@ public class RFEFirearmMode {
                     .createRecoilInstance(itemStack, entity, entity.getRandom());
             RFERecoilManager.trackRecoil(recoilInstance, entity, itemStack, hand);
         }
-        recoilInstance.updateRecoil(itemStack, entity);
+        RFERecoilClientImpulse impulse = recoilInstance.updateRecoil(itemStack, entity);
 
         boolean jam = this.fireMode.isSelfLoading() && this.shouldJam(itemStack, entity);
         this.setJammed(itemStack, entity, jam);
 
         UUID recoilUUID = RFERecoilManager.getRecoilId(itemStack);
-        RFENetwork.sendToServer(new ServerboundRunFiringLogicPacket(firingInputs, jam, hand, recoilUUID));
+        if (entity.level().isClientSide) {
+            RFENetwork.sendToServer(new ServerboundRunFiringLogicPacket(firingInputs, jam, hand, recoilUUID));
+        } else if (entity instanceof ServerPlayer splayer) {
+            RFENetwork.sendToPlayer(new ClientboundRunFiringLogicPacket(hand, impulse), splayer);
+            this.handleFiringInputOnServer(itemStack, entity, firingInputs, jam, recoilUUID, hand);
+        }
+    }
+
+    public void handleServerRecoil(ItemStack itemStack, LivingEntity entity, InteractionHand hand, RFERecoilClientImpulse recoil) {
+        RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(entity, itemStack);
+        if (recoilInstance == null) {
+            recoilInstance = RFERecoilProviderPackHandler.getRecoilProviders(itemStack).getProperties(this.modeId)
+                    .createRecoilInstance(itemStack, entity, entity.getRandom());
+            RFERecoilManager.trackRecoil(recoilInstance, entity, itemStack, hand);
+        }
+        recoilInstance.updateRecoilWithImpulse(itemStack, entity, recoil);
     }
 
     public void handleFiringInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs,
@@ -389,7 +413,7 @@ public class RFEFirearmMode {
             RFEProjectileManager.queueAddedProjectile(projectile, entity.level());
         }
 
-        this.fireFirearm(itemStack, entity, false);
+        this.fireFirearm(itemStack, entity, FiringType.NON_PLAYER_AND_EFFECTS);
         this.setJammed(itemStack, entity, jam);
     }
 
@@ -433,34 +457,46 @@ public class RFEFirearmMode {
                 this.finishCharge(itemStack, entity);
             }
         }
-        boolean isPlayer = entity instanceof Player;
+        if (entity.level().isClientSide)
+            return; // Handle automatic fire on the server only
         if (this.fireMode == FireMode.FULL_AUTO && this.canFireProjectile(itemStack, entity)) {
             if (!(itemStack.getItem() instanceof HoldAttackKeyInteraction holdAttackKey) || holdAttackKey.isHoldingAttackKey(itemStack, entity))
-                this.fireFirearm(itemStack, entity, isPlayer);
+                this.fireFirearm(itemStack, entity, FiringType.AUTOMATIC);
             return;
         }
-        if (this.fireMode == FireMode.BURST && this.canBurstFire(itemStack, entity))
-            this.fireFirearm(itemStack, entity, isPlayer);
+        if (this.fireMode == FireMode.BURST && this.canContinueBurstFire(itemStack, entity)) {
+            this.fireFirearm(itemStack, entity, FiringType.AUTOMATIC);
+            this.decrementBurstFire(itemStack, entity);
+        }
     }
 
     public boolean automaticSingleActionCycle(ItemStack itemStack, LivingEntity entity) {
         return !this.getHandlingProperties(itemStack).manualCharging();
     }
 
-    public boolean canBurstFire(ItemStack itemStack, LivingEntity entity) {
-        if (this.burstRoundCount <= 1)
-            return false;
+    public boolean canContinueBurstFire(ItemStack itemStack, LivingEntity entity) {
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
-        if (!modeTag.contains("BurstFireCount"))
-            modeTag.putInt("BurstFireCount", this.burstRoundCount);
-        int burstFireCount = modeTag.getInt("BurstFireCount") - 1;
+        int burstFireCount = modeTag.getInt("BurstFireCount");
         if (burstFireCount <= 0 || !this.canFireProjectile(itemStack, entity)) {
             modeTag.remove("BurstFireCount");
             return false;
         } else {
-            modeTag.putInt("BurstFireCount", burstFireCount);
             return true;
         }
+    }
+
+    public void tryStartBurstFire(ItemStack itemStack, LivingEntity entity) {
+        if (!entity.level().isClientSide && this.fireMode == FireMode.BURST && this.burstRoundCount > 1 && !this.isBurstFiring(itemStack, entity)) {
+            //RitchiesFirearmEngine.LOGGER.info("start burst firing");
+            this.getOrCreateModeTag(itemStack).putInt("BurstFireCount", this.burstRoundCount - 1);
+        }
+    }
+
+    public void decrementBurstFire(ItemStack itemStack, LivingEntity entity) {
+        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        int dec = modeTag.getInt("BurstFireCount") - 1;
+        //RitchiesFirearmEngine.LOGGER.info("dec = {}", dec);
+        modeTag.putInt("BurstFireCount", dec);
     }
 
     public boolean isBurstFiring(ItemStack itemStack, LivingEntity entity) {
@@ -1144,5 +1180,11 @@ public class RFEFirearmMode {
     }
 
     public boolean requiresAmmo() { return this.ammoRequired; }
+
+    public enum FiringType {
+        CLICK,
+        AUTOMATIC,
+        NON_PLAYER_AND_EFFECTS
+    }
     
 }

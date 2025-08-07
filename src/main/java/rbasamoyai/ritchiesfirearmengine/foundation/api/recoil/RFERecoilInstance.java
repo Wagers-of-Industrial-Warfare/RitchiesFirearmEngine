@@ -10,7 +10,8 @@ public interface RFERecoilInstance {
     RFEAimAngles getCameraRecoil(float dt);
     float getCameraRoll(float dt);
 
-    void updateRecoil(ItemStack itemStack, LivingEntity entity);
+    RFERecoilClientImpulse updateRecoil(ItemStack itemStack, LivingEntity entity);
+    void updateRecoilWithImpulse(ItemStack itemStack, LivingEntity entity, RFERecoilClientImpulse recoil);
     void tickRecoilBehavior();
     boolean isRemoved();
 

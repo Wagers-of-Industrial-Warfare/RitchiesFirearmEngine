@@ -40,9 +40,9 @@ public class RFEClientRemix {
         if (mc.player == null) return;
 
         ItemStack mainhandItem = mc.player.getMainHandItem();
-        if (mainhandItem.getItem() instanceof HoldAttackKeyInteraction holdAttackKeyInteraction) {
+        if (mainhandItem.getItem() instanceof HoldAttackKeyInteraction hold && !hold.isHoldingAttackKey(mainhandItem, mc.player)) {
             RFENetwork.sendToServer(new ServerboundSetAttackKeyPacket(true));
-            holdAttackKeyInteraction.onPressAttackKey(mainhandItem, mc.player);
+            hold.onPressAttackKey(mainhandItem, mc.player);
         }
     }
 
@@ -51,9 +51,9 @@ public class RFEClientRemix {
         if (mc.player == null) return;
 
         ItemStack mainhandItem = mc.player.getMainHandItem();
-        if (mainhandItem.getItem() instanceof HoldAttackKeyInteraction holdAttackKeyInteraction) {
+        if (mainhandItem.getItem() instanceof HoldAttackKeyInteraction hold && hold.isHoldingAttackKey(mainhandItem, mc.player)) {
             RFENetwork.sendToServer(new ServerboundSetAttackKeyPacket(false));
-            holdAttackKeyInteraction.onReleaseAttackKey(mainhandItem, mc.player);
+            hold.onReleaseAttackKey(mainhandItem, mc.player);
         }
     }
 

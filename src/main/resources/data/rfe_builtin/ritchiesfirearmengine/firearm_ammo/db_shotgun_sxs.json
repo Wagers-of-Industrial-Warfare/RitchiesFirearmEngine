@@ -2,12 +2,28 @@
   "replace_primary_ammo": false,
   "primary_ammo": [
     {
+      "ammo": "rfe_builtin:birdshot_shell",
+      "fires": "rfe_builtin:12_ga_7_birdshot_ba"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_birdshot_shell",
+      "fires": "rfe_builtin:12_ga_7_birdshot_ba"
+    },
+    {
+      "ammo": "rfe_builtin:buckshot_shell",
+      "fires": "rfe_builtin:12_ga_1_buckshot_ba"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_buckshot_shell",
+      "fires": "rfe_builtin:12_ga_1_buckshot_ba"
+    },
+    {
       "ammo": "rfe_builtin:slug_shell",
-      "fires": "rfe_builtin:slug_12_ga_db"
+      "fires": "rfe_builtin:12_ga_slug_ba"
     },
     {
       "ammo": "rfe_builtin:infinite_slug_shell",
-      "fires": "rfe_builtin:slug_12_ga_db"
+      "fires": "rfe_builtin:12_ga_slug_ba"
     }
   ],
   "replace_magazines": false,

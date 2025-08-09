@@ -47,10 +47,21 @@ public class RFEProjectileUtils {
      * @return the aim deviation, in degrees; left entry is pitch, right entry is yaw
      */
     public static RFEAimAngles standardSpreadAngles(float radius, boolean tighten, RandomSource random) {
+        return standardSpreadAngles(radius, radius, tighten, random);
+    }
+
+    /**
+     *
+     * @param horizontalDispersion radius of yaw spread, in degrees
+     * @param verticalDispersion radius of pitch spread, in degrees
+     * @param tighten if the spread should be concentrated in the center
+     * @param random random source for generating spread
+     * @return the aim deviation, in degrees; left entry is pitch, right entry is yaw
+     */
+    public static RFEAimAngles standardSpreadAngles(float horizontalDispersion, float verticalDispersion, boolean tighten, RandomSource random) {
         float angle = random.nextFloat() * Mth.TWO_PI;
         float radMul = tighten ? random.nextFloat() : Mth.sqrt(random.nextFloat()); // Taken from sym.gg
-        radMul *= radius;
-        return new RFEAimAngles(radMul * Mth.sin(angle), radMul * Mth.cos(angle));
+        return new RFEAimAngles(radMul * verticalDispersion * Mth.sin(angle), radMul * horizontalDispersion * Mth.cos(angle));
     }
 
 }

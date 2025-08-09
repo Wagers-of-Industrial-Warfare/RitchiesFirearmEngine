@@ -1,16 +1,11 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bullet;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
@@ -27,6 +22,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.*;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.RFEHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.RFEHitMultiplierHandler;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEBaseProjectilePropertiesBuilder;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEProjectileDamageModel;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
@@ -35,32 +31,29 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectile
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEMathUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEProjectileUtils;
-import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 public class RFEBulletProjectileType implements RFEProjectileType {
 
-    private final boolean fullHitscan;
-    private final double muzzleVelocity;
-    private final double drag;
-    private final boolean quadraticDrag;
-    private final double gravity;
-    private final int maxAge;
-    private final float knockback;
-    private final RFEProjectileDamageModel damageModel;
-    private final ResourceKey<DamageType> damageTypeKey;
+    protected final boolean fullHitscan;
+    protected final double muzzleVelocity;
+    protected final double drag;
+    protected final boolean quadraticDrag;
+    protected final double gravity;
+    protected final int maxAge;
+    protected final float knockback;
+    protected final RFEProjectileDamageModel damageModel;
+    protected final ResourceKey<DamageType> damageTypeKey;
 
-    public RFEBulletProjectileType(boolean fullHitscan, double muzzleVelocity, double drag, boolean quadraticDrag,
-                                   double gravity, int maxAge, float knockback, RFEProjectileDamageModel damageModel,
-                                   ResourceKey<DamageType> damageTypeKey) {
-        this.fullHitscan = fullHitscan;
-        this.muzzleVelocity = muzzleVelocity;
-        this.drag = drag;
-        this.quadraticDrag = quadraticDrag;
-        this.gravity = gravity;
-        this.maxAge = maxAge;
-        this.knockback = knockback;
-        this.damageModel = damageModel;
-        this.damageTypeKey = damageTypeKey;
+    public RFEBulletProjectileType(RFEBaseProjectilePropertiesBuilder builder) {
+        this.fullHitscan = builder.fullHitscan;
+        this.muzzleVelocity = builder.muzzleVelocity;
+        this.drag = builder.drag;
+        this.quadraticDrag = builder.quadraticDrag;
+        this.gravity = builder.gravity;
+        this.maxAge = builder.maxAge;
+        this.knockback = builder.knockback;
+        this.damageModel = builder.damageModel;
+        this.damageTypeKey = builder.damageTypeKey;
     }
 
     @Override
@@ -92,8 +85,9 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             newPos = hitResult.getLocation();
         AABB searchBox = this.getAABB(level, instance).expandTowards(velocity).inflate(1.0d);
 
+        double hitboxInflation = this.getHitboxInflation(level, instance);
         while (!instance.isRemoved()) {
-            EntityHitResult entityHitResult = RFEProjectileUtils.getEntityHitResult(level, oldPos, newPos, searchBox, e -> this.canHitEntity(instance, e), 0.1d);
+            EntityHitResult entityHitResult = RFEProjectileUtils.getEntityHitResult(level, oldPos, newPos, searchBox, e -> this.canHitEntity(instance, e), 0.05d);
             if (entityHitResult != null)
                 hitResult = entityHitResult;
 
@@ -140,6 +134,8 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     public AABB getAABB(Level level, RFEProjectileInstance instance) {
         return AABB.ofSize(instance.position(), 0, 0, 0);
     }
+
+    protected double getHitboxInflation(Level level, RFEProjectileInstance instance) { return 0.05d; }
 
     protected boolean canHitEntity(RFEProjectileInstance instance, Entity target) {
         if (!target.canBeHitByProjectile()) {
@@ -200,8 +196,9 @@ public class RFEBulletProjectileType implements RFEProjectileType {
                 if (this.knockback > 0) {
                     double knockbackScale = Math.max(0d, 1d - living.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
                     Vec3 vec3 = instance.velocity().multiply(1d, 0d, 1d).normalize().scale(this.knockback * knockbackScale);
+                    double verticalVel = oldVel.y < 0.05d ? 0.25 : 0;
                     if (vec3.lengthSqr() > 0d)
-                        living.push(vec3.x, 0.25, vec3.z);
+                        living.push(vec3.x, verticalVel, vec3.z);
                 }
 
                 if (!level.isClientSide && owner instanceof LivingEntity ownerLiving) {
@@ -270,60 +267,35 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     public RFEProjectileType.Serializer<?> getSerializer() {
         return BuiltInRFEPlugin.ProjectileTypes.BULLET;
     }
+    
+    public static RFEBaseProjectilePropertiesBuilder makeProjectileProperties(RFEBulletProjectileType type) {
+        RFEBaseProjectilePropertiesBuilder builder = new RFEBaseProjectilePropertiesBuilder();
+        builder.fullHitscan = type.fullHitscan;
+        builder.muzzleVelocity = type.muzzleVelocity;
+        builder.drag = type.drag;
+        builder.quadraticDrag = type.quadraticDrag;
+        builder.gravity = type.gravity;
+        builder.maxAge = type.maxAge;
+        builder.knockback = type.knockback;
+        builder.damageModel = type.damageModel;
+        builder.damageTypeKey = type.damageTypeKey;
+        return builder;
+    }
 
     public static class Serializer implements RFEProjectileType.Serializer<RFEBulletProjectileType> {
         @Override
         public RFEBulletProjectileType fromJson(JsonObject obj) {
-            boolean fullHitscan = GsonHelper.getAsBoolean(obj, "full_hitscan", false);
-            double muzzleVelocity = GsonHelper.getAsDouble(obj, fullHitscan ? "hitscan_range" : "muzzle_velocity");
-            double drag = fullHitscan ? 0 : Mth.clamp(GsonHelper.getAsDouble(obj, "drag"), 0, 1);
-            boolean quadraticDrag = !fullHitscan && GsonHelper.getAsBoolean(obj, "quadratic_drag", true);
-            double gravity = fullHitscan ? 0 : GsonHelper.getAsDouble(obj, "gravity");
-            int maxAge = fullHitscan ? 0 : GsonHelper.getAsInt(obj, "max_age", 400);
-            float knockback = Math.max(GsonHelper.getAsFloat(obj, "knockback", 0), 0);
-
-            RFEProjectileDamageModel damageModel = new RFEProjectileDamageModel();
-            JsonArray dmgModelArr = GsonHelper.getAsJsonArray(obj, "damage_model");
-            for (JsonElement el : dmgModelArr) {
-                if (!el.isJsonObject())
-                    throw new JsonParseException("Expected JSON object for projectile damage model point");
-                JsonObject pointObj = el.getAsJsonObject();
-                double distance = GsonHelper.getAsDouble(pointObj, "distance");
-                double damage = GsonHelper.getAsDouble(pointObj, "damage");
-                damageModel.addPoint(distance, damage);
-            }
-            damageModel.validateDamageModel();
-
-            ResourceKey<DamageType> damageType = ResourceKey.create(Registries.DAMAGE_TYPE, RFEUtils.location(GsonHelper.getAsString(obj, "damage_type")));
-
-            return new RFEBulletProjectileType(fullHitscan, muzzleVelocity, drag, quadraticDrag, gravity, maxAge, knockback, damageModel, damageType);
+            return new RFEBulletProjectileType(RFEBaseProjectilePropertiesBuilder.fromJson(obj));
         }
 
         @Override
         public RFEBulletProjectileType fromNetwork(FriendlyByteBuf buf) {
-            boolean fullHitscan = buf.readBoolean();
-            double muzzleVelocity = buf.readDouble();
-            double drag = buf.readDouble();
-            boolean quadraticDrag = buf.readBoolean();
-            double gravity = buf.readDouble();
-            int maxAge = buf.readVarInt();
-            float knockback = buf.readFloat();
-            RFEProjectileDamageModel damageModel = RFEProjectileDamageModel.fromNetwork(buf);
-            ResourceKey<DamageType> damageType = buf.readResourceKey(Registries.DAMAGE_TYPE);
-            return new RFEBulletProjectileType(fullHitscan, muzzleVelocity, drag, quadraticDrag, gravity, maxAge, knockback, damageModel, damageType);
+            return new RFEBulletProjectileType(RFEBaseProjectilePropertiesBuilder.fromNetwork(buf));
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf buf, RFEBulletProjectileType type) {
-            buf.writeBoolean(type.fullHitscan)
-                    .writeDouble(type.muzzleVelocity)
-                    .writeDouble(type.drag)
-                    .writeBoolean(type.quadraticDrag)
-                    .writeDouble(type.gravity);
-            buf.writeVarInt(type.maxAge)
-                    .writeFloat(type.knockback);
-            RFEProjectileDamageModel.toNetwork(buf, type.damageModel);
-            buf.writeResourceKey(type.damageTypeKey);
+            RFEBaseProjectilePropertiesBuilder.toNetwork(buf, makeProjectileProperties(type));
         }
     }
 

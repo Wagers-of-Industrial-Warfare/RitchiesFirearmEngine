@@ -21,7 +21,10 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.body_parts.HeadshotHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.body_parts.HeadshotHitMultiplierGore;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.fixed.FixedHitMultiplier;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.vulnerable_to_birdshot.BirdshotHitMultiplier;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.vulnerable_to_birdshot.BirdshotHitMultiplierGore;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bullet.RFEBulletProjectileType;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.shotgun.RFEShotgunProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudItemInfoProviders;
@@ -183,9 +186,11 @@ public class BuiltInRFEPlugin implements RFEPlugin {
 
     public static class ProjectileTypes {
         public static final RFEBulletProjectileType.Serializer BULLET = new RFEBulletProjectileType.Serializer();
+        public static final RFEShotgunProjectileType.Serializer SHOTGUN = new RFEShotgunProjectileType.Serializer();
 
         public static void register() {
             RFEContentBuilderRegistry.registerProjectileTypeSerializer(RitchiesFirearmEngine.resource("bullet"), BULLET);
+            RFEContentBuilderRegistry.registerProjectileTypeSerializer(RitchiesFirearmEngine.resource("shotgun"), SHOTGUN);
         }
     }
 
@@ -214,12 +219,16 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         public static final RFEHitMultiplier.Provider ARMOR_PIERCING = ArmorPiercingHitMultiplier::new;
         public static final RFEHitMultiplier.Provider HEADSHOT = HeadshotHitMultiplier::new;
         public static final RFEHitMultiplier.Provider HEADSHOT_GORE = HeadshotHitMultiplierGore::new;
+        public static final RFEHitMultiplier.Provider VULNERABLE_TO_BIRDSHOT = BirdshotHitMultiplier::new;
+        public static final RFEHitMultiplier.Provider VULNERABLE_TO_BIRDSHOT_GORE = BirdshotHitMultiplierGore::new;
 
         public static void register() {
             RFEContentBuilderRegistry.registerHitMultiplierProvider(RitchiesFirearmEngine.resource("fixed"), FIXED);
             RFEContentBuilderRegistry.registerHitMultiplierProvider(RitchiesFirearmEngine.resource("armor_piercing"), ARMOR_PIERCING);
             RFEContentBuilderRegistry.registerHitMultiplierProvider(RitchiesFirearmEngine.resource("headshot"), HEADSHOT);
             RFEContentBuilderRegistry.registerHitMultiplierProvider(RitchiesFirearmEngine.resource("headshot_gore"), HEADSHOT_GORE);
+            RFEContentBuilderRegistry.registerHitMultiplierProvider(RitchiesFirearmEngine.resource("vulnerable_to_birdshot"), VULNERABLE_TO_BIRDSHOT);
+            RFEContentBuilderRegistry.registerHitMultiplierProvider(RitchiesFirearmEngine.resource("vulnerable_to_birdshot_gore"), VULNERABLE_TO_BIRDSHOT_GORE);
         }
     }
 

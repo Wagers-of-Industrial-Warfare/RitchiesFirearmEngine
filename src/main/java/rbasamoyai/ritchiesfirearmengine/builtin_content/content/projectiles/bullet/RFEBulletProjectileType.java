@@ -87,7 +87,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
 
         double hitboxInflation = this.getHitboxInflation(level, instance);
         while (!instance.isRemoved()) {
-            EntityHitResult entityHitResult = RFEProjectileUtils.getEntityHitResult(level, oldPos, newPos, searchBox, e -> this.canHitEntity(instance, e), 0.05d);
+            EntityHitResult entityHitResult = RFEProjectileUtils.getEntityHitResult(level, oldPos, newPos, searchBox, e -> this.canHitEntity(instance, e), hitboxInflation);
             if (entityHitResult != null)
                 hitResult = entityHitResult;
 
@@ -135,7 +135,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         return AABB.ofSize(instance.position(), 0, 0, 0);
     }
 
-    protected double getHitboxInflation(Level level, RFEProjectileInstance instance) { return 0.05d; }
+    protected double getHitboxInflation(Level level, RFEProjectileInstance instance) { return 0.1d; }
 
     protected boolean canHitEntity(RFEProjectileInstance instance, Entity target) {
         if (!target.canBeHitByProjectile()) {

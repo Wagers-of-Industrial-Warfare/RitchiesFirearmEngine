@@ -1,8 +1,8 @@
 {
   "title": "itemGroup.rfe_builtin.weapons",
-  "icon": "rfe_builtin:remington_700",
+  "icon": "rfe_builtin:r700",
   "contents": [
-    "rfe_builtin:remington_700",
+    "rfe_builtin:r700",
     {
       "item": "rfe_builtin:lee_enfield_no_4",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_10rds\",Count:1b}}}"
@@ -13,7 +13,7 @@
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_10rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:hk_g3a3",
+      "item": "rfe_builtin:g3a3",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_20rds\",Count:1b}}}"
     },
     {
@@ -37,6 +37,6 @@
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_32rds\",Count:1b}}}"
     },
     "rfe_builtin:db_shotgun_sxs",
-    "rfe_builtin:colt_m1911"
+    "rfe_builtin:m1911"
   ]
 }

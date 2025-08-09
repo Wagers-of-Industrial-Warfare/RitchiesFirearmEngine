@@ -323,7 +323,10 @@ public class RFEFirearmMode {
             for (ItemStack ammoStack : strippedAmmo) {
                 for (Map.Entry<AmmoPredicate, RFEProjectileType> entry : ammoProperties.primaryAmmo().entrySet()) {
                     if (entry.getKey().test(ammoStack)) {
-                        toFire.add(entry.getValue());
+                        int sz = ammoStack.getCount();
+                        RFEProjectileType projectileType = entry.getValue();
+                        for (int i = 0; i < sz; ++i)
+                            toFire.add(projectileType);
                         break;
                     }
                 }
@@ -623,7 +626,7 @@ public class RFEFirearmMode {
         if (this.internalCapacity > 0) {
             ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
             capacity = this.internalCapacity;
-            if (!replaceChamberedRound)
+            if (!phase.ammoAddedLast() && !replaceChamberedRound)
                 chambered = FirearmDataUtils.stripAmmo(ammoList, false, true);
         } else {
             CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");

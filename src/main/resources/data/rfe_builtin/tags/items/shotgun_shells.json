@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "rfe_builtin:birdshot_shell",
+    "rfe_builtin:buckshot_shell",
+    "rfe_builtin:infinite_birdshot_shell",
+    "rfe_builtin:infinite_buckshot_shell",
+    "rfe_builtin:infinite_slug_shell",
+    "rfe_builtin:slug_shell"
+  ]
+}

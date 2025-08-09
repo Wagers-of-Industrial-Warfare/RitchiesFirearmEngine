@@ -1,0 +1,24 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:slug_shell",
+      "fires": "rfe_builtin:slug_12_ga_db"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_slug_shell",
+      "fires": "rfe_builtin:slug_12_ga_db"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "modes": {
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "parent": "rfe_builtin:item/db_shotgun_sxs/db_shotgun_sxs_normal",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:aiming": 1 },
+      "model": "rfe_builtin:item/db_shotgun_sxs/db_shotgun_sxs_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
+      "model": "rfe_builtin:item/db_shotgun_sxs/db_shotgun_sxs_reload"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
+      "model": "rfe_builtin:item/db_shotgun_sxs/db_shotgun_sxs_reload"
+    }
+  ]
+}

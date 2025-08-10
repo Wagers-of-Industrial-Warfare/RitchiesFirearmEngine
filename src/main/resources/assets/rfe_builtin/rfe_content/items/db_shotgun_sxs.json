@@ -15,12 +15,14 @@
   },
   "ammo": {
     "ammo_required": true,
-    "internal_capacity": 2
+    "internal_capacity": 2,
+    "track_empty_slots": true
   },
   "firing": {
     "fire_mode": "semi_auto",
     "cooldown": 4,
     "ammo_consumed_last": false,
+    "ignore_empty_slots_when_firing": true,
     "shots_fired": 1,
     "sound": "rfe_builtin:item.generic.shotgun.shot"
   },
@@ -49,7 +51,7 @@
         "reload_type": "rounds",
         "reload_count": 2,
         "reload_delays": [ 12, 24 ],
-        "ammo_added_last": true,
+        "ammo_added_last": false,
         "sounds": [
           { "time": 10, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" },
           { "time": 22, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" }
@@ -118,6 +120,7 @@
         "fire_mode": "semi_auto",
         "cooldown": 4,
         "ammo_consumed_last": true,
+        "ignore_empty_slots_when_firing": true,
         "shots_fired": 1,
         "sound": "rfe_builtin:item.generic.shotgun.shot"
       },
@@ -146,7 +149,7 @@
             "reload_type": "rounds",
             "reload_count": 2,
             "reload_delays": [ 12, 24 ],
-            "ammo_added_last": false,
+            "ammo_added_last": true,
             "sounds": [
               { "time": 10, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" },
               { "time": 22, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" }
@@ -211,6 +214,7 @@
         "fire_mode": "semi_auto",
         "cooldown": 4,
         "shots_fired": 2,
+        "ignore_empty_slots_when_firing": true,
         "sound": "rfe_builtin:item.generic.shotgun.shot"
       }
     },

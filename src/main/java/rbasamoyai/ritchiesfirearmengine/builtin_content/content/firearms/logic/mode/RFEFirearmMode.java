@@ -73,11 +73,13 @@ public class RFEFirearmMode {
     protected final int nominalCapacity;
     protected final boolean plusOneCapacity;
     protected final boolean requiresSecondaryAmmo;
+    protected final boolean trackEmptySlots;
 
     // Firing
     protected final FireMode fireMode;
     protected final int firingCooldown;
     protected final boolean ammoConsumedLast;
+    protected final boolean ignoreEmptySlotsWhenFiring;
     protected final int shotsFired;
     protected final int burstRoundCount;
     @Nullable protected final SoundEvent firingSound;
@@ -128,10 +130,12 @@ public class RFEFirearmMode {
         this.nominalCapacity = builder.nominalCapacity;
         this.plusOneCapacity = builder.plusOneCapacity;
         this.requiresSecondaryAmmo = builder.requiresSecondaryAmmo;
+        this.trackEmptySlots = builder.trackEmptySlots;
 
         this.fireMode = builder.fireMode;
         this.firingCooldown = builder.firingCooldown;
         this.ammoConsumedLast = builder.ammoConsumedLast;
+        this.ignoreEmptySlotsWhenFiring = builder.ignoreEmptySlotsWhenFiring;
         this.shotsFired = builder.shotsFired;
         this.burstRoundCount = builder.burstRoundCount;
         this.firingSound = builder.firingSound;
@@ -216,7 +220,8 @@ public class RFEFirearmMode {
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
         if (this.internalCapacity > 0) {
             List<ItemStack> list = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
-            List<ItemStack> internalStripped = FirearmDataUtils.stripMultipleAmmo(list, count, this.ammoConsumedLast, !strip);
+            List<ItemStack> internalStripped = FirearmDataUtils.stripMultipleAmmo(list, count, this.ammoConsumedLast,
+                    !strip, this.trackEmptySlots, this.ignoreEmptySlotsWhenFiring);
             count -= RFEItemUtils.countItems(internalStripped);
             totalStripped.addAll(internalStripped);
             if (strip)
@@ -235,7 +240,8 @@ public class RFEFirearmMode {
             ItemStack magazine = ItemStack.of(magazineTag);
             if (magazine.getItem() instanceof MagazineItem magazineItem) {
                 List<ItemStack> list = magazineItem.getStoredAmmo(magazine);
-                List<ItemStack> magStripped = FirearmDataUtils.stripMultipleAmmo(list, count, this.ammoConsumedLast, !strip);
+                List<ItemStack> magStripped = FirearmDataUtils.stripMultipleAmmo(list, count, this.ammoConsumedLast,
+                        !strip, this.trackEmptySlots, this.ignoreEmptySlotsWhenFiring);
                 count -= RFEItemUtils.countItems(magStripped);
                 totalStripped.addAll(magStripped);
                 if (strip) {
@@ -625,9 +631,14 @@ public class RFEFirearmMode {
         ItemStack chambered = ItemStack.EMPTY;
         if (this.internalCapacity > 0) {
             ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
+            if (this.trackEmptySlots) {
+                int diff = this.internalCapacity - RFEItemUtils.countItemsIncludingSlots(ammoList);
+                for (int i = 0; i < diff; ++i)
+                    ammoList.add(ItemStack.EMPTY);
+            }
             capacity = this.internalCapacity;
             if (!phase.ammoAddedLast() && !replaceChamberedRound)
-                chambered = FirearmDataUtils.stripAmmo(ammoList, false, true);
+                chambered = FirearmDataUtils.stripAmmo(ammoList, false, true, this.trackEmptySlots);
         } else {
             CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
             ItemStack magazine = ItemStack.of(magazineTag);
@@ -639,11 +650,11 @@ public class RFEFirearmMode {
                 ++capacity;
                 ItemStack loadedRound = this.getLoadedRound(itemStack);
                 if (!loadedRound.isEmpty()) {
-                    FirearmDataUtils.addAmmo(ammoList, loadedRound, false, 0);
+                    FirearmDataUtils.addAmmo(ammoList, loadedRound, false, this.trackEmptySlots, 0);
                     this.setLoadedRound(itemStack, ItemStack.EMPTY);
                 }
             } else if (!this.plusOneCapacity && !replaceChamberedRound) {
-                chambered = FirearmDataUtils.stripAmmo(ammoList, false, true);
+                chambered = FirearmDataUtils.stripAmmo(ammoList, false, true, this.trackEmptySlots);
             }
         }
         Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
@@ -659,12 +670,12 @@ public class RFEFirearmMode {
                     } else {
                         addition = s.split(takeAmount);
                     }
-                    FirearmDataUtils.addAmmo(foundAmmo, addition, false);
+                    FirearmDataUtils.addAmmo(foundAmmo, addition, false, false);
                     return s.isEmpty() ? ItemStack.EMPTY : s;
                 }, () -> foundAmmo.size() >= addable || !foundAmmo.isEmpty() && foundAmmo.get(foundAmmo.size() - 1).is(RFEItemTags.INFINITE_AMMO.tag));
                 if (!foundAmmo.isEmpty()) {
                     for (ItemStack sourceStack : foundAmmo)
-                        FirearmDataUtils.addAmmo(ammoList, sourceStack, addedLast, 0);
+                        FirearmDataUtils.addAmmo(ammoList, sourceStack, addedLast, this.trackEmptySlots, 0);
                 }
             }
         } else {
@@ -673,14 +684,14 @@ public class RFEFirearmMode {
             ItemStack bestSpeedloaderStack = RFEItemUtils.findBestSpeedloader(entity, speedloaderPred, ammoPred, reloadCount1, true);
             if (bestSpeedloaderStack.getItem() instanceof MagazineItem magazineItem) {
                 List<ItemStack> strippedAmmo = magazineItem.getStoredAmmo(bestSpeedloaderStack);
-                int consumed = FirearmDataUtils.addMultipleAmmo(ammoList, strippedAmmo, addedLast, false, capacity);
-                FirearmDataUtils.stripMultipleAmmo(strippedAmmo, consumed, false, false);
+                int consumed = FirearmDataUtils.addMultipleAmmo(ammoList, strippedAmmo, addedLast, false, this.trackEmptySlots, capacity);
+                FirearmDataUtils.stripMultipleAmmo(strippedAmmo, consumed, false, false, false /* TODO track empty slots */, true);
                 magazineItem.writeStoredAmmo(bestSpeedloaderStack, strippedAmmo);
                 RFEItemUtils.addItemToEntity(bestSpeedloaderStack, entity);
             }
         }
         if (!chambered.isEmpty())
-            FirearmDataUtils.addAmmo(ammoList, chambered, false);
+            FirearmDataUtils.addAmmo(ammoList, chambered, false, this.trackEmptySlots);
         if (this.internalCapacity > 0) {
             FirearmDataUtils.saveRounds(modeTag, "InternalRounds", ammoList);
         } else {
@@ -788,6 +799,11 @@ public class RFEFirearmMode {
         List<ItemStack> ammoList;
         if (this.internalCapacity > 0) {
             ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
+            if (this.trackEmptySlots) {
+                int diff = this.internalCapacity - RFEItemUtils.countItemsIncludingSlots(ammoList);
+                for (int i = 0; i < diff; ++i)
+                    ammoList.add(ItemStack.EMPTY);
+            }
         } else {
             if (this.plusOneCapacity) {
                 ItemStack loadedRound = this.getLoadedRound(itemStack);
@@ -805,7 +821,7 @@ public class RFEFirearmMode {
                 return;
             ammoList = magazineItem.getStoredAmmo(magazine);
         }
-        List<ItemStack> items = FirearmDataUtils.stripMultipleAmmo(ammoList, unloadCount, phase.ammoAddedLast(), false);
+        List<ItemStack> items = FirearmDataUtils.stripMultipleAmmo(ammoList, unloadCount, phase.ammoAddedLast(), false, this.trackEmptySlots, true);
         for (ItemStack item : items)
             RFEItemUtils.addItemToEntity(item, entity);
         if (this.internalCapacity > 0) {
@@ -857,24 +873,65 @@ public class RFEFirearmMode {
         FirearmDataUtils.setActionTime(itemStack, actionTime);
         if (actionTime > 0)
             return;
-        this.finishCharge(itemStack, entity);
+        if (!entity.level().isClientSide)
+            this.finishCharge(itemStack, entity);
         FirearmDataUtils.setAction(itemStack, null);
     }
 
     public void finishCharge(ItemStack itemStack, LivingEntity entity) {
-        if (this.plusOneCapacity && this.getLoadedRound(itemStack).isEmpty()) {
-            List<ItemStack> nextAmmoList = this.getNextRoundsInItem(itemStack, entity, 1, true);
-            ItemStack nextAmmoStack = FirearmDataUtils.stripFirstAmmo(nextAmmoList, false);
-            this.setLoadedRound(itemStack, nextAmmoStack);
-        }
+        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
         this.setCharged(itemStack, entity, true);
         this.setJammed(itemStack, entity, false);
+        if (this.plusOneCapacity && this.getLoadedRound(itemStack).isEmpty()) {
+            List<ItemStack> nextAmmoList = this.getNextRoundsInItem(itemStack, entity, 1, true);
+            ItemStack nextAmmoStack = FirearmDataUtils.stripAmmo(nextAmmoList, this.ammoConsumedLast, false, this.trackEmptySlots);
+            this.setLoadedRound(itemStack, nextAmmoStack);
+        }
         if (this.canOverheat) {
-            CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
             float heat = FirearmDataUtils.getHeat(modeTag);
             heat -= this.getHandlingProperties(itemStack).heatRemovedOnCharge();
             heat = Math.max(0, heat);
             FirearmDataUtils.setHeat(modeTag, heat);
+        }
+        // TODO cyclical charging; return item to bottom
+        ItemStack chamberedRound = this.getChamberedRound(itemStack);
+        if (!chamberedRound.isEmpty()) {
+            boolean valid = false;
+            RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
+            for (AmmoPredicate pred : ammoProperties.primaryAmmo().keySet()) {
+                if (pred.test(chamberedRound)) {
+                    valid = true;
+                    break;
+                }
+            }
+            if (!valid) {
+                this.setCharged(itemStack, entity, false);
+                this.setJammed(itemStack, entity, true);
+                if (this.plusOneCapacity) {
+                    ItemStack loadedRound = this.getLoadedRound(itemStack);
+                    if (!loadedRound.isEmpty()) {
+                        this.setLoadedRound(itemStack, ItemStack.EMPTY);
+                        RFEItemUtils.addItemToEntity(loadedRound, entity);
+                    }
+                } else if (this.internalCapacity > 0) {
+                    List<ItemStack> ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
+                    ItemStack ejected = FirearmDataUtils.stripAmmo(ammoList, this.ammoConsumedLast, false, this.trackEmptySlots);
+                    FirearmDataUtils.saveRounds(modeTag, "InternalRounds", ammoList);
+                    if (!ejected.isEmpty())
+                        RFEItemUtils.addItemToEntity(ejected, entity);
+                } else {
+                    CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
+                    ItemStack magazine = ItemStack.of(magazineTag);
+                    if (magazine.getItem() instanceof MagazineItem magazineItem) {
+                        List<ItemStack> ammoList = magazineItem.getStoredAmmo(magazine);
+                        ItemStack ejected = FirearmDataUtils.stripAmmo(ammoList, this.ammoConsumedLast, false, this.trackEmptySlots);
+                        magazineItem.writeStoredAmmo(magazine, ammoList);
+                        modeTag.put("DetachedMagazine", magazine.save(magazineTag));
+                        if (!ejected.isEmpty())
+                            RFEItemUtils.addItemToEntity(ejected, entity);
+                    }
+                }
+            }
         }
     }
 
@@ -1128,25 +1185,41 @@ public class RFEFirearmMode {
         }
     }
 
-    public boolean hasChamberedRound(ItemStack itemStack) {
+    protected ItemStack getChamberedRound(ItemStack itemStack) {
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
-        if (!this.isCharged(itemStack))
-            return false;
+        ItemStack chamberedRound;
         if (this.internalCapacity > 0) {
             List<ItemStack> ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
-            return !ammoList.isEmpty();
+            if (ammoList.isEmpty())
+                return ItemStack.EMPTY;
+            chamberedRound = ammoList.get(this.ammoConsumedLast ? ammoList.size() - 1 : 0);
+        } else if (this.plusOneCapacity) {
+            return this.getLoadedRound(itemStack);
         } else {
-            if (this.plusOneCapacity)
-                return !this.getLoadedRound(itemStack).isEmpty();
             CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
             ItemStack magazine = ItemStack.of(magazineTag);
-            if (magazine.getItem() instanceof MagazineItem magazineItem) {
-                List<ItemStack> ammoList = magazineItem.getStoredAmmo(magazine);
-                return !ammoList.isEmpty();
-            } else {
-                return false;
-            }
+            if (!(magazine.getItem() instanceof MagazineItem magazineItem))
+                return ItemStack.EMPTY;
+            List<ItemStack> ammoList = magazineItem.getStoredAmmo(magazine);
+            if (ammoList.isEmpty())
+                return ItemStack.EMPTY;
+            chamberedRound = ammoList.get(this.ammoConsumedLast ? ammoList.size() - 1 : 0);
         }
+        return chamberedRound;
+    }
+
+    public boolean hasChamberedRound(ItemStack itemStack) {
+        if (!this.isCharged(itemStack))
+            return false;
+        if (!this.ammoRequired)
+            return true;
+        ItemStack chamberedRound = this.getChamberedRound(itemStack);
+        RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
+        for (AmmoPredicate pred : ammoProperties.primaryAmmo().keySet()) {
+            if (pred.test(chamberedRound))
+                return true;
+        }
+        return false;
     }
 
     public boolean isCharged(ItemStack itemStack) {

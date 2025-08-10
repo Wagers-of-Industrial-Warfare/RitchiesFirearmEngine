@@ -128,7 +128,7 @@ public class AmmoPacketItem extends Item {
                 ItemStack toAdd = availableStack;
                 if (infinite)
                     toAdd = availableStack.copyWithCount(entry.getValue());
-                int consumed = FirearmDataUtils.addAmmo(ammo, toAdd, false, entry.getValue());
+                int consumed = FirearmDataUtils.addAmmo(ammo, toAdd, false, false, entry.getValue());
                 if (!infinite)
                     availableStack.shrink(consumed);
                 return true;
@@ -147,7 +147,7 @@ public class AmmoPacketItem extends Item {
                 ItemStack toAdd = availableStack;
                 if (infinite)
                     toAdd = availableStack.copyWithCount(addable);
-                int consumed = FirearmDataUtils.addAmmo(ammo, toAdd, false, addable);
+                int consumed = FirearmDataUtils.addAmmo(ammo, toAdd, false, false, addable);
                 if (!infinite)
                     availableStack.shrink(consumed);
                 return true;

@@ -66,7 +66,7 @@ public class RFEItemUtils {
             } else {
                 addition = s.copyWithCount(takeAmount);
             }
-            FirearmDataUtils.addAmmo(list, addition, false);
+            FirearmDataUtils.addAmmo(list, addition, false, false);
             return s.isEmpty() ? ItemStack.EMPTY : s;
         }, () -> maxCount > 0 && list.size() >= maxCount);
         return list;
@@ -103,6 +103,13 @@ public class RFEItemUtils {
         int count = 0;
         for (ItemStack itemStack : items)
             count += itemStack.getCount();
+        return count;
+    }
+
+    public static int countItemsIncludingSlots(List<ItemStack> items) {
+        int count = 0;
+        for (ItemStack itemStack : items)
+            count += itemStack.isEmpty() ? 1 : itemStack.getCount();
         return count;
     }
 

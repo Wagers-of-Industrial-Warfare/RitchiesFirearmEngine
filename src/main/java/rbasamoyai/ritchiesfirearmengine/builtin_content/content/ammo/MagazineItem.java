@@ -119,7 +119,7 @@ public class MagazineItem extends Item {
 
     protected boolean tryReloadForItem(ItemStack magazineStack, List<ItemStack> ammo, ItemStack availableStack) {
         if (this.matchesAmmoItem(magazineStack, availableStack)) {
-            int consumed = FirearmDataUtils.addAmmo(ammo, availableStack, false, 1);
+            int consumed = FirearmDataUtils.addAmmo(ammo, availableStack, false, false /* TODO track empty slots */, 1);
             if (!availableStack.is(RFEItemTags.INFINITE_AMMO.tag))
                 availableStack.shrink(consumed);
             return true;
@@ -134,8 +134,8 @@ public class MagazineItem extends Item {
                 break;
             }
             if (allValid) {
-                int added = FirearmDataUtils.addMultipleAmmo(ammo, speedloaderAmmo, false, true, this.getMagazineCapacity(magazineStack));
-                FirearmDataUtils.stripMultipleAmmo(speedloaderAmmo, added, true, false);
+                int added = FirearmDataUtils.addMultipleAmmo(ammo, speedloaderAmmo, false, true, false /* TODO track empty slots */, this.getMagazineCapacity(magazineStack));
+                FirearmDataUtils.stripMultipleAmmo(speedloaderAmmo, added, true, false, false /* TODO track empty slots */, true);
                 secondary.writeStoredAmmo(availableStack, speedloaderAmmo);
                 return true;
             }
@@ -149,7 +149,7 @@ public class MagazineItem extends Item {
         List<ItemStack> ammo = this.getStoredAmmo(itemStack);
         if (RFEItemUtils.countItems(ammo) == 0)
             return;
-        ItemStack stripped = FirearmDataUtils.stripAmmo(ammo, false, false);
+        ItemStack stripped = FirearmDataUtils.stripAmmo(ammo, false, false, false /* TODO track empty slots */);
         this.writeStoredAmmo(itemStack, ammo);
         this.applyCooldown(itemStack, entity);
 

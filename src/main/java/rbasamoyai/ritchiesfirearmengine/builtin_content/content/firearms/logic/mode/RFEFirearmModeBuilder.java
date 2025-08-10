@@ -37,12 +37,14 @@ public class RFEFirearmModeBuilder {
     protected boolean explicitNominalCapacity = false;
     protected boolean plusOneCapacity = false;
     protected boolean requiresSecondaryAmmo = false;
+    protected boolean trackEmptySlots = false;
 
     protected FireMode fireMode = null;
     protected float jamChance = 0; // Datapackable
     protected boolean manualCharging = false; // Datapackable
     protected int firingCooldown = -1;
     protected boolean ammoConsumedLast = false;
+    protected boolean ignoreEmptySlotsWhenFiring = false;
     protected int shotsFired = 1;
     protected int burstRoundCount = 3;
     @Nullable
@@ -103,12 +105,14 @@ public class RFEFirearmModeBuilder {
         newBuilder.explicitNominalCapacity = this.explicitNominalCapacity;
         newBuilder.plusOneCapacity = this.plusOneCapacity;
         newBuilder.requiresSecondaryAmmo = this.requiresSecondaryAmmo;
+        newBuilder.trackEmptySlots = this.trackEmptySlots;
 
         newBuilder.fireMode = this.fireMode;
         newBuilder.jamChance = this.jamChance;
         newBuilder.manualCharging = this.manualCharging;
         newBuilder.firingCooldown = this.firingCooldown;
         newBuilder.ammoConsumedLast = this.ammoConsumedLast;
+        newBuilder.ignoreEmptySlotsWhenFiring = this.ignoreEmptySlotsWhenFiring;
         newBuilder.shotsFired = this.shotsFired;
         newBuilder.burstRoundCount = this.burstRoundCount;
         newBuilder.firingSound = this.firingSound;
@@ -233,6 +237,11 @@ public class RFEFirearmModeBuilder {
         return this;
     }
 
+    public RFEFirearmModeBuilder trackEmptySlots(boolean trackEmptySlots) {
+        this.trackEmptySlots = trackEmptySlots;
+        return this;
+    }
+
     public RFEFirearmModeBuilder fireMode(FireMode fireMode) {
         this.fireMode = fireMode;
         return this;
@@ -263,6 +272,11 @@ public class RFEFirearmModeBuilder {
 
     public RFEFirearmModeBuilder ammoConsumedLast(boolean ammoConsumedLast) {
         this.ammoConsumedLast = ammoConsumedLast;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder ignoreEmptySlotsWhenFiring(boolean ignoreEmptySlotsWhenFiring) {
+        this.ignoreEmptySlotsWhenFiring = ignoreEmptySlotsWhenFiring;
         return this;
     }
 

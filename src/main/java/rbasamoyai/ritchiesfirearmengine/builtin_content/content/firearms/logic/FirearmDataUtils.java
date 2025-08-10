@@ -8,10 +8,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFire
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 public class FirearmDataUtils {
 
@@ -63,16 +60,45 @@ public class FirearmDataUtils {
 
     public static ListTag writeAmmoList(List<ItemStack> ammo) {
         ListTag list = new ListTag();
-        for (ItemStack itemStack : ammo)
-            list.add(itemStack.save(new CompoundTag()));
+        int emptyCount = 0;
+        for (ItemStack itemStack : ammo) {
+            if (itemStack.isEmpty()) {
+                ++emptyCount;
+            } else {
+                while (emptyCount > 0) {
+                    CompoundTag emptyTag = ItemStack.EMPTY.save(new CompoundTag());
+                    byte count = (byte) Math.min(emptyCount, 64);
+                    emptyTag.putByte("Count", count);
+                    emptyCount -= count;
+                    list.add(emptyTag);
+                }
+                list.add(itemStack.save(new CompoundTag()));
+            }
+        }
+        while (emptyCount > 0) {
+            CompoundTag emptyTag = ItemStack.EMPTY.save(new CompoundTag());
+            byte count = (byte) Math.min(emptyCount, 64);
+            emptyTag.putByte("Count", count);
+            emptyCount -= count;
+            list.add(emptyTag);
+        }
         return list;
     }
 
     public static List<ItemStack> readAmmoList(ListTag tag) {
         int sz = tag.size();
         List<ItemStack> list = new LinkedList<>();
-        for (int i = 0; i < sz; ++i)
-            list.add(ItemStack.of(tag.getCompound(i)));
+        for (int i = 0; i < sz; ++i) {
+            CompoundTag itemTag = tag.getCompound(i);
+            ItemStack item = ItemStack.of(itemTag);
+            if (item.isEmpty()) {
+                int count = itemTag.getByte("Count");
+                for (int j = 0; j < count; ++j)
+                    list.add(ItemStack.EMPTY);
+            } else {
+                list.add(item);
+            }
+        }
         return list;
     }
 
@@ -94,96 +120,160 @@ public class FirearmDataUtils {
         saveRounds(itemStack.getOrCreateTag(), tagKey, ammo);
     }
 
-    public static ItemStack stripFirstAmmo(List<ItemStack> ammo, boolean simulate) { return stripAmmo(ammo, false, simulate); }
-
-    public static ItemStack stripAmmo(List<ItemStack> ammo, boolean last, boolean simulate) {
+    /**
+     * Strip the item at either the start or end of the ammo list. If empty slots are tracked and the targeted slot is
+     * empty, the result will be empty.
+     */
+    public static ItemStack stripAmmo(List<ItemStack> ammo, boolean last, boolean simulate, boolean trackEmptySlots) {
         if (ammo.isEmpty())
             return ItemStack.EMPTY;
-        ItemStack next = last ? ammo.get(ammo.size() - 1) : ammo.get(0);
+        int index = last ? ammo.size() - 1 : 0;
+        ItemStack next = ammo.get(index);
         ItemStack ret = next.copyWithCount(1);
         if (!simulate) {
-            next.shrink(1);
-            if (next.isEmpty())
-                ammo.remove(0);
+            if (!next.isEmpty())
+                next.shrink(1);
+            if (next.isEmpty()) {
+                if (trackEmptySlots) {
+                    ammo.set(index, ItemStack.EMPTY);
+                } else {
+                    ammo.remove(index);
+                }
+            } else if (trackEmptySlots) {
+                ammo.add(index, ItemStack.EMPTY);
+            }
         }
         return ret;
     }
 
     /**
-     * Strips multiple ammo. If count is less than 1, no ammo is stripped.
+     * Strips multiple ammo. If count is less than 1, no ammo is stripped. Ammo stripping is blocked by empty slots if
+     * set to not ignore them.
      */
-    public static List<ItemStack> stripMultipleAmmo(List<ItemStack> ammo, int count, boolean last, boolean simulate) {
+    public static List<ItemStack> stripMultipleAmmo(List<ItemStack> ammo, int count, boolean last, boolean simulate,
+                                                    boolean trackEmptySlots, boolean ignoreEmptySlots) {
         List<ItemStack> stripped = new LinkedList<>();
         if (ammo.isEmpty() || count < 1)
             return stripped;
         ListIterator<ItemStack> lister = last ? ammo.listIterator(ammo.size()) : ammo.listIterator();
         int newCount = count;
+        List<Integer> newEmptySpaces = new ArrayList<>();
         while (last ? lister.hasPrevious() : lister.hasNext()) {
             ItemStack stackToRemove = last ? lister.previous() : lister.next();
+            if (stackToRemove.isEmpty() && ignoreEmptySlots)
+                continue;
             int toRemove = Math.min(newCount, stackToRemove.getCount());
             if (toRemove < 1)
                 break;
             stripped.add(stackToRemove.copyWithCount(toRemove));
             if (!simulate) {
                 stackToRemove.shrink(toRemove);
+                if (trackEmptySlots) {
+                    int index = last ? lister.nextIndex() : lister.previousIndex();
+                    for (int i = 0; i < toRemove; ++i)
+                        newEmptySpaces.add(index);
+                }
                 if (stackToRemove.isEmpty())
                     lister.remove();
             }
             newCount -= toRemove;
         }
+        if (!last)
+            Collections.reverse(newEmptySpaces); // Ensure indices are ordered largest to smallest
+        for (int i : newEmptySpaces)
+            ammo.add(i, ItemStack.EMPTY);
         return stripped;
     }
 
     /**
      * Does not modify the passed ItemStack. Adds the entire itemStack.
+     * If trackEmptySlots is true, the amount of items (including empty slots) in the ammo list is assumed to be the capacity.
      *
      * @return The amount of rounds loaded
      */
-    public static int addAmmo(List<ItemStack> ammo, ItemStack itemStack, boolean last) {
-        return addAmmo(ammo, itemStack, last, 0);
+    public static int addAmmo(List<ItemStack> ammo, ItemStack itemStack, boolean last, boolean trackEmptySlots) {
+        return addAmmo(ammo, itemStack, last, trackEmptySlots, 0);
     }
 
     /**
      * Does not modify the passed ItemStack. Set maxCount to 0 to add the entire stack.
+     * If trackEmptySlots is true, the amount of items (including empty slots) in the ammo list is assumed to be the capacity.
      *
      * @return The amount of rounds loaded
      */
-    public static int addAmmo(List<ItemStack> ammo, ItemStack itemStack, boolean last, int maxCount) {
+    public static int addAmmo(List<ItemStack> ammo, ItemStack itemStack, boolean last, boolean trackEmptySlots, int maxCount) {
         if (itemStack.isEmpty() || maxCount < 0)
             return 0;
         ItemStack copy = itemStack.copy();
+        if (trackEmptySlots) {
+            int emptySlots = 0;
+            for (ItemStack ammoStack : ammo)
+                emptySlots += ammoStack.isEmpty() ? 1 : 0;
+            copy.setCount(Math.min(copy.getCount(), emptySlots));
+        }
         if (maxCount > 0)
             copy.setCount(Math.min(copy.getCount(), maxCount));
+        if (copy.isEmpty())
+            return 0;
         if (ammo.isEmpty()) {
             ammo.add(copy);
             return copy.getCount();
         }
-        ItemStack toStack = last ? ammo.get(ammo.size() - 1) : ammo.get(0);
-        int partial = 0;
-        if (ItemStack.isSameItemSameTags(copy, toStack)) {
-            int stackable = Math.min(toStack.getMaxStackSize(), copy.getCount() + toStack.getCount()) - toStack.getCount();
-            toStack.grow(stackable);
-            copy.shrink(stackable);
-            if (copy.isEmpty()) {
-                return stackable;
-            } else {
-                partial = stackable;
+        if (trackEmptySlots) {
+            ListIterator<ItemStack> lister = ammo.listIterator(last ? ammo.size() : 0);
+            ItemStack priorSlot = ItemStack.EMPTY;
+            int count = copy.getCount();
+            while ((last ? lister.hasPrevious() : lister.hasNext()) && !copy.isEmpty()) {
+                ItemStack ammoSlot = last ? lister.previous() : lister.next();
+                if (!ammoSlot.isEmpty()) {
+                    if (ItemStack.isSameItemSameTags(ammoSlot, priorSlot)) {
+                        int maxCompress = Math.min(ammoSlot.getCount(), priorSlot.getMaxStackSize() - priorSlot.getCount());
+                        priorSlot.grow(maxCompress);
+                        ammoSlot.shrink(maxCompress);
+                    }
+                    if (ammoSlot.isEmpty()) {
+                        lister.remove();
+                    } else {
+                        priorSlot = ammoSlot;
+                    }
+                    continue;
+                }
+                if (ItemStack.isSameItemSameTags(copy, priorSlot) && priorSlot.getCount() < priorSlot.getMaxStackSize()) {
+                    priorSlot.grow(1);
+                    copy.shrink(1);
+                    lister.remove();
+                } else {
+                    lister.set(priorSlot = copy.split(1));
+                }
             }
-        }
-        if (last) {
-            ammo.add(copy);
+            return count;
         } else {
-            ammo.add(0, copy);
+            int index = last ? ammo.size() - 1 : 0;
+            ItemStack toStack = ammo.get(index);
+            int partial = 0;
+            if (ItemStack.isSameItemSameTags(copy, toStack)) {
+                int stackable = Math.min(toStack.getMaxStackSize(), copy.getCount() + toStack.getCount()) - toStack.getCount();
+                toStack.grow(stackable);
+                copy.shrink(stackable);
+                if (copy.isEmpty()) {
+                    return stackable;
+                } else {
+                    partial = stackable;
+                }
+            }
+            ammo.add(index, copy);
+            return partial + copy.getCount();
         }
-        return partial + copy.getCount();
     }
 
     /**
      * Does not modify the source. Set maxCapacity to 0 to add the entire source.
+     * If trackEmptySlots is true, the amount of items (including empty slots) in the destination ammo list is assumed to be the capacity.
      *
      * @return the amount of rounds added
      */
-    public static int addMultipleAmmo(List<ItemStack> dest, List<ItemStack> source, boolean addToDestEnd, boolean fromSourceEnd, int maxCapacity) {
+    public static int addMultipleAmmo(List<ItemStack> dest, List<ItemStack> source, boolean addToDestEnd,
+                                      boolean fromSourceEnd, boolean trackEmptySlots, int maxCapacity) {
         if (source.isEmpty())
             return 0;
         int addable = maxCapacity > 0 ? Math.max(0, maxCapacity - RFEItemUtils.countItems(dest)) : RFEItemUtils.countItems(source);
@@ -195,7 +285,7 @@ public class FirearmDataUtils {
             Collections.reverse(source);
         }
         for (ItemStack sourceStack : source) {
-            addable -= addAmmo(dest, sourceStack, addToDestEnd, addable);
+            addable -= addAmmo(dest, sourceStack, addToDestEnd, trackEmptySlots, addable);
             if (addable < 1)
                 break;
         }

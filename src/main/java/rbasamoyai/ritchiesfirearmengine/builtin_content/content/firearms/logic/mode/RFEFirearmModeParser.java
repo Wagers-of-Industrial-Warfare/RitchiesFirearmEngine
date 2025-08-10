@@ -57,7 +57,9 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                     builder.plusOneCapacity(plusOneCapacity);
                 }
                 boolean requiresSecondaryAmmo = GsonHelper.getAsBoolean(ammo, "requires_secondary_ammo", false);
-                builder.requiresSecondaryAmmo(requiresSecondaryAmmo);
+                boolean trackEmptySlots = GsonHelper.getAsBoolean(ammo, "track_empty_slots", false);
+                builder.requiresSecondaryAmmo(requiresSecondaryAmmo)
+                        .trackEmptySlots(trackEmptySlots);
             }
         }
 
@@ -76,6 +78,10 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                         .ammoConsumedLast(ammoConsumedLast)
                         .shotsFired(shotsFired)
                         .jamChance(jamChance);
+                if (builder.trackEmptySlots) {
+                    boolean ignoreEmptySlots = GsonHelper.getAsBoolean(firing, "ignore_empty_slots_when_firing", false);
+                    builder.ignoreEmptySlotsWhenFiring(ignoreEmptySlots);
+                }
                 if (fireMode == FireMode.SINGLE_ACTION) {
                     boolean manualCharge = GsonHelper.getAsBoolean(firing, "manual_charge", false);
                     builder.manualCharging(manualCharge);

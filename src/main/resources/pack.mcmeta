@@ -5,7 +5,7 @@
   },
   "rfe_pack": {
     "namespace": "rfe_builtin",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "display_name": "Ritchie's Firearm Engine Built-In Pack",
     "dependencies": [
       {

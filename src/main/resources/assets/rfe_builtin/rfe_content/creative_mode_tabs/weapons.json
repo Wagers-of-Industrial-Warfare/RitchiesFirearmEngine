@@ -37,6 +37,7 @@
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_32rds\",Count:1b}}}"
     },
     "rfe_builtin:db_shotgun_sxs",
+    "rfe_builtin:db_shotgun_ou",
     "rfe_builtin:m1911"
   ]
 }

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.GsonHelper;
+import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ChargeAction;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FireMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ReloadPhase;
@@ -69,13 +70,20 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
             FireMode fireMode = FireMode.byId(GsonHelper.getAsString(firing, "fire_mode"));
             builder.fireMode(fireMode);
             if (fireMode != FireMode.SAFETY) {
-                int cooldown = GsonHelper.getAsInt(firing, "cooldown");
+                if (firing.has("rpm")) {
+                    float rpm = GsonHelper.getAsFloat(firing, "rpm");
+                    if (fireMode == FireMode.SINGLE_ACTION)
+                        RitchiesFirearmEngine.LOGGER.warn("Should use cooldown for fire mode single_action");
+                    builder.firingRPM(rpm);
+                } else {
+                    float cooldown = GsonHelper.getAsFloat(firing, "cooldown");
+                    builder.firingCooldown(cooldown);
+                }
                 boolean ammoConsumedLast = GsonHelper.getAsBoolean(firing, "ammo_consumed_last", false);
                 int shotsFired = GsonHelper.getAsInt(firing, "shots_fired", 1);
                 // TODO recoil, spread providers
                 float jamChance = GsonHelper.getAsFloat(firing, "jam_chance", 0);
-                builder.firingCooldown(cooldown)
-                        .ammoConsumedLast(ammoConsumedLast)
+                builder.ammoConsumedLast(ammoConsumedLast)
                         .shotsFired(shotsFired)
                         .jamChance(jamChance);
                 if (builder.trackEmptySlots) {

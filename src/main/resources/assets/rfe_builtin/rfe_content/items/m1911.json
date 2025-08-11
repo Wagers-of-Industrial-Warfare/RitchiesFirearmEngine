@@ -19,7 +19,7 @@
   },
   "firing": {
     "fire_mode": "semi_auto",
-    "cooldown": 4,
+    "rpm": 300,
     "sound": "rfe_builtin:item.generic.pistol.shot"
   },
   "reload": {

@@ -19,7 +19,7 @@
   },
   "firing": {
     "fire_mode": "full_auto",
-    "cooldown": 2,
+    "rpm": 600,
     "sound": "rfe_builtin:item.generic.smg.shot"
   },
   "reload": {

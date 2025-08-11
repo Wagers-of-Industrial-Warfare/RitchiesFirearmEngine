@@ -42,7 +42,7 @@ public class RFEFirearmModeBuilder {
     protected FireMode fireMode = null;
     protected float jamChance = 0; // Datapackable
     protected boolean manualCharging = false; // Datapackable
-    protected int firingCooldown = -1;
+    protected float firingCooldown = -1;
     protected boolean ammoConsumedLast = false;
     protected boolean ignoreEmptySlotsWhenFiring = false;
     protected int shotsFired = 1;
@@ -263,9 +263,13 @@ public class RFEFirearmModeBuilder {
         return this;
     }
 
-    public RFEFirearmModeBuilder firingCooldown(int firingCooldown) {
+    public RFEFirearmModeBuilder firingRPM(float rpm) { return this.firingCooldown(1200 / rpm); }
+
+    public RFEFirearmModeBuilder firingCooldown(float firingCooldown) {
         if (firingCooldown < 0)
             throw new IllegalStateException("Cannot specify firing cooldown less than 0");
+        if (firingCooldown < 1)
+            RitchiesFirearmEngine.LOGGER.warn("Ritchie's Firearm Engine does not support RPM higher than 1200 (cooldown < 1), defaulting to cooldown = 1");
         this.firingCooldown = firingCooldown;
         return this;
     }

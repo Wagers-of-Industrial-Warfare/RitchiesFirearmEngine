@@ -19,7 +19,7 @@
   },
   "firing": {
     "fire_mode": "full_auto",
-    "cooldown": 2,
+    "rpm": 800,
     "sound": "rfe_builtin:item.generic.assault_rifle.shot"
   },
   "reload": {
@@ -135,7 +135,7 @@
     "semi_auto": {
       "firing": {
         "fire_mode": "semi_auto",
-        "cooldown": 2,
+        "rpm": 800,
         "sound": "rfe_builtin:item.generic.assault_rifle.shot"
       }
     },

@@ -77,7 +77,7 @@ public class RFEFirearmMode {
 
     // Firing
     protected final FireMode fireMode;
-    protected final int firingCooldown;
+    protected final float firingCooldown;
     protected final boolean ammoConsumedLast;
     protected final boolean ignoreEmptySlotsWhenFiring;
     protected final int shotsFired;
@@ -311,8 +311,14 @@ public class RFEFirearmMode {
 
         this.setCharged(itemStack, entity, false);
         FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.FIRING);
-        if (this.firingCooldown > 0)
-            FirearmDataUtils.setActionTime(itemStack, this.firingCooldown);
+        if (this.firingCooldown > 0) {
+            float extraActionTime = Math.max(modeTag.getFloat("ExtraFiringTime"), 0);
+            float time = this.firingCooldown + extraActionTime;
+            int actionTime = Mth.floor(time);
+            float remainder = time - actionTime;
+            FirearmDataUtils.setActionTime(itemStack, actionTime);
+            modeTag.putFloat("ExtraFiringTime", remainder);
+        }
         this.playFiringEffects(itemStack, entity);
     }
 
@@ -1127,6 +1133,8 @@ public class RFEFirearmMode {
                     FirearmDataUtils.setHeat(modeTag, heat);
                 }
             }
+            if (action != RFEFirearmItem.Action.FIRING)
+                modeTag.remove("ExtraFiringTime");
         }
     }
 

@@ -14,7 +14,7 @@
       "fires": "rfe_builtin:792x33mm_kurz_tracer"
     },
     {
-      "ammo": "rfe_builtin:tracer_infinite_intermediate_cartridge",
+      "ammo": "rfe_builtin:infinite_tracer_intermediate_cartridge",
       "fires": "rfe_builtin:792x33mm_kurz_tracer"
     }
   ],

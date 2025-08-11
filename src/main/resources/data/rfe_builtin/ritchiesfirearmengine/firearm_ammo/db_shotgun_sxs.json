@@ -18,12 +18,36 @@
       "fires": "rfe_builtin:12_ga_1_buckshot_ba"
     },
     {
+      "ammo": "rfe_builtin:magnum_buckshot_shell",
+      "fires": "rfe_builtin:12_ga_00_buckshot_ba"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_magnum_buckshot_shell",
+      "fires": "rfe_builtin:12_ga_00_buckshot_ba"
+    },
+    {
       "ammo": "rfe_builtin:slug_shell",
       "fires": "rfe_builtin:12_ga_slug_ba"
     },
     {
       "ammo": "rfe_builtin:infinite_slug_shell",
       "fires": "rfe_builtin:12_ga_slug_ba"
+    },
+    {
+      "ammo": "rfe_builtin:ap_slug_shell",
+      "fires": "rfe_builtin:12_ga_slug_ap_ba"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_ap_slug_shell",
+      "fires": "rfe_builtin:12_ga_slug_ap_ba"
+    },
+    {
+      "ammo": "rfe_builtin:expanding_slug_shell",
+      "fires": "rfe_builtin:12_ga_slug_expanding_ba"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_expanding_slug_shell",
+      "fires": "rfe_builtin:12_ga_slug_expanding_ba"
     }
   ],
   "replace_magazines": false,

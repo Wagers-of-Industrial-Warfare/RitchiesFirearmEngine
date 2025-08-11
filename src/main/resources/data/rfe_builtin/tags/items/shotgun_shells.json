@@ -1,11 +1,17 @@
 {
   "replace": false,
   "values": [
+    "rfe_builtin:ap_slug_shell",
     "rfe_builtin:birdshot_shell",
     "rfe_builtin:buckshot_shell",
+    "rfe_builtin:expanding_slug_shell",
+    "rfe_builtin:infinite_ap_slug_shell",
     "rfe_builtin:infinite_birdshot_shell",
     "rfe_builtin:infinite_buckshot_shell",
+    "rfe_builtin:infinite_expanding_slug_shell",
+    "rfe_builtin:infinite_magnum_buckshot_shell",
     "rfe_builtin:infinite_slug_shell",
+    "rfe_builtin:magnum_buckshot_shell",
     "rfe_builtin:slug_shell"
   ]
 }

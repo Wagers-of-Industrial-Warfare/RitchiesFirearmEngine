@@ -63,13 +63,13 @@
     "phases": [
       {
         "phase": "prepare",
-        "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than", "value": 2 },
+        "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 0 },
         "time": 14,
         "sound": "rfe_builtin:item.generic.shotgun.break_action.open"
       },
       {
         "phase": "unload",
-        "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than", "value": 2 },
+        "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 0 },
         "time": 16,
         "unload_type": "rounds",
         "unload_count": 1,

@@ -1,0 +1,99 @@
+{
+  "type": "ritchiesfirearmengine:firearm",
+  "drawing": {
+    "draw_time": 13,
+    "sound": "rfe_builtin:item.generic.shotgun.draw"
+  },
+  "mode_change": {
+    "mode_change_time": 1,
+    "sound": "rfe_builtin:item.generic.firearm.mode_change.switch"
+  },
+  "aiming": {
+    "aim_time": 5,
+    "aim_sound": "rfe_builtin:item.generic.shotgun.aim",
+    "unaim_sound": "rfe_builtin:item.generic.shotgun.unaim"
+  },
+  "ammo": {
+    "ammo_required": true,
+    "internal_capacity": 1
+  },
+  "firing": {
+    "fire_mode": "semi_auto",
+    "cooldown": 4,
+    "sound": "rfe_builtin:item.generic.shotgun.shot"
+  },
+  "reload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1" },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
+          ]
+        },
+        "time": 14,
+        "sound": "rfe_builtin:item.generic.shotgun.break_action.open"
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1" },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
+          ]
+        },
+        "time": 14,
+        "reload_type": "rounds",
+        "reload_count": 1,
+        "reload_delay": 10,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" }
+        ]
+      },
+      {
+        "phase": "finish",
+        "time": 14,
+        "charge_firearm": true,
+        "sound": "rfe_builtin:item.generic.shotgun.break_action.close"
+      }
+    ]
+  },
+  "unload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than", "value": 2 },
+        "time": 14,
+        "sound": "rfe_builtin:item.generic.shotgun.break_action.open"
+      },
+      {
+        "phase": "unload",
+        "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than", "value": 2 },
+        "time": 16,
+        "unload_type": "rounds",
+        "unload_count": 1,
+        "unload_delay": 12,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.shotgun.unload.shell" }
+        ]
+      },
+      {
+        "phase": "finish",
+        "time": 14,
+        "sound": "rfe_builtin:item.generic.shotgun.break_action.close"
+      }
+    ]
+  },
+  "charge": {
+    "actions": [
+    ]
+  },
+  "modes": {
+    "safety": {
+      "firing": {
+        "fire_mode": "safety"
+      }
+    }
+  }
+}

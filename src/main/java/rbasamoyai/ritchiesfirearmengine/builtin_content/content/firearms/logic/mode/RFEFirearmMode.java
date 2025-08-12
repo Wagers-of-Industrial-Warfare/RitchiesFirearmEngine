@@ -48,6 +48,7 @@ import java.util.function.Predicate;
 public class RFEFirearmMode {
 
     protected final String modeId;
+    protected final String modeDisplayId;
 
     protected final RFEFirearmModeHandlingProperties defaultDataPackProperties;
 
@@ -109,6 +110,7 @@ public class RFEFirearmMode {
 
     public RFEFirearmMode(RFEFirearmModeBuilder builder, String modeId) {
         this.modeId = modeId;
+        this.modeDisplayId = builder.modeDisplayId;
 
         this.defaultDataPackProperties = RFEFirearmModeHandlingProperties.fromItemDefinition(builder);
 
@@ -158,6 +160,7 @@ public class RFEFirearmMode {
     }
 
     public String getModeId() { return this.modeId; }
+    public String getDisplayId() { return this.modeDisplayId; }
 
     public RFEFirearmModeHandlingProperties getHandlingProperties(ItemStack itemStack) {
         ImmutableMap<String, RFEFirearmModeHandlingProperties> handlingPropertiesByMode = RFEFirearmHandlingPropertiesHandler.getHandlingProperties(itemStack);

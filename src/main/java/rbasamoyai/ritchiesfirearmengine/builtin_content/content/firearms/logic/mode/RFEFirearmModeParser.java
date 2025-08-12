@@ -17,6 +17,11 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
     public abstract T getBuilder(String modeId);
 
     public T modifyBuilder(T builder, JsonObject obj, String modeId) {
+        if (GsonHelper.isStringValue(obj, "mode_display_id")) {
+            String modeDisplayId = GsonHelper.getAsString(obj, "mode_display_id");
+            builder.modeDisplayId(modeDisplayId);
+        }
+
         if (GsonHelper.isStringValue(obj, "mode_tag")) {
             String modeTag = GsonHelper.getAsString(obj, "mode_tag");
             builder.modeTag(modeTag);

@@ -106,7 +106,7 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
     }
 
     protected String getModeName(ItemStack itemStack) {
-        return itemStack.getItem() instanceof RFEFirearmItem firearm ? firearm.getCurrentMode(itemStack).getModeId() : "";
+        return itemStack.getItem() instanceof RFEFirearmItem firearm ? firearm.getCurrentMode(itemStack).getDisplayId() : "";
     }
 
     public static class Serializer implements RFEHudOverlayRenderer.Serializer {

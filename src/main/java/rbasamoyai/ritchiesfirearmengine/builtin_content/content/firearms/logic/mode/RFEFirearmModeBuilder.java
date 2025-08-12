@@ -14,6 +14,7 @@ import java.util.*;
 
 public class RFEFirearmModeBuilder {
     protected final String modeId;
+    protected String modeDisplayId;
     protected String modeTagId = "MainMode";
 
     protected int drawTime = 1;
@@ -79,6 +80,7 @@ public class RFEFirearmModeBuilder {
 
     public RFEFirearmModeBuilder(String modeId) {
         this.modeId = modeId;
+        this.modeDisplayId = this.modeId;
     }
 
     public RFEFirearmModeBuilder forkBuilder(String newModeId) {
@@ -86,6 +88,7 @@ public class RFEFirearmModeBuilder {
     }
 
     public RFEFirearmModeBuilder forkBuilder(RFEFirearmModeBuilder newBuilder) {
+        // Display id is NOT forked!
         newBuilder.modeTagId = this.modeTagId;
 
         newBuilder.drawTime = this.drawTime;
@@ -140,6 +143,11 @@ public class RFEFirearmModeBuilder {
         newBuilder.coolingDelayTime = this.coolingDelayTime;
 
         return newBuilder;
+    }
+
+    public RFEFirearmModeBuilder modeDisplayId(String modeDisplayId) {
+        this.modeDisplayId = modeDisplayId;
+        return this;
     }
 
     public RFEFirearmModeBuilder modeTag(String modeTag) {

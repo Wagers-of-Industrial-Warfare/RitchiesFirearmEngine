@@ -18,7 +18,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
@@ -42,7 +41,7 @@ import java.util.stream.Collectors;
 /**
  * Basic firearms class.
  */
-public abstract class RFEFirearmItem extends Item implements IFirearmItem, IClientItemExtensions {
+public abstract class RFEFirearmItem extends Item implements IFirearmItem {
 
     protected final Map<String, RFEFirearmMode> baseFirearmModes;
     protected final List<String> modeOrder;

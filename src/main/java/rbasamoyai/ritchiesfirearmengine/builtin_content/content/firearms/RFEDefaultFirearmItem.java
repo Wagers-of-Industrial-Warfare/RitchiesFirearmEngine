@@ -3,8 +3,14 @@ package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import org.jetbrains.annotations.NotNull;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmModeBuilder;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
@@ -13,11 +19,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class RFEDefaultFirearmItem extends RFEFirearmItem {
 
     public RFEDefaultFirearmItem(Properties properties, Map<String, RFEFirearmMode> baseFirearmModes, List<String> modeOrder) {
         super(properties, baseFirearmModes, modeOrder, "default");
+    }
+
+    @Override
+    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
+        super.initializeClient(consumer);
+        consumer.accept(new IClientItemExtensions() {
+            @Override
+            public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack itemStack) {
+                return HumanoidModel.ArmPose.CROSSBOW_HOLD;
+            }
+        });
     }
 
     public static class Builder implements RFEItemBuilder {

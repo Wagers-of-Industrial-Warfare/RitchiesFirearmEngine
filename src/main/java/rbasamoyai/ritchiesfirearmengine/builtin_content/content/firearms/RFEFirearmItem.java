@@ -1,7 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms;
 
 import com.google.common.collect.Multimap;
-import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -20,7 +19,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import org.jetbrains.annotations.NotNull;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
@@ -37,7 +35,6 @@ import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -76,17 +73,6 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IClie
         if (entity instanceof LivingEntity living)
             this.getCurrentMode(itemStack).onTick(itemStack, living, isSelected);
         // TODO clientside effects?
-    }
-
-    @Override
-    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
-        super.initializeClient(consumer);
-        consumer.accept(new IClientItemExtensions() {
-            @Override
-            public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack itemStack) {
-                return HumanoidModel.ArmPose.CROSSBOW_HOLD;
-            }
-        });
     }
 
     @Override

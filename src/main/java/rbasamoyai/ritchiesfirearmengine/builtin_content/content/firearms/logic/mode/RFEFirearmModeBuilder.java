@@ -4,10 +4,7 @@ import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ChargeAction;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.CompareValueSource;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FireMode;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ReloadPhase;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.*;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -42,12 +39,13 @@ public class RFEFirearmModeBuilder {
 
     protected FireMode fireMode = null;
     protected float jamChance = 0; // Datapackable
-    protected boolean manualCharging = false; // Datapackable
+    protected ChargingBehavior chargingBehavior = ChargingBehavior.HOLD; // Datapackable
     protected float firingCooldown = -1;
     protected boolean ammoConsumedLast = false;
     protected boolean ignoreEmptySlotsWhenFiring = false;
     protected int shotsFired = 1;
     protected int burstRoundCount = 3;
+    protected boolean slamfire = false;
     @Nullable
     protected SoundEvent firingSound = null;
     protected int windUpTime = 0;
@@ -112,12 +110,13 @@ public class RFEFirearmModeBuilder {
 
         newBuilder.fireMode = this.fireMode;
         newBuilder.jamChance = this.jamChance;
-        newBuilder.manualCharging = this.manualCharging;
+        newBuilder.chargingBehavior = this.chargingBehavior;
         newBuilder.firingCooldown = this.firingCooldown;
         newBuilder.ammoConsumedLast = this.ammoConsumedLast;
         newBuilder.ignoreEmptySlotsWhenFiring = this.ignoreEmptySlotsWhenFiring;
         newBuilder.shotsFired = this.shotsFired;
         newBuilder.burstRoundCount = this.burstRoundCount;
+        newBuilder.slamfire = slamfire;
         newBuilder.firingSound = this.firingSound;
         newBuilder.windUpTime = this.windUpTime;
         newBuilder.windUpSound = this.windUpSound;
@@ -262,12 +261,12 @@ public class RFEFirearmModeBuilder {
         return this;
     }
 
-    public RFEFirearmModeBuilder manualCharging(boolean manualCharging) {
+    public RFEFirearmModeBuilder chargingBehavior(ChargingBehavior chargingBehavior) {
         if (this.fireMode != FireMode.SINGLE_ACTION) {
-            RitchiesFirearmEngine.LOGGER.warn("Manual charging only applies to fire mode single_action, not {}", this.fireMode.getSerializedName());
+            RitchiesFirearmEngine.LOGGER.warn("Charging behavior only applies to fire mode single_action, not {}", this.fireMode.getSerializedName());
             return this;
         }
-        this.manualCharging = manualCharging;
+        this.chargingBehavior = chargingBehavior;
         return this;
     }
 
@@ -306,6 +305,15 @@ public class RFEFirearmModeBuilder {
         return this;
     }
 
+    public RFEFirearmModeBuilder slamfire(boolean slamfire) {
+        if (this.fireMode != FireMode.SINGLE_ACTION) {
+            RitchiesFirearmEngine.LOGGER.warn("Slamfire only applies to fire mode single_action, not {}", this.fireMode.getSerializedName());
+            return this;
+        }
+        this.slamfire = slamfire;
+        return this;
+    }
+
     public RFEFirearmModeBuilder firingSound(SoundEvent firingSound) {
         this.firingSound = firingSound;
         return this;
@@ -338,7 +346,7 @@ public class RFEFirearmModeBuilder {
     public RFEFirearmModeBuilder resetFiring() {
         this.fireMode = null;
         this.jamChance = 0;
-        this.manualCharging = false;
+        this.chargingBehavior = ChargingBehavior.HOLD;
         this.firingCooldown = -1;
         this.ammoConsumedLast = false;
         this.shotsFired = 1;

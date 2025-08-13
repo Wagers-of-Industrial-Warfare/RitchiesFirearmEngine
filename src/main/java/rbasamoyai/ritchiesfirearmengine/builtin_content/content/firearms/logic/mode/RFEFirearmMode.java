@@ -83,6 +83,7 @@ public class RFEFirearmMode {
     protected final boolean ignoreEmptySlotsWhenFiring;
     protected final int shotsFired;
     protected final int burstRoundCount;
+    protected final boolean slamfire;
     @Nullable protected final SoundEvent firingSound;
     // Wind-up
     protected final int windUpTime;
@@ -140,6 +141,7 @@ public class RFEFirearmMode {
         this.ignoreEmptySlotsWhenFiring = builder.ignoreEmptySlotsWhenFiring;
         this.shotsFired = builder.shotsFired;
         this.burstRoundCount = builder.burstRoundCount;
+        this.slamfire = builder.slamfire;
         this.firingSound = builder.firingSound;
         this.windUpTime = builder.windUpTime;
         this.windUpSound = builder.windUpSound;
@@ -161,6 +163,8 @@ public class RFEFirearmMode {
 
     public String getModeId() { return this.modeId; }
     public String getDisplayId() { return this.modeDisplayId; }
+
+    public FireMode getFireMode() { return this.fireMode; }
 
     public RFEFirearmModeHandlingProperties getHandlingProperties(ItemStack itemStack) {
         ImmutableMap<String, RFEFirearmModeHandlingProperties> handlingPropertiesByMode = RFEFirearmHandlingPropertiesHandler.getHandlingProperties(itemStack);
@@ -452,8 +456,6 @@ public class RFEFirearmMode {
         FirearmDataUtils.setAction(itemStack, null);
         boolean holdingKey = itemStack.getItem() instanceof HoldAttackKeyInteraction holdAttackKeyInteraction
                 && holdAttackKeyInteraction.isHoldingAttackKey(itemStack, entity);
-        if (this.fireMode == FireMode.SINGLE_ACTION && holdingKey)
-            return;
 
         if (this.canOverheat && FirearmDataUtils.isOverheated(this.getOrCreateModeTag(itemStack))) {
             FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.COOLDOWN);
@@ -461,7 +463,7 @@ public class RFEFirearmMode {
             return;
         }
         if (this.fireMode == FireMode.SINGLE_ACTION
-                && this.automaticSingleActionCycle(itemStack, entity)
+                && this.automaticSingleActionCycle(itemStack, entity, holdingKey)
                 && this.canChargeInternal(itemStack, entity)) {
             this.onCharge(itemStack, entity);
             return;
@@ -488,8 +490,8 @@ public class RFEFirearmMode {
         }
     }
 
-    public boolean automaticSingleActionCycle(ItemStack itemStack, LivingEntity entity) {
-        return !this.getHandlingProperties(itemStack).manualCharging();
+    public boolean automaticSingleActionCycle(ItemStack itemStack, LivingEntity entity, boolean hold) {
+        return this.getHandlingProperties(itemStack).chargingBehavior().canChargeAfterFiring(hold);
     }
 
     public boolean canContinueBurstFire(ItemStack itemStack, LivingEntity entity) {
@@ -647,7 +649,7 @@ public class RFEFirearmMode {
             }
             capacity = this.internalCapacity;
             if (!phase.ammoAddedLast() && !replaceChamberedRound)
-                chambered = FirearmDataUtils.stripAmmo(ammoList, false, true, this.trackEmptySlots);
+                chambered = FirearmDataUtils.stripAmmo(ammoList, false, false, this.trackEmptySlots);
         } else {
             CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
             ItemStack magazine = ItemStack.of(magazineTag);
@@ -884,7 +886,13 @@ public class RFEFirearmMode {
             return;
         if (!entity.level().isClientSide)
             this.finishCharge(itemStack, entity);
-        FirearmDataUtils.setAction(itemStack, null);
+        boolean holdingKey = itemStack.getItem() instanceof HoldAttackKeyInteraction holdAttackKeyInteraction
+                && holdAttackKeyInteraction.isHoldingAttackKey(itemStack, entity);
+        if (!entity.level().isClientSide && this.fireMode == FireMode.SINGLE_ACTION && this.slamfire && holdingKey) {
+            this.fireFirearm(itemStack, entity, FiringType.AUTOMATIC);
+        } else {
+            FirearmDataUtils.setAction(itemStack, null);
+        }
     }
 
     public void finishCharge(ItemStack itemStack, LivingEntity entity) {
@@ -1094,8 +1102,9 @@ public class RFEFirearmMode {
             if (FirearmDataUtils.isOverheated(modeTag)) {
                 FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.COOLDOWN);
                 FirearmDataUtils.setActionTime(itemStack, this.cooldownTime);
-            } else if (this.fireMode == FireMode.SINGLE_ACTION && !properties.manualCharging()
-                    && !holdingKey && this.canChargeInternal(itemStack, entity)) {
+            } else if (this.fireMode == FireMode.SINGLE_ACTION
+                    && this.automaticSingleActionCycle(itemStack, entity, holdingKey)
+                    && this.canChargeInternal(itemStack, entity)) {
                 this.onCharge(itemStack, entity);
             }
         }

@@ -20,6 +20,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ChargingBehavior;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmModeHandlingProperties;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.RFEPacket;
@@ -75,7 +76,8 @@ public class RFEFirearmHandlingPropertiesHandler {
                 throw new JsonParseException("Expected JSON object while parsing handling properties for mode " + mode + " for item " + loc);
             JsonObject modeObj = el.getAsJsonObject();
             float jamChance = GsonHelper.getAsFloat(modeObj, "jam_chance", 0);
-            boolean manualCharging = GsonHelper.getAsBoolean(modeObj, "manual_charge", false);
+            ChargingBehavior chargingBehavior = ChargingBehavior.byIdStrict(GsonHelper.getAsString(modeObj, "charging_behavior",
+                    ChargingBehavior.HOLD.getSerializedName()));
             float heatCapacity = GsonHelper.getAsFloat(modeObj, "heat_capacity", 0);
             float heatRemovedPerTick = GsonHelper.getAsFloat(modeObj, "heat_removed_per_tick", 0);
             float heatRemovedOnCharge = GsonHelper.getAsFloat(modeObj, "heat_removed_on_charge", 0);
@@ -83,7 +85,7 @@ public class RFEFirearmHandlingPropertiesHandler {
             int coolingDelayTime = GsonHelper.getAsInt(modeObj, "cooling_delay_time", 0);
             builder.put(mode, new RFEFirearmModeHandlingProperties.Builder()
                     .jamChance(jamChance)
-                    .manualCharging(manualCharging)
+                    .chargingBehavior(chargingBehavior)
                     .heatCapacity(heatCapacity)
                     .heatRemovedPerTick(heatRemovedPerTick)
                     .heatRemovedOnCharge(heatRemovedOnCharge)

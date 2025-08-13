@@ -588,6 +588,66 @@
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.shotgun.draw"
   },
+  "item.generic.shotgun.pump": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/shotgun/pump/full",
+        "volume": 0.25,
+        "pitch": 0.8
+      },
+      {
+        "name": "rfe_builtin:item/generic/shotgun/pump/full",
+        "volume": 0.25,
+        "pitch": 0.78
+      },
+      {
+        "name": "rfe_builtin:item/generic/shotgun/pump/full",
+        "volume": 0.25,
+        "pitch": 0.77
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.shotgun.pump"
+  },
+  "item.generic.shotgun.pump.end": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/shotgun/pump/end",
+        "volume": 0.25,
+        "pitch": 0.8
+      },
+      {
+        "name": "rfe_builtin:item/generic/shotgun/pump/end",
+        "volume": 0.25,
+        "pitch": 0.78
+      },
+      {
+        "name": "rfe_builtin:item/generic/shotgun/pump/end",
+        "volume": 0.25,
+        "pitch": 0.77
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.shotgun.pump"
+  },
+  "item.generic.shotgun.pump.start": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/shotgun/pump/start",
+        "volume": 0.25,
+        "pitch": 0.8
+      },
+      {
+        "name": "rfe_builtin:item/generic/shotgun/pump/start",
+        "volume": 0.25,
+        "pitch": 0.78
+      },
+      {
+        "name": "rfe_builtin:item/generic/shotgun/pump/start",
+        "volume": 0.25,
+        "pitch": 0.77
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.shotgun.pump"
+  },
   "item.generic.shotgun.reload.shell": {
     "sounds": [
       {

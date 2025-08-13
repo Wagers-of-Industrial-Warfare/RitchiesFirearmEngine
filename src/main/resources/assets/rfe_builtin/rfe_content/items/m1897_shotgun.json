@@ -1,0 +1,146 @@
+{
+  "type": "ritchiesfirearmengine:firearm",
+  "drawing": {
+    "draw_time": 13,
+    "sound": "rfe_builtin:item.generic.shotgun.draw"
+  },
+  "mode_change": {
+    "mode_change_time": 1,
+    "sound": "rfe_builtin:item.generic.firearm.mode_change.switch"
+  },
+  "aiming": {
+    "aim_time": 5,
+    "aim_sound": "rfe_builtin:item.generic.shotgun.aim",
+    "unaim_sound": "rfe_builtin:item.generic.shotgun.unaim"
+  },
+  "ammo": {
+    "ammo_required": true,
+    "internal_capacity": 6
+  },
+  "firing": {
+    "fire_mode": "single_action",
+    "cooldown": 2,
+    "sound": "rfe_builtin:item.generic.shotgun.shot"
+  },
+  "reload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1" },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
+          ]
+        },
+        "time": 8
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than_or_equal_to", "value": 1 }
+          ]
+        },
+        "time": 29,
+        "reload_type": "rounds",
+        "reload_count": 1,
+        "reload_delay": 17,
+        "replace_chambered_round": true,
+        "charge_firearm": true,
+        "sounds": [
+          { "time": 0, "sound": "rfe_builtin:item.generic.shotgun.pump.start" },
+          { "time": 15, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" },
+          { "time": 24, "sound": "rfe_builtin:item.generic.shotgun.pump.end" }
+        ]
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 2 },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than_or_equal_to", "value": 2 }
+          ]
+        },
+        "time": 37,
+        "reload_type": "rounds",
+        "reload_count": 2,
+        "reload_delays": [12, 20],
+        "replace_chambered_round": false,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" },
+          { "time": 18, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" }
+        ]
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1" },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than_or_equal_to", "value": 1 }
+          ]
+        },
+        "time": 29,
+        "reload_type": "rounds",
+        "reload_count": 1,
+        "reload_delay": 12,
+        "replace_chambered_round": false,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" }
+        ]
+      },
+      {
+        "phase": "finish",
+        "time": 8,
+        "charge_firearm": true
+      }
+    ]
+  },
+  "unload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
+        "time": 3,
+        "sound": "rfe_builtin:item.generic.shotgun.pump"
+      },
+      {
+        "phase": "unload",
+        "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
+        "time": 1,
+        "unload_type": "rounds",
+        "end_unload": true,
+        "sound": "rfe_builtin:item.generic.shotgun.unload.shell"
+      },
+      {
+        "phase": "finish",
+        "time": 3
+      }
+    ]
+  },
+  "charge": {
+    "actions": [
+      {
+        "condition": { "macro": "rfe_builtin:can_charge" },
+        "time": 7,
+        "sound": "rfe_builtin:item.generic.shotgun.pump"
+      }
+    ]
+  },
+  "modes": {
+    "slamfire": {
+      "firing": {
+        "fire_mode": "single_action",
+        "cooldown": 2,
+        "charging_behavior": "auto",
+        "slamfire": true,
+        "sound": "rfe_builtin:item.generic.shotgun.shot"
+      }
+    },
+    "safety": {
+      "firing": {
+        "fire_mode": "safety"
+      }
+    }
+  }
+}

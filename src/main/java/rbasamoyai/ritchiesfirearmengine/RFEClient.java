@@ -23,6 +23,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.HoldAttackKeyInt
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.AmmoPacketItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FireMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRenderer;
@@ -71,6 +72,29 @@ public class RFEClient {
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_firing"), (itemStack, level, entity, seed) -> {
             return itemStack.getItem() instanceof RFEFirearmItem firearm
                     && firearm.getCurrentAction(itemStack) == RFEFirearmItem.Action.FIRING ? 1 : 0;
+        });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_charged"), (itemStack, level, entity, seed) -> {
+            return itemStack.getItem() instanceof RFEFirearmItem firearm && firearm.isCharged(itemStack) ? 1 : 0;
+        });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_single_action"), (itemStack, level, entity, seed) -> {
+            return itemStack.getItem() instanceof RFEFirearmItem firearm
+                    && firearm.getCurrentMode(itemStack).getFireMode() == FireMode.SINGLE_ACTION ? 1 : 0;
+        });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_semi_auto"), (itemStack, level, entity, seed) -> {
+            return itemStack.getItem() instanceof RFEFirearmItem firearm
+                    && firearm.getCurrentMode(itemStack).getFireMode() == FireMode.SEMI_AUTO ? 1 : 0;
+        });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_full_auto"), (itemStack, level, entity, seed) -> {
+            return itemStack.getItem() instanceof RFEFirearmItem firearm
+                    && firearm.getCurrentMode(itemStack).getFireMode() == FireMode.FULL_AUTO ? 1 : 0;
+        });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_burst"), (itemStack, level, entity, seed) -> {
+            return itemStack.getItem() instanceof RFEFirearmItem firearm
+                    && firearm.getCurrentMode(itemStack).getFireMode() == FireMode.BURST ? 1 : 0;
+        });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_safety"), (itemStack, level, entity, seed) -> {
+            return itemStack.getItem() instanceof RFEFirearmItem firearm
+                    && firearm.getCurrentMode(itemStack).getFireMode() == FireMode.SAFETY ? 1 : 0;
         });
     }
 

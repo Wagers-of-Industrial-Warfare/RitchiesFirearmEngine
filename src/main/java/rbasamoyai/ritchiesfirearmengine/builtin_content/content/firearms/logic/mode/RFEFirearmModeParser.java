@@ -8,6 +8,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.GsonHelper;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ChargeAction;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ChargingBehavior;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FireMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ReloadPhase;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
@@ -96,8 +97,11 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                     builder.ignoreEmptySlotsWhenFiring(ignoreEmptySlots);
                 }
                 if (fireMode == FireMode.SINGLE_ACTION) {
-                    boolean manualCharge = GsonHelper.getAsBoolean(firing, "manual_charge", false);
-                    builder.manualCharging(manualCharge);
+                    ChargingBehavior chargingBehavior = ChargingBehavior.byIdStrict(GsonHelper.getAsString(firing, "charging_behavior",
+                            ChargingBehavior.HOLD.getSerializedName()));
+                    boolean slamfire = GsonHelper.getAsBoolean(firing, "slamfire", false);
+                    builder.chargingBehavior(chargingBehavior)
+                            .slamfire(slamfire);
                 } else if (fireMode == FireMode.BURST) {
                     int burstRounds = GsonHelper.getAsInt(firing, "burst_rounds");
                     builder.burstRoundCount(burstRounds);

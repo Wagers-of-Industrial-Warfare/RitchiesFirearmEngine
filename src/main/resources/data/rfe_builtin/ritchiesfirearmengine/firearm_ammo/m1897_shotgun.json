@@ -1,0 +1,64 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:birdshot_shell",
+      "fires": "rfe_builtin:12_ga_7_birdshot_m1897"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_birdshot_shell",
+      "fires": "rfe_builtin:12_ga_7_birdshot_m1897"
+    },
+    {
+      "ammo": "rfe_builtin:buckshot_shell",
+      "fires": "rfe_builtin:12_ga_1_buckshot_m1897"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_buckshot_shell",
+      "fires": "rfe_builtin:12_ga_1_buckshot_m1897"
+    },
+    {
+      "ammo": "rfe_builtin:magnum_buckshot_shell",
+      "fires": "rfe_builtin:12_ga_00_buckshot_m1897"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_magnum_buckshot_shell",
+      "fires": "rfe_builtin:12_ga_00_buckshot_m1897"
+    },
+    {
+      "ammo": "rfe_builtin:slug_shell",
+      "fires": "rfe_builtin:12_ga_slug_m1897"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_slug_shell",
+      "fires": "rfe_builtin:12_ga_slug_m1897"
+    },
+    {
+      "ammo": "rfe_builtin:ap_slug_shell",
+      "fires": "rfe_builtin:12_ga_slug_ap_m1897"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_ap_slug_shell",
+      "fires": "rfe_builtin:12_ga_slug_ap_m1897"
+    },
+    {
+      "ammo": "rfe_builtin:expanding_slug_shell",
+      "fires": "rfe_builtin:12_ga_slug_expanding_m1897"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_expanding_slug_shell",
+      "fires": "rfe_builtin:12_ga_slug_expanding_m1897"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "modes": {
+  }
+}

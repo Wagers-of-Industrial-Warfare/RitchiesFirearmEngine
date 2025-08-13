@@ -1,30 +1,32 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode;
 
 import net.minecraft.network.FriendlyByteBuf;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ChargingBehavior;
 
-public record RFEFirearmModeHandlingProperties(float jamChance, boolean manualCharging, float heatCapacity, float heatRemovedPerTick,
-                                               float heatRemovedOnCharge, float heatAddedOnFiring, int coolingDelayTime) {
+public record RFEFirearmModeHandlingProperties(float jamChance, ChargingBehavior chargingBehavior, float heatCapacity,
+                                               float heatRemovedPerTick, float heatRemovedOnCharge, float heatAddedOnFiring,
+                                               int coolingDelayTime) {
 
     public static RFEFirearmModeHandlingProperties fromItemDefinition(RFEFirearmModeBuilder builder) {
-        return new RFEFirearmModeHandlingProperties(builder.jamChance, builder.manualCharging, builder.heatCapacity,
+        return new RFEFirearmModeHandlingProperties(builder.jamChance, builder.chargingBehavior, builder.heatCapacity,
                 builder.heatRemovedPerTick, builder.heatRemovedOnCharge, builder.heatAddedOnFiring, builder.coolingDelayTime);
     }
 
     public static RFEFirearmModeHandlingProperties fromNetwork(FriendlyByteBuf buf) {
         float jamChance = buf.readFloat();
-        boolean manualCharging = buf.readBoolean();
+        ChargingBehavior chargingBehavior = buf.readEnum(ChargingBehavior.class);
         float heatCapacity = buf.readFloat();
         float heatRemovedPerTick = buf.readFloat();
         float heatRemovedOnCharge = buf.readFloat();
         float heatAddedOnFiring = buf.readFloat();
         int coolingDelayTime = buf.readVarInt();
-        return new RFEFirearmModeHandlingProperties(jamChance, manualCharging, heatCapacity, heatRemovedPerTick,
+        return new RFEFirearmModeHandlingProperties(jamChance, chargingBehavior, heatCapacity, heatRemovedPerTick,
                 heatRemovedOnCharge, heatAddedOnFiring, coolingDelayTime);
     }
 
     public static void toNetwork(FriendlyByteBuf buf, RFEFirearmModeHandlingProperties properties) {
-        buf.writeFloat(properties.jamChance)
-                .writeBoolean(properties.manualCharging)
+        buf.writeFloat(properties.jamChance);
+        buf.writeEnum(properties.chargingBehavior)
                 .writeFloat(properties.heatCapacity)
                 .writeFloat(properties.heatRemovedOnCharge)
                 .writeFloat(properties.heatRemovedOnCharge)
@@ -34,7 +36,7 @@ public record RFEFirearmModeHandlingProperties(float jamChance, boolean manualCh
 
     public static class Builder {
         protected float jamChance = 0;
-        protected boolean manualCharging = false;
+        protected ChargingBehavior chargingBehavior = ChargingBehavior.HOLD;
         protected float heatCapacity = 0;
         protected float heatRemovedPerTick = 0;
         protected float heatRemovedOnCharge = 0;
@@ -48,8 +50,8 @@ public record RFEFirearmModeHandlingProperties(float jamChance, boolean manualCh
             return this;
         }
 
-        public Builder manualCharging(boolean manualCharging) {
-            this.manualCharging = manualCharging;
+        public Builder chargingBehavior(ChargingBehavior chargingBehavior) {
+            this.chargingBehavior = chargingBehavior;
             return this;
         }
 
@@ -89,7 +91,7 @@ public record RFEFirearmModeHandlingProperties(float jamChance, boolean manualCh
         }
 
         public RFEFirearmModeHandlingProperties build() {
-            return new RFEFirearmModeHandlingProperties(this.jamChance, this.manualCharging, this.heatCapacity,
+            return new RFEFirearmModeHandlingProperties(this.jamChance, this.chargingBehavior, this.heatCapacity,
                     this.heatRemovedPerTick, this.heatRemovedOnCharge, this.heatAddedOnFiring, this.coolingDelayTime);
         }
     }

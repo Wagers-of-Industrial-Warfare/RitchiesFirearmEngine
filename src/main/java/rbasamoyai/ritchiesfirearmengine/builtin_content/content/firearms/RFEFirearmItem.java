@@ -107,6 +107,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
                 firearmMode.fireFirearm(stack, entity, RFEFirearmMode.FiringType.CLICK);
         } else if (firearmMode.canChargeInternal(stack, entity)) {
             firearmMode.onCharge(stack, entity);
+        } else if (firearmMode.canCancelReloadByClick(stack, entity)) {
+            firearmMode.setForceCancelReload(stack, entity, true);
         }
         // TODO alternative API for entity interaction
         return true;

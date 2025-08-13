@@ -597,7 +597,8 @@ public class RFEFirearmMode {
             FirearmDataUtils.cancelReload(itemStack, modeTag);
             return;
         }
-        if (phase.endReload()) {
+        if (phase.endReload() || this.forceCancelReload(itemStack, entity)) {
+            this.setForceCancelReload(itemStack, entity, false);
             if (!this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.FINISH, false, false, false))
                 FirearmDataUtils.cancelReload(itemStack, modeTag);
             return;
@@ -712,6 +713,23 @@ public class RFEFirearmMode {
                 magazineItem.writeStoredAmmo(magazine, ammoList);
             modeTag.put("DetachedMagazine", magazine.save(new CompoundTag()));
         }
+    }
+
+    public boolean canCancelReloadByClick(ItemStack itemStack, LivingEntity entity) {
+        return FirearmDataUtils.getAction(itemStack) == RFEFirearmItem.Action.RELOAD
+                && ReloadPhase.PhaseType.byId(this.getOrCreateModeTag(itemStack).getString("ReloadPhase")) == ReloadPhase.PhaseType.RELOAD;
+    }
+
+    public void setForceCancelReload(ItemStack itemStack, LivingEntity entity, boolean set) {
+        if (set) {
+            this.getOrCreateModeTag(itemStack).putBoolean("ForceEndReload", true);
+        } else {
+            this.getOrCreateModeTag(itemStack).remove("ForceEndReload");
+        }
+    }
+
+    public boolean forceCancelReload(ItemStack itemStack, LivingEntity entity) {
+        return this.getOrCreateModeTag(itemStack).contains("ForceEndReload");
     }
 
     public boolean tryRunningUnloadAction(ItemStack itemStack, LivingEntity entity, ReloadPhase.PhaseType phaseType, boolean onInput) {
@@ -1073,6 +1091,7 @@ public class RFEFirearmMode {
             FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.DRAW);
             FirearmDataUtils.setActionTime(itemStack, this.drawTime);
             this.clearBurstFiring(itemStack);
+            this.setForceCancelReload(itemStack, entity, false);
             return;
         }
         CompoundTag tag = itemStack.getOrCreateTag();
@@ -1085,6 +1104,8 @@ public class RFEFirearmMode {
                 && holdAttackKeyInteraction.isHoldingAttackKey(itemStack, entity);
         if (action != RFEFirearmItem.Action.FIRING)
             this.clearBurstFiring(itemStack);
+        if (action != RFEFirearmItem.Action.RELOAD)
+            this.setForceCancelReload(itemStack, entity, false);
         if (action != null) {
             switch (action) {
                 case RELOAD -> this.onTickReload(itemStack, entity);

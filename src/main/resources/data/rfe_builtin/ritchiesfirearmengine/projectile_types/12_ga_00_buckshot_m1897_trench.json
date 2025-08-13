@@ -1,0 +1,22 @@
+{
+  "type": "ritchiesfirearmengine:shotgun",
+  "muzzle_velocity": 16.7,
+  "drag": 0.007,
+  "quadratic_drag": true,
+  "gravity": 0.03,
+  "max_age": 10,
+  "knockback": 0.05,
+  "damage_model": [
+    {
+      "distance": 15,
+      "damage": 3.5
+    },
+    {
+      "distance": 20,
+      "damage": 1.5
+    }
+  ],
+  "damage_type": "rfe_builtin:bullet",
+  "subprojectile_count": 12,
+  "dispersion": 1.9
+}

@@ -593,17 +593,17 @@
       {
         "name": "rfe_builtin:item/generic/shotgun/pump/full",
         "volume": 0.25,
-        "pitch": 0.8
+        "pitch": 0.9
       },
       {
         "name": "rfe_builtin:item/generic/shotgun/pump/full",
         "volume": 0.25,
-        "pitch": 0.78
+        "pitch": 0.88
       },
       {
         "name": "rfe_builtin:item/generic/shotgun/pump/full",
         "volume": 0.25,
-        "pitch": 0.77
+        "pitch": 0.87
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.shotgun.pump"
@@ -613,17 +613,17 @@
       {
         "name": "rfe_builtin:item/generic/shotgun/pump/end",
         "volume": 0.25,
-        "pitch": 0.8
+        "pitch": 0.9
       },
       {
         "name": "rfe_builtin:item/generic/shotgun/pump/end",
         "volume": 0.25,
-        "pitch": 0.78
+        "pitch": 0.88
       },
       {
         "name": "rfe_builtin:item/generic/shotgun/pump/end",
         "volume": 0.25,
-        "pitch": 0.77
+        "pitch": 0.87
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.shotgun.pump"
@@ -633,17 +633,17 @@
       {
         "name": "rfe_builtin:item/generic/shotgun/pump/start",
         "volume": 0.25,
-        "pitch": 0.8
+        "pitch": 0.9
       },
       {
         "name": "rfe_builtin:item/generic/shotgun/pump/start",
         "volume": 0.25,
-        "pitch": 0.78
+        "pitch": 0.88
       },
       {
         "name": "rfe_builtin:item/generic/shotgun/pump/start",
         "volume": 0.25,
-        "pitch": 0.77
+        "pitch": 0.87
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.shotgun.pump"

@@ -40,6 +40,7 @@
     "rfe_builtin:db_shotgun_sxs",
     "rfe_builtin:db_shotgun_ou",
     "rfe_builtin:m1897_shotgun",
+    "rfe_builtin:m1897_shotgun_trench",
     "rfe_builtin:m1911"
   ]
 }

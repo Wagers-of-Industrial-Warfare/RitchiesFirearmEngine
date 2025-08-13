@@ -32,7 +32,7 @@
             { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
           ]
         },
-        "time": 8
+        "time": 6
       },
       {
         "phase": "reload",
@@ -42,16 +42,16 @@
             { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than_or_equal_to", "value": 1 }
           ]
         },
-        "time": 29,
+        "time": 24,
         "reload_type": "rounds",
         "reload_count": 1,
-        "reload_delay": 17,
+        "reload_delay": 12,
         "replace_chambered_round": true,
         "charge_firearm": true,
         "sounds": [
           { "time": 0, "sound": "rfe_builtin:item.generic.shotgun.pump.start" },
-          { "time": 15, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" },
-          { "time": 24, "sound": "rfe_builtin:item.generic.shotgun.pump.end" }
+          { "time": 10, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" },
+          { "time": 19, "sound": "rfe_builtin:item.generic.shotgun.pump.end" }
         ]
       },
       {
@@ -62,14 +62,14 @@
             { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than_or_equal_to", "value": 2 }
           ]
         },
-        "time": 37,
+        "time": 28,
         "reload_type": "rounds",
         "reload_count": 2,
-        "reload_delays": [12, 20],
+        "reload_delays": [10, 18],
         "replace_chambered_round": false,
         "sounds": [
-          { "time": 10, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" },
-          { "time": 18, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" }
+          { "time": 8, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" },
+          { "time": 16, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" }
         ]
       },
       {
@@ -80,18 +80,18 @@
             { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than_or_equal_to", "value": 1 }
           ]
         },
-        "time": 29,
+        "time": 20,
         "reload_type": "rounds",
         "reload_count": 1,
-        "reload_delay": 12,
+        "reload_delay": 10,
         "replace_chambered_round": false,
         "sounds": [
-          { "time": 10, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" }
+          { "time": 8, "sound": "rfe_builtin:item.generic.shotgun.reload.shell" }
         ]
       },
       {
         "phase": "finish",
-        "time": 8,
+        "time": 6,
         "charge_firearm": true
       }
     ]
@@ -101,7 +101,7 @@
       {
         "phase": "prepare",
         "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
-        "time": 4,
+        "time": 3,
         "sound": "rfe_builtin:item.generic.shotgun.pump"
       },
       {
@@ -114,7 +114,7 @@
       },
       {
         "phase": "finish",
-        "time": 4
+        "time": 3
       }
     ]
   },
@@ -122,7 +122,7 @@
     "actions": [
       {
         "condition": { "macro": "rfe_builtin:can_charge" },
-        "time": 9,
+        "time": 7,
         "sound": "rfe_builtin:item.generic.shotgun.pump"
       }
     ]

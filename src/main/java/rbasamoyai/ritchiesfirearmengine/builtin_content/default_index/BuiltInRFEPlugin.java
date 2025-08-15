@@ -23,6 +23,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.fixed.FixedHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.vulnerable_to_birdshot.BirdshotHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.vulnerable_to_birdshot.BirdshotHitMultiplierGore;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.buck_and_ball.RFEBuckAndBallProjectileType;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bullet.RFEBulletProjectileType;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.shotgun.RFEShotgunProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
@@ -187,10 +188,12 @@ public class BuiltInRFEPlugin implements RFEPlugin {
     public static class ProjectileTypes {
         public static final RFEBulletProjectileType.Serializer BULLET = new RFEBulletProjectileType.Serializer();
         public static final RFEShotgunProjectileType.Serializer SHOTGUN = new RFEShotgunProjectileType.Serializer();
+        public static final RFEBuckAndBallProjectileType.Serializer BUCK_AND_BALL = new RFEBuckAndBallProjectileType.Serializer();
 
         public static void register() {
             RFEContentBuilderRegistry.registerProjectileTypeSerializer(RitchiesFirearmEngine.resource("bullet"), BULLET);
             RFEContentBuilderRegistry.registerProjectileTypeSerializer(RitchiesFirearmEngine.resource("shotgun"), SHOTGUN);
+            RFEContentBuilderRegistry.registerProjectileTypeSerializer(RitchiesFirearmEngine.resource("buck_and_ball"), BUCK_AND_BALL);
         }
     }
 

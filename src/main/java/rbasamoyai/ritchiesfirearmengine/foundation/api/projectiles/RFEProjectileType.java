@@ -8,6 +8,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
 
+import java.util.List;
+
 public interface RFEProjectileType {
 
     void shoot(RFEProjectileInstance instance, double dx, double dy, double dz, ItemStack itemStack, LivingEntity entity,
@@ -25,6 +27,10 @@ public interface RFEProjectileType {
         T fromJson(JsonObject obj);
         T fromNetwork(FriendlyByteBuf buf);
         void toNetwork(FriendlyByteBuf buf, T type);
+    }
+
+    interface HasCombinedProjectiles {
+        List<RFEProjectileType> getSubprojectileTypes();
     }
 
 }

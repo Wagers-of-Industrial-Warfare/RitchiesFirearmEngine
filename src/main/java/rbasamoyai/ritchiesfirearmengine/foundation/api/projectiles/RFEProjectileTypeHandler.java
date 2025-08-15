@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashBigSet;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
@@ -24,12 +25,14 @@ import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executor;
 
 public class RFEProjectileTypeHandler {
 
     private static final Map<ResourceLocation, RFEProjectileType> PROJECTILE_TYPES = new Object2ReferenceOpenHashMap<>();
     private static final Map<RFEProjectileType, ResourceLocation> PROJECTILE_TYPE_IDS = new Reference2ObjectOpenHashMap<>();
+    private static final Set<ResourceLocation> SUBPROJECTILE_TYPE_IDS = new ObjectOpenHashBigSet<>();
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -54,6 +57,15 @@ public class RFEProjectileTypeHandler {
                     RFEProjectileType type = ser.fromJson(obj);
                     PROJECTILE_TYPES.put(id, type);
                     PROJECTILE_TYPE_IDS.put(type, id);
+                    if (type instanceof RFEProjectileType.HasCombinedProjectiles combined) {
+                        int count = 0;
+                        for (RFEProjectileType extra : combined.getSubprojectileTypes()) {
+                            ResourceLocation extraId = id.withSuffix("/" + ++count);
+                            PROJECTILE_TYPES.put(extraId, extra);
+                            PROJECTILE_TYPE_IDS.put(extra, extraId);
+                            SUBPROJECTILE_TYPE_IDS.add(extraId);
+                        }
+                    }
                 } catch (Exception e) {
                     LOGGER.error("Error loading projectile type {}: {}", id, e);
                 }
@@ -64,6 +76,7 @@ public class RFEProjectileTypeHandler {
     private static void clear() {
         PROJECTILE_TYPES.clear();
         PROJECTILE_TYPE_IDS.clear();
+        SUBPROJECTILE_TYPE_IDS.clear();
     }
 
     @Nullable public static RFEProjectileType getProjectileType(ResourceLocation id) { return PROJECTILE_TYPES.get(id); }
@@ -79,7 +92,14 @@ public class RFEProjectileTypeHandler {
     }
 
     public record ClientboundSyncRFEProjectileTypesPacket(Map<ResourceLocation, RFEProjectileType> projectileTypes) implements RFEPacket {
-        ClientboundSyncRFEProjectileTypesPacket() { this(new Object2ReferenceOpenHashMap<>(PROJECTILE_TYPES)); }
+        ClientboundSyncRFEProjectileTypesPacket() { this(getProjectileTypesNoSubprojectiles()); }
+
+        private static Map<ResourceLocation, RFEProjectileType> getProjectileTypesNoSubprojectiles() {
+            Map<ResourceLocation, RFEProjectileType> result = new Object2ReferenceOpenHashMap<>(PROJECTILE_TYPES);
+            for (ResourceLocation subprojectileId : SUBPROJECTILE_TYPE_IDS)
+                result.remove(subprojectileId);
+            return result;
+        }
 
         public static ClientboundSyncRFEProjectileTypesPacket decode(FriendlyByteBuf buf) {
             Map<ResourceLocation, RFEProjectileType> projectileTypes = new Object2ReferenceOpenHashMap<>();
@@ -114,8 +134,21 @@ public class RFEProjectileTypeHandler {
             PROJECTILE_TYPES.clear();
             PROJECTILE_TYPES.putAll(this.projectileTypes);
             PROJECTILE_TYPE_IDS.clear();
-            for (Map.Entry<ResourceLocation, RFEProjectileType> entry : this.projectileTypes.entrySet())
-                PROJECTILE_TYPE_IDS.put(entry.getValue(), entry.getKey());
+            SUBPROJECTILE_TYPE_IDS.clear();
+            for (Map.Entry<ResourceLocation, RFEProjectileType> entry : this.projectileTypes.entrySet()) {
+                ResourceLocation id = entry.getKey();
+                RFEProjectileType projectileType = entry.getValue();
+                PROJECTILE_TYPE_IDS.put(projectileType, id);
+                if (projectileType instanceof RFEProjectileType.HasCombinedProjectiles combined) {
+                    int count = 0;
+                    for (RFEProjectileType extra : combined.getSubprojectileTypes()) {
+                        ResourceLocation extraId = id.withSuffix("/" + ++count);
+                        PROJECTILE_TYPES.put(extraId, extra);
+                        PROJECTILE_TYPE_IDS.put(extra, extraId);
+                        SUBPROJECTILE_TYPE_IDS.add(extraId);
+                    }
+                }
+            }
         }
     }
 

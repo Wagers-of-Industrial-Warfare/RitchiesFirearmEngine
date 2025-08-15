@@ -1,0 +1,27 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:wooden_buttons",
+    "#minecraft:wooden_doors",
+    "#minecraft:wooden_fences",
+    "#minecraft:wooden_pressure_plates",
+    "#minecraft:wooden_slabs",
+    "#minecraft:wooden_stairs",
+    "#minecraft:wooden_trapdoors",
+    "#minecraft:climbable",
+    "#minecraft:all_signs",
+    "#minecraft:campfires",
+    "#minecraft:planks",
+    "#minecraft:logs",
+    "#minecraft:leaves",
+    "#minecraft:sand",
+    "#minecraft:wool",
+    "#minecraft:wool_carpets",
+    "#forge:fence_gates",
+    "minecraft:mangrove_roots",
+    "minecraft:iron_bars",
+    "#forge:glass_panes",
+    "minecraft:decorated_pot",
+    "#minecraft:flower_pots"
+  ]
+}

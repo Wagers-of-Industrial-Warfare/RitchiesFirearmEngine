@@ -3,6 +3,7 @@ package rbasamoyai.ritchiesfirearmengine.foundation;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 
 import java.util.Locale;
@@ -13,6 +14,13 @@ public class RFETags {
         INFINITE_AMMO;
 
         public final TagKey<Item> tag = TagKey.create(Registries.ITEM, RitchiesFirearmEngine.resource(this.name().toLowerCase(Locale.ROOT)));
+    }
+
+    public enum RFEBlockTags {
+        DEFAULT_PENETRATION,
+        DEFAULT_BREAKABLE;
+
+        public final TagKey<Block> tag = TagKey.create(Registries.BLOCK, RitchiesFirearmEngine.resource(this.name().toLowerCase(Locale.ROOT)));
     }
 
     private RFETags() {}

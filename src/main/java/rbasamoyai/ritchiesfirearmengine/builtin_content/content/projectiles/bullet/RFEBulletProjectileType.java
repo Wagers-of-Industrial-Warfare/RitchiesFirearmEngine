@@ -3,9 +3,16 @@ package rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bul
 import com.google.gson.JsonObject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.ParticleUtils;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
@@ -17,20 +24,27 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.*;
+import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.RFEHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.RFEHitMultiplierHandler;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.ProjClipContext;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEBaseProjectilePropertiesBuilder;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEProjectileDamageModel;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
+import rbasamoyai.ritchiesfirearmengine.foundation.RFETags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEMathUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEProjectileUtils;
+
+import java.util.HashMap;
 
 public class RFEBulletProjectileType implements RFEProjectileType {
 
@@ -80,9 +94,9 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             return;
         }
 
-        HitResult hitResult = level.clip(new ClipContext(oldPos, newPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
-        if (hitResult.getType() != HitResult.Type.MISS)
-            newPos = hitResult.getLocation();
+        ProjClipContext context = new ProjClipContext(this, instance, oldPos, newPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE);
+        HitResult hitResult = level.clip(context);
+        if (hitResult.getType() != HitResult.Type.MISS) newPos = hitResult.getLocation();
         AABB searchBox = this.getAABB(level, instance).expandTowards(velocity).inflate(1.0d);
 
         double hitboxInflation = this.getHitboxInflation(level, instance);
@@ -101,8 +115,9 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             }
 
             if (hitResult != null && hitResult.getType() != HitResult.Type.MISS) {
-                this.onHit(instance, level, hitResult);
+                this.onHit(instance, level, hitResult, context.penetratedBlocks);
             }
+            this.onPenetratedHitBlocks(instance, level, context.penetratedBlocks);
 
             // TODO overpenetration
             boolean canContinuePenetrating = false;
@@ -126,8 +141,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         instance.setVelocity(newVelocity.add(0, -this.gravity, 0));
         // TODO effects
 
-        if (instance.age() > this.maxAge)
-            instance.setRemoved();
+        if (instance.age() > this.maxAge || instance.health() == 0f) instance.setRemoved();
     }
 
     @Override
@@ -148,7 +162,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         //return (this.piercingIgnoreEntityIds == null || !this.piercingIgnoreEntityIds.contains(target.getId())) && !this.ignoredEntities.contains(target.getId());
     }
 
-    protected void onHit(RFEProjectileInstance instance, Level level, HitResult hitResult) {
+    protected void onHit(RFEProjectileInstance instance, Level level, HitResult hitResult, HashMap<BlockPos, BlockState> penetratedBlocks) {
         HitResult.Type type = hitResult.getType();
         if (type == HitResult.Type.ENTITY) {
             this.onHitEntity(instance, level, (EntityHitResult) hitResult);
@@ -239,11 +253,30 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     protected void doPostHurtEffects(RFEProjectileInstance instance, Level level, LivingEntity entity) {
     }
 
+    protected void onPenetratedHitBlocks(RFEProjectileInstance instance, Level level, HashMap<BlockPos, BlockState> penetratedBlocks) {
+        TagKey<Block> breakingTag = getBlockBreakingTag();
+        penetratedBlocks.forEach((pos, state) -> {
+            if (breakingTag != null && state.is(breakingTag)) {
+                level.destroyBlock(pos, true, instance.getOwner());
+                return;
+            }
+
+            SoundType soundType = state.getSoundType();
+            level.playSound(null, pos, soundType.getHitSound(), SoundSource.BLOCKS, 1.0F, 1.2F / (level.random.nextFloat() * 0.2F + 0.9F));
+            if (level instanceof ServerLevel serverLevel) {
+                Vec3 center = pos.getCenter();
+                serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state), center.x, center.y, center.z, 16, 0.25, 0.25, 0.25, 0);
+            }
+        });
+    }
+
     protected void onHitBlock(RFEProjectileInstance instance, Level level, BlockHitResult pResult) {
         // TODO ricochet
         // TODO block breaking
 
-        BlockState blockstate = level.getBlockState(pResult.getBlockPos());
+        BlockPos hitPos = pResult.getBlockPos();
+        BlockState blockstate = level.getBlockState(hitPos);
+
         //this.lastState = blockstate;
         //blockstate.onProjectileHit(level, blockstate, pResult, this); TODO fake projectile
         Vec3 projPos = instance.position();
@@ -252,8 +285,21 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         instance.setRemoved();
         instance.setForceSync(true);
 
+        TagKey<Block> breakingTag = getBlockBreakingTag();
+        if (breakingTag != null && blockstate.is(breakingTag)) {
+            level.destroyBlock(hitPos, true, instance.getOwner());
+            return;
+        }
+
         // TODO hit effects
-        //this.playSound(this.getHitGroundSoundEvent(), 1.0F, 1.2F / (this.random.nextFloat() * 0.2F + 0.9F));
+        Vec3 hitLoc = pResult.getLocation();
+        SoundType soundType = blockstate.getSoundType();
+        level.playSound(null, hitPos, soundType.getHitSound(), SoundSource.BLOCKS, 1.0F, 1.2F / (level.random.nextFloat() * 0.2F + 0.9F));
+        if (level instanceof ServerLevel serverLevel) {
+            serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, blockstate), hitLoc.x, hitLoc.y, hitLoc.z, 8, 0, 0, 0, 0);
+        }
+        //ParticleUtils.spawnParticlesOnBlockFaces(level, hitPos.above(), new BlockParticleOption(ParticleTypes.BLOCK, blockstate), UniformInt.of(8, 12));
+
         //this.inGround = true;
         //this.shakeTime = 7;
         //this.setCritArrow(false);
@@ -261,6 +307,13 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         //this.setSoundEvent(SoundEvents.ARROW_HIT);
         //this.setShotFromCrossbow(false);
         //this.resetPiercedEntities();
+    }
+
+    public TagKey<Block> getBlockBreakingTag() {
+        return RFETags.RFEBlockTags.DEFAULT_BREAKABLE.tag;
+    }
+    public TagKey<Block> getBlockPenetrationTag() {
+        return RFETags.RFEBlockTags.DEFAULT_PENETRATION.tag;
     }
 
     @Override

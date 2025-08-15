@@ -84,6 +84,24 @@
     "rfe_builtin:pistol_magazine_20rds",
     "rfe_builtin:pistol_magazine_30rds",
     "rfe_builtin:pistol_magazine_32rds",
-    "rfe_builtin:pistol_magazine_35rds"
+    "rfe_builtin:pistol_magazine_35rds",
+    "rfe_builtin:infinite_rifle_stripper_clip_5rds",
+    "rfe_builtin:infinite_rifle_en_bloc_clip_5rds",
+    "rfe_builtin:infinite_rifle_magazine_5rds",
+    "rfe_builtin:infinite_rifle_magazine_10rds",
+    "rfe_builtin:infinite_rifle_magazine_15rds",
+    "rfe_builtin:infinite_rifle_magazine_20rds",
+    "rfe_builtin:infinite_rifle_magazine_25rds",
+    "rfe_builtin:infinite_rifle_magazine_30rds",
+    "rfe_builtin:infinite_pistol_magazine_7rds",
+    "rfe_builtin:infinite_pistol_magazine_8rds",
+    "rfe_builtin:infinite_pistol_magazine_9rds",
+    "rfe_builtin:infinite_pistol_magazine_10rds",
+    "rfe_builtin:infinite_pistol_magazine_15rds",
+    "rfe_builtin:infinite_pistol_magazine_17rds",
+    "rfe_builtin:infinite_pistol_magazine_20rds",
+    "rfe_builtin:infinite_pistol_magazine_30rds",
+    "rfe_builtin:infinite_pistol_magazine_32rds",
+    "rfe_builtin:infinite_pistol_magazine_35rds"
   ]
 }

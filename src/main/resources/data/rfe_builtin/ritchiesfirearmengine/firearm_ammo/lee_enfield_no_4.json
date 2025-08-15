@@ -48,7 +48,8 @@
   ],
   "replace_speedloaders": false,
   "speedloaders": [
-    "rfe_builtin:rifle_stripper_clip_5rds"
+    "rfe_builtin:rifle_stripper_clip_5rds",
+    "rfe_builtin:infinite_rifle_stripper_clip_5rds"
   ],
   "replace_secondary_ammo": false,
   "secondary_ammo": [

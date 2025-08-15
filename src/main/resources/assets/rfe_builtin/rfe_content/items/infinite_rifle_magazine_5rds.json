@@ -1,9 +1,9 @@
 {
   "type": "ritchiesfirearmengine:magazine",
   "stacks_to": 64,
-  "rarity": "common",
-  "glint": false,
-  "capacity": 15,
+  "rarity": "epic",
+  "glint": true,
+  "capacity": 5,
   "reload_cooldown": 10,
   "valid_ammo": [
     "#rfe_builtin:rifle_magazine_cartridges"

@@ -7,6 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
+import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -148,7 +149,7 @@ public class RFEItemUtils {
             largestCount = ammoCount;
             bestStack = itemStack;
         }
-        return take ? bestStack.split(bestStack.getCount()) : bestStack.copy();
+        return take && !bestStack.is(RFEItemTags.INFINITE_AMMO.tag) ? bestStack.split(bestStack.getCount()) : bestStack.copy();
     }
 
     public static ItemStack findFullestMagazine(LivingEntity entity, Predicate<ItemStack> magazinePredicate, Predicate<ItemStack> ammoPredicate, boolean take) {
@@ -176,7 +177,7 @@ public class RFEItemUtils {
                 bestStack = itemStack;
             }
         }
-        return take ? bestStack.split(bestStack.getCount()) : bestStack.copy();
+        return take && !bestStack.is(RFEItemTags.INFINITE_AMMO.tag) ? bestStack.split(bestStack.getCount()) : bestStack.copy();
     }
 
     private RFEItemUtils() {}

@@ -135,8 +135,10 @@ public class MagazineItem extends Item {
             }
             if (allValid) {
                 int added = FirearmDataUtils.addMultipleAmmo(ammo, speedloaderAmmo, false, true, false /* TODO track empty slots */, this.getMagazineCapacity(magazineStack));
-                FirearmDataUtils.stripMultipleAmmo(speedloaderAmmo, added, true, false, false /* TODO track empty slots */, true);
-                secondary.writeStoredAmmo(availableStack, speedloaderAmmo);
+                if (!availableStack.is(RFEItemTags.INFINITE_AMMO.tag)) {
+                    FirearmDataUtils.stripMultipleAmmo(speedloaderAmmo, added, true, false, false /* TODO track empty slots */, true);
+                    secondary.writeStoredAmmo(availableStack, speedloaderAmmo);
+                }
                 return true;
             }
         }

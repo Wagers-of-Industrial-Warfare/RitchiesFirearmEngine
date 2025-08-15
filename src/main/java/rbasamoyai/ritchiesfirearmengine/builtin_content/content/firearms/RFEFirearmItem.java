@@ -347,6 +347,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
                     }
                     magCount += magStack.getCount();
                 }
+                if (invStack.is(RFEItemTags.INFINITE_AMMO.tag))
+                    return Optional.of(-1);
                 count += magCount;
             }
         }

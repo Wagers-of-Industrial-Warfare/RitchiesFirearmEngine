@@ -1,15 +1,13 @@
 {
   "type": "ritchiesfirearmengine:magazine",
   "stacks_to": 64,
-  "rarity": "common",
-  "glint": false,
+  "rarity": "epic",
+  "glint": true,
   "capacity": 5,
-  "reload_cooldown": 10,
+  "reload_cooldown": 5,
   "valid_ammo": [
     "#rfe_builtin:rifle_magazine_cartridges"
   ],
   "valid_speedloaders": [
-    "rfe_builtin:rifle_stripper_clip_5rds",
-    "rfe_builtin:infinite_rifle_stripper_clip_5rds"
   ]
 }

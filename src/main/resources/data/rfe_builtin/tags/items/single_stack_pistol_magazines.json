@@ -1,6 +1,10 @@
 {
   "replace": false,
   "values": [
+    "rfe_builtin:infinite_pistol_magazine_7rds",
+    "rfe_builtin:infinite_pistol_magazine_8rds",
+    "rfe_builtin:infinite_pistol_magazine_9rds",
+    "rfe_builtin:infinite_pistol_magazine_10rds",
     "rfe_builtin:pistol_magazine_7rds",
     "rfe_builtin:pistol_magazine_8rds",
     "rfe_builtin:pistol_magazine_9rds",

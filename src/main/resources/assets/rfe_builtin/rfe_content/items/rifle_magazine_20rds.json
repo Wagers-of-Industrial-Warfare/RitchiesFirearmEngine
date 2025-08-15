@@ -9,6 +9,7 @@
     "#rfe_builtin:rifle_magazine_cartridges"
   ],
   "valid_speedloaders": [
-    "rfe_builtin:rifle_stripper_clip_5rds"
+    "rfe_builtin:rifle_stripper_clip_5rds",
+    "rfe_builtin:infinite_rifle_stripper_clip_5rds"
   ]
 }

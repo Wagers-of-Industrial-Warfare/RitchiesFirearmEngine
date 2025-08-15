@@ -1,0 +1,13 @@
+{
+  "type": "ritchiesfirearmengine:magazine",
+  "stacks_to": 64,
+  "rarity": "epic",
+  "glint": true,
+  "capacity": 15,
+  "reload_cooldown": 6,
+  "valid_ammo": [
+    "#rfe_builtin:pistol_cartridges"
+  ],
+  "valid_speedloaders": [
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "rfe_builtin:item/pistol_magazine_single_stack/7rds_empty",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 1 },
+      "model": "rfe_builtin:item/pistol_magazine_single_stack/7rds_filled"
+    }
+  ]
+}

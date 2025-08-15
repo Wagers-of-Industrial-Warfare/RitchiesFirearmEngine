@@ -1,0 +1,20 @@
+{
+  "style": "ritchiesfirearmengine:ammo_counter",
+  "hide_entire_ammo_count": false,
+  "hide_firearm_ammo": false,
+  "enlarge_firearm_ammo": true,
+  "show_inventory_ammo": true,
+  "count_loose_rounds": true,
+  "firearm_icon": {
+    "texture": "rfe_builtin:textures/gui/hud/weapon_icon/drilling.png",
+    "width": 64,
+    "height": 16
+  },
+  "mode_translations": {
+    "default": "gui.rfe_builtin.mode.left_first.shotgun",
+    "right_first": "gui.rfe_builtin.mode.right_first.shotgun",
+    "both_barrels": "gui.rfe_builtin.mode.both_barrels.shotgun",
+    "rifle": "gui.rfe_builtin.mode.rifle_barrel",
+    "safety": "gui.ritchiesfirearmengine.mode.safety"
+  }
+}

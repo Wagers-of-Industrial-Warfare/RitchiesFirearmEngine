@@ -1,0 +1,17 @@
+{
+  "parent": "rfe_builtin:item/drilling/drilling_normal",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:aiming": 1 },
+      "model": "rfe_builtin:item/drilling/drilling_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
+      "model": "rfe_builtin:item/drilling/drilling_reload"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
+      "model": "rfe_builtin:item/drilling/drilling_reload"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "type": "ritchiesfirearmengine:simple",
+  "vertical_recoil": 8,
+  "horizontal_recoil": 2,
+  "recoil_decrease": 9,
+  "camera_shake": 2,
+  "modes": {
+    "both_barrels": {
+      "type": "ritchiesfirearmengine:simple",
+      "vertical_recoil": 12,
+      "horizontal_recoil": 3,
+      "recoil_decrease": 9,
+      "camera_shake": 3
+    }
+  }
+}

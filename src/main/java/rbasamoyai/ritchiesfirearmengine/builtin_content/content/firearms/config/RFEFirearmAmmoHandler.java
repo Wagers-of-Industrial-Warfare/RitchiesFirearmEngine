@@ -99,7 +99,9 @@ public class RFEFirearmAmmoHandler {
                     throw new JsonParseException("Expected JSON object while parsing mode ammo for item " + BuiltInRegistries.ITEM.getKey(item));
                 JsonObject modeObj = el.getAsJsonObject();
                 String modeName = entry.getKey();
-                loadUnresolvedModeProperties(modeObj, item, properties.modeProperties.getOrDefault(modeName, properties.defaultModeProperties.fork()));
+                UnresolvedModeAmmoProperties modeProperties = properties.modeProperties.computeIfAbsent(modeName,
+                        s -> properties.defaultModeProperties.fork());
+                loadUnresolvedModeProperties(modeObj, item, modeProperties);
             }
         }
     }

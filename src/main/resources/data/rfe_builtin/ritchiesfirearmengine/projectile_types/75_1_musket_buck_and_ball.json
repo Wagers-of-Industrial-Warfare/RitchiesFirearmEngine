@@ -1,0 +1,43 @@
+{
+  "type": "ritchiesfirearmengine:buck_and_ball",
+  "buck_properties": {
+    "muzzle_velocity": 16,
+    "drag": 0.005,
+    "quadratic_drag": true,
+    "gravity": 0.03,
+    "max_age": 20,
+    "knockback": 0.05,
+    "damage_model": [
+      {
+        "distance": 15,
+        "damage": 3.25
+      },
+      {
+        "distance": 60,
+        "damage": 1.25
+      }
+    ],
+    "damage_type": "rfe_builtin:bullet",
+    "subprojectile_count": 6,
+    "dispersion": 2.25
+  },
+  "ball_properties": {
+    "muzzle_velocity": 16,
+    "drag": 0.0025,
+    "quadratic_drag": true,
+    "gravity": 0.03,
+    "max_age": 400,
+    "knockback": 0.5,
+    "damage_model": [
+      {
+        "distance": 50,
+        "damage": 20.5
+      },
+      {
+        "distance": 80,
+        "damage": 17
+      }
+    ],
+    "damage_type": "rfe_builtin:bullet"
+  }
+}

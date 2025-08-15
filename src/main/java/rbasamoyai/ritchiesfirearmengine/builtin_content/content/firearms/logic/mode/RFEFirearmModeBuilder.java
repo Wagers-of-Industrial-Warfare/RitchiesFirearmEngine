@@ -13,6 +13,7 @@ public class RFEFirearmModeBuilder {
     protected final String modeId;
     protected String modeDisplayId;
     protected String modeTagId = "MainMode";
+    protected boolean resetChargeOnUnequip = false;
 
     protected int drawTime = 1;
     @Nullable
@@ -46,8 +47,11 @@ public class RFEFirearmModeBuilder {
     protected int shotsFired = 1;
     protected int burstRoundCount = 3;
     protected boolean slamfire = false;
+    protected boolean canDryFire = false;
     @Nullable
     protected SoundEvent firingSound = null;
+    @Nullable
+    protected SoundEvent dryFireSound;
     protected int windUpTime = 0;
     @Nullable
     protected SoundEvent windUpSound = null;
@@ -91,6 +95,7 @@ public class RFEFirearmModeBuilder {
 
         newBuilder.drawTime = this.drawTime;
         newBuilder.drawSound = this.drawSound;
+        newBuilder.resetChargeOnUnequip = this.resetChargeOnUnequip;
 
         newBuilder.modeChangeTime = this.modeChangeTime;
         newBuilder.modeChangeSound = this.modeChangeSound;
@@ -116,8 +121,10 @@ public class RFEFirearmModeBuilder {
         newBuilder.ignoreEmptySlotsWhenFiring = this.ignoreEmptySlotsWhenFiring;
         newBuilder.shotsFired = this.shotsFired;
         newBuilder.burstRoundCount = this.burstRoundCount;
-        newBuilder.slamfire = slamfire;
+        newBuilder.slamfire = this.slamfire;
+        newBuilder.canDryFire = this.canDryFire;
         newBuilder.firingSound = this.firingSound;
+        newBuilder.dryFireSound = this.dryFireSound;
         newBuilder.windUpTime = this.windUpTime;
         newBuilder.windUpSound = this.windUpSound;
         newBuilder.windDownTime = this.windDownTime;
@@ -151,6 +158,11 @@ public class RFEFirearmModeBuilder {
 
     public RFEFirearmModeBuilder modeTag(String modeTag) {
         this.modeTagId = modeTag;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder resetChargeOnUnequip(boolean resetChargeOnUnequip) {
+        this.resetChargeOnUnequip = resetChargeOnUnequip;
         return this;
     }
 
@@ -314,8 +326,20 @@ public class RFEFirearmModeBuilder {
         return this;
     }
 
+    public RFEFirearmModeBuilder canDryFire(boolean canDryFire) {
+        this.canDryFire = canDryFire;
+        return this;
+    }
+
     public RFEFirearmModeBuilder firingSound(SoundEvent firingSound) {
         this.firingSound = firingSound;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder dryFireSound(SoundEvent dryFireSound) {
+        if (!this.canDryFire)
+            throw new IllegalStateException("Cannot specify dry fire sound if cannot dry fire");
+        this.dryFireSound = dryFireSound;
         return this;
     }
 

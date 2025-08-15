@@ -1,0 +1,101 @@
+{
+  "type": "ritchiesfirearmengine:firearm",
+  "reset_charge_on_unequip": true,
+  "drawing": {
+    "draw_time": 25,
+    "sound": "rfe_builtin:item.generic.musket.draw"
+  },
+  "mode_change": {
+    "mode_change_time": 1,
+    "sound": "rfe_builtin:item.generic.musket.cocked"
+  },
+  "aiming": {
+    "aim_time": 7,
+    "aim_sound": "rfe_builtin:item.generic.musket.aim",
+    "unaim_sound": "rfe_builtin:item.generic.musket.unaim"
+  },
+  "ammo": {
+    "ammo_required": true,
+    "internal_capacity": 1
+  },
+  "firing": {
+    "fire_mode": "single_action",
+    "cooldown": 16,
+    "charging_behavior": "manual",
+    "sound": "rfe_builtin:item.generic.musket.fired",
+    "can_dry_fire": true,
+    "wind_up": {
+      "time": 2,
+      "sound": "rfe_builtin:item.generic.musket.fired.click"
+    }
+  },
+  "reload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1" },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
+          ]
+        },
+        "time": 15,
+        "sound": "rfe_builtin:item.generic.musket.cocked"
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1" },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
+          ]
+        },
+        "time": 250,
+        "reload_type": "rounds",
+        "reload_count": 1,
+        "reload_delay": 250,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.musket.gunpowder.pour" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.musket.gunpowder.pour" },
+          { "time": 60, "sound": "rfe_builtin:item.generic.musket.ramrod.draw" },
+          { "time": 75, "sound": "rfe_builtin:item.generic.musket.ramrod.draw" },
+          { "time": 95, "sound": "rfe_builtin:item.generic.musket.ramrod.insert" },
+          { "time": 110, "sound": "rfe_builtin:item.generic.musket.ramrod.insert" },
+          { "time": 140, "sound": "rfe_builtin:item.generic.musket.ramrod.ram" },
+          { "time": 147, "sound": "rfe_builtin:item.generic.musket.ramrod.ram" },
+          { "time": 155, "sound": "rfe_builtin:item.generic.musket.ramrod.ram" },
+          { "time": 170, "sound": "rfe_builtin:item.generic.musket.ramrod.draw" },
+          { "time": 185, "sound": "rfe_builtin:item.generic.musket.ramrod.draw" },
+          { "time": 205, "sound": "rfe_builtin:item.generic.musket.ramrod.insert" },
+          { "time": 220, "sound": "rfe_builtin:item.generic.musket.ramrod.insert" }
+        ]
+      },
+      {
+        "phase": "finish",
+        "time": 15,
+        "charge_firearm": true,
+        "sound": "rfe_builtin:item.generic.musket.cocked"
+      }
+    ]
+  },
+  "unload": {
+    "phases": [
+    ]
+  },
+  "charge": {
+    "actions": [
+      {
+        "condition": { "compare": "ritchiesfirearmengine:is_charged", "operator": "equals", "value": 0 },
+        "time": 15,
+        "sound": "rfe_builtin:item.generic.musket.cocked"
+      }
+    ]
+  },
+  "modes": {
+    "safety": {
+      "firing": {
+        "fire_mode": "safety"
+      }
+    }
+  }
+}

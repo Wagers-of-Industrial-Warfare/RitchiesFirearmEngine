@@ -28,6 +28,9 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
             builder.modeTag(modeTag);
         }
 
+        boolean resetChargeOnUnequip = GsonHelper.getAsBoolean(obj, "reset_charge_on_unequip", builder.resetChargeOnUnequip);
+        builder.resetChargeOnUnequip(resetChargeOnUnequip);
+
         if (GsonHelper.isObjectNode(obj, "drawing")) {
             JsonObject drawing = obj.getAsJsonObject("drawing");
             int drawTime = GsonHelper.getAsInt(drawing, "draw_time", 1);
@@ -106,6 +109,10 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                     int burstRounds = GsonHelper.getAsInt(firing, "burst_rounds");
                     builder.burstRoundCount(burstRounds);
                 }
+                boolean canDryFire = GsonHelper.getAsBoolean(firing, "can_dry_fire", false);
+                builder.canDryFire(canDryFire);
+                if (canDryFire)
+                    this.dryFiringEffects(builder, firing, modeId);
                 if (GsonHelper.isObjectNode(firing, "wind_up")) {
                     JsonObject windUp = firing.getAsJsonObject("wind_up");
                     int time = GsonHelper.getAsInt(windUp, "time");
@@ -239,6 +246,14 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
             String str = GsonHelper.getAsString(firingObj, "sound");
             SoundEvent firingSound = SoundEvent.createVariableRangeEvent(RFEUtils.location(str));
             builder.firingSound(firingSound);
+        }
+    }
+
+    protected void dryFiringEffects(T builder, JsonObject firingObj, String modeId) {
+        if (GsonHelper.isStringValue(firingObj, "dry_fire_sound")) {
+            String str = GsonHelper.getAsString(firingObj, "dry_fire_sound");
+            SoundEvent dryFireSound = SoundEvent.createVariableRangeEvent(RFEUtils.location(str));
+            builder.dryFireSound(dryFireSound);
         }
     }
 

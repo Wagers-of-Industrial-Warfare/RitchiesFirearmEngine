@@ -49,7 +49,11 @@ public class RFEClient {
 
     public static void onClientSetup() {
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("round_count"), (itemStack, level, entity, seed) -> {
-           return itemStack.getItem() instanceof MagazineItem magazine ? magazine.countAmmo(itemStack) : 0;
+            if (itemStack.getItem() instanceof MagazineItem magazine)
+                return magazine.countAmmo(itemStack);
+            if (itemStack.getItem() instanceof RFEFirearmItem firearm)
+                return firearm.ammoCount(itemStack, entity);
+            return 0;
         });
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("aiming"), (itemStack, level, entity, seed) -> {
            return (entity instanceof Player ? entity.isUsingItem() : FirearmDataUtils.isAiming(itemStack)) ? 1 : 0;

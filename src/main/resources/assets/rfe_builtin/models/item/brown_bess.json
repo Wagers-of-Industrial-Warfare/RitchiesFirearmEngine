@@ -1,0 +1,72 @@
+{
+  "parent": "rfe_builtin:item/brown_bess/brown_bess_fired",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:aiming": 1 },
+      "model": "rfe_builtin:item/brown_bess/brown_bess_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 1 },
+      "model": "rfe_builtin:item/brown_bess/brown_bess_uncharged"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:round_count": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/brown_bess/brown_bess_uncharged_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_charged": 1 },
+      "model": "rfe_builtin:item/brown_bess/brown_bess_normal"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charged": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/brown_bess/brown_bess_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_charging": 1 },
+      "model": "rfe_builtin:item/brown_bess/brown_bess_normal"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charging": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/brown_bess/brown_bess_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_firing": 1 },
+      "model": "rfe_builtin:item/brown_bess/brown_bess_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_firing": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/brown_bess/brown_bess_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_safety": 1 },
+      "model": "rfe_builtin:item/brown_bess/brown_bess_safety"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_safety": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/brown_bess/brown_bess_safety_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
+      "model": "rfe_builtin:item/brown_bess/brown_bess_reload"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
+      "model": "rfe_builtin:item/brown_bess/brown_bess_reload"
+    }
+  ]
+}

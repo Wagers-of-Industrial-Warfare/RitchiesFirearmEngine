@@ -369,6 +369,9 @@ public class ReloadPhase {
                             for (int delay : this.multipleReloadDelays) {
                                 if (delay < 1)
                                     throw new IllegalStateException("Cannot have " + this.mode + " delay less than 1");
+                                if (delay > this.time)
+                                    throw new IllegalStateException("Cannot have " + this.mode + " delay greater than phase time (delay was "
+                                            + delay + ", time was " + this.time + ")");
                                 this.finalMultipleReloadDelays.addTo(delay, 1);
                             }
                         }
@@ -386,6 +389,9 @@ public class ReloadPhase {
                         this.unloadMagTime = this.time;
                     if (!this.unload && this.unloadMagTime > this.reloadMagTime)
                         throw new IllegalStateException("Unload magazine time for reload cannot be greater than reload magazine time");
+                    if (this.reloadMagTime > this.time)
+                        throw new IllegalStateException("Cannot have reload magazine time greater than phase time (time was "
+                                + this.reloadMagTime + ", time was " + this.time + ")");
                 }
             } else {
                 if (this.reloadType != null)

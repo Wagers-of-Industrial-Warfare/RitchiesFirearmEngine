@@ -21,6 +21,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.*;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.condition.FirearmCondition;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
@@ -84,6 +85,8 @@ public class RFEFirearmMode {
     protected final int shotsFired;
     protected final int burstRoundCount;
     protected final boolean slamfire;
+    protected final boolean canDryFire;
+    @Nullable protected final SoundEvent dryFireSound;
     @Nullable protected final SoundEvent firingSound;
     // Wind-up
     protected final int windUpTime;
@@ -103,6 +106,7 @@ public class RFEFirearmMode {
     // Charging
     protected final List<ChargeAction> chargeActions;
     protected final Map<ResourceLocation, CompareValueSource> chargingCompareValues;
+    protected final boolean resetChargeOnUnequip;
 
     // Overheating
     protected final boolean canOverheat;
@@ -112,6 +116,7 @@ public class RFEFirearmMode {
     public RFEFirearmMode(RFEFirearmModeBuilder builder, String modeId) {
         this.modeId = modeId;
         this.modeDisplayId = builder.modeDisplayId;
+
 
         this.defaultDataPackProperties = RFEFirearmModeHandlingProperties.fromItemDefinition(builder);
 
@@ -142,11 +147,15 @@ public class RFEFirearmMode {
         this.shotsFired = builder.shotsFired;
         this.burstRoundCount = builder.burstRoundCount;
         this.slamfire = builder.slamfire;
+        this.canDryFire = builder.canDryFire;
         this.firingSound = builder.firingSound;
+        this.dryFireSound = builder.dryFireSound;
         this.windUpTime = builder.windUpTime;
         this.windUpSound = builder.windUpSound;
         this.windDownTime = builder.windDownTime;
         this.windDownSound = builder.windDownSound;
+
+        this.resetChargeOnUnequip = builder.resetChargeOnUnequip;
 
         this.reloadPhases = builder.finalReloadPhases;
         this.unloadPhases = builder.finalUnloadPhases;
@@ -279,11 +288,12 @@ public class RFEFirearmMode {
 
     public boolean canFireProjectile(ItemStack itemStack, LivingEntity entity) {
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
-        if (this.fireMode == FireMode.SAFETY || !FirearmDataUtils.isCharged(modeTag) || FirearmDataUtils.getActionTime(itemStack) > 0)
+        if (this.fireMode == FireMode.SAFETY || !FirearmDataUtils.isCharged(modeTag)
+                || FirearmDataUtils.getActionTime(itemStack) > 0 || this.isWindingUp(itemStack, entity))
             return false;
         if (this.isJammed(itemStack))
             return false;
-        if (!this.ammoRequired)
+        if (!this.ammoRequired || this.canDryFire)
             return true;
         // TODO check for secondary ammo
         if (this.plusOneCapacity && this.getLoadedRound(itemStack).isEmpty())
@@ -295,9 +305,19 @@ public class RFEFirearmMode {
         InteractionHand hand = entity.getMainHandItem() == itemStack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
         boolean client = entity.level().isClientSide;
 
-        // TODO windup
-
         if (entity instanceof Player && firing != FiringType.NON_PLAYER_AND_EFFECTS) {
+            if (this.windUpTime > 0) {
+                if (!this.isWindingUp(itemStack, entity)) {
+                    this.setWindingUp(itemStack, entity, true);
+                    FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.FIRING);
+                    FirearmDataUtils.setActionTime(itemStack, this.windUpTime);
+                    this.playWindUpEffects(itemStack, entity);
+                    return;
+                } else {
+                    this.setWindingUp(itemStack, entity, false);
+                }
+            }
+
             if (client && firing == FiringType.CLICK || !client && firing == FiringType.AUTOMATIC)
                 this.handlePlayerAmmoAndShootingOnClient(itemStack, entity);
             return;
@@ -327,6 +347,23 @@ public class RFEFirearmMode {
             modeTag.putFloat("ExtraFiringTime", remainder);
         }
         this.playFiringEffects(itemStack, entity);
+    }
+
+    protected boolean isWindingUp(ItemStack itemStack, LivingEntity entity) {
+        return this.getOrCreateModeTag(itemStack).contains("WindingUp");
+    }
+
+    protected void setWindingUp(ItemStack itemStack, LivingEntity entity, boolean windUp) {
+        if (windUp) {
+            this.getOrCreateModeTag(itemStack).putBoolean("WindingUp", true);
+        } else {
+            this.getOrCreateModeTag(itemStack).remove("WindingUp");
+        }
+    }
+
+    public void playWindUpEffects(ItemStack itemStack, LivingEntity entity) {
+        if (this.windUpSound != null)
+            entity.level().playSound(null, entity.blockPosition(), this.windUpSound, SoundSource.NEUTRAL, 1, 1);
     }
 
     protected void handlePlayerAmmoAndShootingOnClient(ItemStack itemStack, LivingEntity entity) {
@@ -376,13 +413,16 @@ public class RFEFirearmMode {
             }
         }
 
-        RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(entity, itemStack);
-        if (recoilInstance == null) {
-            recoilInstance = RFERecoilProviderPackHandler.getRecoilProviders(itemStack).getProperties(this.modeId)
-                    .createRecoilInstance(itemStack, entity, entity.getRandom());
-            RFERecoilManager.trackRecoil(recoilInstance, entity, itemStack, hand);
+        RFERecoilClientImpulse impulse = new RFERecoilClientImpulse(RFEAimAngles.ZERO_ANGLES, RFEAimAngles.ZERO_ANGLES, 0);
+        if (!firingInputs.isEmpty()) {
+            RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(entity, itemStack);
+            if (recoilInstance == null) {
+                recoilInstance = RFERecoilProviderPackHandler.getRecoilProviders(itemStack).getProperties(this.modeId)
+                        .createRecoilInstance(itemStack, entity, entity.getRandom());
+                RFERecoilManager.trackRecoil(recoilInstance, entity, itemStack, hand);
+            }
+            impulse = recoilInstance.updateRecoil(itemStack, entity);
         }
-        RFERecoilClientImpulse impulse = recoilInstance.updateRecoil(itemStack, entity);
 
         boolean jam = this.fireMode.isSelfLoading() && this.shouldJam(itemStack, entity);
         this.setJammed(itemStack, entity, jam);
@@ -408,6 +448,13 @@ public class RFEFirearmMode {
 
     public void handleFiringInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs,
                                           boolean jam, @Nullable UUID recoilUUID, InteractionHand hand) {
+        if (firingInputs.isEmpty()) {
+            if (this.canDryFire)
+                this.playDryFiringEffects(itemStack, entity);
+            this.setCharged(itemStack, entity, false);
+            return;
+        }
+
         RFERecoilManager.setRecoilId(itemStack, recoilUUID);
         if (this.ammoRequired)
             this.getNextRoundsInItem(itemStack, entity, firingInputs.size(), true);
@@ -444,6 +491,11 @@ public class RFEFirearmMode {
             entity.level().playSound(null, entity.blockPosition(), this.firingSound, SoundSource.NEUTRAL, 1, 1);
     }
 
+    public void playDryFiringEffects(ItemStack itemStack, LivingEntity entity) {
+        if (this.dryFireSound != null)
+            entity.level().playSound(null, entity.blockPosition(), this.dryFireSound, SoundSource.NEUTRAL, 1, 1);
+    }
+
     public void onTickFiring(ItemStack itemStack, LivingEntity entity) {
         // TODO winding up and winding down
         CompoundTag tag = itemStack.getOrCreateTag();
@@ -454,6 +506,11 @@ public class RFEFirearmMode {
         if (actionTime > 0)
             return;
         FirearmDataUtils.setAction(itemStack, null);
+        if (this.isWindingUp(itemStack, entity)) {
+            this.fireFirearm(itemStack, entity, FiringType.AUTOMATIC);
+            return;
+        }
+
         boolean holdingKey = itemStack.getItem() instanceof HoldAttackKeyInteraction holdAttackKeyInteraction
                 && holdAttackKeyInteraction.isHoldingAttackKey(itemStack, entity);
 
@@ -902,8 +959,7 @@ public class RFEFirearmMode {
         FirearmDataUtils.setActionTime(itemStack, actionTime);
         if (actionTime > 0)
             return;
-        if (!entity.level().isClientSide)
-            this.finishCharge(itemStack, entity);
+        this.finishCharge(itemStack, entity);
         boolean holdingKey = itemStack.getItem() instanceof HoldAttackKeyInteraction holdAttackKeyInteraction
                 && holdAttackKeyInteraction.isHoldingAttackKey(itemStack, entity);
         if (!entity.level().isClientSide && this.fireMode == FireMode.SINGLE_ACTION && this.slamfire && holdingKey) {
@@ -917,6 +973,8 @@ public class RFEFirearmMode {
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
         this.setCharged(itemStack, entity, true);
         this.setJammed(itemStack, entity, false);
+        if (entity.level().isClientSide)
+            return;
         if (this.plusOneCapacity && this.getLoadedRound(itemStack).isEmpty()) {
             List<ItemStack> nextAmmoList = this.getNextRoundsInItem(itemStack, entity, 1, true);
             ItemStack nextAmmoStack = FirearmDataUtils.stripAmmo(nextAmmoList, this.ammoConsumedLast, false, this.trackEmptySlots);
@@ -1092,6 +1150,8 @@ public class RFEFirearmMode {
             FirearmDataUtils.setActionTime(itemStack, this.drawTime);
             this.clearBurstFiring(itemStack);
             this.setForceCancelReload(itemStack, entity, false);
+            if (this.resetChargeOnUnequip)
+                this.setCharged(itemStack, entity, false);
             return;
         }
         CompoundTag tag = itemStack.getOrCreateTag();

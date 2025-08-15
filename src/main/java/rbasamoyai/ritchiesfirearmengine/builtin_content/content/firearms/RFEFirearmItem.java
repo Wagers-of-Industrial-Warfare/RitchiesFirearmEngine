@@ -206,6 +206,11 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         return count;
     }
 
+    public int ammoCount(ItemStack itemStack, LivingEntity entity) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.getLoadedAmmoCount(itemStack, entity, true);
+    }
+
     public int freeAmmoSpace(ItemStack itemStack) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
         return mode.countFreeAmmoSpaces(itemStack);

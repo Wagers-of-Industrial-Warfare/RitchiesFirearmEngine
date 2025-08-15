@@ -25,6 +25,7 @@ public class RFEProjectileInstance {
     @Nullable private Entity owner;
     private boolean leftOwner = false;
     private int age = 0;
+    private float health = 1f;
     private double distanceTravelled = 0;
     private boolean forceSync = false;
 
@@ -73,6 +74,9 @@ public class RFEProjectileInstance {
         }
         return true;
     }
+    public float health() { return this.health; }
+    public void removeHealth(float amount) { setHealth(health - amount); }
+    public void setHealth(float health) { this.health = Mth.clamp(health, 0f, 1f); }
 
     public int age() { return this.age; }
     public void setAge(int age) { this.age = age; }

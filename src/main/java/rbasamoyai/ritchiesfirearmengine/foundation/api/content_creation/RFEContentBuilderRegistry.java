@@ -6,8 +6,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.ApiStatus;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.CompareValueSource;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.RFEHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplier;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.misfires.RFEMisfire;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProvider;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProvider;
@@ -129,6 +130,28 @@ public class RFEContentBuilderRegistry {
         if (!HIT_MULTIPLIER_PROVIDERS_IDS.containsKey(prov))
             throw new IllegalStateException("Unknown RFE hit multiplier provider " + prov);
         return HIT_MULTIPLIER_PROVIDERS_IDS.get(prov);
+    }
+    
+    private static final Object2ReferenceMap<ResourceLocation, RFEMisfire.Provider> MISFIRE_PROVIDERS = new Object2ReferenceOpenHashMap<>();
+    private static final Reference2ObjectMap<RFEMisfire.Provider, ResourceLocation> MISFIRE_PROVIDERS_IDS = new Reference2ObjectOpenHashMap<>();
+
+    public static void registerMisfireProvider(ResourceLocation id, RFEMisfire.Provider prov) {
+        if (MISFIRE_PROVIDERS.containsKey(id))
+            throw new IllegalStateException("Already registered RFE misfire provider with id '" + id + "'");
+        MISFIRE_PROVIDERS.put(id, prov);
+        MISFIRE_PROVIDERS_IDS.put(prov, id);
+    }
+
+    public static RFEMisfire.Provider getMisfireProvider(ResourceLocation id) {
+        if (!MISFIRE_PROVIDERS.containsKey(id))
+            throw new IllegalStateException("RFE misfire provider of type '" + id + "' not present");
+        return MISFIRE_PROVIDERS.get(id);
+    }
+
+    public static ResourceLocation getMisfireProviderId(RFEMisfire.Provider prov) {
+        if (!MISFIRE_PROVIDERS_IDS.containsKey(prov))
+            throw new IllegalStateException("Unknown RFE misfire provider " + prov);
+        return MISFIRE_PROVIDERS_IDS.get(prov);
     }
 
 }

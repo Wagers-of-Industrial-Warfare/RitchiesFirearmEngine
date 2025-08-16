@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.*;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.misfires.RFEMisfire;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -39,7 +40,6 @@ public class RFEFirearmModeBuilder {
     protected boolean trackEmptySlots = false;
 
     protected FireMode fireMode = null;
-    protected float jamChance = 0; // Datapackable
     protected ChargingBehavior chargingBehavior = ChargingBehavior.HOLD; // Datapackable
     protected float firingCooldown = -1;
     protected boolean ammoConsumedLast = false;
@@ -51,7 +51,10 @@ public class RFEFirearmModeBuilder {
     @Nullable
     protected SoundEvent firingSound = null;
     @Nullable
-    protected SoundEvent dryFireSound;
+    protected SoundEvent dryFireSound = null;
+    protected List<RFEMisfire> misfires = new ArrayList<>(); // Datapackable
+    @Nullable
+    protected SoundEvent misfireSound = null;
     protected int windUpTime = 0;
     @Nullable
     protected SoundEvent windUpSound = null;
@@ -114,7 +117,6 @@ public class RFEFirearmModeBuilder {
         newBuilder.trackEmptySlots = this.trackEmptySlots;
 
         newBuilder.fireMode = this.fireMode;
-        newBuilder.jamChance = this.jamChance;
         newBuilder.chargingBehavior = this.chargingBehavior;
         newBuilder.firingCooldown = this.firingCooldown;
         newBuilder.ammoConsumedLast = this.ammoConsumedLast;
@@ -125,6 +127,8 @@ public class RFEFirearmModeBuilder {
         newBuilder.canDryFire = this.canDryFire;
         newBuilder.firingSound = this.firingSound;
         newBuilder.dryFireSound = this.dryFireSound;
+        newBuilder.misfires = new ArrayList<>(this.misfires);
+        newBuilder.misfireSound = this.misfireSound;
         newBuilder.windUpTime = this.windUpTime;
         newBuilder.windUpSound = this.windUpSound;
         newBuilder.windDownTime = this.windDownTime;
@@ -266,13 +270,6 @@ public class RFEFirearmModeBuilder {
         return this;
     }
 
-    public RFEFirearmModeBuilder jamChance(float jamChance) {
-        if (jamChance < 0 || 1 < jamChance)
-            throw new IllegalStateException("Cannot specify jam chance less than 0 or greater than 1");
-        this.jamChance = jamChance;
-        return this;
-    }
-
     public RFEFirearmModeBuilder chargingBehavior(ChargingBehavior chargingBehavior) {
         if (this.fireMode != FireMode.SINGLE_ACTION) {
             RitchiesFirearmEngine.LOGGER.warn("Charging behavior only applies to fire mode single_action, not {}", this.fireMode.getSerializedName());
@@ -343,6 +340,16 @@ public class RFEFirearmModeBuilder {
         return this;
     }
 
+    public RFEFirearmModeBuilder addMisfire(RFEMisfire misfire) {
+        this.misfires.add(misfire);
+        return this;
+    }
+
+    public RFEFirearmModeBuilder misfireSound(SoundEvent misfireSound) {
+        this.misfireSound = misfireSound;
+        return this;
+    }
+
     public RFEFirearmModeBuilder windUpTime(int windUpTime) {
         if (windUpTime < 0)
             throw new IllegalStateException("Cannot specify wind-up time less than 0");
@@ -369,13 +376,18 @@ public class RFEFirearmModeBuilder {
 
     public RFEFirearmModeBuilder resetFiring() {
         this.fireMode = null;
-        this.jamChance = 0;
         this.chargingBehavior = ChargingBehavior.HOLD;
         this.firingCooldown = -1;
         this.ammoConsumedLast = false;
+        this.ignoreEmptySlotsWhenFiring = false;
         this.shotsFired = 1;
         this.burstRoundCount = 3;
+        this.slamfire = false;
         this.firingSound = null;
+        this.canDryFire = false;
+        this.dryFireSound = null;
+        this.misfires.clear();
+        this.misfireSound = null;
         this.windUpTime = 0;
         this.windUpSound = null;
         this.windDownTime = 0;

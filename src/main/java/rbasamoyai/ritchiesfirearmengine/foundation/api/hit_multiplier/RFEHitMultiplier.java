@@ -1,4 +1,4 @@
-package rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers;
+package rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.EntityHitResult;

@@ -17,8 +17,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.RFEHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 
 public record BirdshotHitMultiplierGore(float multiplier) implements RFEHitMultiplier {

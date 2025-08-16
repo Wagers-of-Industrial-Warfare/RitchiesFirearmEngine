@@ -1,4 +1,4 @@
-package rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers;
+package rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;

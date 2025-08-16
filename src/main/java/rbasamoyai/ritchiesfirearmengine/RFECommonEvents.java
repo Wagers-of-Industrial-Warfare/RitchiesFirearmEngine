@@ -11,7 +11,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineIte
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.RFEHitMultiplierHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplierHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;

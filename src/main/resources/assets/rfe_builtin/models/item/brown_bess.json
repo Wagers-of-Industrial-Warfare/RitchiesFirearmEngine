@@ -17,6 +17,17 @@
       "model": "rfe_builtin:item/brown_bess/brown_bess_uncharged_aimed"
     },
     {
+      "predicate": { "ritchiesfirearmengine:is_jammed": 1 },
+      "model": "rfe_builtin:item/brown_bess/brown_bess_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_jammed": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/brown_bess/brown_bess_fired_aimed"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_charged": 1 },
       "model": "rfe_builtin:item/brown_bess/brown_bess_normal"
     },

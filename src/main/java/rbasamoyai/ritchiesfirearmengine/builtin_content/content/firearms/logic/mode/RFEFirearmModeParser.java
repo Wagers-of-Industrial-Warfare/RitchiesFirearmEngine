@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.GsonHelper;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
@@ -11,7 +12,10 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.C
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ChargingBehavior;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FireMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ReloadPhase;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
+
+import java.util.Map;
 
 public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
 
@@ -90,11 +94,8 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                 }
                 boolean ammoConsumedLast = GsonHelper.getAsBoolean(firing, "ammo_consumed_last", false);
                 int shotsFired = GsonHelper.getAsInt(firing, "shots_fired", 1);
-                // TODO recoil, spread providers
-                float jamChance = GsonHelper.getAsFloat(firing, "jam_chance", 0);
                 builder.ammoConsumedLast(ammoConsumedLast)
-                        .shotsFired(shotsFired)
-                        .jamChance(jamChance);
+                        .shotsFired(shotsFired);
                 if (builder.trackEmptySlots) {
                     boolean ignoreEmptySlots = GsonHelper.getAsBoolean(firing, "ignore_empty_slots_when_firing", false);
                     builder.ignoreEmptySlotsWhenFiring(ignoreEmptySlots);
@@ -113,6 +114,15 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                 builder.canDryFire(canDryFire);
                 if (canDryFire)
                     this.dryFiringEffects(builder, firing, modeId);
+                if (GsonHelper.isObjectNode(firing, "misfire")) {
+                    JsonObject misfire = firing.getAsJsonObject("misfire");
+                    JsonObject misfireChances = GsonHelper.getAsJsonObject(misfire, "chances", new JsonObject());
+                    for (Map.Entry<String, JsonElement> misfireEntry : misfireChances.entrySet()) {
+                        ResourceLocation id = RFEUtils.location(misfireEntry.getKey());
+                        builder.addMisfire(RFEContentBuilderRegistry.getMisfireProvider(id).apply(misfireEntry.getValue().getAsFloat()));
+                    }
+                    this.misfireEffects(builder, misfire, modeId);
+                }
                 if (GsonHelper.isObjectNode(firing, "wind_up")) {
                     JsonObject windUp = firing.getAsJsonObject("wind_up");
                     int time = GsonHelper.getAsInt(windUp, "time");
@@ -254,6 +264,14 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
             String str = GsonHelper.getAsString(firingObj, "dry_fire_sound");
             SoundEvent dryFireSound = SoundEvent.createVariableRangeEvent(RFEUtils.location(str));
             builder.dryFireSound(dryFireSound);
+        }
+    }
+
+    protected void misfireEffects(T builder, JsonObject misfireObj, String modeId) {
+        if (GsonHelper.isStringValue(misfireObj, "sound")) {
+            String str = GsonHelper.getAsString(misfireObj, "sound");
+            SoundEvent misfireSound = SoundEvent.createVariableRangeEvent(RFEUtils.location(str));
+            builder.misfireSound(misfireSound);
         }
     }
 

@@ -11,12 +11,13 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFire
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.condition.FirearmCondtionMacroHandler;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.misfires.RainMisfire;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.misfires.RandomMisfire;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.misfires.SubmergedMisfire;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.recoil.no_recoil.NoRecoilProvider;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.recoil.simple.SimpleRecoilProvider;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.spread.no_spread.NoSpreadProvider;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.spread.random.SimpleSpreadProvider;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.RFEHitMultiplier;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.RFEHitMultiplierHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.armor_piercing.ArmorPiercingHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.body_parts.HeadshotHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.body_parts.HeadshotHitMultiplierGore;
@@ -30,6 +31,9 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.shot
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudItemInfoProviders;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplier;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplierHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.misfires.RFEMisfire;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProvider;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProviderPackHandler;
@@ -58,6 +62,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         SpreadProviders.register();
         RecoilProviders.register();
         HitMultipliers.register();
+        Misfires.register();
 
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("entity_ammo_count"), BuiltInRFEPlugin::entityAmmoCount);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("free_ammo_space"), BuiltInRFEPlugin::freeAmmoSpace);
@@ -235,6 +240,20 @@ public class BuiltInRFEPlugin implements RFEPlugin {
             RFEContentBuilderRegistry.registerHitMultiplierProvider(RitchiesFirearmEngine.resource("vulnerable_to_birdshot"), VULNERABLE_TO_BIRDSHOT);
             RFEContentBuilderRegistry.registerHitMultiplierProvider(RitchiesFirearmEngine.resource("vulnerable_to_birdshot_gore"), VULNERABLE_TO_BIRDSHOT_GORE);
             RFEContentBuilderRegistry.registerHitMultiplierProvider(RitchiesFirearmEngine.resource("bullet_health"), BULLET_HEALTH);
+        }
+    }
+
+    public static class Misfires {
+        public static final RFEMisfire.Provider RANDOM = register("random", RandomMisfire::of);
+        public static final RFEMisfire.Provider WHEN_RAINING = register("when_raining", RainMisfire::of);
+        public static final RFEMisfire.Provider WHEN_SUBMERGED = register("when_submerged", SubmergedMisfire::new);
+
+        public static void register() {
+        }
+
+        private static RFEMisfire.Provider register(String id, RFEMisfire.Provider prov) {
+            RFEContentBuilderRegistry.registerMisfireProvider(RitchiesFirearmEngine.resource(id), prov);
+            return prov;
         }
     }
 

@@ -22,6 +22,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.*
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.condition.FirearmCondition;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.misfires.RFEMisfire;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
@@ -85,9 +86,12 @@ public class RFEFirearmMode {
     protected final int shotsFired;
     protected final int burstRoundCount;
     protected final boolean slamfire;
+    @Nullable protected final SoundEvent firingSound;
+    // Dry fire
     protected final boolean canDryFire;
     @Nullable protected final SoundEvent dryFireSound;
-    @Nullable protected final SoundEvent firingSound;
+    // Misfire
+    @Nullable protected final SoundEvent misfireSound;
     // Wind-up
     protected final int windUpTime;
     @Nullable protected final SoundEvent windUpSound;
@@ -116,7 +120,6 @@ public class RFEFirearmMode {
     public RFEFirearmMode(RFEFirearmModeBuilder builder, String modeId) {
         this.modeId = modeId;
         this.modeDisplayId = builder.modeDisplayId;
-
 
         this.defaultDataPackProperties = RFEFirearmModeHandlingProperties.fromItemDefinition(builder);
 
@@ -150,6 +153,7 @@ public class RFEFirearmMode {
         this.canDryFire = builder.canDryFire;
         this.firingSound = builder.firingSound;
         this.dryFireSound = builder.dryFireSound;
+        this.misfireSound = builder.misfireSound;
         this.windUpTime = builder.windUpTime;
         this.windUpSound = builder.windUpSound;
         this.windDownTime = builder.windDownTime;
@@ -370,33 +374,43 @@ public class RFEFirearmMode {
         if (!FirearmDataUtils.isHoldingAttackKey(itemStack) && this.fireMode == FireMode.FULL_AUTO)
             return;
         RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
+        RFEFirearmModeHandlingProperties handlingProperties = this.getHandlingProperties(itemStack);
 
-        // TODO recoil
+        boolean jam = false;
+        for (RFEMisfire misfireTest : handlingProperties.misfires()) {
+            if (misfireTest.canMisfire(itemStack, entity)) {
+                jam = true;
+                break;
+            }
+        }
+        this.setJammed(itemStack, entity, jam);
+
         List<RFEProjectileType> toFire = new ArrayList<>();
-        if (this.ammoRequired) {
-            List<ItemStack> strippedAmmo = this.getNextRoundsInItem(itemStack, entity, this.shotsFired, false);
-            // TODO consume secondary ammo if required
-            for (ItemStack ammoStack : strippedAmmo) {
-                for (Map.Entry<AmmoPredicate, RFEProjectileType> entry : ammoProperties.primaryAmmo().entrySet()) {
-                    if (entry.getKey().test(ammoStack)) {
-                        int sz = ammoStack.getCount();
-                        RFEProjectileType projectileType = entry.getValue();
-                        for (int i = 0; i < sz; ++i)
-                            toFire.add(projectileType);
-                        break;
+        if (!jam) {
+            if (this.ammoRequired) {
+                List<ItemStack> strippedAmmo = this.getNextRoundsInItem(itemStack, entity, this.shotsFired, false);
+                // TODO consume secondary ammo if required
+                for (ItemStack ammoStack : strippedAmmo) {
+                    for (Map.Entry<AmmoPredicate, RFEProjectileType> entry : ammoProperties.primaryAmmo().entrySet()) {
+                        if (entry.getKey().test(ammoStack)) {
+                            int sz = ammoStack.getCount();
+                            RFEProjectileType projectileType = entry.getValue();
+                            for (int i = 0; i < sz; ++i)
+                                toFire.add(projectileType);
+                            break;
+                        }
                     }
                 }
-            }
-        } else {
-            RFEProjectileType unlimitedProjectile = ammoProperties.unlimitedProjectile();
-            if (unlimitedProjectile != null) {
-                // TODO one-time warning if no projectile?
-                for (int i = 0; i < this.shotsFired; ++i)
-                    toFire.add(unlimitedProjectile);
+            } else {
+                RFEProjectileType unlimitedProjectile = ammoProperties.unlimitedProjectile();
+                if (unlimitedProjectile != null) {
+                    // TODO one-time warning if no projectile?
+                    for (int i = 0; i < this.shotsFired; ++i)
+                        toFire.add(unlimitedProjectile);
+                }
             }
         }
 
-        // TODO something better probably
         InteractionHand hand = entity.getMainHandItem() == itemStack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
 
         Vec3 pos = new Vec3(entity.getX(), entity.getEyeY(), entity.getZ());
@@ -424,9 +438,6 @@ public class RFEFirearmMode {
             impulse = recoilInstance.updateRecoil(itemStack, entity);
         }
 
-        boolean jam = this.fireMode.isSelfLoading() && this.shouldJam(itemStack, entity);
-        this.setJammed(itemStack, entity, jam);
-
         UUID recoilUUID = RFERecoilManager.getRecoilId(itemStack);
         if (entity.level().isClientSide) {
             RFENetwork.sendToServer(new ServerboundRunFiringLogicPacket(firingInputs, jam, hand, recoilUUID));
@@ -448,9 +459,13 @@ public class RFEFirearmMode {
 
     public void handleFiringInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs,
                                           boolean jam, @Nullable UUID recoilUUID, InteractionHand hand) {
-        if (firingInputs.isEmpty()) {
-            if (this.canDryFire)
+        this.setJammed(itemStack, entity, jam);
+        if (firingInputs.isEmpty() || jam) {
+            if (jam) {
+                this.playMisfireEffects(itemStack, entity);
+            } else if (this.canDryFire) {
                 this.playDryFiringEffects(itemStack, entity);
+            }
             this.setCharged(itemStack, entity, false);
             return;
         }
@@ -483,7 +498,6 @@ public class RFEFirearmMode {
         }
 
         this.fireFirearm(itemStack, entity, FiringType.NON_PLAYER_AND_EFFECTS);
-        this.setJammed(itemStack, entity, jam);
     }
 
     public void playFiringEffects(ItemStack itemStack, LivingEntity entity) {
@@ -494,6 +508,11 @@ public class RFEFirearmMode {
     public void playDryFiringEffects(ItemStack itemStack, LivingEntity entity) {
         if (this.dryFireSound != null)
             entity.level().playSound(null, entity.blockPosition(), this.dryFireSound, SoundSource.NEUTRAL, 1, 1);
+    }
+
+    public void playMisfireEffects(ItemStack itemStack, LivingEntity entity) {
+        if (this.misfireSound != null)
+            entity.level().playSound(null, entity.blockPosition(), this.misfireSound, SoundSource.NEUTRAL, 1, 1);
     }
 
     public void onTickFiring(ItemStack itemStack, LivingEntity entity) {
@@ -526,9 +545,7 @@ public class RFEFirearmMode {
             return;
         }
         if (this.fireMode.isSelfLoading()) {
-            boolean isPlayer = entity instanceof Player;
-            if (isPlayer && this.isJammed(itemStack) || !isPlayer && this.shouldJam(itemStack, entity)) {
-                this.setJammed(itemStack, entity, true);
+            if (this.isJammed(itemStack)) {
                 return;
             } else {
                 this.finishCharge(itemStack, entity);
@@ -1026,10 +1043,6 @@ public class RFEFirearmMode {
                 }
             }
         }
-    }
-
-    public boolean shouldJam(ItemStack itemStack, LivingEntity entity) {
-        return entity.getRandom().nextFloat() < this.getHandlingProperties(itemStack).jamChance();
     }
 
     public void setJammed(ItemStack itemStack, LivingEntity entity, boolean jammed) {

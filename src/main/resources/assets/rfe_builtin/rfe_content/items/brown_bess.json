@@ -24,6 +24,12 @@
     "charging_behavior": "manual",
     "sound": "rfe_builtin:item.generic.musket.fired",
     "can_dry_fire": true,
+    "misfire": {
+      "chances": {
+        "ritchiesfirearmengine:when_raining": 0.85,
+        "ritchiesfirearmengine:when_submerged": 1
+      }
+    },
     "wind_up": {
       "time": 2,
       "sound": "rfe_builtin:item.generic.musket.fired.click"
@@ -73,7 +79,6 @@
       {
         "phase": "finish",
         "time": 15,
-        "charge_firearm": true,
         "sound": "rfe_builtin:item.generic.musket.cocked"
       }
     ]
@@ -85,7 +90,12 @@
   "charge": {
     "actions": [
       {
-        "condition": { "compare": "ritchiesfirearmengine:is_charged", "operator": "equals", "value": 0 },
+        "condition": {
+          "or": [
+            { "compare": "ritchiesfirearmengine:is_charged", "operator": "equals", "value": 0 },
+            { "compare": "ritchiesfirearmengine:is_jammed", "operator": "equals", "value": 1 }
+          ]
+        },
         "time": 15,
         "sound": "rfe_builtin:item.generic.musket.cocked"
       }

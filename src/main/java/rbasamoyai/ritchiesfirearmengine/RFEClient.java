@@ -80,6 +80,9 @@ public class RFEClient {
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_charged"), (itemStack, level, entity, seed) -> {
             return itemStack.getItem() instanceof RFEFirearmItem firearm && firearm.isCharged(itemStack) ? 1 : 0;
         });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_jammed"), (itemStack, level, entity, seed) -> {
+            return itemStack.getItem() instanceof RFEFirearmItem firearm && firearm.isJammed(itemStack) ? 1 : 0;
+        });
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_single_action"), (itemStack, level, entity, seed) -> {
             return itemStack.getItem() instanceof RFEFirearmItem firearm
                     && firearm.getCurrentMode(itemStack).getFireMode() == FireMode.SINGLE_ACTION ? 1 : 0;

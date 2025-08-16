@@ -22,8 +22,10 @@ import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ChargingBehavior;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmModeHandlingProperties;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.RFEPacket;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -75,7 +77,6 @@ public class RFEFirearmHandlingPropertiesHandler {
             if (!el.isJsonObject())
                 throw new JsonParseException("Expected JSON object while parsing handling properties for mode " + mode + " for item " + loc);
             JsonObject modeObj = el.getAsJsonObject();
-            float jamChance = GsonHelper.getAsFloat(modeObj, "jam_chance", 0);
             ChargingBehavior chargingBehavior = ChargingBehavior.byIdStrict(GsonHelper.getAsString(modeObj, "charging_behavior",
                     ChargingBehavior.HOLD.getSerializedName()));
             float heatCapacity = GsonHelper.getAsFloat(modeObj, "heat_capacity", 0);
@@ -83,15 +84,23 @@ public class RFEFirearmHandlingPropertiesHandler {
             float heatRemovedOnCharge = GsonHelper.getAsFloat(modeObj, "heat_removed_on_charge", 0);
             float heatAddedOnFiring = GsonHelper.getAsFloat(modeObj, "heat_added_on_firing", 0);
             int coolingDelayTime = GsonHelper.getAsInt(modeObj, "cooling_delay_time", 0);
-            builder.put(mode, new RFEFirearmModeHandlingProperties.Builder()
-                    .jamChance(jamChance)
+            RFEFirearmModeHandlingProperties.Builder modeBuilder = new RFEFirearmModeHandlingProperties.Builder()
                     .chargingBehavior(chargingBehavior)
                     .heatCapacity(heatCapacity)
                     .heatRemovedPerTick(heatRemovedPerTick)
                     .heatRemovedOnCharge(heatRemovedOnCharge)
                     .heatAddedOnFiring(heatAddedOnFiring)
-                    .coolingDelay(coolingDelayTime)
-                    .build());
+                    .coolingDelay(coolingDelayTime);
+
+            if (GsonHelper.isObjectNode(obj, "misfire_chances")) {
+                JsonObject misfires = obj.getAsJsonObject("misfire_chances");
+                for (Map.Entry<String, JsonElement> misfireEntry : misfires.entrySet()) {
+                    ResourceLocation id = RFEUtils.location(misfireEntry.getKey());
+                    modeBuilder.addMisfire(RFEContentBuilderRegistry.getMisfireProvider(id).apply(misfireEntry.getValue().getAsFloat()));
+                }
+            }
+
+            builder.put(mode, modeBuilder.build());
         }
         return builder.build();
     }

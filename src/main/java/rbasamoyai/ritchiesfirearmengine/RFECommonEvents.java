@@ -26,7 +26,6 @@ public class RFECommonEvents {
 
     public static void loadTagsAndTypes() {
         RFEFirearmAmmoHandler.loadProjectileTypes();
-        RFEHitMultiplierHandler.loadProjectileTypes();
     }
 
     public static void onDatapackReload(boolean singleplayer) {

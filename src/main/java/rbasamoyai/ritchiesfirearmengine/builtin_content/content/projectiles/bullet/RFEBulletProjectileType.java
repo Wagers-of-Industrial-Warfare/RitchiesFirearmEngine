@@ -8,6 +8,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
@@ -37,10 +38,12 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMult
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplierHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEMathUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEProjectileUtils;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 
 public class RFEBulletProjectileType implements RFEProjectileType {
@@ -54,6 +57,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     protected final float knockback;
     protected final RFEProjectileDamageModel damageModel;
     protected final ResourceKey<DamageType> damageTypeKey;
+    @Nullable protected final ResourceLocation hitMultiplierId;
 
     public RFEBulletProjectileType(RFEBaseProjectilePropertiesBuilder builder) {
         this.fullHitscan = builder.fullHitscan;
@@ -65,6 +69,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         this.knockback = builder.knockback;
         this.damageModel = builder.damageModel;
         this.damageTypeKey = builder.damageTypeKey;
+        this.hitMultiplierId = builder.hitMultiplierId;
     }
 
     @Override
@@ -178,7 +183,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         double additionalDisplacement = result.getLocation().subtract(instance.position()).length();
 
         float damage = (float) this.damageModel.getDamage(instance.distanceTravelled() + additionalDisplacement);
-        for (RFEHitMultiplier mul : RFEHitMultiplierHandler.getHitMultipliers(this))
+        for (RFEHitMultiplier mul : RFEHitMultiplierHandler.getHitMultipliers(this.getHitMultiplierId()))
             damage = mul.multiplyDamage(entity, instance, result, damage);
 
         // TODO crits and damage multipliers
@@ -245,6 +250,10 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         }
 
         // TODO syncing removal such that the bullet travels a bit more nicely
+    }
+
+    protected ResourceLocation getHitMultiplierId() {
+        return this.hitMultiplierId != null ? this.hitMultiplierId : RFEProjectileTypeHandler.getProjectileTypeId(this);
     }
 
     protected void doPostHurtEffects(RFEProjectileInstance instance, Level level, LivingEntity entity) {

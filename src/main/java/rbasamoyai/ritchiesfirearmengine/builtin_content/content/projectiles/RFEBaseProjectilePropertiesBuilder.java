@@ -7,6 +7,7 @@ import com.google.gson.JsonParseException;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageType;
@@ -23,6 +24,7 @@ public class RFEBaseProjectilePropertiesBuilder {
     public float knockback;
     public RFEProjectileDamageModel damageModel;
     public ResourceKey<DamageType> damageTypeKey;
+    public ResourceLocation hitMultiplierId = null;
 
     public static RFEBaseProjectilePropertiesBuilder fromJson(JsonObject obj) {
         RFEBaseProjectilePropertiesBuilder builder = new RFEBaseProjectilePropertiesBuilder();
@@ -48,6 +50,9 @@ public class RFEBaseProjectilePropertiesBuilder {
         builder.damageModel = damageModel;
 
         builder.damageTypeKey = ResourceKey.create(Registries.DAMAGE_TYPE, RFEUtils.location(GsonHelper.getAsString(obj, "damage_type")));
+
+        if (GsonHelper.isStringValue(obj, "hit_multiplier"))
+            builder.hitMultiplierId = RFEUtils.location(GsonHelper.getAsString(obj, "hit_multiplier"));
 
         return builder;
     }

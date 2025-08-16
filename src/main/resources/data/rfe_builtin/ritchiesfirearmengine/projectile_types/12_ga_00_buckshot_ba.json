@@ -17,6 +17,7 @@
     }
   ],
   "damage_type": "rfe_builtin:bullet",
+  "hit_multiplier": "rfe_builtin:generic_buckshot",
   "subprojectile_count": 12,
   "dispersion": 2.25
 }

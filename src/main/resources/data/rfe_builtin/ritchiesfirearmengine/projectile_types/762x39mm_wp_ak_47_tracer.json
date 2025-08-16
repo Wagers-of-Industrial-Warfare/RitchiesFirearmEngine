@@ -12,5 +12,6 @@
       "damage": 8
     }
   ],
-  "damage_type": "rfe_builtin:bullet"
+  "damage_type": "rfe_builtin:bullet",
+  "hit_multiplier": "762x39mm_wp_ak_47"
 }

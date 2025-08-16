@@ -17,8 +17,6 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.data_packing.RFEJsonResourceReloadListener;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.RFEPacket;
@@ -31,8 +29,7 @@ import java.util.concurrent.Executor;
 
 public class RFEHitMultiplierHandler {
 
-    private static final Multimap<RFEProjectileType, RFEHitMultiplier> HIT_MULTIPLIERS = LinkedHashMultimap.create();
-    private static final Multimap<ResourceLocation, RFEHitMultiplier> UNRESOLVED_HIT_MULTIPLIERS = LinkedHashMultimap.create();
+    private static final Multimap<ResourceLocation, RFEHitMultiplier> HIT_MULTIPLIERS = LinkedHashMultimap.create();
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -45,7 +42,6 @@ public class RFEHitMultiplierHandler {
         @Override
         protected void apply(Multimap<ResourceLocation, JsonElement> data, ResourceManager resourceManager, ProfilerFiller profiler) {
             HIT_MULTIPLIERS.clear();
-            UNRESOLVED_HIT_MULTIPLIERS.clear();
 
             for (Map.Entry<ResourceLocation, JsonElement> entry : data.entries()) {
                 ResourceLocation id = entry.getKey();
@@ -63,21 +59,14 @@ public class RFEHitMultiplierHandler {
 
     private static void loadData(ResourceLocation id, JsonObject obj) {
         if (GsonHelper.getAsBoolean(obj, "replace", false))
-            UNRESOLVED_HIT_MULTIPLIERS.removeAll(id);
+            HIT_MULTIPLIERS.removeAll(id);
         JsonObject multipliers = GsonHelper.getAsJsonObject(obj, "hit_multipliers");
         for (Map.Entry<String, JsonElement> entry : multipliers.entrySet())
-            UNRESOLVED_HIT_MULTIPLIERS.put(id, RFEContentBuilderRegistry.getHitMultiplierProvider(RFEUtils.location(entry.getKey()))
+            HIT_MULTIPLIERS.put(id, RFEContentBuilderRegistry.getHitMultiplierProvider(RFEUtils.location(entry.getKey()))
                     .apply(entry.getValue().getAsFloat()));
     }
 
-    public static void loadProjectileTypes() {
-        HIT_MULTIPLIERS.clear();
-        for (Map.Entry<ResourceLocation, RFEHitMultiplier> entry : UNRESOLVED_HIT_MULTIPLIERS.entries())
-            HIT_MULTIPLIERS.put(RFEProjectileTypeHandler.getProjectileType(entry.getKey()), entry.getValue());
-        UNRESOLVED_HIT_MULTIPLIERS.clear();
-    }
-
-    public static Collection<RFEHitMultiplier> getHitMultipliers(RFEProjectileType type) { return HIT_MULTIPLIERS.get(type); }
+    public static Collection<RFEHitMultiplier> getHitMultipliers(ResourceLocation id) { return HIT_MULTIPLIERS.get(id); }
 
     public static void syncToAll() {
         RFENetwork.sendToAll(new ClientboundSyncHitMultipliersPacket());
@@ -100,17 +89,7 @@ public class RFEHitMultiplierHandler {
             return new ClientboundSyncHitMultipliersPacket(map);
         }
 
-        ClientboundSyncHitMultipliersPacket() { this(prepareForSyncing()); }
-
-        private static Multimap<ResourceLocation, RFEHitMultiplier> prepareForSyncing() {
-            Multimap<ResourceLocation, RFEHitMultiplier> map = LinkedHashMultimap.create();
-            for (Map.Entry<RFEProjectileType, RFEHitMultiplier> entry : HIT_MULTIPLIERS.entries()) {
-                ResourceLocation loc = RFEProjectileTypeHandler.getProjectileTypeId(entry.getKey());
-                if (loc != null)
-                    map.put(loc, entry.getValue());
-            }
-            return map;
-        }
+        ClientboundSyncHitMultipliersPacket() { this(LinkedHashMultimap.create(HIT_MULTIPLIERS)); }
 
         @Override
         public void rootEncode(FriendlyByteBuf buf) {
@@ -125,9 +104,7 @@ public class RFEHitMultiplierHandler {
         @Override
         public void handle(Executor exec, PacketListener listener, @Nullable ServerPlayer sender) {
             HIT_MULTIPLIERS.clear();
-            UNRESOLVED_HIT_MULTIPLIERS.clear();
-            UNRESOLVED_HIT_MULTIPLIERS.putAll(this.hitMultipliers);
-            loadProjectileTypes();
+            HIT_MULTIPLIERS.putAll(this.hitMultipliers);
         }
     }
 

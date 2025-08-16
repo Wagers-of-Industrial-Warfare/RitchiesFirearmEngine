@@ -16,5 +16,6 @@
       "damage": 7
     }
   ],
-  "damage_type": "rfe_builtin:bullet"
+  "damage_type": "rfe_builtin:bullet",
+  "hit_multiplier": "rfe_builtin:generic_headshot_strong"
 }

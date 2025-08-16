@@ -1,0 +1,19 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:pointed_dripstone",
+    "minecraft:amethyst_cluster",
+    "minecraft:large_amethyst_bud",
+    "minecraft:medium_amethyst_bud",
+    "minecraft:small_amethyst_bud",
+    "minecraft:mangrove_roots",
+    "minecraft:decorated_pot",
+    "#minecraft:flower_pots",
+    "#forge:glass",
+    "#forge:glass_panes",
+    "minecraft:carved_pumpkin",
+    "minecraft:pumpkin",
+    "minecraft:melon",
+    "minecraft:jack_o_lantern"
+  ]
+}

@@ -442,12 +442,14 @@ public class RFEFirearmMode {
         if (entity.level().isClientSide) {
             RFENetwork.sendToServer(new ServerboundRunFiringLogicPacket(firingInputs, jam, hand, recoilUUID));
         } else if (entity instanceof ServerPlayer splayer) {
-            RFENetwork.sendToPlayer(new ClientboundRunFiringLogicPacket(hand, impulse), splayer);
+            RFENetwork.sendToPlayer(new ClientboundRunFiringLogicPacket(hand, impulse, recoilUUID), splayer);
             this.handleFiringInputOnServer(itemStack, entity, firingInputs, jam, recoilUUID, hand);
         }
     }
 
-    public void handleServerRecoil(ItemStack itemStack, LivingEntity entity, InteractionHand hand, RFERecoilClientImpulse recoil) {
+    public void handleServerRecoil(ItemStack itemStack, LivingEntity entity, InteractionHand hand,
+                                   RFERecoilClientImpulse recoil, @Nullable UUID recoilUUID) {
+        RFERecoilManager.setRecoilId(itemStack, recoilUUID);
         RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(entity, itemStack);
         if (recoilInstance == null) {
             recoilInstance = RFERecoilProviderPackHandler.getRecoilProviders(itemStack).getProperties(this.modeId)

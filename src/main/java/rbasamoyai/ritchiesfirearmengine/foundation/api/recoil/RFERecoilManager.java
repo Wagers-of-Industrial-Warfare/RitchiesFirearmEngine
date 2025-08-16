@@ -71,8 +71,8 @@ public class RFERecoilManager {
             RECOIL_INSTANCES.put(entity, new EnumMap<>(InteractionHand.class));
         Map<InteractionHand, TaggedRecoilInstance> instances = RECOIL_INSTANCES.get(entity);
 
-        UUID spreadId = getOrCreateRecoilId(entity, itemStack);
-        instances.put(hand, new TaggedRecoilInstance(spreadId, instance));
+        UUID recoilId = getOrCreateRecoilId(entity, itemStack);
+        instances.put(hand, new TaggedRecoilInstance(recoilId, instance));
     }
 
     public static void stopTrackingRecoil(LivingEntity entity, ItemStack itemStack) {

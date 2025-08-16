@@ -15,7 +15,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectile
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
 
-import java.util.List;
+import java.util.Map;
 
 public class RFEBuckAndBallProjectileType implements RFEProjectileType, RFEProjectileType.HasCombinedProjectiles {
 
@@ -50,8 +50,8 @@ public class RFEBuckAndBallProjectileType implements RFEProjectileType, RFEProje
     @Override public RFEProjectileType.Serializer<?> getSerializer() { return BuiltInRFEPlugin.ProjectileTypes.BUCK_AND_BALL; }
 
     @Override
-    public List<RFEProjectileType> getSubprojectileTypes() {
-        return List.of(this.ballProjectileType, this.buckProjectileType);
+    public Map<String, RFEProjectileType> getSubprojectileTypes() {
+        return Map.of("ball", this.ballProjectileType, "buck", this.buckProjectileType);
     }
 
     public static class Serializer implements RFEProjectileType.Serializer<RFEBuckAndBallProjectileType> {

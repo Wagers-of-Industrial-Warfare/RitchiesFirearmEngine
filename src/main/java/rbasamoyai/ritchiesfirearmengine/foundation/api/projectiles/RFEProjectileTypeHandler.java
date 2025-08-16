@@ -58,11 +58,10 @@ public class RFEProjectileTypeHandler {
                     PROJECTILE_TYPES.put(id, type);
                     PROJECTILE_TYPE_IDS.put(type, id);
                     if (type instanceof RFEProjectileType.HasCombinedProjectiles combined) {
-                        int count = 0;
-                        for (RFEProjectileType extra : combined.getSubprojectileTypes()) {
-                            ResourceLocation extraId = id.withSuffix("/" + ++count);
-                            PROJECTILE_TYPES.put(extraId, extra);
-                            PROJECTILE_TYPE_IDS.put(extra, extraId);
+                        for (Map.Entry<String, RFEProjectileType> extra : combined.getSubprojectileTypes().entrySet()) {
+                            ResourceLocation extraId = id.withSuffix("_" + extra.getKey());
+                            PROJECTILE_TYPES.put(extraId, extra.getValue());
+                            PROJECTILE_TYPE_IDS.put(extra.getValue(), extraId);
                             SUBPROJECTILE_TYPE_IDS.add(extraId);
                         }
                     }
@@ -140,11 +139,10 @@ public class RFEProjectileTypeHandler {
                 RFEProjectileType projectileType = entry.getValue();
                 PROJECTILE_TYPE_IDS.put(projectileType, id);
                 if (projectileType instanceof RFEProjectileType.HasCombinedProjectiles combined) {
-                    int count = 0;
-                    for (RFEProjectileType extra : combined.getSubprojectileTypes()) {
-                        ResourceLocation extraId = id.withSuffix("/" + ++count);
-                        PROJECTILE_TYPES.put(extraId, extra);
-                        PROJECTILE_TYPE_IDS.put(extra, extraId);
+                    for (Map.Entry<String, RFEProjectileType> extra : combined.getSubprojectileTypes().entrySet()) {
+                        ResourceLocation extraId = id.withSuffix("_" + extra.getKey());
+                        PROJECTILE_TYPES.put(extraId, extra.getValue());
+                        PROJECTILE_TYPE_IDS.put(extra.getValue(), extraId);
                         SUBPROJECTILE_TYPE_IDS.add(extraId);
                     }
                 }

@@ -8,7 +8,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
 
-import java.util.List;
+import java.util.Map;
 
 public interface RFEProjectileType {
 
@@ -30,7 +30,7 @@ public interface RFEProjectileType {
     }
 
     interface HasCombinedProjectiles {
-        List<RFEProjectileType> getSubprojectileTypes();
+        Map<String, RFEProjectileType> getSubprojectileTypes();
     }
 
 }

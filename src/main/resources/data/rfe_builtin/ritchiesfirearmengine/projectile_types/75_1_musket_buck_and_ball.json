@@ -19,7 +19,7 @@
     ],
     "damage_type": "rfe_builtin:bullet",
     "subprojectile_count": 6,
-    "dispersion": 2.25
+    "dispersion": 3.5
   },
   "ball_properties": {
     "muzzle_velocity": 16,

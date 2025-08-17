@@ -1,7 +1,12 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins;
 
+import com.mojang.logging.LogUtils;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.foundation.pack_loading.RFEPackMetadata;
 import rbasamoyai.ritchiesfirearmengine.utils.EnvExecute;
@@ -13,6 +18,7 @@ import java.util.function.BiConsumer;
 
 public class RFEPluginManager {
 
+    private static final Logger LOGGER = LogUtils.getLogger();
     private static final Map<String, RFEPlugin> PLUGINS = new LinkedHashMap<>();
 
     public static void registerAndInitPlugins(String packId, RFEPackMetadata metadata) throws Exception {
@@ -65,6 +71,24 @@ public class RFEPluginManager {
     public static void registerResourceListeners(BiConsumer<ResourceLocation, PreparableReloadListener> registry) {
         for (RFEPlugin plugin : PLUGINS.values())
             plugin.registerResourceListeners(registry);
+    }
+
+    public static void loadItems(BiConsumer<ResourceLocation, Item> registry) {
+        LOGGER.info("Registering RFE plugin items");
+        for (RFEPlugin plugin : PLUGINS.values())
+            plugin.registerPluginItems(registry);
+    }
+
+    public static void loadCreativeModeTabs(BiConsumer<ResourceLocation, CreativeModeTab> registry) {
+        LOGGER.info("Registering RFE plugin creative mode tabs");
+        for (RFEPlugin plugin : PLUGINS.values())
+            plugin.registerPluginCreativeModeTabs(registry);
+    }
+
+    public static void loadParticleTypes(BiConsumer<ResourceLocation, ParticleType<?>> registry) {
+        LOGGER.info("Registering RFE plugin particle types");
+        for (RFEPlugin plugin : PLUGINS.values())
+            plugin.registerPluginParticleTypes(registry);
     }
 
     private RFEPluginManager() {}

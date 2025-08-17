@@ -2,6 +2,7 @@ package rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import rbasamoyai.ritchiesfirearmengine.RFEClient;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.foundation.pack_loading.RFEPackMetadata;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEModUtils;
@@ -51,6 +52,16 @@ public class RFEClientPluginManager {
     public static void registerResourceListeners(BiConsumer<ResourceLocation, PreparableReloadListener> registry) {
         for (Map.Entry<String, RFEClientPlugin> entry : CLIENT_PLUGINS.entrySet())
             entry.getValue().registerResourceListeners(registry);
+    }
+
+    public static void registerParticleProviders(RFEClient.ParticleRegistry registry) {
+        for (RFEClientPlugin plugin : CLIENT_PLUGINS.values())
+            plugin.registerParticleProviders(registry);
+    }
+
+    public static void onClientSetup() {
+        for (RFEClientPlugin plugin : CLIENT_PLUGINS.values())
+            plugin.onClientSetup();
     }
 
     private RFEClientPluginManager() {}

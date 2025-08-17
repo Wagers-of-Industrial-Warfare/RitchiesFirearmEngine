@@ -1,9 +1,14 @@
 package rbasamoyai.ritchiesfirearmengine;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.core.Registry;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
@@ -27,6 +32,8 @@ import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 import rbasamoyai.ritchiesfirearmengine.foundation.pack_loading.RFEPackLoader;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
+
+import java.util.function.BiConsumer;
 
 @Mod(RitchiesFirearmEngine.MOD_ID)
 public class RitchiesFirearmEngine {
@@ -66,10 +73,18 @@ public class RitchiesFirearmEngine {
     }
 
     private void onRegisterObjects(final RegisterEvent event) {
-        if (event.getRegistryKey() == Registries.ITEM) {
-            RFEPackLoader.loadItems((loc, item) -> event.register(Registries.ITEM, loc, () -> item));
-        } else if (event.getRegistryKey() == Registries.CREATIVE_MODE_TAB) {
-            RFEPackLoader.loadCreativeModeTabs((loc, tab) -> event.register(Registries.CREATIVE_MODE_TAB, loc, () -> tab));
+        ResourceKey<? extends Registry<?>> key = event.getRegistryKey();
+        if (key == Registries.ITEM) {
+            BiConsumer<ResourceLocation, Item> cons = (loc, item) -> event.register(Registries.ITEM, loc, () -> item);
+            RFEPackLoader.loadItems(cons);
+            RFEPluginManager.loadItems(cons);
+        } else if (key == Registries.CREATIVE_MODE_TAB) {
+            BiConsumer<ResourceLocation, CreativeModeTab> cons = (loc, tab) -> event.register(Registries.CREATIVE_MODE_TAB, loc, () -> tab);
+            RFEPackLoader.loadCreativeModeTabs(cons);
+            RFEPluginManager.loadCreativeModeTabs(cons);
+        } else if (key == Registries.PARTICLE_TYPE) {
+            BiConsumer<ResourceLocation, ParticleType<?>> cons = (loc, tab) -> event.register(Registries.PARTICLE_TYPE, loc, () -> tab);
+            RFEPluginManager.loadParticleTypes(cons);
         }
     }
 

@@ -3,6 +3,7 @@ package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.*;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.misfires.RFEMisfire;
@@ -15,6 +16,7 @@ public class RFEFirearmModeBuilder {
     protected String modeDisplayId;
     protected String modeTagId = "MainMode";
     protected boolean resetChargeOnUnequip = false;
+    protected float itemLength = 2;
 
     protected int drawTime = 1;
     @Nullable
@@ -99,6 +101,7 @@ public class RFEFirearmModeBuilder {
         newBuilder.drawTime = this.drawTime;
         newBuilder.drawSound = this.drawSound;
         newBuilder.resetChargeOnUnequip = this.resetChargeOnUnequip;
+        newBuilder.itemLength = this.itemLength;
 
         newBuilder.modeChangeTime = this.modeChangeTime;
         newBuilder.modeChangeSound = this.modeChangeSound;
@@ -167,6 +170,11 @@ public class RFEFirearmModeBuilder {
 
     public RFEFirearmModeBuilder resetChargeOnUnequip(boolean resetChargeOnUnequip) {
         this.resetChargeOnUnequip = resetChargeOnUnequip;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder itemLength(float itemLength) {
+        this.itemLength = Mth.clamp(itemLength, 0, 100);
         return this;
     }
 

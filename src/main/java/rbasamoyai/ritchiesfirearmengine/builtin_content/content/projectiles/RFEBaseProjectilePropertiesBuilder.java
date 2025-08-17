@@ -25,6 +25,7 @@ public class RFEBaseProjectilePropertiesBuilder {
     public RFEProjectileDamageModel damageModel;
     public ResourceKey<DamageType> damageTypeKey;
     public ResourceLocation hitMultiplierId = null;
+    public float smoke;
 
     public static RFEBaseProjectilePropertiesBuilder fromJson(JsonObject obj) {
         RFEBaseProjectilePropertiesBuilder builder = new RFEBaseProjectilePropertiesBuilder();
@@ -53,6 +54,8 @@ public class RFEBaseProjectilePropertiesBuilder {
 
         if (GsonHelper.isStringValue(obj, "hit_multiplier"))
             builder.hitMultiplierId = RFEUtils.location(GsonHelper.getAsString(obj, "hit_multiplier"));
+
+        builder.smoke = Mth.clamp(GsonHelper.getAsFloat(obj, "smoke", 0), 0, 10);
 
         return builder;
     }

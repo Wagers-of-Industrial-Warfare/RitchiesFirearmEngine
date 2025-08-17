@@ -9,9 +9,12 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -26,6 +29,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFire
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FireMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEClientPluginManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRenderer;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRendererPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
@@ -48,6 +52,8 @@ public class RFEClient {
     public static final KeyMapping SWITCH_MODE = createSafeKeyMapping("key.ritchiesfirearmengine.switch_mode", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V);
 
     public static void onClientSetup() {
+        RFEClientPluginManager.onClientSetup();
+
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("round_count"), (itemStack, level, entity, seed) -> {
             if (itemStack.getItem() instanceof MagazineItem magazine)
                 return magazine.countAmmo(itemStack);
@@ -103,6 +109,16 @@ public class RFEClient {
             return itemStack.getItem() instanceof RFEFirearmItem firearm
                     && firearm.getCurrentMode(itemStack).getFireMode() == FireMode.SAFETY ? 1 : 0;
         });
+    }
+
+    public static void onRegisterParticleProviders(ParticleRegistry registry) {
+        RFEClientPluginManager.registerParticleProviders(registry);
+    }
+
+    public interface ParticleRegistry {
+        void registerSpecial(ParticleType<?> type, ParticleProvider<?> provider);
+        void registerSprite(ParticleType<?> type, ParticleProvider.Sprite<?> sprite);
+        void registerSpriteSet(ParticleType<?> type, ParticleEngine.SpriteParticleRegistration<?> spriteSet);
     }
 
     public static void onMouseInput(int button, int action, int modifiers) {

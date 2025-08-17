@@ -1,11 +1,14 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.default_index;
 
+import com.mojang.serialization.Codec;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.*;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.effects.particles.BlackPowderSmokeOptions;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEDefaultFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
@@ -94,6 +97,11 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         registry.accept(RitchiesFirearmEngine.resource("firearm_spread"), RFESpreadProviderPackHandler.ReloadListener.INSTANCE);
         registry.accept(RitchiesFirearmEngine.resource("firearm_recoil"), RFERecoilProviderPackHandler.ReloadListener.INSTANCE);
         registry.accept(RitchiesFirearmEngine.resource("hit_multipliers"), RFEHitMultiplierHandler.ReloadListener.INSTANCE);
+    }
+
+    @Override
+    public void registerPluginParticleTypes(BiConsumer<ResourceLocation, ParticleType<?>> registry) {
+        ParticleTypes.register(registry);
     }
 
     /**
@@ -201,6 +209,8 @@ public class BuiltInRFEPlugin implements RFEPlugin {
             RFEContentBuilderRegistry.registerProjectileTypeSerializer(RitchiesFirearmEngine.resource("shotgun"), SHOTGUN);
             RFEContentBuilderRegistry.registerProjectileTypeSerializer(RitchiesFirearmEngine.resource("buck_and_ball"), BUCK_AND_BALL);
         }
+
+        private ProjectileTypes() {}
     }
 
     public static class SpreadProviders {
@@ -211,6 +221,8 @@ public class BuiltInRFEPlugin implements RFEPlugin {
             RFEContentBuilderRegistry.registerSpreadProviderSerializer(RitchiesFirearmEngine.resource("no_spread"), NO_SPREAD);
             RFEContentBuilderRegistry.registerSpreadProviderSerializer(RitchiesFirearmEngine.resource("simple"), SIMPLE);
         }
+
+        private SpreadProviders() {}
     }
 
     public static class RecoilProviders {
@@ -221,6 +233,8 @@ public class BuiltInRFEPlugin implements RFEPlugin {
             RFEContentBuilderRegistry.registerRecoilProviderSerializer(RitchiesFirearmEngine.resource("no_recoil"), NO_RECOIL);
             RFEContentBuilderRegistry.registerRecoilProviderSerializer(RitchiesFirearmEngine.resource("simple"), SIMPLE);
         }
+
+        private RecoilProviders() {}
     }
 
     public static class HitMultipliers {
@@ -241,6 +255,8 @@ public class BuiltInRFEPlugin implements RFEPlugin {
             RFEContentBuilderRegistry.registerHitMultiplierProvider(RitchiesFirearmEngine.resource("vulnerable_to_birdshot_gore"), VULNERABLE_TO_BIRDSHOT_GORE);
             RFEContentBuilderRegistry.registerHitMultiplierProvider(RitchiesFirearmEngine.resource("bullet_health"), BULLET_HEALTH);
         }
+
+        private HitMultipliers() {}
     }
 
     public static class Misfires {
@@ -255,6 +271,20 @@ public class BuiltInRFEPlugin implements RFEPlugin {
             RFEContentBuilderRegistry.registerMisfireProvider(RitchiesFirearmEngine.resource(id), prov);
             return prov;
         }
+
+        private Misfires() {}
+    }
+
+    public static class ParticleTypes {
+        public static final ParticleType<BlackPowderSmokeOptions> BLACK_POWDER_SMOKE = new ParticleType<>(true, BlackPowderSmokeOptions.DESERIALIZER) {
+            @Override public Codec<BlackPowderSmokeOptions> codec() { return BlackPowderSmokeOptions.CODEC; }
+        };
+
+        public static void register(BiConsumer<ResourceLocation, ParticleType<?>> registry) {
+            registry.accept(RitchiesFirearmEngine.resource("black_powder_smoke"), BLACK_POWDER_SMOKE);
+        }
+
+        private ParticleTypes() {}
     }
 
 }

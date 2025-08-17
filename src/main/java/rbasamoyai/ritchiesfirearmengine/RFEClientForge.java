@@ -1,5 +1,9 @@
 package rbasamoyai.ritchiesfirearmengine;
 
+import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -12,6 +16,7 @@ public class RFEClientForge {
         modBus.addListener(RFEClientForge::onClientSetup);
         modBus.addListener(RFEClientForge::onRegisterClientReloadListeners);
         modBus.addListener(RFEClientForge::onRegisterKeyMappings);
+        modBus.addListener(RFEClientForge::onRegisterParticleProviders);
 
         forgeBus.addListener(RFEClientForge::onMouseInput);
         forgeBus.addListener(RFEClientForge::onKeyInput);
@@ -28,6 +33,42 @@ public class RFEClientForge {
 
     private static void onRegisterClientReloadListeners(final RegisterClientReloadListenersEvent event) {
         RFEClientPluginManager.registerResourceListeners((id, listener) -> event.registerReloadListener(listener));
+    }
+
+    private static void onRegisterParticleProviders(final RegisterParticleProvidersEvent event) {
+        RFEClient.onRegisterParticleProviders(new ForgeParticleRegistry(event));
+    }
+
+    private record ForgeParticleRegistry(RegisterParticleProvidersEvent event) implements RFEClient.ParticleRegistry {
+        @Override
+        public void registerSpecial(ParticleType<?> type, ParticleProvider<?> provider) {
+            this.innerRegisterSpecial(type, provider);
+        }
+
+        @SuppressWarnings("unchecked")
+        private <T extends ParticleOptions> void innerRegisterSpecial(ParticleType<T> type, ParticleProvider<?> provider) {
+            this.event.registerSpecial(type, (ParticleProvider<T>) provider);
+        }
+
+        @Override
+        public void registerSprite(ParticleType<?> type, ParticleProvider.Sprite<?> sprite) {
+            this.innerRegisterSprite(type, sprite);
+        }
+
+        @SuppressWarnings("unchecked")
+        private <T extends ParticleOptions> void innerRegisterSprite(ParticleType<T> type, ParticleProvider.Sprite<?> provider) {
+            this.event.registerSprite(type, (ParticleProvider.Sprite<T>) provider);
+        }
+
+        @Override
+        public void registerSpriteSet(ParticleType<?> type, ParticleEngine.SpriteParticleRegistration<?> spriteSet) {
+            this.innerRegisterSpriteSet(type, spriteSet);
+        }
+
+        @SuppressWarnings("unchecked")
+        private <T extends ParticleOptions> void innerRegisterSpriteSet(ParticleType<T> type, ParticleEngine.SpriteParticleRegistration<?> spriteSet) {
+            this.event.registerSpriteSet(type, (ParticleEngine.SpriteParticleRegistration<T>) spriteSet);
+        }
     }
 
     private static void onMouseInput(final InputEvent.MouseButton.Pre inputEvent) {

@@ -315,7 +315,7 @@ public class RFEPackLoader {
                 }
             }
         }
-        LOGGER.debug("RFE successfully registered {} out of {} found items", successfulObjectCount, totalObjectCount);
+        LOGGER.debug("RFE successfully registered {} out of {} found creative mode tabs", successfulObjectCount, totalObjectCount);
     }
 
     public static void addPacks(PackType packType, Consumer<RepositorySource> cons) {

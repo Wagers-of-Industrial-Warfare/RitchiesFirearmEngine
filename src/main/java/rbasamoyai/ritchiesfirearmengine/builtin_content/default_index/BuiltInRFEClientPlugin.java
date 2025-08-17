@@ -2,7 +2,9 @@ package rbasamoyai.ritchiesfirearmengine.builtin_content.default_index;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import rbasamoyai.ritchiesfirearmengine.RFEClient;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.effects.particles.BlackPowderSmokeParticle;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.hud.AmmoCounterHUDOverlayRenderer;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.hud.NoHUDOverlayRenderer;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.NoOpProjectileRenderer;
@@ -29,6 +31,11 @@ public class BuiltInRFEClientPlugin implements RFEClientPlugin {
     public void registerResourceListeners(BiConsumer<ResourceLocation, PreparableReloadListener> registry) {
         registry.accept(RitchiesFirearmEngine.resource("projectile_renderers"), RFEProjectileRendererPacksHandler.ReloadListener.INSTANCE);
         registry.accept(RitchiesFirearmEngine.resource("hud_overlay_renderers"), RFEHudOverlayRendererPacksHandler.ReloadListener.INSTANCE);
+    }
+
+    @Override
+    public void registerParticleProviders(RFEClient.ParticleRegistry registry) {
+        registry.registerSpriteSet(BuiltInRFEPlugin.ParticleTypes.BLACK_POWDER_SMOKE, new BlackPowderSmokeParticle.SpriteRegistration());
     }
 
 }

@@ -4,14 +4,17 @@ import com.google.gson.JsonObject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
@@ -28,6 +31,8 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.*;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.RFEItemLengths;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.effects.particles.BlackPowderSmokeOptions;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.ProjClipContext;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEBaseProjectilePropertiesBuilder;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEProjectileDamageModel;
@@ -58,6 +63,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     protected final RFEProjectileDamageModel damageModel;
     protected final ResourceKey<DamageType> damageTypeKey;
     @Nullable protected final ResourceLocation hitMultiplierId;
+    protected final float smoke;
 
     public RFEBulletProjectileType(RFEBaseProjectilePropertiesBuilder builder) {
         this.fullHitscan = builder.fullHitscan;
@@ -70,6 +76,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         this.damageModel = builder.damageModel;
         this.damageTypeKey = builder.damageTypeKey;
         this.hitMultiplierId = builder.hitMultiplierId;
+        this.smoke = builder.smoke;
     }
 
     @Override
@@ -79,10 +86,31 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         RFEAimAngles aimAngles = RFEMathUtils.getAnglesFromVec(aimDir, entity.getXRot(), entity.yHeadRot);
         RFEAimAngles spreadAngles = spread.getSpread(itemStack, entity);
         Vec3 finalAimDir = RFEMathUtils.calculateAimVector(aimAngles.pitch() + spreadAngles.pitch(), aimAngles.yaw() + spreadAngles.yaw());
+        Vec3 spawnPos = instance.getPosition(1);
         instance.setVelocity(finalAimDir.normalize().scale(this.muzzleVelocity));
         this.tick(entity.level(), instance);
         if (this.fullHitscan)
             instance.setRemoved();
+
+        if (this.smoke > 0 && entity.level() instanceof ServerLevel slevel) {
+            RandomSource random = entity.getRandom();
+            Vec3 smokePos = spawnPos.add(aimDir.scale(RFEItemLengths.getItemLength(itemStack, entity)));
+            double speed = Math.sqrt(this.smoke);
+            double spawnDispersion = Math.max(this.smoke * 0.15, 1);
+            ParticleOptions option = new BlackPowderSmokeOptions(this.smoke);
+            for (int i = 0; i < 10; ++i) {
+                double sx = smokePos.x + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
+                double sy = smokePos.y + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
+                double sz = smokePos.z + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
+                Vec3 smokeVelocity = RFEMathUtils.calculateAimVector(aimAngles.pitch() + (random.nextFloat() - random.nextFloat()) * 30f,
+                        aimAngles.yaw() + (random.nextFloat() - random.nextFloat()) * 30f);
+                double pdx = smokeVelocity.x * speed * (0.9 * 0.1 * random.nextDouble());
+                double pdy = smokeVelocity.y * speed * (0.9 * 0.1 * random.nextDouble());
+                double pdz = smokeVelocity.z * speed * (0.9 * 0.1 * random.nextDouble());
+                for (ServerPlayer splayer : slevel.players())
+                    slevel.sendParticles(splayer, option, true, sx, sy, sz, 0, pdx, pdy, pdz, 1);
+            }
+        }
     }
 
     @Override

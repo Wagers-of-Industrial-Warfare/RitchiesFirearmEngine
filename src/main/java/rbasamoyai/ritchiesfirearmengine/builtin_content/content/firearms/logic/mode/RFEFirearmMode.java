@@ -115,6 +115,9 @@ public class RFEFirearmMode {
     protected final int cooldownTime;
     @Nullable protected final SoundEvent cooldownSound;
 
+    // Misc
+    protected final float itemLength;
+
     public RFEFirearmMode(RFEFirearmModeBuilder builder, String modeId) {
         this.modeId = modeId;
         this.modeDisplayId = builder.modeDisplayId;
@@ -170,6 +173,8 @@ public class RFEFirearmMode {
         this.canOverheat = builder.canOverheat;
         this.cooldownTime = builder.cooldownTime;
         this.cooldownSound = builder.cooldownSound;
+
+        this.itemLength = builder.itemLength;
     }
 
     public String getModeId() { return this.modeId; }
@@ -1248,6 +1253,10 @@ public class RFEFirearmMode {
     }
 
     public void onReleaseAttackKey(ItemStack itemStack, LivingEntity entity) {
+    }
+
+    public float getItemLength(ItemStack itemStack, @Nullable LivingEntity entity) {
+        return this.itemLength;
     }
 
     public int countFreeAmmoSpaces(ItemStack itemStack) {

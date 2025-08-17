@@ -21,7 +21,7 @@
     "hit_multiplier": "rfe_builtin:generic_buckshot",
     "pass_sound": "rfe_builtin:projectile.generic.whizz",
     "subprojectile_count": 6,
-    "dispersion": 3.5
+    "dispersion": 2.25
   },
   "ball_properties": {
     "muzzle_velocity": 16,

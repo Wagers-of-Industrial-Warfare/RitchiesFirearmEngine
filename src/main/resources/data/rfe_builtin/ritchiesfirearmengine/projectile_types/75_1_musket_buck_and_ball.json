@@ -19,6 +19,7 @@
     ],
     "damage_type": "rfe_builtin:bullet",
     "hit_multiplier": "rfe_builtin:generic_buckshot",
+    "pass_sound": "rfe_builtin:projectile.generic.whizz",
     "subprojectile_count": 6,
     "dispersion": 3.5
   },
@@ -41,6 +42,7 @@
     ],
     "damage_type": "rfe_builtin:bullet",
     "hit_multiplier": "rfe_builtin:generic_headshot_strong",
-    "smoke": 2.25
+    "smoke": 2.25,
+    "pass_sound": "rfe_builtin:projectile.generic.whizz"
   }
 }

@@ -13,5 +13,6 @@
     }
   ],
   "damage_type": "rfe_builtin:bullet",
-  "hit_multiplier": "rfe_builtin:556x45mm_nato_m4_carbine"
+  "hit_multiplier": "rfe_builtin:556x45mm_nato_m4_carbine",
+  "pass_sound": "rfe_builtin:projectile.generic.crack"
 }

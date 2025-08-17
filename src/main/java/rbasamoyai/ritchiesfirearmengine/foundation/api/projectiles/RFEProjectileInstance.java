@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles;
 
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
@@ -28,6 +29,7 @@ public class RFEProjectileInstance {
     private float health = 1f;
     private double distanceTravelled = 0;
     private boolean forceSync = false;
+    private final IntOpenHashSet ignoredEntities = new IntOpenHashSet();
 
     public RFEProjectileInstance(RFEProjectileType projectileType) {
         this.projectileType = projectileType;
@@ -99,5 +101,8 @@ public class RFEProjectileInstance {
     public void shoot(double dx, double dy, double dz, ItemStack itemStack, LivingEntity entity, RFESpreadInstance spreadInstance) {
         this.projectileType.shoot(this, dx, dy, dz, itemStack, entity, spreadInstance);
     }
+
+    public void ignoreEntity(Entity entity) { this.ignoredEntities.add(entity.getId()); }
+    public boolean canIgnoreEntity(Entity entity) { return this.ignoredEntities.contains(entity.getId()); }
 
 }

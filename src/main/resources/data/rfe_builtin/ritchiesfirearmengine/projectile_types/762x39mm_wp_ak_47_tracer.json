@@ -13,5 +13,6 @@
     }
   ],
   "damage_type": "rfe_builtin:bullet",
-  "hit_multiplier": "762x39mm_wp_ak_47"
+  "hit_multiplier": "762x39mm_wp_ak_47",
+  "pass_sound": "rfe_builtin:projectile.generic.crack"
 }

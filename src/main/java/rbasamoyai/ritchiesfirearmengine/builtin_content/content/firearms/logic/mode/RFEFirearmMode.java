@@ -507,7 +507,7 @@ public class RFEFirearmMode {
 
     public void playFiringEffects(ItemStack itemStack, LivingEntity entity) {
         if (this.firingSound != null)
-            entity.level().playSound(null, entity.blockPosition(), this.firingSound, SoundSource.NEUTRAL, 1, 1);
+            entity.level().playSound(null, entity.blockPosition(), this.firingSound, SoundSource.NEUTRAL, 16, 1);
     }
 
     public void playDryFiringEffects(ItemStack itemStack, LivingEntity entity) {

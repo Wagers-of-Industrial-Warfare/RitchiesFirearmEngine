@@ -8,10 +8,13 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageType;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
+
+import javax.annotation.Nullable;
 
 public class RFEBaseProjectilePropertiesBuilder {
 
@@ -24,8 +27,9 @@ public class RFEBaseProjectilePropertiesBuilder {
     public float knockback;
     public RFEProjectileDamageModel damageModel;
     public ResourceKey<DamageType> damageTypeKey;
-    public ResourceLocation hitMultiplierId = null;
+    @Nullable public ResourceLocation hitMultiplierId = null;
     public float smoke;
+    @Nullable public SoundEvent passSound = null;
 
     public static RFEBaseProjectilePropertiesBuilder fromJson(JsonObject obj) {
         RFEBaseProjectilePropertiesBuilder builder = new RFEBaseProjectilePropertiesBuilder();
@@ -57,6 +61,11 @@ public class RFEBaseProjectilePropertiesBuilder {
 
         builder.smoke = Mth.clamp(GsonHelper.getAsFloat(obj, "smoke", 0), 0, 10);
 
+        if (GsonHelper.isStringValue(obj, "pass_sound")) {
+            String passSoundKey = GsonHelper.getAsString(obj, "pass_sound");
+            builder.passSound = SoundEvent.createVariableRangeEvent(RFEUtils.location(passSoundKey));
+        }
+
         return builder;
     }
 
@@ -71,6 +80,9 @@ public class RFEBaseProjectilePropertiesBuilder {
         builder.knockback = buf.readFloat();
         builder.damageModel = RFEProjectileDamageModel.fromNetwork(buf);
         builder.damageTypeKey = buf.readResourceKey(Registries.DAMAGE_TYPE);
+        builder.hitMultiplierId = buf.readBoolean() ? buf.readResourceLocation() : null;
+        builder.smoke = buf.readFloat();
+        builder.passSound = buf.readBoolean() ? SoundEvent.createVariableRangeEvent(buf.readResourceLocation()) : null;
         return builder;
     }
     
@@ -84,6 +96,13 @@ public class RFEBaseProjectilePropertiesBuilder {
                 .writeFloat(builder.knockback);
         RFEProjectileDamageModel.toNetwork(buf, builder.damageModel);
         buf.writeResourceKey(builder.damageTypeKey);
+        buf.writeBoolean(builder.hitMultiplierId != null);
+        if (builder.hitMultiplierId != null)
+            buf.writeResourceLocation(builder.hitMultiplierId);
+        buf.writeFloat(builder.smoke)
+                .writeBoolean(builder.passSound != null);
+        if (builder.passSound != null)
+            buf.writeResourceLocation(builder.passSound.getLocation());
     }
 
 }

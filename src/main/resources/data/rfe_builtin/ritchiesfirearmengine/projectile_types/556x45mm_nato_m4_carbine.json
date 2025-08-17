@@ -12,5 +12,6 @@
       "damage": 9.5
     }
   ],
-  "damage_type": "rfe_builtin:bullet"
+  "damage_type": "rfe_builtin:bullet",
+  "pass_sound": "rfe_builtin:projectile.generic.crack"
 }

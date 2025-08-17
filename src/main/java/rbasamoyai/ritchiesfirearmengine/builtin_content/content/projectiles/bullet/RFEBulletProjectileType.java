@@ -2,18 +2,22 @@ package rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bul
 
 import com.google.gson.JsonObject;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
@@ -33,8 +37,8 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.*;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.RFEItemLengths;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.effects.particles.BlackPowderSmokeOptions;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.ProjClipContext;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEBaseProjectilePropertiesBuilder;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEProjectileClipContext;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEProjectileDamageModel;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags;
@@ -49,7 +53,7 @@ import rbasamoyai.ritchiesfirearmengine.utils.RFEMathUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEProjectileUtils;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
+import java.util.*;
 
 public class RFEBulletProjectileType implements RFEProjectileType {
 
@@ -64,6 +68,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     protected final ResourceKey<DamageType> damageTypeKey;
     @Nullable protected final ResourceLocation hitMultiplierId;
     protected final float smoke;
+    @Nullable protected final SoundEvent passSound;
 
     public RFEBulletProjectileType(RFEBaseProjectilePropertiesBuilder builder) {
         this.fullHitscan = builder.fullHitscan;
@@ -77,6 +82,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         this.damageTypeKey = builder.damageTypeKey;
         this.hitMultiplierId = builder.hitMultiplierId;
         this.smoke = builder.smoke;
+        this.passSound = builder.passSound;
     }
 
     @Override
@@ -124,41 +130,89 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             return;
         }
 
-        ProjClipContext context = new ProjClipContext(this, instance, oldPos, newPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE);
-        HitResult hitResult = level.clip(context);
-        if (hitResult.getType() != HitResult.Type.MISS) newPos = hitResult.getLocation();
-        AABB searchBox = this.getAABB(level, instance).expandTowards(velocity).inflate(1.0d);
+        Vec3 diff = newPos.subtract(oldPos);
+        double length = diff.length();
+        double rem = length % 8d;
+        int iterations = Math.max(Mth.ceil(length / 8d), 1);
+        Vec3 wholeDiff = diff.normalize().scale(8);
+        Vec3 remDiff = diff.normalize().scale(rem);
+        Vec3 totalDiff = Vec3.ZERO;
 
+        Vec3 rootPos = oldPos;
+
+        AABB baseBox = this.getAABB(level, instance);
         double hitboxInflation = this.getHitboxInflation(level, instance);
-        while (!instance.isRemoved()) {
-            EntityHitResult entityHitResult = RFEProjectileUtils.getEntityHitResult(level, oldPos, newPos, searchBox, e -> this.canHitEntity(instance, e), hitboxInflation);
-            if (entityHitResult != null)
-                hitResult = entityHitResult;
+        double suppressionInflation = hitboxInflation + 3;
 
-            if (hitResult != null && hitResult.getType() == HitResult.Type.ENTITY) {
-                Entity hitEntity = ((EntityHitResult) hitResult).getEntity();
-                Entity owner = instance.getOwner();
-                if (hitEntity instanceof Player hitPlayer && owner instanceof Player ownerPlayer && !ownerPlayer.canHarmPlayer(hitPlayer)) {
-                    hitResult = null;
-                    entityHitResult = null;
+        for (int i = 0; i < iterations; ++i) {
+            Vec3 nextDiff = i == iterations - 1 ? remDiff : wholeDiff;
+            AABB searchBox = baseBox.move(totalDiff).expandTowards(nextDiff).inflate(1.0d);
+            Vec3 nextRoot = rootPos.add(nextDiff);
+            Vec3 endPos = nextRoot;
+
+            RFEProjectileClipContext context = new RFEProjectileClipContext(this, instance, rootPos, endPos,
+                    ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE);
+            HitResult hitResult = level.clip(context);
+            if (hitResult.getType() != HitResult.Type.MISS)
+                endPos = hitResult.getLocation();
+
+            Set<Entity> hitEntities = new HashSet<>();
+            while (!instance.isRemoved()) {
+                EntityHitResult entityHitResult = RFEProjectileUtils.getEntityHitResult(level, rootPos, endPos, searchBox,
+                        e -> this.canHitEntity(instance, e), hitboxInflation);
+                if (entityHitResult != null)
+                    hitResult = entityHitResult;
+
+                if (entityHitResult != null) {
+                    Entity hitEntity = entityHitResult.getEntity();
+                    Entity owner = instance.getOwner();
+                    if (hitEntity instanceof Player hitPlayer && owner instanceof Player ownerPlayer && !ownerPlayer.canHarmPlayer(hitPlayer)) {
+                        instance.ignoreEntity(hitEntity);
+                        hitResult = null;
+                        entityHitResult = null;
+                    }
+                }
+                if (entityHitResult != null)
+                    hitEntities.add(entityHitResult.getEntity());
+
+                if (hitResult != null && hitResult.getType() != HitResult.Type.MISS)
+                    this.onHit(instance, level, hitResult, context.penetratedBlocks);
+                this.onPenetratedHitBlocks(instance, level, context.penetratedBlocks);
+
+                boolean canContinuePenetrating = instance.health() > 0;
+                if (entityHitResult == null || !canContinuePenetrating)
+                    break;
+                hitResult = null;
+            }
+
+            List<Entity> entities = level.getEntities(instance.getOwner(), searchBox.inflate(suppressionInflation), e -> true);
+            for (Entity entity1 : entities) {
+                if (hitEntities.contains(entity1))
+                    continue;
+                AABB aabb = entity1.getBoundingBox().inflate(suppressionInflation);
+                Optional<Vec3> optional = aabb.clip(rootPos, endPos);
+                if (aabb.contains(rootPos) || optional.isPresent()) {
+                    Vec3 passPos = optional.orElse(rootPos);
+                    if (this.passSound != null && !level.isClientSide && entity1 instanceof ServerPlayer splayer) {
+                        splayer.connection.send(new ClientboundSoundPacket(Holder.direct(this.passSound), SoundSource.NEUTRAL,
+                                passPos.x, passPos.y, passPos.z, 1, 1, 42L));
+                    }
                 }
             }
 
-            if (hitResult != null && hitResult.getType() != HitResult.Type.MISS) {
-                this.onHit(instance, level, hitResult, context.penetratedBlocks);
-            }
-            this.onPenetratedHitBlocks(instance, level, context.penetratedBlocks);
-
-            // TODO overpenetration
-            boolean canContinuePenetrating = false;
-            if (entityHitResult == null || !canContinuePenetrating)
+            if (instance.health() <= 0) {
+                newPos = endPos;
                 break;
-            hitResult = null;
+            }
+
+            rootPos = nextRoot;
+            totalDiff = totalDiff.add(nextDiff);
         }
 
         Vec3 newVelocity = instance.velocity();
         instance.setOldPosition(oldPos);
         instance.setPosition(newPos);
+
         instance.setDistanceTravelled(instance.distanceTravelled() + newPos.subtract(oldPos).length());
         // TODO handle velocity when collision
 
@@ -171,7 +225,8 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         instance.setVelocity(newVelocity.add(0, -this.gravity, 0));
         // TODO effects
 
-        if (instance.age() > this.maxAge || instance.health() == 0f) instance.setRemoved();
+        if (instance.age() > this.maxAge || instance.health() <= 0f)
+            instance.setRemoved();
     }
 
     @Override
@@ -182,17 +237,17 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     protected double getHitboxInflation(Level level, RFEProjectileInstance instance) { return 0.1d; }
 
     protected boolean canHitEntity(RFEProjectileInstance instance, Entity target) {
-        if (!target.canBeHitByProjectile()) {
+        if (!target.canBeHitByProjectile() || this.canIgnoreEntity(instance, target)) {
             return false;
         } else {
             Entity entity = instance.getOwner();
             return entity == null || instance.leftOwner() || !entity.isPassengerOfSameVehicle(target);
         }
-        // TODO overpenetration
-        //return (this.piercingIgnoreEntityIds == null || !this.piercingIgnoreEntityIds.contains(target.getId())) && !this.ignoredEntities.contains(target.getId());
     }
 
-    protected void onHit(RFEProjectileInstance instance, Level level, HitResult hitResult, HashMap<BlockPos, BlockState> penetratedBlocks) {
+    protected boolean canIgnoreEntity(RFEProjectileInstance instance, Entity target) { return instance.canIgnoreEntity(target); }
+
+    protected void onHit(RFEProjectileInstance instance, Level level, HitResult hitResult, Map<BlockPos, BlockState> penetratedBlocks) {
         HitResult.Type type = hitResult.getType();
         if (type == HitResult.Type.ENTITY) {
             this.onHitEntity(instance, level, (EntityHitResult) hitResult);
@@ -235,6 +290,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             if (flag)
                 return;
             entity.setDeltaMovement(oldVel);
+            instance.ignoreEntity(entity);
 
             if (entity instanceof LivingEntity living) {
                 if (this.knockback > 0) {
@@ -267,11 +323,10 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             // TODO hit effects
 //            this.playSound(this.soundEvent, 1.0F, 1.2F / (this.random.nextFloat() * 0.2F + 0.9F));
 
-            // TODO overpenetration
-            instance.setRemoved();
-//            if (this.getPierceLevel() <= 0) {
-//                this.discard();
-//            }
+            // TODO overpenetration values
+            instance.setHealth(0);
+            if (instance.health() <= 0)
+                instance.setRemoved();
         } else {
             // TODO entity ricochet if warranted
             instance.setRemoved();
@@ -287,7 +342,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     protected void doPostHurtEffects(RFEProjectileInstance instance, Level level, LivingEntity entity) {
     }
 
-    protected void onPenetratedHitBlocks(RFEProjectileInstance instance, Level level, HashMap<BlockPos, BlockState> penetratedBlocks) {
+    protected void onPenetratedHitBlocks(RFEProjectileInstance instance, Level level, Map<BlockPos, BlockState> penetratedBlocks) {
         TagKey<Block> breakingTag = getBlockBreakingTag();
         penetratedBlocks.forEach((pos, state) -> {
             if (breakingTag != null && state.is(breakingTag)) {
@@ -366,6 +421,9 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         builder.knockback = type.knockback;
         builder.damageModel = type.damageModel;
         builder.damageTypeKey = type.damageTypeKey;
+        builder.hitMultiplierId = type.hitMultiplierId;
+        builder.smoke = type.smoke;
+        builder.passSound = type.passSound;
         return builder;
     }
 

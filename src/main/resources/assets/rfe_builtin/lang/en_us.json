@@ -176,5 +176,7 @@
   "subtitles.rfe_builtin.item.generic.smg.magazine.reload": "Submachine gun magazine reloaded",
   "subtitles.rfe_builtin.item.generic.smg.magazine.unload": "Submachine gun magazine unloaded",
   "subtitles.rfe_builtin.item.generic.smg.rack": "Submachine gun racked",
-  "subtitles.rfe_builtin.item.generic.smg.shot": "Submachine gun shot"
+  "subtitles.rfe_builtin.item.generic.smg.shot": "Submachine gun shot",
+  "subtitles.rfe_builtin.projectile.generic.crack": "Bullet cracks past",
+  "subtitles.rfe_builtin.projectile.generic.whizz": "Bullet whizzes past"
 }

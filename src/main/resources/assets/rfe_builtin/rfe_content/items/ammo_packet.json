@@ -17,6 +17,8 @@
     { "ammo": "rfe_builtin:infinite_black_powder_handgun_cartridge", "capacity": 20 },
     { "ammo": "rfe_builtin:musket_cartridge", "capacity": 10 },
     { "ammo": "rfe_builtin:infinite_musket_cartridge", "capacity": 10 },
+    { "ammo": "rfe_builtin:musket_rifle_cartridge", "capacity": 10 },
+    { "ammo": "rfe_builtin:infinite_musket_rifle_cartridge", "capacity": 10 },
     { "ammo": "rfe_builtin:buck_and_ball_musket_cartridge", "capacity": 10 },
     { "ammo": "rfe_builtin:infinite_buck_and_ball_musket_cartridge", "capacity": 10 },
     { "ammo": "rfe_builtin:paper_handgun_cartridge", "capacity": 20 },

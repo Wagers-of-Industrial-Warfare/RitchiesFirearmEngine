@@ -64,7 +64,8 @@ public class RFERecoilManager {
      * @param itemStack
      * @param hand
      */
-    public static void trackRecoil(RFERecoilInstance instance, LivingEntity entity, ItemStack itemStack, InteractionHand hand) {
+    public static void trackRecoil(RFERecoilInstance instance, RFERecoilProvider provider, LivingEntity entity,
+                                   ItemStack itemStack, InteractionHand hand) {
         if (instance.isRemoved())
             return;
         if (!RECOIL_INSTANCES.containsKey(entity))
@@ -72,7 +73,15 @@ public class RFERecoilManager {
         Map<InteractionHand, TaggedRecoilInstance> instances = RECOIL_INSTANCES.get(entity);
 
         UUID recoilId = getOrCreateRecoilId(entity, itemStack);
-        instances.put(hand, new TaggedRecoilInstance(recoilId, instance));
+        instances.put(hand, new TaggedRecoilInstance(recoilId, instance, provider));
+    }
+
+    @Nullable
+    public static RFERecoilProvider getCurrentProvider(LivingEntity entity, InteractionHand hand) {
+        if (!RECOIL_INSTANCES.containsKey(entity))
+            return null;
+        Map<InteractionHand, TaggedRecoilInstance> instances = RECOIL_INSTANCES.get(entity);
+        return instances.containsKey(hand) ? instances.get(hand).source : null;
     }
 
     public static void stopTrackingRecoil(LivingEntity entity, ItemStack itemStack) {
@@ -119,7 +128,7 @@ public class RFERecoilManager {
         }
     }
 
-    private record TaggedRecoilInstance(UUID uuid, RFERecoilInstance instance) {
+    private record TaggedRecoilInstance(UUID uuid, RFERecoilInstance instance, RFERecoilProvider source) {
     }
 
 }

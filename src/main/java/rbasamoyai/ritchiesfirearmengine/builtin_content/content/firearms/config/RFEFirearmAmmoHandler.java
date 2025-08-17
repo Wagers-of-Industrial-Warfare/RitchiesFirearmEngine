@@ -100,7 +100,7 @@ public class RFEFirearmAmmoHandler {
                 JsonObject modeObj = el.getAsJsonObject();
                 String modeName = entry.getKey();
                 UnresolvedModeAmmoProperties modeProperties = properties.modeProperties.computeIfAbsent(modeName,
-                        s -> properties.defaultModeProperties.fork());
+                        s -> new UnresolvedModeAmmoProperties());
                 loadUnresolvedModeProperties(modeObj, item, modeProperties);
             }
         }

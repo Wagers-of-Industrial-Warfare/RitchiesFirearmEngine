@@ -64,7 +64,8 @@ public class RFESpreadManager {
      * @param itemStack
      * @param hand
      */
-    public static void trackSpread(RFESpreadInstance instance, LivingEntity entity, ItemStack itemStack, InteractionHand hand) {
+    public static void trackSpread(RFESpreadInstance instance, RFESpreadProvider provider, LivingEntity entity,
+                                   ItemStack itemStack, InteractionHand hand) {
         if (instance.isRemoved())
             return;
         if (!SPREAD_INSTANCES.containsKey(entity))
@@ -72,7 +73,15 @@ public class RFESpreadManager {
         Map<InteractionHand, TaggedSpreadInstance> instances = SPREAD_INSTANCES.get(entity);
 
         UUID spreadId = getOrCreateSpreadId(entity, itemStack);
-        instances.put(hand, new TaggedSpreadInstance(spreadId, instance));
+        instances.put(hand, new TaggedSpreadInstance(spreadId, instance, provider));
+    }
+
+    @Nullable
+    public static RFESpreadProvider getCurrentProvider(LivingEntity entity, InteractionHand hand) {
+        if (!SPREAD_INSTANCES.containsKey(entity))
+            return null;
+        Map<InteractionHand, TaggedSpreadInstance> instances = SPREAD_INSTANCES.get(entity);
+        return instances.containsKey(hand) ? instances.get(hand).source : null;
     }
 
     public static void stopTrackingSpread(LivingEntity entity, ItemStack itemStack) {
@@ -119,7 +128,7 @@ public class RFESpreadManager {
         }
     }
 
-    private record TaggedSpreadInstance(UUID uuid, RFESpreadInstance instance) {
+    private record TaggedSpreadInstance(UUID uuid, RFESpreadInstance instance, RFESpreadProvider source) {
     }
 
 }

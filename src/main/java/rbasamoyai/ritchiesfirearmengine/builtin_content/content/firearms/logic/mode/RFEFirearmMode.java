@@ -27,12 +27,10 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectile
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilClientImpulse;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilInstance;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProviderPackHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.*;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProvider;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProviderPackHandler;
 import rbasamoyai.ritchiesfirearmengine.network.ClientboundRunFiringLogicPacket;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
@@ -430,10 +428,10 @@ public class RFEFirearmMode {
         RFERecoilClientImpulse impulse = new RFERecoilClientImpulse(RFEAimAngles.ZERO_ANGLES, RFEAimAngles.ZERO_ANGLES, 0);
         if (!firingInputs.isEmpty()) {
             RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(entity, itemStack);
-            if (recoilInstance == null) {
-                recoilInstance = RFERecoilProviderPackHandler.getRecoilProviders(itemStack).getProperties(this.modeId)
-                        .createRecoilInstance(itemStack, entity, entity.getRandom());
-                RFERecoilManager.trackRecoil(recoilInstance, entity, itemStack, hand);
+            RFERecoilProvider provider = RFERecoilProviderPackHandler.getRecoilProviders(itemStack).getProperties(this.modeId);
+            if (recoilInstance == null || provider != RFERecoilManager.getCurrentProvider(entity, hand)) {
+                recoilInstance = provider.createRecoilInstance(itemStack, entity, entity.getRandom());
+                RFERecoilManager.trackRecoil(recoilInstance, provider, entity, itemStack, hand);
             }
             impulse = recoilInstance.updateRecoil(itemStack, entity);
         }
@@ -451,10 +449,10 @@ public class RFEFirearmMode {
                                    RFERecoilClientImpulse recoil, @Nullable UUID recoilUUID) {
         RFERecoilManager.setRecoilId(itemStack, recoilUUID);
         RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(entity, itemStack);
-        if (recoilInstance == null) {
-            recoilInstance = RFERecoilProviderPackHandler.getRecoilProviders(itemStack).getProperties(this.modeId)
-                    .createRecoilInstance(itemStack, entity, entity.getRandom());
-            RFERecoilManager.trackRecoil(recoilInstance, entity, itemStack, hand);
+        RFERecoilProvider provider = RFERecoilProviderPackHandler.getRecoilProviders(itemStack).getProperties(this.modeId);
+        if (recoilInstance == null || provider != RFERecoilManager.getCurrentProvider(entity, hand)) {
+            recoilInstance = provider.createRecoilInstance(itemStack, entity, entity.getRandom());
+            RFERecoilManager.trackRecoil(recoilInstance, provider, entity, itemStack, hand);
         }
         recoilInstance.updateRecoilWithImpulse(itemStack, entity, recoil);
     }
@@ -477,10 +475,10 @@ public class RFEFirearmMode {
             this.getNextRoundsInItem(itemStack, entity, firingInputs.size(), true);
 
         RFESpreadInstance spreadInstance = RFESpreadManager.getSpreadInstance(entity, itemStack);
-        if (spreadInstance == null) {
-            spreadInstance = RFESpreadProviderPackHandler.getSpreadProviders(itemStack).getProperties(this.modeId)
-                    .createSpreadInstance(itemStack, entity, entity.getRandom());
-            RFESpreadManager.trackSpread(spreadInstance, entity, itemStack, hand);
+        RFESpreadProvider provider = RFESpreadProviderPackHandler.getSpreadProviders(itemStack).getProperties(this.modeId);
+        if (spreadInstance == null || provider != RFESpreadManager.getCurrentProvider(entity, hand)) {
+            spreadInstance = provider.createSpreadInstance(itemStack, entity, entity.getRandom());
+            RFESpreadManager.trackSpread(spreadInstance, provider, entity, itemStack, hand);
         }
 
         for (RFEFiringInput input : firingInputs) {

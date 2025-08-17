@@ -193,7 +193,9 @@ public class RFEBulletProjectileType implements RFEProjectileType {
                 Optional<Vec3> optional = aabb.clip(rootPos, endPos);
                 if (aabb.contains(rootPos) || optional.isPresent()) {
                     Vec3 passPos = optional.orElse(rootPos);
-                    if (this.passSound != null && !level.isClientSide && entity1 instanceof ServerPlayer splayer) {
+                    double alignment = entity1.getEyePosition().subtract(rootPos).normalize().dot(velocity.normalize());
+                    boolean passBy = 0.15 < alignment && alignment < 0.995;
+                    if (passBy && this.passSound != null && !level.isClientSide && entity1 instanceof ServerPlayer splayer) {
                         splayer.connection.send(new ClientboundSoundPacket(Holder.direct(this.passSound), SoundSource.NEUTRAL,
                                 passPos.x, passPos.y, passPos.z, 1, 1, 42L));
                     }
@@ -234,7 +236,9 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         return AABB.ofSize(instance.position(), 0, 0, 0);
     }
 
-    protected double getHitboxInflation(Level level, RFEProjectileInstance instance) { return 0.1d; }
+    protected double getHitboxInflation(Level level, RFEProjectileInstance instance) {
+        return instance.age() == 0 ? 0 : 0.05d;
+    }
 
     protected boolean canHitEntity(RFEProjectileInstance instance, Entity target) {
         if (!target.canBeHitByProjectile() || this.canIgnoreEntity(instance, target)) {

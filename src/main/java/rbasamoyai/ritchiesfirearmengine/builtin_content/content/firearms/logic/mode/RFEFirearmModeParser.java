@@ -34,8 +34,10 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
 
         boolean resetChargeOnUnequip = GsonHelper.getAsBoolean(obj, "reset_charge_on_unequip", builder.resetChargeOnUnequip);
         float itemLength = GsonHelper.getAsFloat(obj, "item_length", builder.itemLength);
+        float movementSpeedMultiplier = GsonHelper.getAsFloat(obj, "movement_speed_modifier", builder.movementSpeedModifier);
         builder.resetChargeOnUnequip(resetChargeOnUnequip)
-                .itemLength(itemLength);
+                .itemLength(itemLength)
+                .movementSpeedMultiplier(movementSpeedMultiplier);
 
         if (GsonHelper.isObjectNode(obj, "drawing")) {
             JsonObject drawing = obj.getAsJsonObject("drawing");

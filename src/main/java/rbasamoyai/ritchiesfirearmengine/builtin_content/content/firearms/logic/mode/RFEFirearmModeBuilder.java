@@ -17,6 +17,7 @@ public class RFEFirearmModeBuilder {
     protected String modeTagId = "MainMode";
     protected boolean resetChargeOnUnequip = false;
     protected float itemLength = 2;
+    protected float movementSpeedModifier = 0; // Datapackable
 
     protected int drawTime = 1;
     @Nullable
@@ -102,6 +103,7 @@ public class RFEFirearmModeBuilder {
         newBuilder.drawSound = this.drawSound;
         newBuilder.resetChargeOnUnequip = this.resetChargeOnUnequip;
         newBuilder.itemLength = this.itemLength;
+        newBuilder.movementSpeedModifier = this.movementSpeedModifier;
 
         newBuilder.modeChangeTime = this.modeChangeTime;
         newBuilder.modeChangeSound = this.modeChangeSound;
@@ -175,6 +177,13 @@ public class RFEFirearmModeBuilder {
 
     public RFEFirearmModeBuilder itemLength(float itemLength) {
         this.itemLength = Mth.clamp(itemLength, 0, 100);
+        return this;
+    }
+
+    public RFEFirearmModeBuilder movementSpeedMultiplier(float movementSpeedMultiplier) {
+        if (movementSpeedMultiplier < -1 || 10 < movementSpeedMultiplier)
+            throw new IllegalStateException("Movement speed multiplier must be in range [-1, 10] (was " + movementSpeedMultiplier + ")");
+        this.movementSpeedModifier = movementSpeedMultiplier;
         return this;
     }
 

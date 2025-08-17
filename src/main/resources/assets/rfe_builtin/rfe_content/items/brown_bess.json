@@ -2,6 +2,7 @@
   "type": "ritchiesfirearmengine:firearm",
   "reset_charge_on_unequip": true,
   "item_length": 2.5,
+  "movement_speed_modifier": -0.35,
   "drawing": {
     "draw_time": 25,
     "sound": "rfe_builtin:item.generic.musket.draw"

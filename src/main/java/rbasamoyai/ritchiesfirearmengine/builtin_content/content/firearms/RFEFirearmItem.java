@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -13,6 +14,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -25,6 +27,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.R
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ReloadPhase;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmModeAmmoProperties;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmModeHandlingProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilClientImpulse;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
@@ -47,6 +50,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
     protected final List<String> modeOrder;
     protected final String defaultMode;
 
+    public static final UUID MOVEMENT_SPEED_MODIFIER_ID = Mth.createInsecureUUID();
+
     protected RFEFirearmItem(Properties properties, Map<String, RFEFirearmMode> baseFirearmModes, List<String> modeOrder, String defaultMode) {
         super(properties.stacksTo(1));
         this.baseFirearmModes = baseFirearmModes;
@@ -56,7 +61,16 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
 
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-        return super.getAttributeModifiers(slot, stack);
+        ImmutableMultimap.Builder<Attribute, AttributeModifier> map = ImmutableMultimap.builder();
+        if (slot == EquipmentSlot.MAINHAND || slot == EquipmentSlot.OFFHAND) {
+            RFEFirearmMode mode = this.getCurrentMode(stack);
+            RFEFirearmModeHandlingProperties properties = mode.getHandlingProperties(stack);
+            if (Math.abs(properties.movementSpeedModifier()) > 0.01d) {
+                map.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(MOVEMENT_SPEED_MODIFIER_ID, "ritchiesfirearmengine.handling.movement_speed",
+                        properties.movementSpeedModifier(), AttributeModifier.Operation.MULTIPLY_TOTAL));
+            }
+        }
+        return map.build();
     }
 
     @Override

@@ -77,6 +77,7 @@ public class RFEFirearmHandlingPropertiesHandler {
             if (!el.isJsonObject())
                 throw new JsonParseException("Expected JSON object while parsing handling properties for mode " + mode + " for item " + loc);
             JsonObject modeObj = el.getAsJsonObject();
+            float movementSpeedModifier = GsonHelper.getAsFloat(modeObj, "movement_speed_modifier", 0);
             ChargingBehavior chargingBehavior = ChargingBehavior.byIdStrict(GsonHelper.getAsString(modeObj, "charging_behavior",
                     ChargingBehavior.HOLD.getSerializedName()));
             float heatCapacity = GsonHelper.getAsFloat(modeObj, "heat_capacity", 0);
@@ -85,6 +86,7 @@ public class RFEFirearmHandlingPropertiesHandler {
             float heatAddedOnFiring = GsonHelper.getAsFloat(modeObj, "heat_added_on_firing", 0);
             int coolingDelayTime = GsonHelper.getAsInt(modeObj, "cooling_delay_time", 0);
             RFEFirearmModeHandlingProperties.Builder modeBuilder = new RFEFirearmModeHandlingProperties.Builder()
+                    .movementSpeedModifier(movementSpeedModifier)
                     .chargingBehavior(chargingBehavior)
                     .heatCapacity(heatCapacity)
                     .heatRemovedPerTick(heatRemovedPerTick)

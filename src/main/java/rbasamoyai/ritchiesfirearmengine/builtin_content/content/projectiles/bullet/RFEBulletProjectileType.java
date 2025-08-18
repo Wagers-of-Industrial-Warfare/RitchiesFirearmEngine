@@ -48,6 +48,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectile
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.penetration.RFEProjectilePenetrationHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.penetration.RFEProjectilePenetrationProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
+import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEMathUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEProjectileUtils;
 
@@ -318,14 +319,17 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             // TODO hit effects
 //            this.playSound(this.soundEvent, 1.0F, 1.2F / (this.random.nextFloat() * 0.2F + 0.9F));
 
-            RFEProjectilePenetrationProperties penetrationProperties = this.getPenetrationProperties();
-            RFEProjectilePenetrationProperties.PenetrationStats entityPenetration = penetrationProperties.getEntityPenetrationStats(entity);
-            if (level.random.nextFloat() > entityPenetration.chance())
+            if (RFEConfig.SERVER.enableEntityPenetration.get()) {
+                RFEProjectilePenetrationProperties penetrationProperties = this.getPenetrationProperties();
+                RFEProjectilePenetrationProperties.PenetrationStats entityPenetration = penetrationProperties.getEntityPenetrationStats(entity);
+                if (level.random.nextFloat() > entityPenetration.chance())
+                    instance.setRemoved();
+                instance.setHealth(instance.health() - entityPenetration.bulletDamage());
+                if (instance.health() <= 0)
+                    instance.setRemoved();
+            } else {
                 instance.setRemoved();
-            instance.setHealth(instance.health() - entityPenetration.bulletDamage());
-
-            if (instance.health() <= 0)
-                instance.setRemoved();
+            }
         } else {
             // TODO entity ricochet if warranted
             instance.setRemoved();
@@ -341,11 +345,12 @@ public class RFEBulletProjectileType implements RFEProjectileType {
 
     protected void onPenetratedHitBlocks(RFEProjectileInstance instance, Level level, Map<BlockPos, BlockState> penetratedBlocks) {
         RFEProjectilePenetrationProperties penetrationProperties = this.getPenetrationProperties();
+        boolean canBreak = RFEConfig.SERVER.enableBlockBreaking.get();
         for (Map.Entry<BlockPos, BlockState> entry : penetratedBlocks.entrySet()) {
             BlockPos pos = entry.getKey();
             BlockState state = entry.getValue();
             RFEProjectilePenetrationProperties.PenetrationStats blockBreaking = penetrationProperties.getBlockBreakingStats(state);
-            if (instance.health() >= blockBreaking.bulletDamage() && level.random.nextFloat() < blockBreaking.chance()) {
+            if (canBreak && instance.health() >= blockBreaking.bulletDamage() && level.random.nextFloat() < blockBreaking.chance()) {
                 level.destroyBlock(pos, true, instance.getOwner());
                 instance.setHealth(instance.health() - blockBreaking.bulletDamage());
             } else {
@@ -361,7 +366,6 @@ public class RFEBulletProjectileType implements RFEProjectileType {
 
     protected void onHitBlock(RFEProjectileInstance instance, Level level, BlockHitResult pResult) {
         // TODO ricochet
-        // TODO block breaking
 
         BlockPos hitPos = pResult.getBlockPos();
         BlockState blockstate = level.getBlockState(hitPos);
@@ -374,25 +378,20 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         instance.setRemoved();
         instance.setForceSync(true);
 
-        RFEProjectilePenetrationProperties penetrationProperties = this.getPenetrationProperties();
-        RFEProjectilePenetrationProperties.PenetrationStats blockBreaking = penetrationProperties.getBlockBreakingStats(blockstate);
-        if (instance.health() >= blockBreaking.bulletDamage() && level.random.nextFloat() < blockBreaking.chance()) {
-            level.destroyBlock(hitPos, true, instance.getOwner());
-            return;
+        if (RFEConfig.SERVER.enableBlockBreaking.get()) {
+            RFEProjectilePenetrationProperties penetrationProperties = this.getPenetrationProperties();
+            RFEProjectilePenetrationProperties.PenetrationStats blockBreaking = penetrationProperties.getBlockBreakingStats(blockstate);
+            if (instance.health() >= blockBreaking.bulletDamage() && level.random.nextFloat() < blockBreaking.chance()) {
+                level.destroyBlock(hitPos, true, instance.getOwner());
+                return;
+            }
         }
 
-        // TODO hit effects
         Vec3 hitLoc = pResult.getLocation();
         SoundType soundType = blockstate.getSoundType();
         level.playSound(null, hitPos, soundType.getHitSound(), SoundSource.BLOCKS, 1.0F, 1.2F / (level.random.nextFloat() * 0.2F + 0.9F));
         if (level instanceof ServerLevel serverLevel)
             serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, blockstate), hitLoc.x, hitLoc.y, hitLoc.z, 8, 0, 0, 0, 0);
-
-        //this.shakeTime = 7;
-        //this.setPierceLevel((byte)0);
-        //this.setSoundEvent(SoundEvents.ARROW_HIT);
-        //this.setShotFromCrossbow(false);
-        //this.resetPiercedEntities();
     }
 
     public RFEProjectilePenetrationProperties getPenetrationProperties() {

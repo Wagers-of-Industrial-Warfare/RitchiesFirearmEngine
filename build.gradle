@@ -115,6 +115,7 @@ dependencies {
 
     runtimeOnly(fg.deobf("curse.maven:moonlight-499980:${moonlight_cf_file}"))
     runtimeOnly(fg.deobf("curse.maven:dummymod-225738:${dummy_mod_cf_file}"))
+    runtimeOnly(fg.deobf("curse.maven:configured-457570:${configured_cf_file}"))
 }
 
 tasks.named('processResources', ProcessResources).configure {

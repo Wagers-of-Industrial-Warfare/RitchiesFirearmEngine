@@ -11,6 +11,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bullet.RFEBulletProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.penetration.RFEProjectilePenetrationProperties;
+import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class RFEProjectileClipContext extends ClipContext {
 
     @Override
     public VoxelShape getBlockShape(BlockState state, BlockGetter level, BlockPos pos) {
-        if (this.instance.health() > 0f) {
+        if (RFEConfig.SERVER.enableBlockPenetration.get() && this.instance.health() > 0f) {
             RFEProjectilePenetrationProperties penetrationProperties = this.type.getPenetrationProperties();
             RFEProjectilePenetrationProperties.PenetrationStats blockPenetration = penetrationProperties.getBlockPenetrationStats(state);
             if (this.instance.health() >= blockPenetration.bulletDamage() && this.random.nextFloat() < blockPenetration.chance()) {

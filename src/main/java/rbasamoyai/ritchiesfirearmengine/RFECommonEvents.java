@@ -14,6 +14,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplierHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.penetration.RFEProjectilePenetrationHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProviderPackHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
@@ -45,6 +46,7 @@ public class RFECommonEvents {
         RFEFirearmHandlingPropertiesHandler.syncToAll();
         RFESpreadProviderPackHandler.syncToAll();
         RFERecoilProviderPackHandler.syncToAll();
+        RFEProjectilePenetrationHandler.syncToAll();
     }
 
     public static void onDatapackSync(ServerPlayer player, boolean singleplayer) {
@@ -58,6 +60,7 @@ public class RFECommonEvents {
         RFEFirearmHandlingPropertiesHandler.syncToPlayer(player);
         RFESpreadProviderPackHandler.syncToPlayer(player);
         RFERecoilProviderPackHandler.syncToPlayer(player);
+        RFEProjectilePenetrationHandler.syncToPlayer(player);
     }
 
     public static void onLevelLoad(LevelAccessor level) {

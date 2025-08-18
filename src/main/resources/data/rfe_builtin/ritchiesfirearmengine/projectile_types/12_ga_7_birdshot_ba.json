@@ -22,6 +22,7 @@
   ],
   "damage_type": "rfe_builtin:bullet",
   "hit_multiplier": "rfe_builtin:generic_birdshot",
+  "penetration": "rfe_builtin:default_birdshot",
   "pass_sound": "rfe_builtin:projectile.generic.whizz",
   "subprojectile_count": 30,
   "dispersion": 2.25,

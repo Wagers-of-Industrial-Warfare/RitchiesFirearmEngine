@@ -2,32 +2,27 @@ package rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers
 
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
-import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
+import rbasamoyai.ritchiesfirearmengine.foundation.RFETags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 
 public record HeadshotHitMultiplierGore(float multiplier) implements RFEHitMultiplier {
 
-    private static final TagKey<EntityType<?>> HUMANOID = TagKey.create(Registries.ENTITY_TYPE, RitchiesFirearmEngine.resource("humanoid"));
-
     @Override
     public float multiplyDamage(Entity target, RFEProjectileInstance projectile, EntityHitResult hitResult, float damage) {
-        if (!target.getType().is(HUMANOID))
+        if (!target.getType().is(RFETags.RFEEntityTypeTags.HUMANOID.tag))
             return damage;
         double diff = hitResult.getLocation().y - target.getEyeY();
         double headHalf = Math.abs(target.getBbHeight() - target.getEyeHeight());

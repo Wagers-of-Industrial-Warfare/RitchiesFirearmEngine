@@ -13,5 +13,6 @@
     }
   ],
   "damage_type": "rfe_builtin:bullet",
+  "penetration": "rfe_builtin:default",
   "pass_sound": "rfe_builtin:projectile.generic.crack"
 }

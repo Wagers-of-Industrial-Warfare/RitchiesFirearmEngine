@@ -1,22 +1,17 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.body_parts;
 
-import net.minecraft.core.registries.Registries;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.EntityHitResult;
-import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
+import rbasamoyai.ritchiesfirearmengine.foundation.RFETags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 
 public record HeadshotHitMultiplier(float multiplier) implements RFEHitMultiplier {
 
-    private static final TagKey<EntityType<?>> HUMANOID = TagKey.create(Registries.ENTITY_TYPE, RitchiesFirearmEngine.resource("humanoid"));
-
     @Override
     public float multiplyDamage(Entity target, RFEProjectileInstance projectile, EntityHitResult hitResult, float damage) {
-        if (!target.getType().is(HUMANOID))
+        if (!target.getType().is(RFETags.RFEEntityTypeTags.HUMANOID.tag))
             return damage;
         double diff = hitResult.getLocation().y - target.getEyeY();
         double headHalf = Math.abs(target.getBbHeight() - target.getEyeHeight());

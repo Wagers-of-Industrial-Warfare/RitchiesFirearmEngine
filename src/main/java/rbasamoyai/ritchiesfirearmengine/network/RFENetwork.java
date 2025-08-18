@@ -18,6 +18,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectile
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager.ClientboundSpawnRFEProjectilePacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager.ClientboundUpdateRFEProjectilePacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler.ClientboundSyncRFEProjectileTypesPacket;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.penetration.RFEProjectilePenetrationHandler.ClientboundSyncProjectilePenetrationPacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProviderPackHandler.ClientboundSyncRecoilProvidersPacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProviderPackHandler.ClientboundSyncSpreadProvidersPacket;
 
@@ -55,6 +56,7 @@ public class RFENetwork {
         buildMessage(network, id++, ClientboundSyncRecoilProvidersPacket.class, ClientboundSyncRecoilProvidersPacket::decode);
         buildMessage(network, id++, ClientboundSyncHitMultipliersPacket.class, ClientboundSyncHitMultipliersPacket::decode);
         buildMessage(network, id++, ClientboundRunFiringLogicPacket.class, ClientboundRunFiringLogicPacket::decode);
+        buildMessage(network, id++, ClientboundSyncProjectilePenetrationPacket.class, ClientboundSyncProjectilePenetrationPacket::decode);
 
         return network;
     }

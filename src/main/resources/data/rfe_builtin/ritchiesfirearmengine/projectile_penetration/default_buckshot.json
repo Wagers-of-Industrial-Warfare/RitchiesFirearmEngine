@@ -1,0 +1,55 @@
+{
+  "default_entity_penetration": {
+    "chance": 0,
+    "damage_to_projectile": 1
+  },
+  "replace_entity_penetration": false,
+  "entity_penetration": [
+  ],
+  "default_block_penetration": {
+    "chance": 0,
+    "damage_to_projectile": 1
+  },
+  "replace_block_penetration": false,
+  "block_penetration": [
+    { "block": "#minecraft:wooden_doors", "chance": 0.85, "damage_to_projectile": 0.5 },
+    { "block": "#minecraft:wooden_fences", "chance": 0.85, "damage_to_projectile": 0.25 },
+    { "block": "#minecraft:wooden_trapdoors", "chance": 0.85, "damage_to_projectile": 0.5 },
+    { "block": "#minecraft:climbable", "chance": 1, "damage_to_projectile": 0 },
+    { "block": "#minecraft:all_signs", "chance": 1, "damage_to_projectile": 0.2 },
+    { "block": "#minecraft:leaves", "chance": 1, "damage_to_projectile": 0 },
+    { "block": "#minecraft:wool", "chance": 0.5, "damage_to_projectile": 0.5 },
+    { "block": "#minecraft:wool_carpets", "chance": 0.85, "damage_to_projectile": 0.2 },
+    { "block": "#forge:fence_gates", "chance": 0.85, "damage_to_projectile": 0.25 },
+    { "block": "minecraft:mangrove_roots", "chance": 0.85, "damage_to_projectile": 0.5 },
+    { "block": "minecraft:iron_bars", "chance": 0.85, "damage_to_projectile": 0.65 },
+    { "block": "#forge:glass", "chance": 0.85, "damage_to_projectile": 0.5 },
+    { "block": "#forge:glass_panes", "chance": 1, "damage_to_projectile": 0.25 },
+    { "block": "minecraft:decorated_pot", "chance": 0.85, "damage_to_projectile": 0.65 },
+    { "block": "#minecraft:flower_pots", "chance": 0.85, "damage_to_projectile": 0.5 },
+    { "block": "minecraft:carved_pumpkin", "chance": 0.4, "damage_to_projectile": 0 },
+    { "block": "minecraft:pumpkin", "chance": 0.4, "damage_to_projectile": 0 },
+    { "block": "minecraft:melon", "chance": 0.4, "damage_to_projectile": 0 },
+    { "block": "minecraft:jack_o_lantern", "chance": 0.4, "damage_to_projectile": 0 }
+  ],
+  "default_block_breaking": {
+    "chance": 0,
+    "damage_to_projectile": 1
+  },
+  "replace_block_breaking": false,
+  "block_breaking": [
+    { "block": "minecraft:pointed_dripstone", "chance": 0.25, "damage_to_projectile": 0.85 },
+    { "block": "minecraft:amethyst_cluster", "chance": 1, "damage_to_projectile": 0.85 },
+    { "block": "minecraft:large_amethyst_bud", "chance": 1, "damage_to_projectile": 0.85 },
+    { "block": "minecraft:medium_amethyst_bud", "chance": 1, "damage_to_projectile": 0.85 },
+    { "block": "minecraft:small_amethyst_bud", "chance": 1, "damage_to_projectile": 0.85 },
+    { "block": "minecraft:decorated_pot", "chance": 1, "damage_to_projectile": 0 },
+    { "block": "#minecraft:flower_pots", "chance": 1, "damage_to_projectile": 0 },
+    { "block": "#forge:glass", "chance": 1, "damage_to_projectile": 0 },
+    { "block": "#forge:glass_panes", "chance": 1, "damage_to_projectile": 0 },
+    { "block": "minecraft:carved_pumpkin", "chance": 0.5, "damage_to_projectile": 0.85 },
+    { "block": "minecraft:pumpkin", "chance": 0.5, "damage_to_projectile": 0.85 },
+    { "block": "minecraft:melon", "chance": 0.5, "damage_to_projectile": 0.85 },
+    { "block": "minecraft:jack_o_lantern", "chance": 0.5, "damage_to_projectile": 0.85 }
+  ]
+}

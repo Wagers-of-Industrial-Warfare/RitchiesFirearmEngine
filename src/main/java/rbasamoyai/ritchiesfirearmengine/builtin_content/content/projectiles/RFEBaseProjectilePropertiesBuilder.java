@@ -28,6 +28,7 @@ public class RFEBaseProjectilePropertiesBuilder {
     public RFEProjectileDamageModel damageModel;
     public ResourceKey<DamageType> damageTypeKey;
     @Nullable public ResourceLocation hitMultiplierId = null;
+    @Nullable public ResourceLocation penetrationId = null;
     public float smoke;
     @Nullable public SoundEvent passSound = null;
 
@@ -58,6 +59,8 @@ public class RFEBaseProjectilePropertiesBuilder {
 
         if (GsonHelper.isStringValue(obj, "hit_multiplier"))
             builder.hitMultiplierId = RFEUtils.location(GsonHelper.getAsString(obj, "hit_multiplier"));
+        if (GsonHelper.isStringValue(obj, "penetration"))
+            builder.penetrationId = RFEUtils.location(GsonHelper.getAsString(obj, "penetration"));
 
         builder.smoke = Mth.clamp(GsonHelper.getAsFloat(obj, "smoke", 0), 0, 10);
 
@@ -81,6 +84,7 @@ public class RFEBaseProjectilePropertiesBuilder {
         builder.damageModel = RFEProjectileDamageModel.fromNetwork(buf);
         builder.damageTypeKey = buf.readResourceKey(Registries.DAMAGE_TYPE);
         builder.hitMultiplierId = buf.readBoolean() ? buf.readResourceLocation() : null;
+        builder.penetrationId = buf.readBoolean() ? buf.readResourceLocation() : null;
         builder.smoke = buf.readFloat();
         builder.passSound = buf.readBoolean() ? SoundEvent.createVariableRangeEvent(buf.readResourceLocation()) : null;
         return builder;
@@ -99,6 +103,9 @@ public class RFEBaseProjectilePropertiesBuilder {
         buf.writeBoolean(builder.hitMultiplierId != null);
         if (builder.hitMultiplierId != null)
             buf.writeResourceLocation(builder.hitMultiplierId);
+        buf.writeBoolean(builder.penetrationId != null);
+        if (builder.penetrationId != null)
+            buf.writeResourceLocation(builder.penetrationId);
         buf.writeFloat(builder.smoke)
                 .writeBoolean(builder.passSound != null);
         if (builder.passSound != null)

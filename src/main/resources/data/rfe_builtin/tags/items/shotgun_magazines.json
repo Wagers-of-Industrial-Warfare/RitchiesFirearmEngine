@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "rfe_builtin:infinite_shotgun_magazine_2rds",
+    "rfe_builtin:infinite_shotgun_magazine_5rds",
+    "rfe_builtin:infinite_shotgun_magazine_8rds",
+    "rfe_builtin:infinite_shotgun_magazine_10rds",
+    "rfe_builtin:shotgun_magazine_2rds",
+    "rfe_builtin:shotgun_magazine_5rds",
+    "rfe_builtin:shotgun_magazine_8rds",
+    "rfe_builtin:shotgun_magazine_10rds"
+  ]
+}

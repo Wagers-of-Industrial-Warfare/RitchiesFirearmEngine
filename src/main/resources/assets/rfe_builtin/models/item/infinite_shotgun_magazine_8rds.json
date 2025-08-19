@@ -1,0 +1,9 @@
+{
+  "parent": "rfe_builtin:item/shotgun_magazine_8rds/0rds",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 1 },
+      "model": "rfe_builtin:item/shotgun_magazine_8rds/1rds"
+    }
+  ]
+}

@@ -746,6 +746,36 @@
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.shotgun.draw"
   },
+  "item.generic.shotgun.magazine.reload": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_reload",
+        "volume": 0.25,
+        "pitch": 0.9
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.shotgun.magazine.reload"
+  },
+  "item.generic.shotgun.magazine.reload.full": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_reload_full",
+        "volume": 0.25,
+        "pitch": 0.9
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.shotgun.magazine.reload"
+  },
+  "item.generic.shotgun.magazine.unload": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_unload",
+        "volume": 0.25,
+        "pitch": 0.9
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.shotgun.magazine.unload"
+  },
   "item.generic.shotgun.pump": {
     "sounds": [
       {
@@ -805,6 +835,66 @@
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.shotgun.pump"
+  },
+  "item.generic.shotgun.rack": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 1.25
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 1.23
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 1.21
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.shotgun.rack"
+  },
+  "item.generic.shotgun.rack.end": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 1.25
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 1.23
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 1.21
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.shotgun.rack"
+  },
+  "item.generic.shotgun.rack.start": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 1.25
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 1.23
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 1.21
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.shotgun.rack"
   },
   "item.generic.shotgun.reload.shell": {
     "sounds": [

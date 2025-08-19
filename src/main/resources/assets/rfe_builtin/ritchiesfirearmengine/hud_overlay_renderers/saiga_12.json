@@ -6,7 +6,7 @@
   "show_inventory_ammo": true,
   "count_loose_rounds": false,
   "firearm_icon": {
-    "texture": "rfe_builtin:textures/gui/hud/weapon_icon/ak_47.png",
+    "texture": "rfe_builtin:textures/gui/hud/weapon_icon/saiga_12.png",
     "width": 48,
     "height": 16
   },

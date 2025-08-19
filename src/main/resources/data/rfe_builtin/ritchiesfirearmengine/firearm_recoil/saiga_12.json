@@ -1,0 +1,9 @@
+{
+  "type": "ritchiesfirearmengine:simple",
+  "vertical_recoil": 1.2,
+  "horizontal_recoil": 0.5,
+  "recoil_decrease": 6,
+  "camera_shake": 1.5,
+  "modes": {
+  }
+}

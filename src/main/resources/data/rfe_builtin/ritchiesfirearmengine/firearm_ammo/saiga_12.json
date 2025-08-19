@@ -3,63 +3,64 @@
   "primary_ammo": [
     {
       "ammo": "rfe_builtin:birdshot_shell",
-      "fires": "rfe_builtin:12_ga_7_birdshot_m1897_trench"
+      "fires": "rfe_builtin:12_ga_7_birdshot_saiga_12"
     },
     {
       "ammo": "rfe_builtin:infinite_birdshot_shell",
-      "fires": "rfe_builtin:12_ga_7_birdshot_m1897_trench"
+      "fires": "rfe_builtin:12_ga_7_birdshot_saiga_12"
     },
     {
       "ammo": "rfe_builtin:buckshot_shell",
-      "fires": "rfe_builtin:12_ga_1_buckshot_m1897_trench"
+      "fires": "rfe_builtin:12_ga_1_buckshot_saiga_12"
     },
     {
       "ammo": "rfe_builtin:infinite_buckshot_shell",
-      "fires": "rfe_builtin:12_ga_1_buckshot_m1897_trench"
+      "fires": "rfe_builtin:12_ga_1_buckshot_saiga_12"
     },
     {
       "ammo": "rfe_builtin:magnum_buckshot_shell",
-      "fires": "rfe_builtin:12_ga_00_buckshot_m1897_trench"
+      "fires": "rfe_builtin:12_ga_00_buckshot_saiga_12"
     },
     {
       "ammo": "rfe_builtin:infinite_magnum_buckshot_shell",
-      "fires": "rfe_builtin:12_ga_00_buckshot_m1897_trench"
+      "fires": "rfe_builtin:12_ga_00_buckshot_saiga_12"
     },
     {
       "ammo": "rfe_builtin:buck_and_ball_shell",
-      "fires": "rfe_builtin:12_ga_buck_and_ball_m1897_trench"
+      "fires": "rfe_builtin:12_ga_buck_and_ball_saiga_12"
     },
     {
       "ammo": "rfe_builtin:infinite_buck_and_ball_shell",
-      "fires": "rfe_builtin:12_ga_buck_and_ball_m1897_trench"
+      "fires": "rfe_builtin:12_ga_buck_and_ball_saiga_12"
     },
     {
       "ammo": "rfe_builtin:slug_shell",
-      "fires": "rfe_builtin:12_ga_slug_m1897_trench"
+      "fires": "rfe_builtin:12_ga_slug_saiga_12"
     },
     {
       "ammo": "rfe_builtin:infinite_slug_shell",
-      "fires": "rfe_builtin:12_ga_slug_m1897_trench"
+      "fires": "rfe_builtin:12_ga_slug_saiga_12"
     },
     {
       "ammo": "rfe_builtin:ap_slug_shell",
-      "fires": "rfe_builtin:12_ga_slug_ap_m1897_trench"
+      "fires": "rfe_builtin:12_ga_slug_ap_saiga_12"
     },
     {
       "ammo": "rfe_builtin:infinite_ap_slug_shell",
-      "fires": "rfe_builtin:12_ga_slug_ap_m1897_trench"
+      "fires": "rfe_builtin:12_ga_slug_ap_saiga_12"
     },
     {
       "ammo": "rfe_builtin:expanding_slug_shell",
-      "fires": "rfe_builtin:12_ga_slug_expanding_m1897_trench"
+      "fires": "rfe_builtin:12_ga_slug_expanding_saiga_12"
     },
     {
       "ammo": "rfe_builtin:infinite_expanding_slug_shell",
-      "fires": "rfe_builtin:12_ga_slug_expanding_m1897_trench"
+      "fires": "rfe_builtin:12_ga_slug_expanding_saiga_12"
     }
   ],
   "replace_magazines": false,
   "magazines": [
+    "#rfe_builtin:shotgun_magazines"
   ],
   "replace_speedloaders": false,
   "speedloaders": [

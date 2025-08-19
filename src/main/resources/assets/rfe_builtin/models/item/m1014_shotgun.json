@@ -1,0 +1,39 @@
+{
+  "parent": "rfe_builtin:item/m1014_shotgun/m1014_shotgun_normal",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:aiming": 1 },
+      "model": "rfe_builtin:item/m1014_shotgun/m1014_shotgun_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_firing": 1 },
+      "model": "rfe_builtin:item/m1014_shotgun/m1014_shotgun_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_firing": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/m1014_shotgun/m1014_shotgun_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_charging": 1 },
+      "model": "rfe_builtin:item/m1014_shotgun/m1014_shotgun_charge"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charging": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/m1014_shotgun/m1014_shotgun_charge_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
+      "model": "rfe_builtin:item/m1014_shotgun/m1014_shotgun_reload"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
+      "model": "rfe_builtin:item/m1014_shotgun/m1014_shotgun_charge"
+    }
+  ]
+}

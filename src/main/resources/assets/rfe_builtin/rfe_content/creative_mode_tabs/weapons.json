@@ -41,6 +41,7 @@
     "rfe_builtin:db_shotgun_ou",
     "rfe_builtin:m1897_shotgun",
     "rfe_builtin:m1897_shotgun_trench",
+    "rfe_builtin:m1014_shotgun",
     {
       "item": "rfe_builtin:saiga_12",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:shotgun_magazine_10rds\",Count:1b}}}"

@@ -365,6 +365,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
             } else if (magazineAndSpeedloaderPred.test(invStack) && invStack.getItem() instanceof MagazineItem magazineItem) {
                 List<ItemStack> magAmmo = magazineItem.getStoredAmmo(invStack);
                 int magCount = 0;
+                if (magAmmo.isEmpty())
+                    continue;
                 for (ItemStack magStack : magAmmo) {
                     if (!primaryAmmoPred.test(magStack)) {
                         magCount = 0;

@@ -1001,7 +1001,11 @@ public class RFEFirearmMode {
             List<ItemStack> nextAmmoList = this.getNextRoundsInItem(itemStack, entity, 1, true);
             ItemStack nextAmmoStack = FirearmDataUtils.stripAmmo(nextAmmoList, this.ammoConsumedLast, false, this.trackEmptySlots);
             this.setLoadedRound(itemStack, nextAmmoStack);
+            if (nextAmmoStack.isEmpty())
+                this.setCharged(itemStack, entity, false);
         }
+        if (!this.plusOneCapacity && this.getNextRoundsInItem(itemStack, entity, 1, false).isEmpty())
+            this.setCharged(itemStack, entity, false);
         if (this.canOverheat) {
             float heat = FirearmDataUtils.getHeat(modeTag);
             heat -= this.getHandlingProperties(itemStack).heatRemovedOnCharge();

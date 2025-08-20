@@ -36,6 +36,18 @@
       "item": "rfe_builtin:mat_49",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_32rds\",Count:1b}}}"
     },
+    {
+      "item": "rfe_builtin:mp_18",
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_30rds\",Count:1b}}}"
+    },
+    {
+      "item": "rfe_builtin:mp_18_experimental",
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_30rds\",Count:1b}}}"
+    },
+    {
+      "item": "rfe_builtin:mp_28",
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_30rds\",Count:1b}}}"
+    },
     "rfe_builtin:single_shot_shotgun",
     "rfe_builtin:db_shotgun_sxs",
     "rfe_builtin:db_shotgun_ou",

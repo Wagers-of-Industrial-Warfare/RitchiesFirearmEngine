@@ -85,6 +85,7 @@ public class RFEFirearmMode {
     protected final int burstRoundCount;
     protected final boolean slamfire;
     @Nullable protected final SoundEvent firingSound;
+    protected final float firingSoundRange;
     // Dry fire
     protected final boolean canDryFire;
     @Nullable protected final SoundEvent dryFireSound;
@@ -156,6 +157,7 @@ public class RFEFirearmMode {
         this.slamfire = builder.slamfire;
         this.canDryFire = builder.canDryFire;
         this.firingSound = builder.firingSound;
+        this.firingSoundRange = builder.firingSoundRange;
         this.dryFireSound = builder.dryFireSound;
         this.misfireSound = builder.misfireSound;
         this.windUpTime = builder.windUpTime;
@@ -512,7 +514,7 @@ public class RFEFirearmMode {
 
     public void playFiringEffects(ItemStack itemStack, LivingEntity entity) {
         if (this.firingSound != null)
-            entity.level().playSound(null, entity.blockPosition(), this.firingSound, SoundSource.NEUTRAL, 16, 1);
+            entity.level().playSound(null, entity.blockPosition(), this.firingSound, SoundSource.NEUTRAL, this.firingSoundRange, 1);
     }
 
     public void playDryFiringEffects(ItemStack itemStack, LivingEntity entity) {

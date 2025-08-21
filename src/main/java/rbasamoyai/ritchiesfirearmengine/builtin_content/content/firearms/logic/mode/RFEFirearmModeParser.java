@@ -275,6 +275,10 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
             SoundEvent firingSound = SoundEvent.createVariableRangeEvent(RFEUtils.location(str));
             builder.firingSound(firingSound);
         }
+        if (GsonHelper.isNumberValue(firingObj, "firing_sound_range")) {
+            float firingSoundRange = GsonHelper.getAsFloat(firingObj, "firing_sound_range");
+            builder.firingSoundRange(firingSoundRange);
+        }
     }
 
     protected void dryFiringEffects(T builder, JsonObject firingObj, String modeId) {

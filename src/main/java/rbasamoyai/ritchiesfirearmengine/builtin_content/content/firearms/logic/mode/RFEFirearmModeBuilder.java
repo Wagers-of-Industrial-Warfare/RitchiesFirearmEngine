@@ -53,6 +53,7 @@ public class RFEFirearmModeBuilder {
     protected boolean canDryFire = false;
     @Nullable
     protected SoundEvent firingSound = null;
+    protected float firingSoundRange = 16;
     @Nullable
     protected SoundEvent dryFireSound = null;
     protected List<RFEMisfire> misfires = new ArrayList<>(); // Datapackable
@@ -134,6 +135,7 @@ public class RFEFirearmModeBuilder {
         newBuilder.slamfire = this.slamfire;
         newBuilder.canDryFire = this.canDryFire;
         newBuilder.firingSound = this.firingSound;
+        newBuilder.firingSoundRange = this.firingSoundRange;
         newBuilder.dryFireSound = this.dryFireSound;
         newBuilder.misfires = new ArrayList<>(this.misfires);
         newBuilder.misfireSound = this.misfireSound;
@@ -304,10 +306,12 @@ public class RFEFirearmModeBuilder {
     public RFEFirearmModeBuilder firingRPM(float rpm) { return this.firingCooldown(1200 / rpm); }
 
     public RFEFirearmModeBuilder firingCooldown(float firingCooldown) {
-        if (firingCooldown < 0)
-            throw new IllegalStateException("Cannot specify firing cooldown less than 0");
-        if (firingCooldown < 1)
+        if (firingCooldown < 0 || !Float.isFinite(firingCooldown))
+            throw new IllegalStateException("Cannot specify firing cooldown less than 0 or non-finite");
+        if (firingCooldown < 1) {
             RitchiesFirearmEngine.LOGGER.warn("Ritchie's Firearm Engine does not support RPM higher than 1200 (cooldown < 1), defaulting to cooldown = 1");
+            firingCooldown = 1;
+        }
         this.firingCooldown = firingCooldown;
         return this;
     }
@@ -352,6 +356,13 @@ public class RFEFirearmModeBuilder {
 
     public RFEFirearmModeBuilder firingSound(SoundEvent firingSound) {
         this.firingSound = firingSound;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder firingSoundRange(float firingSoundRange) {
+        if (firingSoundRange < 0 || !Float.isFinite(firingSoundRange))
+            throw new IllegalStateException("Firing sound range must be a positive, finite value");
+        this.firingSoundRange = firingSoundRange;
         return this;
     }
 
@@ -416,6 +427,7 @@ public class RFEFirearmModeBuilder {
         this.burstRoundCount = 3;
         this.slamfire = false;
         this.firingSound = null;
+        this.firingSoundRange = 16;
         this.canDryFire = false;
         this.dryFireSound = null;
         this.misfires.clear();
@@ -485,8 +497,8 @@ public class RFEFirearmModeBuilder {
     public RFEFirearmModeBuilder heatCapacity(float heatCapacity) {
         if (!this.canOverheat)
             throw new IllegalStateException("Internal error: cannot set default heat capacity outside of overheating module");
-        if (heatCapacity < 0)
-            throw new IllegalStateException("Cannot specify heat capacity less than 0");
+        if (heatCapacity < 0 || !Float.isFinite(heatCapacity))
+            throw new IllegalStateException("Cannot specify heat capacity less than 0 or non-finite");
         this.heatCapacity = heatCapacity;
         return this;
     }
@@ -510,8 +522,8 @@ public class RFEFirearmModeBuilder {
     public RFEFirearmModeBuilder heatRemovedPerTick(float heatRemovedPerTick) {
         if (!this.canOverheat)
             throw new IllegalStateException("Internal error: cannot set default heat removed per tick outside of overheating module");
-        if (heatRemovedPerTick < 0)
-            throw new IllegalStateException("Cannot specify default heat removed per tick less than 0");
+        if (heatRemovedPerTick < 0 || !Float.isFinite(heatRemovedPerTick))
+            throw new IllegalStateException("Cannot specify default heat removed per tick less than 0 or non-finite");
         this.heatRemovedPerTick = heatRemovedPerTick;
         return this;
     }
@@ -519,8 +531,8 @@ public class RFEFirearmModeBuilder {
     public RFEFirearmModeBuilder heatRemovedOnCharge(float heatRemovedOnCharge) {
         if (!this.canOverheat)
             throw new IllegalStateException("Internal error: cannot set default heat removed on charge outside of overheating module");
-        if (heatRemovedOnCharge < 0)
-            throw new IllegalStateException("Cannot specify default heat removed on charge less than 0");
+        if (heatRemovedOnCharge < 0 || !Float.isFinite(heatRemovedOnCharge))
+            throw new IllegalStateException("Cannot specify default heat removed on charge less than 0 or non-finite");
         this.heatRemovedOnCharge = heatRemovedOnCharge;
         return this;
     }
@@ -528,8 +540,8 @@ public class RFEFirearmModeBuilder {
     public RFEFirearmModeBuilder heatAddedOnFiring(float heatAddedOnFiring) {
         if (!this.canOverheat)
             throw new IllegalStateException("Internal error: cannot set default heat added on firing outside of overheating module");
-        if (heatAddedOnFiring < 0)
-            throw new IllegalStateException("Cannot specify default heat added on firing less than 0");
+        if (heatAddedOnFiring < 0 || !Float.isFinite(heatAddedOnFiring))
+            throw new IllegalStateException("Cannot specify default heat added on firing less than 0 or non-finite");
         this.heatAddedOnFiring = heatAddedOnFiring;
         return this;
     }

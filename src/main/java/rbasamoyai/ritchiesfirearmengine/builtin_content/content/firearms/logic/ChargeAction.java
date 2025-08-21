@@ -1,48 +1,51 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic;
 
+import com.google.common.collect.ImmutableMultimap;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.condition.FirearmCondition;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 
 public class ChargeAction {
 
     protected final FirearmCondition firearmCondition;
     protected final int time;
-    @Nullable protected final SoundEvent sound;
+    protected final boolean ejectMagazine;
+    protected final ImmutableMultimap<Integer, SoundEvent> soundTimeline;
 
-    public ChargeAction(FirearmCondition firearmCondition, int time, SoundEvent sound) {
+    public ChargeAction(FirearmCondition firearmCondition, int time, boolean ejectMagazine, ImmutableMultimap<Integer, SoundEvent> soundTimeline) {
         this.firearmCondition = firearmCondition;
         this.time = time;
-        this.sound = sound;
+        this.ejectMagazine = ejectMagazine;
+        this.soundTimeline = soundTimeline;
     }
 
-    public boolean tryExecute(ItemStack itemStack, LivingEntity entity, Map<ResourceLocation, Float> context) {
-        if (!this.firearmCondition.test(context))
-            return false;
-        FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.CHARGING);
-        FirearmDataUtils.setActionTime(itemStack, this.time);
-        this.playEffects(itemStack, entity);
-        return true;
+    public boolean canExecute(ItemStack itemStack, LivingEntity entity, Map<ResourceLocation, Float> context) {
+        return this.firearmCondition.test(context);
     }
 
-    protected void playEffects(ItemStack itemStack, LivingEntity entity) {
-        if (this.sound != null)
-            entity.level().playSound(null, entity.blockPosition(), this.sound, SoundSource.NEUTRAL, 1f, 1f);
+    public void playEffects(ItemStack itemStack, LivingEntity entity, int actionTime) {
+        for (SoundEvent event : this.soundTimeline.get(actionTime))
+            entity.level().playSound(null, entity.blockPosition(), event, SoundSource.NEUTRAL, 1f, 1f);
     }
 
     public void getCompareValueSources(Map<ResourceLocation, CompareValueSource> toEvaluate) {
         this.firearmCondition.getCompareValueSources(toEvaluate);
     }
+
+    public int time() { return this.time; }
+
+    public boolean ejectMagazine() { return this.ejectMagazine; }
 
     public static ChargeAction fromJson(JsonObject obj) {
         FirearmCondition condition = GsonHelper.isObjectNode(obj, "condition") ? FirearmCondition.fromJson(obj.getAsJsonObject("condition"), true)
@@ -50,12 +53,25 @@ public class ChargeAction {
         int time = GsonHelper.getAsInt(obj, "time");
         if (time < 1)
             throw new IllegalStateException("Charge action time cannot be less than 1");
-        SoundEvent soundEvent = null;
+        ImmutableMultimap.Builder<Integer, SoundEvent> soundTimeline = ImmutableMultimap.builder();
         if (GsonHelper.isStringValue(obj, "sound")) {
             String str = GsonHelper.getAsString(obj, "sound");
-            soundEvent = SoundEvent.createVariableRangeEvent(RFEUtils.location(str));
+            SoundEvent evt = SoundEvent.createVariableRangeEvent(RFEUtils.location(str));
+            soundTimeline.put(0, evt);
+        } else if (GsonHelper.isArrayNode(obj, "sounds")) {
+            JsonArray sounds = GsonHelper.getAsJsonArray(obj, "sounds");
+            for (JsonElement el : sounds) {
+                if (!el.isJsonObject())
+                    throw new JsonParseException("Sound timeline object must be a JSON object");
+                JsonObject soundObj = el.getAsJsonObject();
+                int soundTime = GsonHelper.getAsInt(soundObj, "time");
+                String str = GsonHelper.getAsString(soundObj, "sound");
+                SoundEvent evt = SoundEvent.createVariableRangeEvent(RFEUtils.location(str));
+                soundTimeline.put(soundTime, evt);
+            }
         }
-        return new ChargeAction(condition, time, soundEvent);
+        boolean ejectMagazine = GsonHelper.getAsBoolean(obj, "eject_magazine", false);
+        return new ChargeAction(condition, time, ejectMagazine, soundTimeline.build());
     }
 
 }

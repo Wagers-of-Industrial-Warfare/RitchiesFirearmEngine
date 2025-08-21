@@ -139,6 +139,12 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                     builder.windDownTime(time);
                     this.windDownEffects(builder, windDown, modeId);
                 }
+                if (builder.internalCapacity < 1 && GsonHelper.isObjectNode(firing, "eject_magazine_on_last_shot")) {
+                    JsonObject ejectMagazine = firing.getAsJsonObject("eject_magazine_on_last_shot");
+                    boolean eject = GsonHelper.getAsBoolean(ejectMagazine, "eject", true);
+                    builder.ejectMagazineOnLastShot(eject);
+                    this.ejectMagazineOnLastShotEffects(builder, ejectMagazine, modeId);
+                }
                 this.firingEffects(builder, firing, modeId);
             }
         }
@@ -252,6 +258,14 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
             String str = GsonHelper.getAsString(windDownObj, "sound");
             SoundEvent modeChangeSound = SoundEvent.createVariableRangeEvent(RFEUtils.location(str));
             builder.windDownSound(modeChangeSound);
+        }
+    }
+
+    protected void ejectMagazineOnLastShotEffects(T builder, JsonObject ejectOnLastObj, String modeId) {
+        if (GsonHelper.isStringValue(ejectOnLastObj, "sound")) {
+            String str = GsonHelper.getAsString(ejectOnLastObj, "sound");
+            SoundEvent modeChangeSound = SoundEvent.createVariableRangeEvent(RFEUtils.location(str));
+            builder.ejectMagazineOnLastShotSound(modeChangeSound);
         }
     }
 

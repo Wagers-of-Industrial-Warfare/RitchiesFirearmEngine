@@ -5,7 +5,7 @@
   "quadratic_drag": true,
   "gravity": 0.03,
   "max_age": 400,
-  "knockback": 0.5,
+  "knockback": 0.05,
   "damage_model": [
     {
       "distance": 10,

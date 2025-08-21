@@ -1,0 +1,217 @@
+{
+  "type": "ritchiesfirearmengine:firearm",
+  "drawing": {
+    "draw_time": 18,
+    "sound": "rfe_builtin:item.generic.rifle.draw"
+  },
+  "mode_change": {
+    "mode_change_time": 1,
+    "sound": "rfe_builtin:item.generic.firearm.mode_change.switch"
+  },
+  "aiming": {
+    "aim_time": 5,
+    "aim_sound": "rfe_builtin:item.generic.rifle.aim",
+    "unaim_sound": "rfe_builtin:item.generic.rifle.unaim"
+  },
+  "ammo": {
+    "ammo_required": true,
+    "plus_one_capacity": true
+  },
+  "firing": {
+    "fire_mode": "single_action",
+    "cooldown": 2,
+    "sound": "rfe_builtin:item.generic.rifle.shot"
+  },
+  "reload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": {
+          "or": [
+            {
+              "and": [
+                { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
+                {
+                  "or": [
+                    { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 0 },
+                    {
+                      "and": [
+                        { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 },
+                        { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than", "value": 0 }
+                      ]
+                    },
+                    {
+                      "and": [
+                        { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
+                        { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than", "value": 1 }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "and": [
+                { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 },
+                { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 0 },
+                { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
+              ]
+            }
+          ]
+        },
+        "time": 11,
+        "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_start"
+      },
+      {
+        "phase": "unload",
+        "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
+        "time": 1,
+        "unload_type": "rounds",
+        "unload_count": 1,
+        "sound": "rfe_builtin:item.generic.rifle.bullet_unload"
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 }
+          ]
+        },
+        "time": 20,
+        "unload_type": "magazines",
+        "unload_time": 16,
+        "sounds": [
+          { "time": 14, "sound": "rfe_builtin:item.generic.firearm.en_bloc.remove" }
+        ]
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 0 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 }
+          ]
+        },
+        "time": 22,
+        "reload_type": "magazines",
+        "reload_time": 16,
+        "end_reload": true,
+        "sounds": [
+          { "time": 14, "sound": "rfe_builtin:item.generic.firearm.en_bloc.insert" }
+        ]
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 },
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 0 },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
+          ]
+        },
+        "time": 18,
+        "reload_type": "rounds",
+        "reload_count": 1,
+        "reload_delay": 12,
+        "replace_chambered_round": true,
+        "end_reload": true,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" }
+        ]
+      },
+      {
+        "phase": "finish",
+        "time": 11,
+        "charge_firearm": true,
+        "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_end"
+      }
+    ]
+  },
+  "unload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": {
+          "or": [
+            { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 }
+          ]
+        },
+        "time": 12,
+        "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_start"
+      },
+      {
+        "phase": "unload",
+        "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
+        "time": 1,
+        "unload_type": "rounds",
+        "sound": "rfe_builtin:item.generic.rifle.bullet_unload"
+      },
+      {
+        "phase": "unload",
+        "condition": { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+        "time": 20,
+        "unload_type": "magazines",
+        "unload_time": 16,
+        "sounds": [
+          { "time": 14, "sound": "rfe_builtin:item.generic.firearm.en_bloc.remove" }
+        ]
+      },
+      {
+        "phase": "finish",
+        "time": 12,
+        "charge_firearm": true,
+        "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_end"
+      }
+    ]
+  },
+  "charge": {
+    "actions": [
+      {
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_charge" },
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:firearm_ammo_count", "operator": "equals", "value": 1 }
+          ]
+        },
+        "time": 22,
+        "eject_magazine": true,
+        "sounds": [
+          { "time": 0, "sound": "rfe_builtin:item.generic.rifle.bolt_cycle" },
+          { "time": 11, "sound": "rfe_builtin:item.generic.firearm.en_bloc.drop" }
+        ]
+      },
+      {
+        "condition": { "macro": "rfe_builtin:can_charge" },
+        "time": 22,
+        "sound": "rfe_builtin:item.generic.rifle.bolt_cycle"
+      }
+    ]
+  },
+  "modes": {
+    "safety": {
+      "firing": {
+        "fire_mode": "safety"
+      }
+    },
+    "locked_safety": {
+      "firing": {
+        "fire_mode": "safety"
+      },
+      "reload": {
+        "phases": [
+        ]
+      },
+      "unload": {
+        "phases": [
+        ]
+      },
+      "charge": {
+        "actions": [
+        ]
+      }
+    }
+  }
+}

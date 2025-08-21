@@ -64,6 +64,9 @@ public class RFEFirearmModeBuilder {
     protected int windDownTime = 0;
     @Nullable
     protected SoundEvent windDownSound = null;
+    protected boolean ejectMagazineOnLastShot = false;
+    @Nullable
+    protected SoundEvent ejectMagazineOnLastShotSound = null;
 
     protected List<ReloadPhase> reloadPhases = new LinkedList<>();
     protected final Map<ReloadPhase.PhaseType, List<ReloadPhase>> finalReloadPhases = new EnumMap<>(ReloadPhase.PhaseType.class);
@@ -138,6 +141,8 @@ public class RFEFirearmModeBuilder {
         newBuilder.windUpSound = this.windUpSound;
         newBuilder.windDownTime = this.windDownTime;
         newBuilder.windDownSound = this.windDownSound;
+        newBuilder.ejectMagazineOnLastShot = this.ejectMagazineOnLastShot;
+        newBuilder.ejectMagazineOnLastShotSound = this.ejectMagazineOnLastShotSound;
 
         newBuilder.reloadPhases = new LinkedList<>(this.reloadPhases);
         newBuilder.unloadPhases = new LinkedList<>(this.unloadPhases);
@@ -391,6 +396,16 @@ public class RFEFirearmModeBuilder {
         return this;
     }
 
+    public RFEFirearmModeBuilder ejectMagazineOnLastShot(boolean ejectMagazineOnLastShot) {
+        this.ejectMagazineOnLastShot = ejectMagazineOnLastShot;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder ejectMagazineOnLastShotSound(SoundEvent ejectMagazineOnLastShotSound) {
+        this.ejectMagazineOnLastShotSound = ejectMagazineOnLastShotSound;
+        return this;
+    }
+
     public RFEFirearmModeBuilder resetFiring() {
         this.fireMode = null;
         this.chargingBehavior = ChargingBehavior.HOLD;
@@ -409,6 +424,8 @@ public class RFEFirearmModeBuilder {
         this.windUpSound = null;
         this.windDownTime = 0;
         this.windDownSound = null;
+        this.ejectMagazineOnLastShot = false;
+        this.ejectMagazineOnLastShotSound = null;
         return this;
     }
 
@@ -540,15 +557,17 @@ public class RFEFirearmModeBuilder {
 
         if (!this.reloadPhases.isEmpty()) {
             Set<ReloadPhase.PhaseType> absentReloadPhaseTypes = EnumSet.allOf(ReloadPhase.PhaseType.class);
+            absentReloadPhaseTypes.remove(ReloadPhase.PhaseType.UNLOAD);
             for (ReloadPhase phase : this.reloadPhases) {
                 this.finalReloadPhases.computeIfAbsent(phase.phaseType(), $ -> new LinkedList<>()).add(phase);
                 absentReloadPhaseTypes.remove(phase.phaseType());
             }
             if (!absentReloadPhaseTypes.isEmpty())
-                throw new IllegalStateException("Missing reload phases, must have all of 'prepare', 'reload', and 'finish'");
+                throw new IllegalStateException("Missing reload phases, must have all of 'prepare', 'reload', and 'finish' ('unload' optional)");
         }
         if (!this.unloadPhases.isEmpty()) {
             Set<ReloadPhase.PhaseType> absentUnloadPhaseTypes = EnumSet.allOf(ReloadPhase.PhaseType.class);
+            absentUnloadPhaseTypes.remove(ReloadPhase.PhaseType.RELOAD);
             for (ReloadPhase phase : this.unloadPhases) {
                 this.finalUnloadPhases.computeIfAbsent(phase.phaseType(), $ -> new LinkedList<>()).add(phase);
                 absentUnloadPhaseTypes.remove(phase.phaseType());

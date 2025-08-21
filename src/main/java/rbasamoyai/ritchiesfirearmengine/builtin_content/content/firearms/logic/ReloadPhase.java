@@ -37,7 +37,6 @@ public class ReloadPhase {
     protected final boolean endReload;
     protected final boolean firstReloadOnly;
     protected final Int2IntOpenHashMap reloadDelays;
-    protected final int unloadMagTime;
     protected final int reloadMagTime;
     protected final ImmutableMultimap<Integer, SoundEvent> soundTimeline;
 
@@ -53,7 +52,6 @@ public class ReloadPhase {
         this.endReload = builder.endReload;
         this.firstReloadOnly = builder.firstReloadOnly;
         this.reloadDelays = builder.finalMultipleReloadDelays;
-        this.unloadMagTime = builder.unloadMagTime;
         this.reloadMagTime = builder.reloadMagTime;
         this.soundTimeline = ImmutableMultimap.<Integer, SoundEvent>builder().putAll(builder.soundTimeline).build();
     }
@@ -81,7 +79,6 @@ public class ReloadPhase {
     public boolean firstReloadOnly() { return this.firstReloadOnly; }
     public int reloadsAtTime(int time) { return this.reloadDelays.getOrDefault(time, 0); }
 
-    public int unloadMagazineTime() { return this.unloadMagTime; }
     public int reloadMagazineTime() { return this.reloadMagTime; }
 
     public static ReloadPhase fromJson(JsonObject obj, boolean unload) {
@@ -91,7 +88,8 @@ public class ReloadPhase {
         String phaseTypeString = GsonHelper.getAsString(obj, "phase");
         PhaseType phaseType = unload ? PhaseType.byIdUnload(phaseTypeString) : PhaseType.byId(phaseTypeString);
         if (phaseType == null)
-            throw new JsonParseException("Invalid " + reloadKey + " phase type '" + phaseTypeString + "', must be one of 'prepare', '" + reloadKey + "', 'finish'");
+            throw new JsonParseException("Invalid " + reloadKey + " phase type '" + phaseTypeString + "', must be one of 'prepare', "
+                    + (unload ? "'unload'" : "'reload', 'unload'") + ", 'finish'");
         builder.phaseType(phaseType);
 
         if (GsonHelper.isObjectNode(obj, "condition")) {
@@ -123,48 +121,45 @@ public class ReloadPhase {
             }
         }
 
-        if (phaseType == PhaseType.RELOAD) {
-            String reloadTypeString = GsonHelper.getAsString(obj, reloadKey + "_type");
+        if (phaseType == PhaseType.RELOAD || phaseType == PhaseType.UNLOAD) {
+            String subactionKey = phaseType == PhaseType.RELOAD ? "reload" : "unload";
+            String reloadTypeString = GsonHelper.getAsString(obj, subactionKey + "_type");
             ReloadType reloadType = ReloadType.byId(reloadTypeString);
             if (reloadType == null)
-                throw new JsonParseException("Invalid " + reloadKey + " type '" + reloadTypeString +
-                        "', must be one of 'rounds', 'magazines', " + (unload ? "" : "'speedloaders', ") + "'secondaries'");
+                throw new JsonParseException("Invalid " + subactionKey + " type '" + reloadTypeString +
+                        "', must be one of 'rounds', 'magazines', " + (phaseType == PhaseType.UNLOAD ? "" : "'speedloaders', ") + "'secondaries'");
             boolean endReload = GsonHelper.getAsBoolean(obj, "end_" + reloadKey, false);
-            boolean blockMagazineReloads = !unload && GsonHelper.getAsBoolean(obj, "block_magazine_reloads", true);
+            boolean blockMagazineReloads = phaseType == PhaseType.RELOAD && GsonHelper.getAsBoolean(obj, "block_magazine_reloads", true);
             builder.reloadType(reloadType)
                     .endReload(endReload)
                     .blockMagazineReloads(blockMagazineReloads);
-            if (!unload) {
+            if (phaseType == PhaseType.RELOAD) {
                 boolean firstReloadOnly = GsonHelper.getAsBoolean(obj, "first_reload_only", false);
                 builder.firstReloadOnly(firstReloadOnly);
             }
             if (reloadType != ReloadType.MAGAZINES) {
-                int reloadCount = obj.has(reloadKey + "_count") ? GsonHelper.getAsInt(obj, reloadKey + "_count") : 1;
-                boolean ammoAddedLast = GsonHelper.getAsBoolean(obj, unload ? "ammo_removed_last" : "ammo_added_last", false);
-                boolean replaceChamberedRound = !unload && GsonHelper.getAsBoolean(obj, "replace_chambered_round", !ammoAddedLast);
+                int reloadCount = obj.has(subactionKey + "_count") ? GsonHelper.getAsInt(obj, subactionKey + "_count") : 1;
+                boolean ammoAddedLast = GsonHelper.getAsBoolean(obj, phaseType == PhaseType.RELOAD ? "ammo_added_last" : "ammo_removed_last", false);
+                boolean replaceChamberedRound = phaseType == PhaseType.RELOAD && GsonHelper.getAsBoolean(obj, "replace_chambered_round", !ammoAddedLast);
                 builder.reloadCount(reloadCount)
                         .ammoAddedLast(ammoAddedLast);
                 if (!unload)
-                        builder.replaceChamberedRound(replaceChamberedRound);
-                if (obj.has(reloadKey + "_delay")) {
-                    int reloadDelay = GsonHelper.getAsInt(obj, reloadKey + "_delay");
+                    builder.replaceChamberedRound(replaceChamberedRound);
+                if (obj.has(subactionKey + "_delay")) {
+                    int reloadDelay = GsonHelper.getAsInt(obj, subactionKey + "_delay");
                     builder.reloadDelay(reloadDelay);
                 }
-                if (reloadCount > 1 && reloadType != ReloadType.SPEEDLOADERS && obj.has(reloadKey + "_delays")) {
-                    JsonArray delayArr = GsonHelper.getAsJsonArray(obj, reloadKey + "_delays");
+                if (reloadCount > 1 && reloadType != ReloadType.SPEEDLOADERS && obj.has(subactionKey + "_delays")) {
+                    JsonArray delayArr = GsonHelper.getAsJsonArray(obj, subactionKey + "_delays");
                     List<Integer> delayList = new ArrayList<>();
                     for (JsonElement el : delayArr)
                         delayList.add(el.getAsInt());
                     builder.reloadDelays(delayList);
                 }
             } else {
-                if (!unload && GsonHelper.isNumberValue(obj, "reload_time")) {
-                    int value = GsonHelper.getAsInt(obj, "reload_time");
+                if (GsonHelper.isNumberValue(obj, subactionKey + "_time")) {
+                    int value = GsonHelper.getAsInt(obj, subactionKey + "_time");
                     builder.reloadMagTime(value);
-                }
-                if (GsonHelper.isNumberValue(obj, "unload_time")) {
-                    int value = GsonHelper.getAsInt(obj, "unload_time");
-                    builder.unloadMagTime(value);
                 }
             }
         }
@@ -174,6 +169,7 @@ public class ReloadPhase {
     public enum PhaseType implements StringRepresentable {
         PREPARE,
         RELOAD,
+        UNLOAD,
         FINISH;
 
         private static final Map<String, PhaseType> BY_ID = Arrays.stream(values())
@@ -187,11 +183,7 @@ public class ReloadPhase {
 
         @Nullable
         public static PhaseType byIdUnload(String id) {
-            if ("unload".equals(id))
-                return RELOAD;
-            if ("reload".equals(id))
-                return null;
-            return byId(id);
+            return "reload".equals(id) ? null : byId(id);
         }
     }
 
@@ -231,7 +223,6 @@ public class ReloadPhase {
         protected boolean firstReloadOnly = false;
         protected List<Integer> multipleReloadDelays = new ArrayList<>();
         protected Int2IntOpenHashMap finalMultipleReloadDelays = new Int2IntOpenHashMap();
-        protected int unloadMagTime = -1;
         protected int reloadMagTime = -1;
         protected Multimap<Integer, SoundEvent> soundTimeline = HashMultimap.create();
 
@@ -240,7 +231,12 @@ public class ReloadPhase {
             this.mode = unload ? "unload" : "reload";
         }
 
-        public Builder phaseType(PhaseType phaseType) { this.phaseType = phaseType; return this; }
+        public Builder phaseType(PhaseType phaseType) {
+            if (this.unload && phaseType == PhaseType.RELOAD)
+                throw new IllegalStateException("Cannot define reload sub-action in unload");
+            this.phaseType = phaseType;
+            return this;
+        }
         public Builder condition(FirearmCondition condition) { this.condition = condition; return this; }
 
         public Builder time(int time) {
@@ -256,7 +252,7 @@ public class ReloadPhase {
         }
 
         public Builder reloadType(ReloadType reloadType) {
-            if (reloadType == ReloadType.SPEEDLOADERS && this.unload)
+            if (reloadType == ReloadType.SPEEDLOADERS && (this.unload || this.phaseType == PhaseType.UNLOAD))
                 throw new IllegalStateException("Cannot set unload type to 'speedloaders'");
             this.reloadType = reloadType;
             return this;
@@ -321,13 +317,6 @@ public class ReloadPhase {
             return this;
         }
 
-        public Builder unloadMagTime(int time) {
-            if (time < 1)
-                throw new IllegalStateException("Cannot have unload magazine time less than 1");
-            this.unloadMagTime = time;
-            return this;
-        }
-
         public Builder sound(int time, SoundEvent sound) {
             if (time < 0)
                 throw new IllegalStateException("Cannot have sound event time less than 0");
@@ -383,12 +372,6 @@ public class ReloadPhase {
                 } else {
                     if (!this.unload && (this.reloadMagTime == -1 || this.reloadMagTime > this.time))
                         this.reloadMagTime = this.time;
-                    if (this.unloadMagTime == -1)
-                        this.unloadMagTime = this.unload ? this.time : this.reloadMagTime;
-                    if (this.unloadMagTime > this.time)
-                        this.unloadMagTime = this.time;
-                    if (!this.unload && this.unloadMagTime > this.reloadMagTime)
-                        throw new IllegalStateException("Unload magazine time for reload cannot be greater than reload magazine time");
                     if (this.reloadMagTime > this.time)
                         throw new IllegalStateException("Cannot have reload magazine time greater than phase time (time was "
                                 + this.reloadMagTime + ", time was " + this.time + ")");

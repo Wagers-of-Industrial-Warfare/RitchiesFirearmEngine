@@ -66,6 +66,39 @@
         "time": 1
       },
       {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
+            {
+              "not": {
+                "and": [
+                  {
+                    "or": [
+                      { "macro": "rfe_builtin:can_load_1_detachable" },
+                      { "macro": "rfe_builtin:can_load_1_extra_detachable" }
+                    ]
+                  },
+                  {
+                    "or": [
+                      { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 },
+                      { "compare": "ritchiesfirearmengine:best_speedloader_ammo_count", "operator": "greater_than", "value": 0 }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "time": 30,
+        "unload_type": "magazines",
+        "unload_time": 18,
+        "sounds": [
+          { "time": 13, "sound": "rfe_builtin:item.generic.rifle.magazine.unload" }
+        ]
+      },
+      {
         "phase": "reload",
         "condition": { "macro": "rfe_builtin:can_strip_5_detachable" },
         "time": 25,
@@ -194,25 +227,9 @@
         "time": 26,
         "reload_type": "magazines",
         "reload_time": 18,
+        "end_reload": true,
         "sounds": [
-          { "time": 10, "sound": "rfe_builtin:item.generic.rifle.magazine.reload" }
-        ]
-      },
-      {
-        "phase": "reload",
-        "condition": {
-          "and": [
-            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 }
-          ]
-        },
-        "time": 56,
-        "reload_type": "magazines",
-        "unload_time": 18,
-        "reload_time": 44,
-        "sounds": [
-          { "time": 10, "sound": "rfe_builtin:item.generic.rifle.magazine.unload" },
-          { "time": 36, "sound": "rfe_builtin:item.generic.rifle.magazine.reload" }
+          { "time": 13, "sound": "rfe_builtin:item.generic.rifle.magazine.reload" }
         ]
       },
       {

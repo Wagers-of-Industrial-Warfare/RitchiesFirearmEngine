@@ -59,6 +59,66 @@
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.battle_rifle.shot"
   },
+  "item.generic.firearm.en_bloc.drop": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/clip_drop",
+        "volume": 0.5,
+        "pitch": 1.1
+      },
+      {
+        "name": "rfe_builtin:item/generic/firearm/clip_drop",
+        "volume": 0.5,
+        "pitch": 1.08
+      },
+      {
+        "name": "rfe_builtin:item/generic/firearm/clip_drop",
+        "volume": 0.5,
+        "pitch": 1.07
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.firearm.en_bloc.eject"
+  },
+  "item.generic.firearm.en_bloc.insert": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_reload",
+        "volume": 0.25,
+        "pitch": 1.93
+      },
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_reload",
+        "volume": 0.25,
+        "pitch": 1.89
+      },
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_reload",
+        "volume": 0.25,
+        "pitch": 1.87
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.firearm.en_bloc.insert"
+  },
+  "item.generic.firearm.en_bloc.remove": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_unload",
+        "volume": 0.25,
+        "pitch": 1.93
+      },
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_unload",
+        "volume": 0.25,
+        "pitch": 1.89
+      },
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_unload",
+        "volume": 0.25,
+        "pitch": 1.87
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.firearm.en_bloc.remove"
+  },
   "item.generic.firearm.mode_change.switch": {
     "sounds": [
       {

@@ -8,6 +8,7 @@
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_10rds\",Count:1b}}}"
     },
     "rfe_builtin:kar98k",
+    "rfe_builtin:gewehr_88",
     {
       "item": "rfe_builtin:mas_49_56",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_10rds\",Count:1b}}}"

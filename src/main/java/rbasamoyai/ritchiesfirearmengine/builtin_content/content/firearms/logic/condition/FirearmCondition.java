@@ -129,6 +129,19 @@ public abstract sealed class FirearmCondition implements Predicate<Map<ResourceL
         }
     }
 
+    public static final class Not extends FirearmCondition {
+        private final FirearmCondition wrapped;
+
+        public Not(FirearmCondition wrapped) { this.wrapped = wrapped; }
+
+        @Override
+        public void getCompareValueSources(Map<ResourceLocation, CompareValueSource> toEvaluate) {
+            this.wrapped.getCompareValueSources(toEvaluate);
+        }
+
+        @Override public boolean test(Map<ResourceLocation, Float> context) { return !this.wrapped.test(context); }
+    }
+
     public static final class AlwaysTrue extends FirearmCondition {
         public static final AlwaysTrue ALWAYS_TRUE = new AlwaysTrue();
 
@@ -166,6 +179,10 @@ public abstract sealed class FirearmCondition implements Predicate<Map<ResourceL
             for (JsonElement el : arr)
                 conditions.add(fromJson(el.getAsJsonObject(), macroEnabled));
             return new Or(conditions);
+        }
+        if (GsonHelper.isObjectNode(obj, "not")) {
+            FirearmCondition wrapped = fromJson(obj.getAsJsonObject("not"), macroEnabled);
+            return new Not(wrapped);
         }
         if (GsonHelper.isStringValue(obj, "macro")) {
             if (!macroEnabled)

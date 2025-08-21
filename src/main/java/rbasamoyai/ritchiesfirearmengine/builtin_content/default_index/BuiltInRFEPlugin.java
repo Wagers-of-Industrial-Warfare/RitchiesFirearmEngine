@@ -78,6 +78,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("firearm_has_magazine"), BuiltInRFEPlugin::firearmHasMagazine);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("entity_has_magazine"), BuiltInRFEPlugin::entityHasMagazine);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("best_speedloader_ammo_count"), BuiltInRFEPlugin::bestSpeedloaderAmmoCount);
+        RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("firearm_ammo_count"), BuiltInRFEPlugin::firearmAmmoCount);
 
         RFEHudItemInfoProviders.registerAmmoProvider(RFEFirearmItem::getAmmoItemsForHUD);
         RFEHudItemInfoProviders.registerAmmoInventoryCountProvider(RFEFirearmItem::getInventoryAmmoCountForHUD);
@@ -198,6 +199,15 @@ public class BuiltInRFEPlugin implements RFEPlugin {
     private static float bestSpeedloaderAmmoCount(ItemStack itemStack, LivingEntity entity) {
         if (itemStack.getItem() instanceof RFEFirearmItem firearm)
             return firearm.bestSpeedloaderAmmoCount(itemStack, entity);
+        return 0;
+    }
+
+    /**
+     * How much ammo the firearm has, as would be displayed on an ammo counter.
+     */
+    private static float firearmAmmoCount(ItemStack itemStack, LivingEntity entity) {
+        if (itemStack.getItem() instanceof RFEFirearmItem firearm)
+            return firearm.ammoCount(itemStack, entity);
         return 0;
     }
 

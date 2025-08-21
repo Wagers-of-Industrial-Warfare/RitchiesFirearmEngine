@@ -381,10 +381,10 @@ public class ReloadPhase {
                 } else if (this.reloadType == ReloadType.SPEEDLOADERS) {
                     this.finalMultipleReloadDelays.addTo(this.singleReloadDelay, this.reloadCount);
                 } else {
-                    if (!this.unload && (this.reloadMagTime == -1 || this.reloadMagTime > this.time))
+                    if (this.reloadMagTime == -1)
                         this.reloadMagTime = this.time;
                     if (this.reloadMagTime > this.time)
-                        throw new IllegalStateException("Cannot have reload magazine time greater than phase time (time was "
+                        throw new IllegalStateException("Cannot have " + this.mode + " magazine time greater than phase time (time was "
                                 + this.reloadMagTime + ", time was " + this.time + ")");
                 }
             } else {

@@ -66,7 +66,7 @@ public class RFEShotgunProjectileType extends RFEBulletProjectileType {
         }
     }
 
-    @Override protected double getHitboxInflation(Level level, RFEProjectileInstance instance) { return this.size; }
+    @Override protected double getHitboxInflation(Level level, RFEProjectileInstance instance, double distance) { return this.size; }
 
     @Override public RFEProjectileType.Serializer<?> getSerializer() { return BuiltInRFEPlugin.ProjectileTypes.SHOTGUN; }
 

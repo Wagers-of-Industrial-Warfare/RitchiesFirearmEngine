@@ -143,10 +143,13 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         Vec3 rootPos = oldPos;
 
         AABB baseBox = this.getAABB(level, instance);
-        double hitboxInflation = this.getHitboxInflation(level, instance);
-        double suppressionInflation = hitboxInflation + 3;
+        double baseDistance = instance.distanceTravelled();
 
         for (int i = 0; i < iterations; ++i) {
+            double hitboxInflation = this.getHitboxInflation(level, instance, baseDistance);
+            double suppressionInflation = hitboxInflation + 3;
+            baseDistance += 8;
+
             Vec3 nextDiff = i == iterations - 1 ? remDiff : wholeDiff;
             AABB searchBox = baseBox.move(totalDiff).expandTowards(nextDiff).inflate(1.0d);
             Vec3 nextRoot = rootPos.add(nextDiff);
@@ -238,8 +241,8 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         return AABB.ofSize(instance.position(), 0, 0, 0);
     }
 
-    protected double getHitboxInflation(Level level, RFEProjectileInstance instance) {
-        return instance.age() == 0 ? 0 : 0.1d;
+    protected double getHitboxInflation(Level level, RFEProjectileInstance instance, double distance) {
+        return instance.age() == 0 && distance < 5 ? 0 : 0.1d;
     }
 
     protected boolean canHitEntity(RFEProjectileInstance instance, Entity target) {

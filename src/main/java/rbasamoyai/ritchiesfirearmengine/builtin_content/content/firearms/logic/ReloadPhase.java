@@ -332,10 +332,10 @@ public class ReloadPhase {
                 throw new IllegalStateException("Must specify " + this.mode + " phase condition");
             if (this.time < 1)
                 throw new IllegalStateException("Must specify " + this.mode + " phase time");
-            if (this.phaseType == PhaseType.RELOAD) {
+            if (this.phaseType == PhaseType.RELOAD || this.phaseType == PhaseType.UNLOAD) {
                 if (this.reloadType == null)
                     throw new IllegalStateException("Must specify " + this.mode + " type for phase type '" + this.mode + "'");
-                if (this.unload && this.reloadType == ReloadType.SPEEDLOADERS)
+                if (this.phaseType == PhaseType.UNLOAD && this.reloadType == ReloadType.SPEEDLOADERS)
                     throw new JsonParseException("Cannot set unload type to 'speedloaders'");
                 if (this.reloadType == ReloadType.ROUNDS || this.reloadType == ReloadType.SECONDARIES) {
                     if (this.reloadCount > 1) {

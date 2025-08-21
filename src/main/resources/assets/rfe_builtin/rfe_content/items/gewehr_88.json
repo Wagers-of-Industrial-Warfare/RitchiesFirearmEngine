@@ -68,6 +68,7 @@
         "time": 1,
         "unload_type": "rounds",
         "unload_count": 1,
+        "unload_time": 1,
         "sound": "rfe_builtin:item.generic.rifle.bullet_unload"
       },
       {

@@ -685,6 +685,10 @@ public class RFEFirearmMode {
             return;
         if (phase.chargeFirearm())
             this.finishCharge(itemStack, entity);
+        if (phase.ejectMagazine()) {
+            ItemStack previousMagazine = this.setMagazine(itemStack, entity, ItemStack.EMPTY);
+            RFEItemUtils.addItemToEntity(previousMagazine, entity);
+        }
         if (phaseType == ReloadPhase.PhaseType.PREPARE
                 && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.UNLOAD, false, false, true)
                 && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.RELOAD, false, false, true)) {

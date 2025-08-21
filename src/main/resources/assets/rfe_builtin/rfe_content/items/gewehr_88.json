@@ -123,6 +123,22 @@
       },
       {
         "phase": "finish",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:firearm_ammo_count", "operator": "equals", "value": 1 }
+          ]
+        },
+        "time": 11,
+        "charge_firearm": true,
+        "eject_magazine": true,
+        "sounds": [
+          { "time": 0, "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_end" },
+          { "time": 10, "sound": "rfe_builtin:item.generic.firearm.en_bloc.drop" }
+        ]
+      },
+      {
+        "phase": "finish",
         "time": 11,
         "charge_firearm": true,
         "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_end"

@@ -30,6 +30,7 @@ public class ReloadPhase {
     protected final FirearmCondition condition;
     protected final int time;
     protected final boolean chargeFirearm;
+    protected final boolean ejectMagazine;
     protected final ReloadType reloadType;
     protected final boolean ammoAddedLast;
     protected final boolean replaceChamberedRound;
@@ -45,6 +46,7 @@ public class ReloadPhase {
         this.condition = builder.condition;
         this.time = builder.time;
         this.chargeFirearm = builder.chargeFirearm;
+        this.ejectMagazine = builder.ejectMagazine;
         this.reloadType = builder.reloadType;
         this.ammoAddedLast = builder.ammoAddedLast;
         this.replaceChamberedRound = builder.replaceChamberedRound;
@@ -71,6 +73,7 @@ public class ReloadPhase {
 
     public int time() { return this.time; }
     public boolean chargeFirearm() { return this.chargeFirearm; }
+    public boolean ejectMagazine() { return this.ejectMagazine; }
     public ReloadType reloadType() { return this.reloadType; }
     public boolean ammoAddedLast() { return this.ammoAddedLast; }
     public boolean replaceChamberedRound() { return this.replaceChamberedRound; }
@@ -101,8 +104,10 @@ public class ReloadPhase {
 
         int time = GsonHelper.getAsInt(obj, "time");
         boolean chargeFirearm = GsonHelper.getAsBoolean(obj, "charge_firearm", false);
+        boolean ejectMagazine = GsonHelper.getAsBoolean(obj, "eject_magazine", false);
         builder.time(time)
-                .chargeFirearm(chargeFirearm);
+                .chargeFirearm(chargeFirearm)
+                .ejectMagazine(ejectMagazine);
 
         if (GsonHelper.isStringValue(obj, "sound")) {
             String str = GsonHelper.getAsString(obj, "sound");
@@ -212,6 +217,7 @@ public class ReloadPhase {
         protected FirearmCondition condition = null;
         protected int time = -1;
         protected boolean chargeFirearm = false;
+        protected boolean ejectMagazine = false;
         protected ReloadType reloadType = null;
         protected int singleReloadDelay = 1;
         private boolean setSingleDelay = false;
@@ -248,6 +254,11 @@ public class ReloadPhase {
 
         public Builder chargeFirearm(boolean chargeFirearm) {
             this.chargeFirearm = chargeFirearm;
+            return this;
+        }
+
+        public Builder ejectMagazine(boolean ejectMagazine) {
+            this.ejectMagazine = ejectMagazine;
             return this;
         }
 

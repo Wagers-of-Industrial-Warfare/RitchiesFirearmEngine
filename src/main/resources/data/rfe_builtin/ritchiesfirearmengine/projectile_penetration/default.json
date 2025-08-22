@@ -23,6 +23,8 @@
     { "block": "#minecraft:planks", "chance": 0.85, "damage_to_projectile": 0.33 },
     { "block": "#minecraft:logs", "chance": 0.15, "damage_to_projectile": 0.65 },
     { "block": "#minecraft:leaves", "chance": 1, "damage_to_projectile": 0 },
+    { "block": "minecraft:azalea", "chance": 1, "damage_to_projectile": 0 },
+    { "block": "minecraft:flowering_azalea", "chance": 1, "damage_to_projectile": 0 },
     { "block": "#minecraft:wool", "chance": 1, "damage_to_projectile": 0.1 },
     { "block": "#minecraft:wool_carpets", "chance": 1, "damage_to_projectile": 0.05 },
     { "block": "#forge:fence_gates", "chance": 1, "damage_to_projectile": 0.2 },

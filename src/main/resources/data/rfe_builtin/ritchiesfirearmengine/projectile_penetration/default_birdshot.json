@@ -14,6 +14,8 @@
   "block_penetration": [
     { "block": "#minecraft:climbable", "chance": 1, "damage_to_projectile": 0 },
     { "block": "#minecraft:leaves", "chance": 1, "damage_to_projectile": 0 },
+    { "block": "minecraft:azalea", "chance": 1, "damage_to_projectile": 0 },
+    { "block": "minecraft:flowering_azalea", "chance": 1, "damage_to_projectile": 0 },
     { "block": "minecraft:mangrove_roots", "chance": 0.85, "damage_to_projectile": 0.75 },
     { "block": "minecraft:iron_bars", "chance": 0.85, "damage_to_projectile": 0.75 },
     { "block": "#forge:glass", "chance": 0.25, "damage_to_projectile": 0.85 },

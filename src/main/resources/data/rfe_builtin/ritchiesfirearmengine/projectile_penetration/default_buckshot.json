@@ -18,6 +18,8 @@
     { "block": "#minecraft:climbable", "chance": 1, "damage_to_projectile": 0 },
     { "block": "#minecraft:all_signs", "chance": 1, "damage_to_projectile": 0.2 },
     { "block": "#minecraft:leaves", "chance": 1, "damage_to_projectile": 0 },
+    { "block": "minecraft:azalea", "chance": 1, "damage_to_projectile": 0 },
+    { "block": "minecraft:flowering_azalea", "chance": 1, "damage_to_projectile": 0 },
     { "block": "#minecraft:wool", "chance": 0.5, "damage_to_projectile": 0.5 },
     { "block": "#minecraft:wool_carpets", "chance": 0.85, "damage_to_projectile": 0.2 },
     { "block": "#forge:fence_gates", "chance": 0.85, "damage_to_projectile": 0.25 },

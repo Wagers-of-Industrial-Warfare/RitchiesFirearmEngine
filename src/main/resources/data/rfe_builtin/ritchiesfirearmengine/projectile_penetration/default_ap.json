@@ -20,6 +20,7 @@
     { "block": "#minecraft:climbable", "chance": 1, "damage_to_projectile": 0 },
     { "block": "#minecraft:all_signs", "chance": 1, "damage_to_projectile": 0.05 },
     { "block": "#minecraft:campfires", "chance": 1, "damage_to_projectile": 0.16 },
+    { "block": "minecraft:composter", "chance": 1, "damage_to_projectile": 0.1 },
     { "block": "#minecraft:planks", "chance": 1, "damage_to_projectile": 0.16 },
     { "block": "#minecraft:logs", "chance": 0.5, "damage_to_projectile": 0.33 },
     { "block": "#minecraft:leaves", "chance": 1, "damage_to_projectile": 0 },
@@ -39,7 +40,8 @@
     { "block": "minecraft:melon", "chance": 0.85, "damage_to_projectile": 0 },
     { "block": "minecraft:jack_o_lantern", "chance": 0.85, "damage_to_projectile": 0 },
     { "block": "minecraft:iron_door", "chance": 0.65, "damage_to_projectile": 0.5 },
-    { "block": "minecraft:iron_trapdoor", "chance": 0.65, "damage_to_projectile": 0.5 }
+    { "block": "minecraft:iron_trapdoor", "chance": 0.65, "damage_to_projectile": 0.5 },
+    { "block": "#minecraft:cauldrons", "chance": 0.65, "damage_to_projectile": 0.5 }
   ],
   "default_block_breaking": {
     "chance": 0,

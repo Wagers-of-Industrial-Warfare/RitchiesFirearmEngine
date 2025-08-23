@@ -20,6 +20,7 @@
     { "block": "#minecraft:climbable", "chance": 1, "damage_to_projectile": 0 },
     { "block": "#minecraft:all_signs", "chance": 1, "damage_to_projectile": 0.1 },
     { "block": "#minecraft:campfires", "chance": 0.35, "damage_to_projectile": 0.5 },
+    { "block": "minecraft:composter", "chance": 1, "damage_to_projectile": 0.3 },
     { "block": "#minecraft:planks", "chance": 0.5, "damage_to_projectile": 0.5 },
     { "block": "#minecraft:leaves", "chance": 1, "damage_to_projectile": 0 },
     { "block": "minecraft:azalea", "chance": 1, "damage_to_projectile": 0 },

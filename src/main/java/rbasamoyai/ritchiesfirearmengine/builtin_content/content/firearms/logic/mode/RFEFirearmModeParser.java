@@ -53,11 +53,15 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
         }
         if (GsonHelper.isObjectNode(obj, "aiming")) {
             JsonObject aiming = obj.getAsJsonObject("aiming");
-            int aimTime = GsonHelper.getAsInt(aiming, "aim_time");
-            int unaimTime = GsonHelper.getAsInt(aiming, "unaim_time", aimTime);
-            builder.aimTime(aimTime)
-                    .unaimTime(unaimTime);
-            this.aimingEffects(builder, aiming, modeId);
+            boolean canAim = GsonHelper.getAsBoolean(aiming, "can_aim", true);
+            builder.canAim(canAim);
+            if (canAim) {
+                int aimTime = GsonHelper.getAsInt(aiming, "aim_time");
+                int unaimTime = GsonHelper.getAsInt(aiming, "unaim_time", aimTime);
+                builder.aimTime(aimTime)
+                        .unaimTime(unaimTime);
+                this.aimingEffects(builder, aiming, modeId);
+            }
         }
 
         if (GsonHelper.isObjectNode(obj, "ammo")) {

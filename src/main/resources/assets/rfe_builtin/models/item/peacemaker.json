@@ -1,0 +1,50 @@
+{
+  "parent": "rfe_builtin:item/peacemaker/peacemaker_fired",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:aiming": 1 },
+      "model": "rfe_builtin:item/peacemaker/peacemaker_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_charged": 1 },
+      "model": "rfe_builtin:item/peacemaker/peacemaker_normal"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charged": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/peacemaker/peacemaker_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_charging": 1 },
+      "model": "rfe_builtin:item/peacemaker/peacemaker_charge"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charging": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/peacemaker/peacemaker_charge_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_firing": 1 },
+      "model": "rfe_builtin:item/peacemaker/peacemaker_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_firing": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/peacemaker/peacemaker_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
+      "model": "rfe_builtin:item/peacemaker/peacemaker_reload"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
+      "model": "rfe_builtin:item/peacemaker/peacemaker_reload"
+    }
+  ]
+}

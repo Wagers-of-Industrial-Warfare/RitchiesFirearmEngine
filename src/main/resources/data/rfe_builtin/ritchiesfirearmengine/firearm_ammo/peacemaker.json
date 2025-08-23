@@ -1,0 +1,24 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:black_powder_handgun_cartridge",
+      "fires": "rfe_builtin:45_long_colt"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_black_powder_handgun_cartridge",
+      "fires": "rfe_builtin:45_long_colt"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "modes": {
+  }
+}

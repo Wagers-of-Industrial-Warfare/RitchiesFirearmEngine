@@ -1,0 +1,176 @@
+{
+  "type": "ritchiesfirearmengine:firearm",
+  "drawing": {
+    "draw_time": 11,
+    "sound": "rfe_builtin:item.generic.revolver.draw"
+  },
+  "mode_change": {
+    "mode_change_time": 1,
+    "sound": "rfe_builtin:item.generic.firearm.mode_change.switch"
+  },
+  "aiming": {
+    "aim_time": 2,
+    "aim_sound": "rfe_builtin:item.generic.revolver.aim",
+    "unaim_sound": "rfe_builtin:item.generic.revolver.unaim"
+  },
+  "ammo": {
+    "ammo_required": true,
+    "internal_capacity": 6,
+    "track_empty_slots": true
+  },
+  "firing": {
+    "fire_mode": "single_action",
+    "cooldown": 2,
+    "sound": "rfe_builtin:item.generic.revolver.shot"
+  },
+  "reload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1" },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
+          ]
+        },
+        "time": 20,
+        "sounds": [
+          { "time": 0, "sound": "rfe_builtin:item.generic.revolver.gate.open" },
+          { "time": 14, "sound": "rfe_builtin:item.generic.revolver.hammer.cocked" }
+        ]
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1" },
+            { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than_or_equal_to", "value": 1 }
+          ]
+        },
+        "time": 18,
+        "reload_type": "rounds",
+        "reload_count": 1,
+        "reload_delay": 14,
+        "sounds": [
+          { "time": 8, "sound": "rfe_builtin:item.generic.revolver.bullet.unload" },
+          { "time": 12, "sound": "rfe_builtin:item.generic.revolver.bullet.reload" }
+        ]
+      },
+      {
+        "phase": "index",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1" },
+            { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than_or_equal_to", "value": 1 }
+          ]
+        },
+        "time": 5,
+        "index_count": 1,
+        "sounds": [
+          { "time": 2, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" }
+        ]
+      },
+      {
+        "phase": "index",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than", "value": 6 },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "equals", "value": 0 }
+          ]
+        },
+        "time": 5,
+        "index_count": 1,
+        "sounds": [
+          { "time": 2, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" }
+        ]
+      },
+      {
+        "phase": "finish",
+        "time": 20,
+        "charge_firearm": true,
+        "sounds": [
+          { "time": 0, "sound": "rfe_builtin:item.generic.revolver.gate.close" },
+          { "time": 14, "sound": "rfe_builtin:item.generic.revolver.hammer.cocked" }
+        ]
+      }
+    ]
+  },
+  "unload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
+        "time": 20,
+        "sounds": [
+          { "time": 0, "sound": "rfe_builtin:item.generic.revolver.gate.open" },
+          { "time": 14, "sound": "rfe_builtin:item.generic.revolver.hammer.cocked" }
+        ]
+      },
+      {
+        "phase": "unload",
+        "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
+        "time": 18,
+        "unload_type": "rounds",
+        "unload_delay": 11,
+        "end_unload": true,
+        "sounds": [
+          { "time": 9, "sound": "rfe_builtin:item.generic.revolver.bullet.unload" }
+        ]
+      },
+      {
+        "phase": "finish",
+        "time": 20,
+        "sounds": [
+          { "time": 0, "sound": "rfe_builtin:item.generic.revolver.gate.close" },
+          { "time": 14, "sound": "rfe_builtin:item.generic.revolver.hammer.cocked" }
+        ]
+      }
+    ]
+  },
+  "charge": {
+    "actions": [
+      {
+        "condition": { "macro": "rfe_builtin:can_charge" },
+        "time": 6,
+        "cycle_magazine": true,
+        "sound": "rfe_builtin:item.generic.revolver.hammer.cocked"
+      }
+    ]
+  },
+  "modes": {
+    "fan_fire": {
+      "aiming": {
+        "can_aim": false
+      },
+      "firing": {
+        "fire_mode": "single_action",
+        "cooldown": 2,
+        "charging_behavior": "auto",
+        "slamfire": true,
+        "sound": "rfe_builtin:item.generic.revolver.shot"
+      },
+      "charge": {
+        "actions": [
+          {
+            "condition": { "macro": "rfe_builtin:can_charge" },
+            "time": 3,
+            "cycle_magazine": true,
+            "sound": "rfe_builtin:item.generic.revolver.hammer.cocked"
+          }
+        ]
+      }
+    },
+    "safety": {
+      "firing": {
+        "fire_mode": "safety"
+      },
+      "charge": {
+        "actions": [
+        ]
+      }
+    }
+  }
+}

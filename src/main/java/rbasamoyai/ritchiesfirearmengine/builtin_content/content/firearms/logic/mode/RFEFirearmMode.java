@@ -63,6 +63,7 @@ public class RFEFirearmMode {
     @Nullable protected final SoundEvent modeChangeSound;
 
     // Aiming
+    protected final boolean canAim;
     protected final int aimTime;
     protected final int unaimTime;
     @Nullable protected final SoundEvent aimSound;
@@ -136,6 +137,7 @@ public class RFEFirearmMode {
         this.modeChangeTime = builder.modeChangeTime;
         this.modeChangeSound = builder.modeChangeSound;
 
+        this.canAim = builder.canAim;
         this.aimTime = builder.aimTime;
         this.unaimTime = builder.unaimTime;
         this.aimSound = builder.aimSound;
@@ -683,15 +685,19 @@ public class RFEFirearmMode {
 
         if (actionTime > 0)
             return;
+        if (phaseType == ReloadPhase.PhaseType.INDEX)
+            this.indexMagazine(itemStack, entity, phase.indexCount());
         if (phase.chargeFirearm())
             this.finishCharge(itemStack, entity);
         if (phase.ejectMagazine()) {
             ItemStack previousMagazine = this.setMagazine(itemStack, entity, ItemStack.EMPTY);
             RFEItemUtils.addItemToEntity(previousMagazine, entity);
         }
+        // TODO better handling of moving between states, specified via JSON
         if (phaseType == ReloadPhase.PhaseType.PREPARE
                 && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.UNLOAD, false, false, true)
-                && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.RELOAD, false, false, true)) {
+                && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.RELOAD, false, false, true)
+                && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.INDEX, false, false, false)) {
             FirearmDataUtils.cancelReload(itemStack, modeTag);
             return;
         }
@@ -710,12 +716,76 @@ public class RFEFirearmMode {
         }
         if (phaseType == ReloadPhase.PhaseType.RELOAD
                 && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.RELOAD, false, phase.blockMagazineReloads(), false)
+                && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.INDEX, false, false, false)
+                && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.FINISH, false, false, false)) {
+            FirearmDataUtils.cancelReload(itemStack, modeTag);
+            return;
+        }
+        if (phaseType == ReloadPhase.PhaseType.INDEX
+                && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.RELOAD, false, phase.blockMagazineReloads(), false)
+                && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.INDEX, false, false, false)
                 && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.FINISH, false, false, false)) {
             FirearmDataUtils.cancelReload(itemStack, modeTag);
             return;
         }
         if (phaseType == ReloadPhase.PhaseType.FINISH)
             FirearmDataUtils.cancelReload(itemStack, modeTag);
+    }
+
+    public void indexMagazine(ItemStack itemStack, LivingEntity entity, int indexCount) {
+        if (indexCount == 0)
+            return;
+        boolean reverse = indexCount < 0;
+        indexCount = Math.abs(indexCount);
+        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        List<ItemStack> ammoList;
+        if (this.internalCapacity > 0) {
+            ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
+        } else {
+            CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
+            ItemStack magazine = ItemStack.of(magazineTag);
+            if (!(magazine.getItem() instanceof MagazineItem magazineItem))
+                return;
+            ammoList = magazineItem.getStoredAmmo(magazine);
+        }
+        if (ammoList.isEmpty())
+            return;
+
+        int count = indexCount;
+        while (count > 0) {
+            int stripIndex = reverse ? ammoList.size() - 1 : 0;
+            ItemStack strip = ammoList.get(stripIndex);
+            int deductible = Math.min(count, strip.isEmpty() ? 1 : strip.getCount());
+            ItemStack split = strip.isEmpty() ? ItemStack.EMPTY : strip.split(deductible);
+            if (strip.isEmpty())
+                ammoList.remove(stripIndex);
+            int addIndex = reverse ? 0 : ammoList.size();
+            if (split.isEmpty()) {
+                ammoList.add(addIndex, split);
+            } else if (ammoList.isEmpty()) {
+                ammoList.add(split);
+            } else {
+                ItemStack next = ammoList.get(reverse ? 0 : ammoList.size() - 1);
+                if (ItemStack.isSameItemSameTags(next, split)) {
+                    int maxAddable = Math.min(next.getMaxStackSize() - split.getCount(), split.getCount());
+                    next.grow(maxAddable);
+                    split.shrink(maxAddable);
+                }
+                if (!split.isEmpty())
+                    ammoList.add(addIndex, split);
+            }
+            count -= deductible;
+        }
+
+        if (this.internalCapacity > 0) {
+            FirearmDataUtils.saveRounds(modeTag, "InternalRounds", ammoList);
+        } else {
+            CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
+            ItemStack magazine = ItemStack.of(magazineTag);
+            if (magazine.getItem() instanceof MagazineItem magazineItem)
+                magazineItem.writeStoredAmmo(magazine, ammoList);
+            modeTag.put("DetachedMagazine", magazine.save(new CompoundTag()));
+        }
     }
 
     // TODO secondary ammo
@@ -909,9 +979,13 @@ public class RFEFirearmMode {
 
         if (actionTime > 0)
             return;
+        if (phaseType == ReloadPhase.PhaseType.INDEX)
+            this.indexMagazine(itemStack, entity, phase.indexCount());
         if (phase.chargeFirearm())
             this.finishCharge(itemStack, entity);
-        if (phaseType == ReloadPhase.PhaseType.PREPARE && !this.tryRunningUnloadAction(itemStack, entity, ReloadPhase.PhaseType.UNLOAD, false)) {
+        if (phaseType == ReloadPhase.PhaseType.PREPARE
+                && !this.tryRunningUnloadAction(itemStack, entity, ReloadPhase.PhaseType.UNLOAD, false)
+                && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.INDEX, false, false, false)) {
             FirearmDataUtils.cancelUnload(itemStack, modeTag);
             return;
         }
@@ -923,8 +997,16 @@ public class RFEFirearmMode {
         }
         if (phaseType == ReloadPhase.PhaseType.UNLOAD
                 && !this.tryRunningUnloadAction(itemStack, entity, ReloadPhase.PhaseType.UNLOAD, false)
+                && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.INDEX, false, false, false)
                 && !this.tryRunningUnloadAction(itemStack, entity, ReloadPhase.PhaseType.FINISH, false)) {
             FirearmDataUtils.cancelUnload(itemStack, modeTag);
+            return;
+        }
+        if (phaseType == ReloadPhase.PhaseType.INDEX
+                && !this.tryRunningUnloadAction(itemStack, entity, ReloadPhase.PhaseType.UNLOAD, false)
+                && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.INDEX, false, false, false)
+                && !this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.FINISH, false, false, false)) {
+            FirearmDataUtils.cancelReload(itemStack, modeTag);
             return;
         }
         if (phaseType == ReloadPhase.PhaseType.FINISH)
@@ -1058,15 +1140,18 @@ public class RFEFirearmMode {
         if (actionTime > 0)
             return;
 
+        boolean isClientside = entity.level().isClientSide;
+        if (!isClientside && action.cycleMagazine())
+            this.indexMagazine(itemStack, entity, 1);
         this.finishCharge(itemStack, entity);
-        if (!entity.level().isClientSide && action.ejectMagazine()) {
+        if (!isClientside && action.ejectMagazine()) {
             ItemStack previousMagazine = this.setMagazine(itemStack, entity, ItemStack.EMPTY);
             RFEItemUtils.addItemToEntity(previousMagazine, entity);
         }
 
         boolean holdingKey = itemStack.getItem() instanceof HoldAttackKeyInteraction holdAttackKeyInteraction
                 && holdAttackKeyInteraction.isHoldingAttackKey(itemStack, entity);
-        if (!entity.level().isClientSide && this.fireMode == FireMode.SINGLE_ACTION && this.slamfire && holdingKey) {
+        if (!isClientside && this.fireMode == FireMode.SINGLE_ACTION && this.slamfire && holdingKey) {
             this.fireFirearm(itemStack, entity, FiringType.AUTOMATIC);
         } else {
             FirearmDataUtils.setAction(itemStack, null);
@@ -1086,7 +1171,8 @@ public class RFEFirearmMode {
             if (nextAmmoStack.isEmpty())
                 this.setCharged(itemStack, entity, false);
         }
-        if (!this.plusOneCapacity && this.getNextRoundsInItem(itemStack, entity, 1, false).isEmpty())
+        List<ItemStack> nextRound = this.getNextRoundsInItem(itemStack, entity, 1, false);
+        if (!this.plusOneCapacity && nextRound.isEmpty())
             this.setCharged(itemStack, entity, false);
         if (this.canOverheat) {
             float heat = FirearmDataUtils.getHeat(modeTag);
@@ -1094,7 +1180,6 @@ public class RFEFirearmMode {
             heat = Math.max(0, heat);
             FirearmDataUtils.setHeat(modeTag, heat);
         }
-        // TODO cyclical charging; return item to bottom
         ItemStack chamberedRound = this.getChamberedRound(itemStack);
         if (!chamberedRound.isEmpty()) {
             boolean valid = false;
@@ -1203,6 +1288,8 @@ public class RFEFirearmMode {
     }
 
     public boolean canAim(ItemStack itemStack, LivingEntity entity) {
+        if (!this.canAim)
+            return false;
         RFEFirearmItem.Action action = FirearmDataUtils.getAction(itemStack);
         if (action != null && !action.canAim())
             return false;
@@ -1212,6 +1299,11 @@ public class RFEFirearmMode {
     }
 
     public void startAiming(ItemStack itemStack, LivingEntity entity) {
+        if (!this.canAim) {
+            FirearmDataUtils.setAiming(itemStack, false);
+            this.setAimingTime(itemStack, entity, 0);
+            return;
+        }
         FirearmDataUtils.setAiming(itemStack, true);
         int currentUnaimingTime = this.getAimingTime(itemStack, entity);
         float frac = this.unaimTime == 0 ? 0 : (float) currentUnaimingTime / (float) this.unaimTime;
@@ -1223,7 +1315,11 @@ public class RFEFirearmMode {
 
     public void stopAiming(ItemStack itemStack, LivingEntity entity) {
         FirearmDataUtils.setAiming(itemStack, false);
-        int currentAimingTime = this.getAimingTime(itemStack, entity);;
+        if (!this.canAim) {
+            this.setAimingTime(itemStack, entity, 0);
+            return;
+        }
+        int currentAimingTime = this.getAimingTime(itemStack, entity);
         float frac = this.aimTime == 0 ? 0 : (float) currentAimingTime / (float) this.aimTime;
         frac = 1f - frac;
         this.setAimingTime(itemStack, entity, Mth.ceil(this.unaimTime * frac));
@@ -1381,13 +1477,13 @@ public class RFEFirearmMode {
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
         if (this.internalCapacity > 0) {
             List<ItemStack> ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
-            return !ammoList.isEmpty();
+            return RFEItemUtils.countItems(ammoList) > 0;
         } else {
             CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
             ItemStack magazine = ItemStack.of(magazineTag);
             if (magazine.getItem() instanceof MagazineItem magazineItem) {
                 List<ItemStack> ammoList = magazineItem.getStoredAmmo(magazine);
-                return !ammoList.isEmpty();
+                return RFEItemUtils.countItems(ammoList) > 0;
             } else {
                 return false;
             }
@@ -1418,8 +1514,6 @@ public class RFEFirearmMode {
     }
 
     public boolean hasChamberedRound(ItemStack itemStack) {
-        if (!this.isCharged(itemStack))
-            return false;
         if (!this.ammoRequired)
             return true;
         ItemStack chamberedRound = this.getChamberedRound(itemStack);

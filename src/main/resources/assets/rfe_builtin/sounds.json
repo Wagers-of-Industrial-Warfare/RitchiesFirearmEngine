@@ -141,19 +141,19 @@
   "item.generic.musket.cocked": {
     "sounds": [
       {
-        "name": "minecraft:random/click",
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
         "volume": 0.25,
-        "pitch": 1.41
+        "pitch": 0.75
       },
       {
-        "name": "minecraft:random/click",
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
         "volume": 0.25,
-        "pitch": 1.39
+        "pitch": 0.73
       },
       {
-        "name": "minecraft:random/click",
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
         "volume": 0.25,
-        "pitch": 1.38
+        "pitch": 0.71
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.musket.cocked"
@@ -304,7 +304,7 @@
         "pitch": 1.2
       }
     ],
-    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.bullet_reload"
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.bullet.reload"
   },
   "item.generic.pistol.bullet.unload": {
     "sounds": [
@@ -314,7 +314,7 @@
         "pitch": 1.2
       }
     ],
-    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.bullet_unload"
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.bullet.unload"
   },
   "item.generic.pistol.bullets.unload": {
     "sounds": [
@@ -324,7 +324,7 @@
         "pitch": 1.2
       }
     ],
-    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.bullet_unload"
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.bullet.unload"
   },
   "item.generic.pistol.draw": {
     "sounds": [
@@ -456,6 +456,193 @@
     "subtitle": "subtitles.rfe_builtin.item.generic.pistol.shot"
   },
   "item.generic.pistol.unaim": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/aim",
+        "volume": 0.25,
+        "pitch": 0.7
+      }
+    ]
+  },
+  "item.generic.revolver.aim": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/aim",
+        "volume": 0.25,
+        "pitch": 1
+      }
+    ]
+  },
+  "item.generic.revolver.bullet.reload": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/bullet_reload",
+        "volume": 0.25,
+        "pitch": 1.2
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.bullet.reload"
+  },
+  "item.generic.revolver.bullet.unload": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/bullet_unload",
+        "volume": 0.25,
+        "pitch": 1.2
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.bullet.unload"
+  },
+  "item.generic.revolver.bullets.unload": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/bullets_unload",
+        "volume": 0.25,
+        "pitch": 1.2
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.bullet.unload"
+  },
+  "item.generic.revolver.cylinder.indexed": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 0.96
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.cylinder.indexed"
+  },
+  "item.generic.revolver.cylinder.reload": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_reload",
+        "volume": 0.25,
+        "pitch": 1.93
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.cylinder.reload"
+  },
+  "item.generic.revolver.cylinder.reload.full": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_reload_full",
+        "volume": 0.25,
+        "pitch": 1.93
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.cylinder.reload"
+  },
+  "item.generic.revolver.cylinder.unload": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_unload",
+        "volume": 0.25,
+        "pitch": 1.93
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.cylinder.unload"
+  },
+  "item.generic.revolver.draw": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/draw",
+        "volume": 0.25,
+        "pitch": 1
+      },
+      {
+        "name": "rfe_builtin:item/generic/firearm/draw",
+        "volume": 0.25,
+        "pitch": 1.02
+      },
+      {
+        "name": "rfe_builtin:item/generic/firearm/draw",
+        "volume": 0.25,
+        "pitch": 1.04
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.draw"
+  },
+  "item.generic.revolver.gate.close": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 0.91
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 0.88
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 0.87
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.rack"
+  },
+  "item.generic.revolver.gate.open": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 0.96
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 0.93
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 0.92
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.rack"
+  },
+  "item.generic.revolver.hammer.cocked": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 1
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 0.98
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 0.97
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.cocked"
+  },
+  "item.generic.revolver.shot": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/revolver/shot",
+        "volume": 1.0
+      },
+      {
+        "name": "rfe_builtin:item/generic/revolver/shot",
+        "volume": 1.0,
+        "pitch": 0.98
+      },
+      {
+        "name": "rfe_builtin:item/generic/revolver/shot",
+        "volume": 1.0,
+        "pitch": 0.97
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.shot"
+  },
+  "item.generic.revolver.unaim": {
     "sounds": [
       {
         "name": "rfe_builtin:item/generic/firearm/aim",

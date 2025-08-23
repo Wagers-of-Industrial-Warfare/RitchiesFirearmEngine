@@ -25,8 +25,13 @@ public class RFEProjectileUtils {
         for (Entity entity1 : level.getEntities((Entity) null, boundingBox, filter)) {
             AABB aabb = entity1.getBoundingBox().inflate(inflation);
             Optional<Vec3> optional = aabb.clip(start, end);
-            if (optional.isEmpty())
-                continue;
+            if (optional.isEmpty()) {
+                if (aabb.contains(start)) {
+                    optional = Optional.of(start);
+                } else {
+                    continue;
+                }
+            }
             Vec3 pos1 = optional.get();
             double d1 = start.distanceToSqr(pos1);
             if (d1 > d0)

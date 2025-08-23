@@ -27,6 +27,7 @@ public class RFEFirearmModeBuilder {
     @Nullable
     protected SoundEvent modeChangeSound = null;
 
+    protected boolean canAim = true;
     protected int aimTime = -1;
     protected int unaimTime = -1;
     @Nullable
@@ -112,6 +113,7 @@ public class RFEFirearmModeBuilder {
         newBuilder.modeChangeTime = this.modeChangeTime;
         newBuilder.modeChangeSound = this.modeChangeSound;
 
+        newBuilder.canAim = this.canAim;
         newBuilder.aimTime = this.aimTime;
         newBuilder.unaimTime = this.unaimTime;
         newBuilder.aimSound = this.aimSound;
@@ -215,6 +217,11 @@ public class RFEFirearmModeBuilder {
 
     public RFEFirearmModeBuilder modeChangeSound(SoundEvent modeChangeSound) {
         this.modeChangeSound = modeChangeSound;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder canAim(boolean canAim) {
+        this.canAim = canAim;
         return this;
     }
 
@@ -570,6 +577,7 @@ public class RFEFirearmModeBuilder {
         if (!this.reloadPhases.isEmpty()) {
             Set<ReloadPhase.PhaseType> absentReloadPhaseTypes = EnumSet.allOf(ReloadPhase.PhaseType.class);
             absentReloadPhaseTypes.remove(ReloadPhase.PhaseType.UNLOAD);
+            absentReloadPhaseTypes.remove(ReloadPhase.PhaseType.INDEX);
             for (ReloadPhase phase : this.reloadPhases) {
                 this.finalReloadPhases.computeIfAbsent(phase.phaseType(), $ -> new LinkedList<>()).add(phase);
                 absentReloadPhaseTypes.remove(phase.phaseType());
@@ -580,6 +588,7 @@ public class RFEFirearmModeBuilder {
         if (!this.unloadPhases.isEmpty()) {
             Set<ReloadPhase.PhaseType> absentUnloadPhaseTypes = EnumSet.allOf(ReloadPhase.PhaseType.class);
             absentUnloadPhaseTypes.remove(ReloadPhase.PhaseType.RELOAD);
+            absentUnloadPhaseTypes.remove(ReloadPhase.PhaseType.INDEX);
             for (ReloadPhase phase : this.unloadPhases) {
                 this.finalUnloadPhases.computeIfAbsent(phase.phaseType(), $ -> new LinkedList<>()).add(phase);
                 absentUnloadPhaseTypes.remove(phase.phaseType());

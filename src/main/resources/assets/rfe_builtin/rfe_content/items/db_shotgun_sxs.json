@@ -112,6 +112,11 @@
   },
   "charge": {
     "actions": [
+      {
+        "condition": { "macro": "rfe_builtin:can_charge" },
+        "time": 1,
+        "sound": "rfe_builtin:item.generic.shotgun.break_action.close"
+      }
     ]
   },
   "modes": {

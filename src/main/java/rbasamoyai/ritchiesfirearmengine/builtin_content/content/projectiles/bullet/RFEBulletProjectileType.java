@@ -104,7 +104,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             RandomSource random = entity.getRandom();
             Vec3 smokePos = spawnPos.add(aimDir.scale(RFEItemLengths.getItemLength(itemStack, entity)));
             double speed = Math.sqrt(this.smoke);
-            double spawnDispersion = Math.max(this.smoke * 0.15, 1);
+            double spawnDispersion = Math.min(this.smoke * 0.15, 1);
             ParticleOptions option = new BlackPowderSmokeOptions(this.smoke);
             for (int i = 0; i < 10; ++i) {
                 double sx = smokePos.x + (random.nextDouble() - random.nextDouble()) * spawnDispersion;

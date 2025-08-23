@@ -39,6 +39,7 @@ public class ReloadPhase {
     protected final boolean firstReloadOnly;
     protected final Int2IntOpenHashMap reloadDelays;
     protected final int reloadMagTime;
+    protected final int indexCount;
     protected final ImmutableMultimap<Integer, SoundEvent> soundTimeline;
 
     public ReloadPhase(Builder builder) {
@@ -55,6 +56,7 @@ public class ReloadPhase {
         this.firstReloadOnly = builder.firstReloadOnly;
         this.reloadDelays = builder.finalMultipleReloadDelays;
         this.reloadMagTime = builder.reloadMagTime;
+        this.indexCount = builder.indexCount;
         this.soundTimeline = ImmutableMultimap.<Integer, SoundEvent>builder().putAll(builder.soundTimeline).build();
     }
 
@@ -83,6 +85,7 @@ public class ReloadPhase {
     public int reloadsAtTime(int time) { return this.reloadDelays.getOrDefault(time, 0); }
 
     public int reloadMagazineTime() { return this.reloadMagTime; }
+    public int indexCount() { return this.indexCount; }
 
     public static ReloadPhase fromJson(JsonObject obj, boolean unload) {
         Builder builder = new Builder(unload);
@@ -92,7 +95,7 @@ public class ReloadPhase {
         PhaseType phaseType = unload ? PhaseType.byIdUnload(phaseTypeString) : PhaseType.byId(phaseTypeString);
         if (phaseType == null)
             throw new JsonParseException("Invalid " + reloadKey + " phase type '" + phaseTypeString + "', must be one of 'prepare', "
-                    + (unload ? "'unload'" : "'reload', 'unload'") + ", 'finish'");
+                    + (unload ? "'unload'" : "'reload', 'unload'") + ", 'index', 'finish'");
         builder.phaseType(phaseType);
 
         if (GsonHelper.isObjectNode(obj, "condition")) {
@@ -167,6 +170,9 @@ public class ReloadPhase {
                     builder.reloadMagTime(value);
                 }
             }
+        } else if (phaseType == PhaseType.INDEX) {
+            int indexCount = GsonHelper.getAsInt(obj, "index_count");
+            builder.indexCount(indexCount);
         }
         return builder.build();
     }
@@ -175,6 +181,7 @@ public class ReloadPhase {
         PREPARE,
         RELOAD,
         UNLOAD,
+        INDEX,
         FINISH;
 
         private static final Map<String, PhaseType> BY_ID = Arrays.stream(values())
@@ -230,6 +237,7 @@ public class ReloadPhase {
         protected List<Integer> multipleReloadDelays = new ArrayList<>();
         protected Int2IntOpenHashMap finalMultipleReloadDelays = new Int2IntOpenHashMap();
         protected int reloadMagTime = -1;
+        protected int indexCount = 0;
         protected Multimap<Integer, SoundEvent> soundTimeline = HashMultimap.create();
 
         public Builder(boolean unload) {
@@ -328,6 +336,13 @@ public class ReloadPhase {
             return this;
         }
 
+        public Builder indexCount(int indexCount) {
+            if (indexCount == 0)
+                throw new IllegalStateException("Cannot set index count to 0");
+            this.indexCount = indexCount;
+            return this;
+        }
+
         public Builder sound(int time, SoundEvent sound) {
             if (time < 0)
                 throw new IllegalStateException("Cannot have sound event time less than 0");
@@ -387,6 +402,9 @@ public class ReloadPhase {
                         throw new IllegalStateException("Cannot have " + this.mode + " magazine time greater than phase time (time was "
                                 + this.reloadMagTime + ", time was " + this.time + ")");
                 }
+            } else if (this.phaseType == PhaseType.INDEX) {
+                if (this.indexCount == 0)
+                    throw new IllegalStateException("Must set index count to a non-zero integer (positive or negative)");
             } else {
                 if (this.reloadType != null)
                     RitchiesFirearmEngine.LOGGER.warn("Ignoring {} phase {} type '{}' in non-{} phase '{}'",

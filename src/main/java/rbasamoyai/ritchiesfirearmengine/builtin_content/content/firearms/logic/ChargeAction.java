@@ -21,12 +21,15 @@ public class ChargeAction {
     protected final FirearmCondition firearmCondition;
     protected final int time;
     protected final boolean ejectMagazine;
+    protected final boolean cycleMagazine;
     protected final ImmutableMultimap<Integer, SoundEvent> soundTimeline;
 
-    public ChargeAction(FirearmCondition firearmCondition, int time, boolean ejectMagazine, ImmutableMultimap<Integer, SoundEvent> soundTimeline) {
+    public ChargeAction(FirearmCondition firearmCondition, int time, boolean ejectMagazine, boolean cycleMagazine,
+                        ImmutableMultimap<Integer, SoundEvent> soundTimeline) {
         this.firearmCondition = firearmCondition;
         this.time = time;
         this.ejectMagazine = ejectMagazine;
+        this.cycleMagazine = cycleMagazine;
         this.soundTimeline = soundTimeline;
     }
 
@@ -46,6 +49,7 @@ public class ChargeAction {
     public int time() { return this.time; }
 
     public boolean ejectMagazine() { return this.ejectMagazine; }
+    public boolean cycleMagazine() { return this.cycleMagazine; }
 
     public static ChargeAction fromJson(JsonObject obj) {
         FirearmCondition condition = GsonHelper.isObjectNode(obj, "condition") ? FirearmCondition.fromJson(obj.getAsJsonObject("condition"), true)
@@ -71,7 +75,8 @@ public class ChargeAction {
             }
         }
         boolean ejectMagazine = GsonHelper.getAsBoolean(obj, "eject_magazine", false);
-        return new ChargeAction(condition, time, ejectMagazine, soundTimeline.build());
+        boolean cycleMagazine = GsonHelper.getAsBoolean(obj, "cycle_magazine", false);
+        return new ChargeAction(condition, time, ejectMagazine, cycleMagazine, soundTimeline.build());
     }
 
 }

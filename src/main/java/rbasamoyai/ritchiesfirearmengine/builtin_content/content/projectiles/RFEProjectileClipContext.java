@@ -5,6 +5,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -33,16 +34,21 @@ public class RFEProjectileClipContext extends ClipContext {
 
     @Override
     public VoxelShape getBlockShape(BlockState state, BlockGetter level, BlockPos pos) {
+        VoxelShape blockShape = super.getBlockShape(state, level, pos);
+
         if (RFEConfig.SERVER.enableBlockPenetration.get() && this.instance.health() > 0f) {
-            RFEProjectilePenetrationProperties penetrationProperties = this.type.getPenetrationProperties();
-            RFEProjectilePenetrationProperties.PenetrationStats blockPenetration = penetrationProperties.getBlockPenetrationStats(state);
-            if (this.instance.health() >= blockPenetration.bulletDamage() && this.random.nextFloat() < blockPenetration.chance()) {
-                this.penetratedBlocks.put(pos.immutable(), state);
-                this.instance.removeHealth(blockPenetration.bulletDamage());
-                return Shapes.empty();
+            BlockHitResult hitResult = blockShape.clip(this.getFrom(), this.getTo(), pos);
+            if (hitResult != null) {
+                RFEProjectilePenetrationProperties penetrationProperties = this.type.getPenetrationProperties();
+                RFEProjectilePenetrationProperties.PenetrationStats blockPenetration = penetrationProperties.getBlockPenetrationStats(state);
+                if (this.instance.health() >= blockPenetration.bulletDamage() && this.random.nextFloat() < blockPenetration.chance()) {
+                    this.penetratedBlocks.put(pos.immutable(), state);
+                    this.instance.removeHealth(blockPenetration.bulletDamage());
+                    return Shapes.empty();
+                }
             }
         }
-        return super.getBlockShape(state, level, pos);
+        return blockShape;
     }
 
 }

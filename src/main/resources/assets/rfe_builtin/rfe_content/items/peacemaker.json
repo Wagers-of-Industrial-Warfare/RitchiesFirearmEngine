@@ -29,6 +29,26 @@
         "phase": "prepare",
         "condition": {
           "and": [
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
+          ]
+        },
+        "time": 20,
+        "sounds": [
+          { "time": 0, "sound": "rfe_builtin:item.generic.revolver.gate.open" },
+          { "time": 14, "sound": "rfe_builtin:item.generic.revolver.hammer.cocked" }
+        ],
+        "accessible_phases": {
+          "index": { "include": [3] },
+          "reload": { "include": [1] },
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "prepare",
+        "condition": {
+          "and": [
             { "macro": "rfe_builtin:can_load_1" },
             { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
           ]
@@ -37,24 +57,6 @@
         "sounds": [
           { "time": 0, "sound": "rfe_builtin:item.generic.revolver.gate.open" },
           { "time": 14, "sound": "rfe_builtin:item.generic.revolver.hammer.cocked" }
-        ]
-      },
-      {
-        "phase": "reload",
-        "condition": {
-          "and": [
-            { "macro": "rfe_builtin:can_load_1" },
-            { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 },
-            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than_or_equal_to", "value": 1 }
-          ]
-        },
-        "time": 18,
-        "reload_type": "rounds",
-        "reload_count": 1,
-        "reload_delay": 14,
-        "sounds": [
-          { "time": 8, "sound": "rfe_builtin:item.generic.revolver.bullet.unload" },
-          { "time": 12, "sound": "rfe_builtin:item.generic.revolver.bullet.reload" }
         ]
       },
       {
@@ -70,22 +72,127 @@
         "index_count": 1,
         "sounds": [
           { "time": 2, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" }
-        ]
+        ],
+        "accessible_phases": {
+          "index": { "include": [0] },
+          "reload": { "include": [1] },
+          "finish": "all"
+        }
       },
       {
         "phase": "index",
         "condition": {
           "and": [
-            { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 },
-            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than", "value": 6 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than", "value": 0 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than", "value": 5 },
+            { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
             { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "equals", "value": 0 }
           ]
         },
-        "time": 5,
+        "time": 2,
         "index_count": 1,
         "sounds": [
+          { "time": 1, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" }
+        ],
+        "accessible_phases": {
+          "index": { "include": [2] },
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "index",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than", "value": 6 },
+            { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 }
+          ]
+        },
+        "time": 2,
+        "index_count": 1,
+        "sounds": [
+          { "time": 1, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" }
+        ],
+        "accessible_phases": {
+          "index": { "include": [2] },
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "index",
+        "time": 5,
+        "index_count": -1,
+        "sounds": [
           { "time": 2, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" }
-        ]
+        ],
+        "accessible_phases": {
+          "index": { "include": [0, 1] },
+          "reload": { "include": [1] },
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 6 },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than_or_equal_to", "value": 6 }
+          ]
+        },
+        "time": 70,
+        "reload_type": "rounds",
+        "reload_count": 6,
+        "reload_delays": [42, 47, 52, 57, 62, 67],
+        "sounds": [
+          { "time": 5, "sound": "rfe_builtin:item.generic.revolver.bullet.unload" },
+          { "time": 7, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" },
+          { "time": 10, "sound": "rfe_builtin:item.generic.revolver.bullet.unload" },
+          { "time": 12, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" },
+          { "time": 15, "sound": "rfe_builtin:item.generic.revolver.bullet.unload" },
+          { "time": 17, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" },
+          { "time": 20, "sound": "rfe_builtin:item.generic.revolver.bullet.unload" },
+          { "time": 22, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.revolver.bullet.unload" },
+          { "time": 27, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" },
+          { "time": 30, "sound": "rfe_builtin:item.generic.revolver.bullet.unload" },
+          { "time": 32, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.revolver.bullet.reload" },
+          { "time": 42, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" },
+          { "time": 45, "sound": "rfe_builtin:item.generic.revolver.bullet.reload" },
+          { "time": 47, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" },
+          { "time": 50, "sound": "rfe_builtin:item.generic.revolver.bullet.reload" },
+          { "time": 52, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.revolver.bullet.reload" },
+          { "time": 57, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" },
+          { "time": 60, "sound": "rfe_builtin:item.generic.revolver.bullet.reload" },
+          { "time": 62, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" },
+          { "time": 65, "sound": "rfe_builtin:item.generic.revolver.bullet.reload" },
+          { "time": 67, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" }
+        ],
+        "accessible_phases": {
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1" },
+            { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than_or_equal_to", "value": 1 }
+          ]
+        },
+        "time": 15,
+        "reload_type": "rounds",
+        "reload_count": 1,
+        "reload_delay": 14,
+        "sounds": [
+          { "time": 8, "sound": "rfe_builtin:item.generic.revolver.bullet.unload" },
+          { "time": 12, "sound": "rfe_builtin:item.generic.revolver.bullet.reload" }
+        ],
+        "accessible_phases": {
+          "index": { "include": [0, 1] },
+          "finish": "all"
+        }
       },
       {
         "phase": "finish",
@@ -115,10 +222,12 @@
         "time": 18,
         "unload_type": "rounds",
         "unload_delay": 11,
-        "end_unload": true,
         "sounds": [
           { "time": 9, "sound": "rfe_builtin:item.generic.revolver.bullet.unload" }
-        ]
+        ],
+        "accessible_phases": {
+          "finish": "all"
+        }
       },
       {
         "phase": "finish",
@@ -142,6 +251,10 @@
   },
   "modes": {
     "fan_fire": {
+      "drawing": {
+        "draw_time": 5,
+        "sound": "rfe_builtin:item.generic.revolver.draw"
+      },
       "aiming": {
         "can_aim": false
       },

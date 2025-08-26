@@ -580,8 +580,7 @@
         "volume": 0.25,
         "pitch": 0.87
       }
-    ],
-    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.rack"
+    ]
   },
   "item.generic.revolver.gate.open": {
     "sounds": [
@@ -600,8 +599,7 @@
         "volume": 0.25,
         "pitch": 0.92
       }
-    ],
-    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.rack"
+    ]
   },
   "item.generic.revolver.hammer.cocked": {
     "sounds": [

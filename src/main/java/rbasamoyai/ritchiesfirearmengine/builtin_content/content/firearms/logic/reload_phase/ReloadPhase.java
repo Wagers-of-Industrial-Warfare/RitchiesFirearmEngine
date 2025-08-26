@@ -1,6 +1,7 @@
-package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic;
+package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonArray;
@@ -16,6 +17,7 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.CompareValueSource;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.condition.FirearmCondition;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
@@ -34,13 +36,11 @@ public class ReloadPhase {
     protected final ReloadType reloadType;
     protected final boolean ammoAddedLast;
     protected final boolean replaceChamberedRound;
-    protected final boolean blockMagazineReloads;
-    protected final boolean endReload;
-    protected final boolean firstReloadOnly;
     protected final Int2IntOpenHashMap reloadDelays;
     protected final int reloadMagTime;
     protected final int indexCount;
     protected final ImmutableMultimap<Integer, SoundEvent> soundTimeline;
+    protected final ImmutableMap<PhaseType, ReloadPhaseAccessFilter> accessiblePhases;
 
     public ReloadPhase(Builder builder) {
         this.phaseType = builder.phaseType;
@@ -51,13 +51,11 @@ public class ReloadPhase {
         this.reloadType = builder.reloadType;
         this.ammoAddedLast = builder.ammoAddedLast;
         this.replaceChamberedRound = builder.replaceChamberedRound;
-        this.blockMagazineReloads = builder.blockMagazineReloads;
-        this.endReload = builder.endReload;
-        this.firstReloadOnly = builder.firstReloadOnly;
         this.reloadDelays = builder.finalMultipleReloadDelays;
         this.reloadMagTime = builder.reloadMagTime;
         this.indexCount = builder.indexCount;
-        this.soundTimeline = ImmutableMultimap.<Integer, SoundEvent>builder().putAll(builder.soundTimeline).build();
+        this.soundTimeline = ImmutableMultimap.copyOf(builder.soundTimeline);
+        this.accessiblePhases = ImmutableMap.copyOf(builder.accessiblePhases);
     }
 
     public void playEffects(ItemStack itemStack, LivingEntity entity, int time) {
@@ -79,10 +77,11 @@ public class ReloadPhase {
     public ReloadType reloadType() { return this.reloadType; }
     public boolean ammoAddedLast() { return this.ammoAddedLast; }
     public boolean replaceChamberedRound() { return this.replaceChamberedRound; }
-    public boolean blockMagazineReloads() { return this.blockMagazineReloads; }
-    public boolean endReload() { return this.endReload; }
-    public boolean firstReloadOnly() { return this.firstReloadOnly; }
     public int reloadsAtTime(int time) { return this.reloadDelays.getOrDefault(time, 0); }
+
+    public ReloadPhaseAccessFilter accessiblePhases(PhaseType type) {
+        return this.accessiblePhases.getOrDefault(type, ReloadPhaseAccessFilter.ExcludeAll.INSTANCE);
+    }
 
     public int reloadMagazineTime() { return this.reloadMagTime; }
     public int indexCount() { return this.indexCount; }
@@ -136,15 +135,7 @@ public class ReloadPhase {
             if (reloadType == null)
                 throw new JsonParseException("Invalid " + subactionKey + " type '" + reloadTypeString +
                         "', must be one of 'rounds', 'magazines', " + (phaseType == PhaseType.UNLOAD ? "" : "'speedloaders', ") + "'secondaries'");
-            boolean endReload = GsonHelper.getAsBoolean(obj, "end_" + reloadKey, false);
-            boolean blockMagazineReloads = phaseType == PhaseType.RELOAD && GsonHelper.getAsBoolean(obj, "block_magazine_reloads", true);
-            builder.reloadType(reloadType)
-                    .endReload(endReload)
-                    .blockMagazineReloads(blockMagazineReloads);
-            if (phaseType == PhaseType.RELOAD) {
-                boolean firstReloadOnly = GsonHelper.getAsBoolean(obj, "first_reload_only", false);
-                builder.firstReloadOnly(firstReloadOnly);
-            }
+            builder.reloadType(reloadType);
             if (reloadType != ReloadType.MAGAZINES) {
                 int reloadCount = obj.has(subactionKey + "_count") ? GsonHelper.getAsInt(obj, subactionKey + "_count") : 1;
                 boolean ammoAddedLast = GsonHelper.getAsBoolean(obj, phaseType == PhaseType.RELOAD ? "ammo_added_last" : "ammo_removed_last", false);
@@ -173,6 +164,26 @@ public class ReloadPhase {
         } else if (phaseType == PhaseType.INDEX) {
             int indexCount = GsonHelper.getAsInt(obj, "index_count");
             builder.indexCount(indexCount);
+        }
+
+        if (phaseType != PhaseType.FINISH && GsonHelper.isObjectNode(obj, "accessible_phases")) {
+            JsonObject accessiblePhases = obj.getAsJsonObject("accessible_phases");
+            for (PhaseType ptype : PhaseType.values()) {
+                if (ptype == PhaseType.PREPARE || unload && ptype == PhaseType.RELOAD)
+                    continue;
+                String id = ptype.getSerializedName();
+                if (accessiblePhases.has(id)) {
+                    builder.accessiblePhases.put(ptype, ReloadPhaseAccessFilter.fromJson(accessiblePhases.get(id)));
+                } else {
+                    builder.accessiblePhases.put(ptype, ReloadPhaseAccessFilter.ExcludeAll.INSTANCE);
+                }
+            }
+        } else {
+            for (PhaseType ptype : PhaseType.values()) {
+                if (ptype == PhaseType.PREPARE || unload && ptype == PhaseType.RELOAD)
+                    continue;
+                builder.accessiblePhases.put(ptype, ReloadPhaseAccessFilter.IncludeAll.INSTANCE);
+            }
         }
         return builder.build();
     }
@@ -231,14 +242,12 @@ public class ReloadPhase {
         protected int reloadCount = 1;
         protected boolean ammoAddedLast = false;
         protected boolean replaceChamberedRound = false;
-        protected boolean blockMagazineReloads = false;
-        protected boolean endReload = false;
-        protected boolean firstReloadOnly = false;
         protected List<Integer> multipleReloadDelays = new ArrayList<>();
         protected Int2IntOpenHashMap finalMultipleReloadDelays = new Int2IntOpenHashMap();
         protected int reloadMagTime = -1;
         protected int indexCount = 0;
         protected Multimap<Integer, SoundEvent> soundTimeline = HashMultimap.create();
+        protected Map<PhaseType, ReloadPhaseAccessFilter> accessiblePhases = new EnumMap<>(PhaseType.class);
 
         public Builder(boolean unload) {
             this.unload = unload;
@@ -309,12 +318,6 @@ public class ReloadPhase {
             this.replaceChamberedRound = replaceChamberedRound;
             return this;
         }
-
-        public Builder blockMagazineReloads(boolean blockMagazineReloads) { this.blockMagazineReloads = blockMagazineReloads; return this; }
-
-        public Builder endReload(boolean endReload) { this.endReload = endReload; return this; }
-
-        public Builder firstReloadOnly(boolean firstReloadOnly) { this.firstReloadOnly = firstReloadOnly; return this; }
 
         public Builder reloadDelays(List<Integer> delays) {
             if (this.setSingleDelay)

@@ -98,10 +98,12 @@
         "unload_count": 1,
         "unload_delay": 12,
         "ammo_removed_last": true,
-        "end_unload": true,
         "sounds": [
           { "time": 10, "sound": "rfe_builtin:item.generic.shotgun.unload.shell" }
-        ]
+        ],
+        "accessible_phases": {
+          "finish": "all"
+        }
       },
       {
         "phase": "finish",
@@ -201,10 +203,12 @@
             "unload_count": 1,
             "unload_delay": 12,
             "ammo_removed_last": false,
-            "end_unload": true,
             "sounds": [
               { "time": 10, "sound": "rfe_builtin:item.generic.shotgun.unload.shell" }
-            ]
+            ],
+            "accessible_phases": {
+              "finish": "all"
+            }
           },
           {
             "phase": "finish",

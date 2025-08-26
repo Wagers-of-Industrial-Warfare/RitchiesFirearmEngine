@@ -146,11 +146,11 @@ public class RFEProjectilePenetrationHandler {
 
         public RFEProjectilePenetrationProperties build() {
             return new RFEProjectilePenetrationProperties(this.defaultEntityPenetration,
-                    ImmutableMap.<RFEEntityTypePredicate, PenetrationStats>builder().putAll(this.entityPenetration).build(),
+                    ImmutableMap.copyOf(this.entityPenetration),
                     this.defaultBlockPenetration,
-                    ImmutableMap.<RFEBlockPredicate, PenetrationStats>builder().putAll(this.blockPenetration).build(),
+                    ImmutableMap.copyOf(this.blockPenetration),
                     this.defaultBlockBreaking,
-                    ImmutableMap.<RFEBlockPredicate, PenetrationStats>builder().putAll(this.blockBreaking).build());
+                    ImmutableMap.copyOf(this.blockBreaking));
         }
     }
 

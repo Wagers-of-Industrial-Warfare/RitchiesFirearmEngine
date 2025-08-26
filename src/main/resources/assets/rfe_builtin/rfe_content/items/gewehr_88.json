@@ -60,7 +60,10 @@
           ]
         },
         "time": 11,
-        "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_start"
+        "sound": "rfe_builtin:item.generic.rifle.bolt_cycle_start",
+        "accessible_phases": {
+          "reload": "all"
+        }
       },
       {
         "phase": "unload",
@@ -69,7 +72,11 @@
         "unload_type": "rounds",
         "unload_count": 1,
         "unload_time": 1,
-        "sound": "rfe_builtin:item.generic.rifle.bullet_unload"
+        "sound": "rfe_builtin:item.generic.rifle.bullet_unload",
+        "accessible_phases": {
+          "unload": "all",
+          "reload": "all"
+        }
       },
       {
         "phase": "unload",
@@ -84,7 +91,11 @@
         "unload_time": 16,
         "sounds": [
           { "time": 14, "sound": "rfe_builtin:item.generic.firearm.en_bloc.remove" }
-        ]
+        ],
+        "accessible_phases": {
+          "unload": "all",
+          "reload": "all"
+        }
       },
       {
         "phase": "reload",
@@ -97,10 +108,14 @@
         "time": 22,
         "reload_type": "magazines",
         "reload_time": 16,
-        "end_reload": true,
         "sounds": [
           { "time": 14, "sound": "rfe_builtin:item.generic.firearm.en_bloc.insert" }
-        ]
+        ],
+        "accessible_phases": {
+          "unload": "none",
+          "reload": "none",
+          "finish": "all"
+        }
       },
       {
         "phase": "reload",
@@ -116,10 +131,14 @@
         "reload_count": 1,
         "reload_delay": 12,
         "replace_chambered_round": true,
-        "end_reload": true,
         "sounds": [
           { "time": 10, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" }
-        ]
+        ],
+        "accessible_phases": {
+          "unload": "none",
+          "reload": "none",
+          "finish": "all"
+        }
       },
       {
         "phase": "finish",

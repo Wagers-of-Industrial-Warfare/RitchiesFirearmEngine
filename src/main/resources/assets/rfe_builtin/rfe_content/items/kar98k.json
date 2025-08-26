@@ -54,7 +54,11 @@
         "reload_count": 5,
         "reload_delay": 20,
         "replace_chambered_round": true,
-        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds"
+        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds",
+        "accessible_phases": {
+          "reload": { "exclude": [8] },
+          "finish": "all"
+        }
       },
       {
         "phase": "reload",
@@ -64,7 +68,11 @@
         "reload_count": 4,
         "reload_delay": 20,
         "replace_chambered_round": true,
-        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds"
+        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds",
+        "accessible_phases": {
+          "reload": { "exclude": [8] },
+          "finish": "all"
+        }
       },
       {
         "phase": "reload",
@@ -74,7 +82,11 @@
         "reload_count": 3,
         "reload_delay": 20,
         "replace_chambered_round": true,
-        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds"
+        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds",
+        "accessible_phases": {
+          "reload": { "exclude": [8] },
+          "finish": "all"
+        }
       },
       {
         "phase": "reload",
@@ -84,7 +96,11 @@
         "reload_count": 2,
         "reload_delay": 20,
         "replace_chambered_round": true,
-        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds"
+        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds",
+        "accessible_phases": {
+          "reload": { "exclude": [8] },
+          "finish": "all"
+        }
       },
       {
         "phase": "reload",
@@ -94,7 +110,11 @@
         "reload_count": 1,
         "reload_delay": 20,
         "replace_chambered_round": true,
-        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds"
+        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds",
+        "accessible_phases": {
+          "reload": { "exclude": [8] },
+          "finish": "all"
+        }
       },
       {
         "phase": "reload",
@@ -113,7 +133,11 @@
           { "time": 10, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" },
           { "time": 18, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" },
           { "time": 26, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" }
-        ]
+        ],
+        "accessible_phases": {
+          "reload": { "exclude": [8] },
+          "finish": "all"
+        }
       },
       {
         "phase": "reload",
@@ -131,7 +155,11 @@
         "sounds": [
           { "time": 10, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" },
           { "time": 18, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" }
-        ]
+        ],
+        "accessible_phases": {
+          "reload": { "exclude": [8] },
+          "finish": "all"
+        }
       },
       {
         "phase": "reload",
@@ -148,7 +176,11 @@
         "replace_chambered_round": true,
         "sounds": [
           { "time": 10, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" }
-        ]
+        ],
+        "accessible_phases": {
+          "reload": { "exclude": [8] },
+          "finish": "all"
+        }
       },
       {
         "phase": "reload",
@@ -163,11 +195,12 @@
         "reload_count": 1,
         "reload_delay": 12,
         "replace_chambered_round": true,
-        "first_reload_only": true,
-        "end_reload": true,
         "sounds": [
           { "time": 10, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" }
-        ]
+        ],
+        "accessible_phases": {
+          "finish": "all"
+        }
       },
       {
         "phase": "finish",
@@ -190,8 +223,10 @@
         "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
         "time": 1,
         "unload_type": "rounds",
-        "end_unload": true,
-        "sound": "rfe_builtin:item.generic.rifle.bullet_unload"
+        "sound": "rfe_builtin:item.generic.rifle.bullet_unload",
+        "accessible_phases": {
+          "finish": "all"
+        }
       },
       {
         "phase": "finish",

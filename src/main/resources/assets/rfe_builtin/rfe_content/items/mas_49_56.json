@@ -27,23 +27,32 @@
       {
         "phase": "prepare",
         "condition": {
-          "and": [
+          "or": [
             {
-              "or": [
-                { "macro": "rfe_builtin:can_load_1_detachable" },
-                { "macro": "rfe_builtin:can_load_1_extra_detachable" }
+              "and": [
+                { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 },
+                { "macro": "rfe_builtin:can_load_1_detachable" }
               ]
             },
             {
-              "or": [
+              "and": [
                 { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 },
-                { "compare": "ritchiesfirearmengine:best_speedloader_ammo_count", "operator": "greater_than", "value": 0 }
+                { "macro": "rfe_builtin:can_load_1_extra_detachable" }
               ]
-            }
+            },
+            { "macro": "rfe_builtin:can_strip_5_detachable" },
+            { "macro": "rfe_builtin:can_strip_4_detachable" },
+            { "macro": "rfe_builtin:can_strip_3_detachable" },
+            { "macro": "rfe_builtin:can_strip_2_detachable" },
+            { "macro": "rfe_builtin:can_strip_1_detachable" }
           ]
         },
         "time": 13,
-        "sound": "rfe_builtin:item.generic.rifle.rack_start"
+        "sound": "rfe_builtin:item.generic.rifle.rack_start",
+        "accessible_phases": {
+          "reload": { "exclude": [9] },
+          "finish": { "include": [2] }
+        }
       },
       {
         "phase": "prepare",
@@ -63,32 +72,19 @@
             }
           ]
         },
-        "time": 1
+        "time": 1,
+        "accessible_phases": {
+          "unload": "all",
+          "reload": { "include": [9] },
+          "finish": { "include": [2] }
+        }
       },
       {
         "phase": "unload",
         "condition": {
           "and": [
             { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
-            {
-              "not": {
-                "and": [
-                  {
-                    "or": [
-                      { "macro": "rfe_builtin:can_load_1_detachable" },
-                      { "macro": "rfe_builtin:can_load_1_extra_detachable" }
-                    ]
-                  },
-                  {
-                    "or": [
-                      { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 },
-                      { "compare": "ritchiesfirearmengine:best_speedloader_ammo_count", "operator": "greater_than", "value": 0 }
-                    ]
-                  }
-                ]
-              }
-            }
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 }
           ]
         },
         "time": 30,
@@ -96,66 +92,86 @@
         "unload_time": 20,
         "sounds": [
           { "time": 15, "sound": "rfe_builtin:item.generic.rifle.magazine.unload" }
-        ]
+        ],
+        "accessible_phases": {
+          "unload": "none",
+          "reload": { "include": [9] },
+          "finish": { "include": [2] }
+        }
       },
       {
         "phase": "reload",
-        "condition": {
-          "macro": "rfe_builtin:can_strip_5_detachable"
-        },
+        "condition": { "macro": "rfe_builtin:can_strip_5_detachable" },
         "time": 25,
         "reload_type": "speedloaders",
         "reload_count": 5,
         "replace_chambered_round": true,
-        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds"
+        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds",
+        "accessible_phases": {
+          "unload": "none",
+          "reload": { "exclude": [9] },
+          "finish": { "include": [0] }
+        }
       },
       {
         "phase": "reload",
-        "condition": {
-          "macro": "rfe_builtin:can_strip_4_detachable"
-        },
+        "condition": { "macro": "rfe_builtin:can_strip_4_detachable" },
         "time": 25,
         "reload_type": "speedloaders",
         "reload_count": 4,
         "reload_delay": 20,
         "replace_chambered_round": true,
-        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds"
+        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds",
+        "accessible_phases": {
+          "unload": "none",
+          "reload": { "exclude": [9] },
+          "finish": { "include": [0] }
+        }
       },
       {
         "phase": "reload",
-        "condition": {
-          "macro": "rfe_builtin:can_strip_3_detachable"
-        },
+        "condition": { "macro": "rfe_builtin:can_strip_3_detachable" },
         "time": 25,
         "reload_type": "speedloaders",
         "reload_count": 3,
         "reload_delay": 20,
         "replace_chambered_round": true,
-        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds"
+        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds",
+        "accessible_phases": {
+          "unload": "none",
+          "reload": { "exclude": [9] },
+          "finish": { "include": [0] }
+        }
       },
       {
         "phase": "reload",
-        "condition": {
-          "macro": "rfe_builtin:can_strip_2_detachable"
-        },
+        "condition": { "macro": "rfe_builtin:can_strip_2_detachable" },
         "time": 25,
         "reload_type": "speedloaders",
         "reload_count": 2,
         "reload_delay": 20,
         "replace_chambered_round": true,
-        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds"
+        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds",
+        "accessible_phases": {
+          "unload": "none",
+          "reload": { "exclude": [9] },
+          "finish": { "include": [0] }
+        }
       },
       {
         "phase": "reload",
-        "condition": {
-          "macro": "rfe_builtin:can_strip_1_detachable"
-        },
+        "condition": { "macro": "rfe_builtin:can_strip_1_detachable" },
         "time": 25,
         "reload_type": "speedloaders",
         "reload_count": 1,
         "reload_delay": 20,
         "replace_chambered_round": true,
-        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds"
+        "sound": "rfe_builtin:item.generic.rifle.stripper_clip.5rds",
+        "accessible_phases": {
+          "unload": "none",
+          "reload": { "exclude": [9] },
+          "finish": { "include": [0] }
+        }
       },
       {
         "phase": "reload",
@@ -174,7 +190,12 @@
           { "time": 10, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" },
           { "time": 15, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" },
           { "time": 20, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" }
-        ]
+        ],
+        "accessible_phases": {
+          "unload": "none",
+          "reload": { "exclude": [9] },
+          "finish": { "include": [0] }
+        }
       },
       {
         "phase": "reload",
@@ -192,7 +213,12 @@
         "sounds": [
           { "time": 10, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" },
           { "time": 15, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" }
-        ]
+        ],
+        "accessible_phases": {
+          "unload": "none",
+          "reload": { "exclude": [9] },
+          "finish": { "include": [0] }
+        }
       },
       {
         "phase": "reload",
@@ -209,7 +235,12 @@
         "replace_chambered_round": true,
         "sounds": [
           { "time": 10, "sound": "rfe_builtin:item.generic.rifle.bullet_reload" }
-        ]
+        ],
+        "accessible_phases": {
+          "unload": "none",
+          "reload": { "exclude": [9] },
+          "finish": { "include": [0] }
+        }
       },
       {
         "phase": "reload",
@@ -224,7 +255,12 @@
         "reload_count": 1,
         "reload_delay": 12,
         "replace_chambered_round": true,
-        "sound": "rfe_builtin:item.generic.rifle.bullet_reload"
+        "sound": "rfe_builtin:item.generic.rifle.bullet_reload",
+        "accessible_phases": {
+          "unload": "none",
+          "reload": { "exclude": [9] },
+          "finish": { "include": [0] }
+        }
       },
       {
         "phase": "reload",
@@ -237,16 +273,29 @@
         "time": 28,
         "reload_type": "magazines",
         "reload_time": 15,
-        "end_reload": true,
         "sounds": [
           { "time": 10, "sound": "rfe_builtin:item.generic.rifle.magazine.reload" }
-        ]
+        ],
+        "accessible_phases": {
+          "finish": { "include": [1, 2] }
+        }
       },
       {
         "phase": "finish",
         "time": 13,
         "charge_firearm": true,
         "sound": "rfe_builtin:item.generic.rifle.rack_end"
+      },
+      {
+        "phase": "finish",
+        "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 },
+        "time": 20,
+        "charge_firearm": true,
+        "sound": "rfe_builtin:item.generic.rifle.rack"
+      },
+      {
+        "phase": "finish",
+        "time": 1
       }
     ]
   },

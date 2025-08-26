@@ -110,8 +110,10 @@
         "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
         "time": 1,
         "unload_type": "rounds",
-        "end_unload": true,
-        "sound": "rfe_builtin:item.generic.rifle.bullet_unload"
+        "sound": "rfe_builtin:item.generic.rifle.bullet_unload",
+        "accessible_phases": {
+          "finish": "all"
+        }
       },
       {
         "phase": "finish",

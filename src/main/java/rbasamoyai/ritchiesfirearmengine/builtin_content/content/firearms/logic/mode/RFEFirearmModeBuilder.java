@@ -5,7 +5,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.*;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ChargeAction;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ChargingBehavior;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.CompareValueSource;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FireMode;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhase;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.misfires.RFEMisfire;
 
 import javax.annotation.Nullable;

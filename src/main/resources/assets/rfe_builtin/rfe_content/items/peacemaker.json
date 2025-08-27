@@ -57,7 +57,12 @@
         "sounds": [
           { "time": 0, "sound": "rfe_builtin:item.generic.revolver.gate.open" },
           { "time": 14, "sound": "rfe_builtin:item.generic.revolver.hammer.cocked" }
-        ]
+        ],
+        "accessible_phases": {
+          "index": { "exclude": [3] },
+          "reload": "all",
+          "finish": "all"
+        }
       },
       {
         "phase": "index",

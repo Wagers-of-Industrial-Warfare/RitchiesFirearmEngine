@@ -8,12 +8,12 @@
   "knockback": 0.5,
   "damage_model": [
     {
-      "distance": 30,
-      "damage": 14
+      "distance": 25,
+      "damage": 8
     },
     {
-      "distance": 60,
-      "damage": 8
+      "distance": 100,
+      "damage": 5
     }
   ],
   "damage_type": "rfe_builtin:bullet",

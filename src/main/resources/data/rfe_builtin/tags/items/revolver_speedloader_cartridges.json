@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "#rfe_builtin:pistol_cartridges",
+    "rfe_builtin:black_powder_handgun_cartridge",
+    "rfe_builtin:infinite_black_powder_handgun_cartridge"
+  ]
+}

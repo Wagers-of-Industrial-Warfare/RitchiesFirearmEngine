@@ -119,7 +119,9 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                     builder.burstRoundCount(burstRounds);
                 }
                 boolean canDryFire = GsonHelper.getAsBoolean(firing, "can_dry_fire", false);
-                builder.canDryFire(canDryFire);
+                int slotsCycledAfterFiring = GsonHelper.getAsInt(firing, "slots_cycled_after_firing", 0);
+                builder.canDryFire(canDryFire)
+                        .slotsCycledAfterFiring(slotsCycledAfterFiring);
                 if (canDryFire)
                     this.dryFiringEffects(builder, firing, modeId);
                 if (GsonHelper.isObjectNode(firing, "misfire")) {

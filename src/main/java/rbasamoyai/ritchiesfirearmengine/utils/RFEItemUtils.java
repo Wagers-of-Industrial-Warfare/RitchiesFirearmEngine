@@ -143,7 +143,7 @@ public class RFEItemUtils {
                 continue;
             int ammoCount = countItems(storedAmmo);
             if (ammoCount == bestCount)
-                return itemStack;
+                return take && !itemStack.is(RFEItemTags.INFINITE_AMMO.tag) ? itemStack : itemStack.copy();
             if (ammoCount > bestCount || ammoCount <= largestCount)
                 continue;
             largestCount = ammoCount;

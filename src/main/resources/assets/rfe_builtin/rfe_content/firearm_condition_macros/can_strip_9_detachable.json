@@ -1,0 +1,22 @@
+{
+  "and": [
+    { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+    { "compare": "ritchiesfirearmengine:best_speedloader_ammo_count", "operator": "equals", "value": 9 },
+    {
+      "or": [
+        {
+          "and": [
+            { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 10 }
+          ]
+        },
+        {
+          "and": [
+            { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 9 }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -87,6 +87,7 @@ public class RFEFirearmMode {
     protected final int shotsFired;
     protected final int burstRoundCount;
     protected final boolean slamfire;
+    protected final int slotsCycledAfterFiring;
     @Nullable protected final SoundEvent firingSound;
     protected final float firingSoundRange;
     // Dry fire
@@ -159,6 +160,7 @@ public class RFEFirearmMode {
         this.shotsFired = builder.shotsFired;
         this.burstRoundCount = builder.burstRoundCount;
         this.slamfire = builder.slamfire;
+        this.slotsCycledAfterFiring = builder.slotsCycledAfterFiring;
         this.canDryFire = builder.canDryFire;
         this.firingSound = builder.firingSound;
         this.firingSoundRange = builder.firingSoundRange;
@@ -549,6 +551,7 @@ public class RFEFirearmMode {
             ItemStack previousMagazine = this.setMagazine(itemStack, entity, ItemStack.EMPTY);
             RFEItemUtils.addItemToEntity(previousMagazine, entity);
         }
+        this.indexMagazine(itemStack, entity, this.slotsCycledAfterFiring);
 
         boolean holdingKey = itemStack.getItem() instanceof HoldAttackKeyInteraction holdAttackKeyInteraction
                 && holdAttackKeyInteraction.isHoldingAttackKey(itemStack, entity);

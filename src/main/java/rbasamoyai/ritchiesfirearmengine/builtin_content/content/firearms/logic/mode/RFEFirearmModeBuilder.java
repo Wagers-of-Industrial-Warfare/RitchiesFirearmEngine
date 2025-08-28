@@ -55,6 +55,7 @@ public class RFEFirearmModeBuilder {
     protected int shotsFired = 1;
     protected int burstRoundCount = 3;
     protected boolean slamfire = false;
+    protected int slotsCycledAfterFiring = 0;
     protected boolean canDryFire = false;
     @Nullable
     protected SoundEvent firingSound = null;
@@ -139,6 +140,7 @@ public class RFEFirearmModeBuilder {
         newBuilder.shotsFired = this.shotsFired;
         newBuilder.burstRoundCount = this.burstRoundCount;
         newBuilder.slamfire = this.slamfire;
+        newBuilder.slotsCycledAfterFiring = this.slotsCycledAfterFiring;
         newBuilder.canDryFire = this.canDryFire;
         newBuilder.firingSound = this.firingSound;
         newBuilder.firingSoundRange = this.firingSoundRange;
@@ -360,6 +362,11 @@ public class RFEFirearmModeBuilder {
         return this;
     }
 
+    public RFEFirearmModeBuilder slotsCycledAfterFiring(int slotsCycledAfterFiring) {
+        this.slotsCycledAfterFiring = slotsCycledAfterFiring;
+        return this;
+    }
+
     public RFEFirearmModeBuilder canDryFire(boolean canDryFire) {
         this.canDryFire = canDryFire;
         return this;
@@ -437,6 +444,7 @@ public class RFEFirearmModeBuilder {
         this.shotsFired = 1;
         this.burstRoundCount = 3;
         this.slamfire = false;
+        this.slotsCycledAfterFiring = 0;
         this.firingSound = null;
         this.firingSoundRange = 16;
         this.canDryFire = false;

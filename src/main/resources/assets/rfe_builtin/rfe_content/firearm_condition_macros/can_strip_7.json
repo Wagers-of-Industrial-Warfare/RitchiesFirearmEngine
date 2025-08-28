@@ -1,0 +1,6 @@
+{
+  "and": [
+    { "compare": "ritchiesfirearmengine:best_speedloader_ammo_count", "operator": "equals", "value": 7 },
+    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than_or_equal_to", "value": 7 }
+  ]
+}

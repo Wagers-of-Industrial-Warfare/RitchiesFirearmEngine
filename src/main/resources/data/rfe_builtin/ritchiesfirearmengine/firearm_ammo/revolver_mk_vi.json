@@ -1,0 +1,58 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:handgun_cartridge",
+      "fires": "rfe_builtin:455_webley"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_handgun_cartridge",
+      "fires": "rfe_builtin:455_webley"
+    },
+    {
+      "ammo": "rfe_builtin:black_powder_handgun_cartridge",
+      "fires": "rfe_builtin:455_webley_bp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_black_powder_handgun_cartridge",
+      "fires": "rfe_builtin:455_webley_bp"
+    },
+    {
+      "ammo": "rfe_builtin:tracer_handgun_cartridge",
+      "fires": "rfe_builtin:455_webley_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_tracer_handgun_cartridge",
+      "fires": "rfe_builtin:455_webley_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:sp_handgun_cartridge",
+      "fires": "rfe_builtin:455_webley_sp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_sp_handgun_cartridge",
+      "fires": "rfe_builtin:455_webley_sp"
+    },
+    {
+      "ammo": "rfe_builtin:hp_handgun_cartridge",
+      "fires": "rfe_builtin:455_webley_hp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_hp_handgun_cartridge",
+      "fires": "rfe_builtin:455_webley_hp"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+    "rfe_builtin:revolver_speedloader_6rds",
+    "rfe_builtin:infinite_revolver_speedloader_6rds"
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "modes": {
+  }
+}

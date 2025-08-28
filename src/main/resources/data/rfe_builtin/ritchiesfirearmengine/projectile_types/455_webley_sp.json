@@ -1,0 +1,23 @@
+{
+  "type": "ritchiesfirearmengine:bullet",
+  "muzzle_velocity": 11.5,
+  "drag": 0.0025,
+  "quadratic_drag": true,
+  "gravity": 0.03,
+  "max_age": 400,
+  "knockback": 0.5,
+  "damage_model": [
+    {
+      "distance": 13,
+      "damage": 12.1
+    },
+    {
+      "distance": 33,
+      "damage": 4.5
+    }
+  ],
+  "damage_type": "rfe_builtin:bullet",
+  "hit_multiplier": "rfe_builtin:generic_headshot",
+  "penetration": "rfe_builtin:default",
+  "pass_sound": "rfe_builtin:projectile.generic.whizz"
+}

@@ -473,6 +473,46 @@
       }
     ]
   },
+  "item.generic.revolver.break_action.close": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 1.16
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 1.12
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 1.11
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.break_action.close"
+  },
+  "item.generic.revolver.break_action.open": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 0.85
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 0.83
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 0.81
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.break_action.open"
+  },
   "item.generic.revolver.bullet.reload": {
     "sounds": [
       {
@@ -641,6 +681,35 @@
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.revolver.shot"
+  },
+  "item.generic.revolver.shot1": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot",
+        "volume": 1.23
+      },
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot",
+        "volume": 1.0,
+        "pitch": 1.21
+      },
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot",
+        "volume": 1.0,
+        "pitch": 1.19
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.shot"
+  },
+  "item.generic.revolver.speedloader.reload": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/bullets_unload",
+        "volume": 0.25,
+        "pitch": 0.95
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.speedloader.reload"
   },
   "item.generic.revolver.unaim": {
     "sounds": [

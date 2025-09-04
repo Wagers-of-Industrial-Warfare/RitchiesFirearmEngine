@@ -33,15 +33,17 @@ public class MagazineItem extends Item {
     private final ImmutableList<AmmoPredicate> defaultAmmoPredicates; // Datapackable
     private final ImmutableList<AmmoPredicate> defaultSpeedloaderPredicates; // Datapackable
     private final int reloadCooldown;
+    private final boolean trackEmptySlots;
 
     public MagazineItem(Properties pProperties, boolean glint, int capacity, ImmutableList<AmmoPredicate> defaultAmmoPredicates,
-                        ImmutableList<AmmoPredicate> defaultSpeedloaderPredicates, int reloadCooldown) {
+                        ImmutableList<AmmoPredicate> defaultSpeedloaderPredicates, int reloadCooldown, boolean trackEmptySlots) {
         super(pProperties);
         this.glint = glint;
         this.capacity = capacity;
         this.defaultAmmoPredicates = defaultAmmoPredicates;
         this.defaultSpeedloaderPredicates = defaultSpeedloaderPredicates;
         this.reloadCooldown = reloadCooldown;
+        this.trackEmptySlots = trackEmptySlots;
         MagazineItemPropertiesHandler.registerDefaults(this, defaultAmmoPredicates, defaultSpeedloaderPredicates);
     }
 
@@ -99,7 +101,13 @@ public class MagazineItem extends Item {
         if (this.isOnCooldown(entity))
             return;
         List<ItemStack> ammo = this.getStoredAmmo(itemStack);
-        if (RFEItemUtils.countItems(ammo) >= this.getMagazineCapacity(itemStack))
+        int capacity = this.getMagazineCapacity(itemStack);
+        if (this.trackEmptySlots) {
+            int diff = capacity - RFEItemUtils.countItemsIncludingSlots(ammo);
+            for (int i = 0; i < diff; ++i)
+                ammo.add(ItemStack.EMPTY);
+        }
+        if (RFEItemUtils.countItems(ammo) >= capacity)
             return;
         boolean split = itemStack.getCount() > 1;
         RFEItemUtils.consumeItemsFromEntity(entity, s -> {
@@ -119,7 +127,7 @@ public class MagazineItem extends Item {
 
     protected boolean tryReloadForItem(ItemStack magazineStack, List<ItemStack> ammo, ItemStack availableStack) {
         if (this.matchesAmmoItem(magazineStack, availableStack)) {
-            int consumed = FirearmDataUtils.addAmmo(ammo, availableStack, false, false /* TODO track empty slots */, 1);
+            int consumed = FirearmDataUtils.addAmmo(ammo, availableStack, false, this.trackEmptySlots, 1);
             if (!availableStack.is(RFEItemTags.INFINITE_AMMO.tag))
                 availableStack.shrink(consumed);
             return true;
@@ -134,9 +142,9 @@ public class MagazineItem extends Item {
                 break;
             }
             if (allValid) {
-                int added = FirearmDataUtils.addMultipleAmmo(ammo, speedloaderAmmo, false, true, false /* TODO track empty slots */, this.getMagazineCapacity(magazineStack));
+                int added = FirearmDataUtils.addMultipleAmmo(ammo, speedloaderAmmo, false, true, this.trackEmptySlots, this.getMagazineCapacity(magazineStack));
                 if (!availableStack.is(RFEItemTags.INFINITE_AMMO.tag)) {
-                    FirearmDataUtils.stripMultipleAmmo(speedloaderAmmo, added, true, false, false /* TODO track empty slots */, true);
+                    FirearmDataUtils.stripMultipleAmmo(speedloaderAmmo, added, true, false, this.trackEmptySlots, true);
                     secondary.writeStoredAmmo(availableStack, speedloaderAmmo);
                 }
                 return true;
@@ -151,7 +159,7 @@ public class MagazineItem extends Item {
         List<ItemStack> ammo = this.getStoredAmmo(itemStack);
         if (RFEItemUtils.countItems(ammo) == 0)
             return;
-        ItemStack stripped = FirearmDataUtils.stripAmmo(ammo, false, false, false /* TODO track empty slots */);
+        ItemStack stripped = FirearmDataUtils.stripAmmo(ammo, false, false, this.trackEmptySlots);
         this.writeStoredAmmo(itemStack, ammo);
         this.applyCooldown(itemStack, entity);
 
@@ -176,8 +184,10 @@ public class MagazineItem extends Item {
         super.appendHoverText(itemStack, level, tooltip, flag);
         List<ItemStack> storedAmmo = this.getStoredAmmo(itemStack);
         Map<Item, Integer> storedIndex = new LinkedHashMap<>();
-        for (ItemStack ammoStack : storedAmmo)
-            storedIndex.merge(ammoStack.getItem(), ammoStack.getCount(), Integer::sum);
+        for (ItemStack ammoStack : storedAmmo) {
+            if (!ammoStack.isEmpty())
+                storedIndex.merge(ammoStack.getItem(), ammoStack.getCount(), Integer::sum);
+        }
         for (Map.Entry<Item, Integer> entry : storedIndex.entrySet()) {
             MutableComponent itemTitle = Component.translatable(entry.getKey().getDescriptionId()).copy();
             itemTitle.append(" x").append(Component.literal(String.valueOf(entry.getValue())));
@@ -196,6 +206,7 @@ public class MagazineItem extends Item {
             int capacity = GsonHelper.getAsInt(obj, "capacity");
             if (capacity < 1)
                 throw new IllegalStateException("'capacity' must be at least 1");
+            boolean trackEmptySlots = GsonHelper.getAsBoolean(obj, "track_empty_slots", false);
             int reloadCooldown = GsonHelper.getAsInt(obj, "reload_cooldown", 5);
             if (reloadCooldown < 0)
                 throw new IllegalStateException("'reload_cooldown' must be at least 0");
@@ -214,7 +225,7 @@ public class MagazineItem extends Item {
                     speedloaderPredicates.add(pred);
             }
             return new MagazineItem(new Properties().stacksTo(stacksTo).rarity(rarity), glint, capacity, ammoPredicates.build(),
-                    speedloaderPredicates.build(), reloadCooldown);
+                    speedloaderPredicates.build(), reloadCooldown, trackEmptySlots);
         }
     }
 

@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "rfe_builtin:infinite_revolver_speedloader_5rds",
+    "rfe_builtin:infinite_revolver_speedloader_6rds",
+    "rfe_builtin:infinite_revolver_speedloader_7rds",
+    "rfe_builtin:infinite_revolver_speedloader_8rds",
+    "rfe_builtin:revolver_speedloader_5rds",
+    "rfe_builtin:revolver_speedloader_6rds",
+    "rfe_builtin:revolver_speedloader_7rds",
+    "rfe_builtin:revolver_speedloader_8rds"
+  ]
+}

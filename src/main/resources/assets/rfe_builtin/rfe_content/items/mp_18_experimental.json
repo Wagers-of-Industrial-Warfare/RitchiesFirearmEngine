@@ -58,7 +58,11 @@
         "unload_time": 15,
         "sounds": [
           { "time": 10, "sound": "rfe_builtin:item.generic.smg.magazine.unload" }
-        ]
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
       },
       {
         "phase": "reload",
@@ -73,7 +77,10 @@
         "reload_time": 15,
         "sounds": [
           { "time": 10, "sound": "rfe_builtin:item.generic.smg.magazine.reload" }
-        ]
+        ],
+        "accessible_phases": {
+          "finish": "all"
+        }
       },
       {
         "phase": "finish",

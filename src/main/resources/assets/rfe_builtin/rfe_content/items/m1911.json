@@ -57,7 +57,11 @@
         "unload_time": 10,
         "sounds": [
           { "time": 5, "sound": "rfe_builtin:item.generic.pistol.magazine.unload" }
-        ]
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
       },
       {
         "phase": "reload",
@@ -71,7 +75,10 @@
         "reload_type": "magazines",
         "sounds": [
           { "time": 5, "sound": "rfe_builtin:item.generic.pistol.magazine.reload" }
-        ]
+        ],
+        "accessible_phases": {
+          "finish": "all"
+        }
       },
       {
         "phase": "finish",

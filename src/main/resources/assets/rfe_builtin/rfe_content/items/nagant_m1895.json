@@ -286,15 +286,28 @@
         }
       },
       {
+        "phase": "index",
+        "condition": { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+        "time": 8,
+        "index_count": 1,
+        "sounds": [
+          { "time": 2, "sound": "rfe_builtin:item.generic.revolver.cylinder.indexed" }
+        ],
+        "accessible_phases": {
+          "finish": "all"
+        }
+      },
+      {
         "phase": "unload",
         "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
-        "time": 30,
+        "time": 16,
         "unload_type": "rounds",
         "unload_delay": 11,
         "sounds": [
           { "time": 9, "sound": "rfe_builtin:item.generic.revolver.bullet.unload" }
         ],
         "accessible_phases": {
+          "index": "all",
           "finish": "all"
         }
       },

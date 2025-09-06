@@ -1,0 +1,126 @@
+{
+  "parent": "rfe_builtin:item/nagant_m1895/nagant_m1895_empty_fired",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:aiming": 1 },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_empty_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:has_magazine": 1 },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_magazine_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:has_magazine": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_magazine_fired_aimed"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_single_action": 1,
+        "ritchiesfirearmengine:is_charged": 1
+      },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_empty"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_single_action": 1,
+        "ritchiesfirearmengine:is_charged": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_empty_aimed"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_single_action": 1,
+        "ritchiesfirearmengine:is_charged": 1,
+        "ritchiesfirearmengine:has_magazine": 1
+      },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_magazine"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_single_action": 1,
+        "ritchiesfirearmengine:is_charged": 1,
+        "ritchiesfirearmengine:aiming": 1,
+        "ritchiesfirearmengine:has_magazine": 1
+      },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_magazine_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_charging": 1 },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_empty_charge"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charging": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_empty_charge_aimed"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charging": 1,
+        "ritchiesfirearmengine:has_magazine": 1
+      },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_magazine_charge"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charging": 1,
+        "ritchiesfirearmengine:aiming": 1,
+        "ritchiesfirearmengine:has_magazine": 1
+      },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_magazine_charge_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_firing": 1 },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_empty"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_firing": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_empty_aimed"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_firing": 1,
+        "ritchiesfirearmengine:has_magazine": 1
+      },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_magazine"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_firing": 1,
+        "ritchiesfirearmengine:aiming": 1,
+        "ritchiesfirearmengine:has_magazine": 1
+      },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_magazine_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_empty_reload"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_reloading": 1,
+        "ritchiesfirearmengine:has_magazine": 1
+      },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_magazine_reload"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_empty_reload"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_unloading": 1,
+        "ritchiesfirearmengine:has_magazine": 1
+      },
+      "model": "rfe_builtin:item/nagant_m1895/nagant_m1895_magazine_reload"
+    }
+  ]
+}

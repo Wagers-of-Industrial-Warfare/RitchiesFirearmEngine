@@ -63,6 +63,10 @@
     "rfe_builtin:m1911",
     "rfe_builtin:peacemaker",
     "rfe_builtin:revolver_mk_vi",
+    {
+      "item": "rfe_builtin:nagant_m1895",
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:revolver_cylinder_7rds\",Count:1b}}}"
+    },
     "rfe_builtin:brown_bess"
   ]
 }

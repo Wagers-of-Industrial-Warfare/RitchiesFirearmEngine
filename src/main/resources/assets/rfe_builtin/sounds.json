@@ -611,12 +611,12 @@
         "pitch": 0.91
       },
       {
-        "name": "rfe_builtin:item/generic/rifle/hammer_cocked",
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
         "volume": 0.25,
         "pitch": 0.88
       },
       {
-        "name": "rfe_builtin:item/generic/rifle/hammer_cocked",
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
         "volume": 0.25,
         "pitch": 0.87
       }
@@ -631,12 +631,12 @@
         "pitch": 0.96
       },
       {
-        "name": "rfe_builtin:item/generic/rifle/hammer_cocked",
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
         "volume": 0.25,
         "pitch": 0.93
       },
       {
-        "name": "rfe_builtin:item/generic/rifle/hammer_cocked",
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
         "volume": 0.25,
         "pitch": 0.92
       }
@@ -651,12 +651,12 @@
         "pitch": 1
       },
       {
-        "name": "rfe_builtin:item/generic/rifle/hammer_cocked",
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
         "volume": 0.25,
         "pitch": 0.98
       },
       {
-        "name": "rfe_builtin:item/generic/rifle/hammer_cocked",
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
         "volume": 0.25,
         "pitch": 0.97
       }
@@ -686,7 +686,8 @@
     "sounds": [
       {
         "name": "rfe_builtin:item/generic/pistol/shot",
-        "volume": 1.23
+        "volume": 1.0,
+        "pitch": 1.23
       },
       {
         "name": "rfe_builtin:item/generic/pistol/shot",

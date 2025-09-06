@@ -86,7 +86,13 @@ public class MagazineItem extends Item {
     public int getReloadCooldown(ItemStack itemStack) { return this.reloadCooldown; }
 
     public List<ItemStack> getStoredAmmo(ItemStack itemStack) {
-        return FirearmDataUtils.getRounds(itemStack, "Rounds");
+        List<ItemStack> stored = FirearmDataUtils.getRounds(itemStack, "Rounds");
+        if (this.trackEmptySlots) {
+            int diff = capacity - RFEItemUtils.countItemsIncludingSlots(stored);
+            for (int i = 0; i < diff; ++i)
+                stored.add(ItemStack.EMPTY);
+        }
+        return stored;
     }
 
     public void writeStoredAmmo(ItemStack itemStack, List<ItemStack> ammo) {

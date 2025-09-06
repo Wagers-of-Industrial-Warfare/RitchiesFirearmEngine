@@ -1,0 +1,26 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:handgun_cartridge",
+      "fires": "rfe_builtin:762x38mmr_nagant"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_handgun_cartridge",
+      "fires": "rfe_builtin:762x38mmr_nagant"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+    "rfe_builtin:revolver_cylinder_7rds",
+    "rfe_builtin:infinite_revolver_cylinder_7rds"
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "modes": {
+  }
+}

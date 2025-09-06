@@ -85,7 +85,9 @@
         "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 },
         "time": 10,
         "charge_firearm": true,
-        "sound": "rfe_builtin:item.generic.pistol.rack.end"
+        "sounds": [
+          { "time": 5, "sound": "rfe_builtin:item.generic.pistol.rack.end" }
+        ]
       },
       {
         "phase": "finish",

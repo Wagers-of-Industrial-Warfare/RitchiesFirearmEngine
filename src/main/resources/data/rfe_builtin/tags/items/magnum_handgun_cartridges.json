@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "rfe_builtin:magnum_ap_handgun_cartridge",
+    "rfe_builtin:magnum_hp_handgun_cartridge",
+    "rfe_builtin:infinite_magnum_ap_handgun_cartridge",
+    "rfe_builtin:infinite_magnum_hp_handgun_cartridge",
+    "rfe_builtin:infinite_magnum_handgun_cartridge",
+    "rfe_builtin:infinite_magnum_sp_handgun_cartridge",
+    "rfe_builtin:infinite_magnum_tracer_handgun_cartridge",
+    "rfe_builtin:magnum_handgun_cartridge",
+    "rfe_builtin:magnum_sp_handgun_cartridge",
+    "rfe_builtin:magnum_tracer_handgun_cartridge"
+  ]
+}

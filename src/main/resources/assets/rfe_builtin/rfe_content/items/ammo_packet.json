@@ -11,6 +11,7 @@
     { "ammo": "#rfe_builtin:rifle_cartridges", "capacity": 10 },
     { "ammo": "#rfe_builtin:intermediate_cartridges", "capacity": 15 },
     { "ammo": "#rfe_builtin:pistol_cartridges", "capacity": 20 },
+    { "ammo": "#rfe_builtin:magnum_handgun_cartridges", "capacity": 15 },
     { "ammo": "#rfe_builtin:magnum_rifle_cartridges", "capacity": 5 },
     { "ammo": "#rfe_builtin:shotgun_shells", "capacity": 10 },
     { "ammo": "rfe_builtin:black_powder_handgun_cartridge", "capacity": 20 },

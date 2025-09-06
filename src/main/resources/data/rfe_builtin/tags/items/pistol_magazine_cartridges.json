@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "#rfe_builtin:magnum_handgun_cartridges",
+    "#rfe_builtin:pistol_cartridges"
+  ]
+}

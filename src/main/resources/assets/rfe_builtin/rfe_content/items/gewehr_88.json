@@ -15,7 +15,7 @@
   },
   "ammo": {
     "ammo_required": true,
-    "plus_one_capacity": true
+    "plus_1_capacity": true
   },
   "firing": {
     "fire_mode": "single_action",

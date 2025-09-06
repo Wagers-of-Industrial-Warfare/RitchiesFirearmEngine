@@ -270,7 +270,7 @@
     "actions": [
       {
         "condition": { "macro": "rfe_builtin:can_charge" },
-        "time": 6,
+        "time": 4,
         "cycle_magazine": true,
         "sound": "rfe_builtin:item.generic.revolver.hammer.cocked"
       }

@@ -17,7 +17,7 @@
     }
   ],
   "damage_type": "rfe_builtin:bullet",
-  "hit_multiplier": "rfe_builtin:generic_headshot",
+  "hit_multiplier": "rfe_builtin:generic_headshot_sp",
   "penetration": "rfe_builtin:default",
   "pass_sound": "rfe_builtin:projectile.generic.whizz"
 }

@@ -1,4 +1,5 @@
 {
+  "container.rfe_builtin.magazine.more": "and %s more...",
   "death.attack.rfe_builtin.shot": "%s was shot by %s",
   "death.attack.rfe_builtin.shot.item": "%s was shot by %s using %s",
   "gui.rfe_builtin.mode.both_barrels": "Both barrels",

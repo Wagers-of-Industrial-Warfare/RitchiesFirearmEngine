@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.GsonHelper;
@@ -18,6 +19,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.A
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
+import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
@@ -194,11 +196,21 @@ public class MagazineItem extends Item {
             if (!ammoStack.isEmpty())
                 storedIndex.merge(ammoStack.getItem(), ammoStack.getCount(), Integer::sum);
         }
+        int additional = 0;
+        int MAX_TYPES = RFEConfig.CLIENT.maxMagazineItemTypesDisplayed.get();
+        int types = 0;
         for (Map.Entry<Item, Integer> entry : storedIndex.entrySet()) {
-            MutableComponent itemTitle = Component.translatable(entry.getKey().getDescriptionId()).copy();
-            itemTitle.append(" x").append(Component.literal(String.valueOf(entry.getValue())));
-            tooltip.add(itemTitle);
+            ++types;
+            if (types > MAX_TYPES) {
+                additional += entry.getValue();
+            } else {
+                MutableComponent itemTitle = Component.translatable(entry.getKey().getDescriptionId()).copy();
+                itemTitle.append(" x").append(Component.literal(String.valueOf(entry.getValue())));
+                tooltip.add(itemTitle);
+            }
         }
+        if (additional > 0)
+            tooltip.add(Component.translatable("container.rfe_builtin.magazine.more", additional).withStyle(ChatFormatting.ITALIC));
     }
 
     public static class Builder implements RFEItemBuilder {

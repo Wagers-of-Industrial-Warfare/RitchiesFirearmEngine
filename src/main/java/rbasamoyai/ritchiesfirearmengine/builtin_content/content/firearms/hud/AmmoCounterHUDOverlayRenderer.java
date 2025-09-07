@@ -122,12 +122,14 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
             if (GsonHelper.isObjectNode(obj, "firearm_icon"))
                 firearmIcon = RFEHudIcon.fromJson(GsonHelper.getAsJsonObject(obj, "firearm_icon"));
 
-            if (!GsonHelper.isObjectNode(obj, "mode_translations"))
-                throw new IllegalStateException("Missing translations for modes in ammo counter");
-            JsonObject modeNamesObj = GsonHelper.getAsJsonObject(obj, "mode_translations");
             Map<String, String> modeNames = new HashMap<>();
-            for (Map.Entry<String, JsonElement> entry : modeNamesObj.entrySet())
-                modeNames.put(entry.getKey(), entry.getValue().getAsString());
+            if (GsonHelper.isObjectNode(obj, "mode_translations")) {
+                JsonObject modeNamesObj = GsonHelper.getAsJsonObject(obj, "mode_translations");
+                for (Map.Entry<String, JsonElement> entry : modeNamesObj.entrySet())
+                    modeNames.put(entry.getKey(), entry.getValue().getAsString());
+            } else {
+                // throw new IllegalStateException("Missing translations for modes in ammo counter");
+            }
 
             return new AmmoCounterHUDOverlayRenderer(hideEntireAmmoCount, hideFirearmAmmoCount, enlargeFirearmAmmoCount,
                     showInventoryCount, countLooseRounds, firearmIcon, modeNames);

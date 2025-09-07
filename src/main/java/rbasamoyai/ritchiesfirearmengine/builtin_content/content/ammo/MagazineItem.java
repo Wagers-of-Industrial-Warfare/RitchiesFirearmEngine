@@ -19,6 +19,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.A
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudItemInfoProviders;
 import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
@@ -27,6 +28,8 @@ import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 public class MagazineItem extends Item {
 
@@ -47,6 +50,12 @@ public class MagazineItem extends Item {
         this.reloadCooldown = reloadCooldown;
         this.trackEmptySlots = trackEmptySlots;
         MagazineItemPropertiesHandler.registerDefaults(this, defaultAmmoPredicates, defaultSpeedloaderPredicates);
+        this.registerHUDProviders();
+    }
+
+    protected void registerHUDProviders() {
+        RFEHudItemInfoProviders.registerAmmoProvider(this, this::getAmmoItemsForHUD);
+        RFEHudItemInfoProviders.registerAmmoInventoryCountProvider(this, this::getInventoryAmmoCountForHUD);
     }
 
     @Override public boolean isFoil(ItemStack stack) { return this.glint || super.isFoil(stack); }
@@ -72,13 +81,13 @@ public class MagazineItem extends Item {
         return false;
     }
 
-    public ImmutableList<AmmoPredicate> getSpeedloaderPredicate(ItemStack itemStack) {
+    public ImmutableList<AmmoPredicate> getSpeedloaderPredicates(ItemStack itemStack) {
         ImmutableList<AmmoPredicate> predicates = MagazineItemPropertiesHandler.getValidSpeedloaderPredicates(this);
         return predicates == null ? this.defaultSpeedloaderPredicates : predicates;
     }
 
     public boolean matchesSpeedloaderItem(ItemStack magazine, ItemStack speedloader) {
-        for (AmmoPredicate pred : this.getSpeedloaderPredicate(magazine)) {
+        for (AmmoPredicate pred : this.getSpeedloaderPredicates(magazine)) {
             if (pred.test(speedloader))
                 return true;
         }
@@ -211,6 +220,43 @@ public class MagazineItem extends Item {
         }
         if (additional > 0)
             tooltip.add(Component.translatable("container.rfe_builtin.magazine.more", additional).withStyle(ChatFormatting.ITALIC));
+    }
+
+    public List<ItemStack> getAmmoItemsForHUD(ItemStack itemStack) {
+        return this.getStoredAmmo(itemStack);
+    }
+
+    public Optional<Integer> getInventoryAmmoCountForHUD(ItemStack itemStack, List<ItemStack> inventory, boolean countLooseRounds) {
+        Predicate<ItemStack> ammoPredicate = RFEUtils.orAllPredicates(this.getAmmoPredicates(itemStack));
+        Predicate<ItemStack> speedloaderPredicate = RFEUtils.orAllPredicates(this.getSpeedloaderPredicates(itemStack));
+        int count = 0;
+        for (ItemStack invStack : inventory) {
+            if (countLooseRounds && ammoPredicate.test(invStack)) {
+                if (invStack.is(RFEItemTags.INFINITE_AMMO.tag))
+                    return Optional.of(-1);
+                count += invStack.getCount();
+            } else if (speedloaderPredicate.test(invStack) && invStack.getItem() instanceof MagazineItem magazineItem) {
+                List<ItemStack> magAmmo = magazineItem.getStoredAmmo(invStack);
+                int magCount = 0;
+                if (magAmmo.isEmpty())
+                    continue;
+                boolean valid = true;
+                for (ItemStack magStack : magAmmo) {
+                    if (magStack.isEmpty())
+                        continue;
+                    if (!ammoPredicate.test(magStack)) {
+                        magCount = 0;
+                        valid = false;
+                        break;
+                    }
+                    magCount += magStack.getCount();
+                }
+                if (valid && invStack.is(RFEItemTags.INFINITE_AMMO.tag))
+                    return Optional.of(-1);
+                count += magCount;
+            }
+        }
+        return Optional.of(count);
     }
 
     public static class Builder implements RFEItemBuilder {

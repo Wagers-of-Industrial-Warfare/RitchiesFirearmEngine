@@ -455,6 +455,26 @@
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.pistol.shot"
   },
+  "item.generic.pistol.shot1": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot_powerful",
+        "volume": 1.0,
+        "pitch": 0.95
+      },
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot_powerful",
+        "volume": 1.0,
+        "pitch": 0.93
+      },
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot_powerful",
+        "volume": 1.0,
+        "pitch": 0.92
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.shot"
+  },
   "item.generic.pistol.unaim": {
     "sounds": [
       {
@@ -702,6 +722,26 @@
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.revolver.shot"
   },
+  "item.generic.revolver.shot2": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot_powerful",
+        "volume": 1.0,
+        "pitch": 0.95
+      },
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot_powerful",
+        "volume": 1.0,
+        "pitch": 0.93
+      },
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot_powerful",
+        "volume": 1.0,
+        "pitch": 0.92
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.shot"
+  },
   "item.generic.revolver.speedloader.reload": {
     "sounds": [
       {
@@ -711,6 +751,46 @@
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.revolver.speedloader.reload"
+  },
+  "item.generic.revolver.swing.close": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 1.2
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 1.18
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 1.17
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.swing.close"
+  },
+  "item.generic.revolver.swing.open": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 1.15
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 1.13
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 1.12
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.swing.open"
   },
   "item.generic.revolver.unaim": {
     "sounds": [

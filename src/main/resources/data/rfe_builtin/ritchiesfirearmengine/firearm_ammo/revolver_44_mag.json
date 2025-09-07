@@ -1,0 +1,106 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:handgun_cartridge",
+      "fires": "rfe_builtin:44_special"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_handgun_cartridge",
+      "fires": "rfe_builtin:44_special"
+    },
+    {
+      "ammo": "rfe_builtin:black_powder_handgun_cartridge",
+      "fires": "rfe_builtin:44_russian"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_black_powder_handgun_cartridge",
+      "fires": "rfe_builtin:44_russian"
+    },
+    {
+      "ammo": "rfe_builtin:tracer_handgun_cartridge",
+      "fires": "rfe_builtin:44_special_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_tracer_handgun_cartridge",
+      "fires": "rfe_builtin:44_special_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:ap_handgun_cartridge",
+      "fires": "rfe_builtin:44_special_ap"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_ap_handgun_cartridge",
+      "fires": "rfe_builtin:44_special_ap"
+    },
+    {
+      "ammo": "rfe_builtin:sp_handgun_cartridge",
+      "fires": "rfe_builtin:44_special_sp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_sp_handgun_cartridge",
+      "fires": "rfe_builtin:44_special_sp"
+    },
+    {
+      "ammo": "rfe_builtin:hp_handgun_cartridge",
+      "fires": "rfe_builtin:44_special_hp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_hp_handgun_cartridge",
+      "fires": "rfe_builtin:44_special_hp"
+    },
+    {
+      "ammo": "rfe_builtin:magnum_handgun_cartridge",
+      "fires": "rfe_builtin:44_magnum"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_magnum_handgun_cartridge",
+      "fires": "rfe_builtin:44_magnum"
+    },
+    {
+      "ammo": "rfe_builtin:magnum_tracer_handgun_cartridge",
+      "fires": "rfe_builtin:44_magnum_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_magnum_tracer_handgun_cartridge",
+      "fires": "rfe_builtin:44_magnum_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:magnum_ap_handgun_cartridge",
+      "fires": "rfe_builtin:44_magnum_ap"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_magnum_ap_handgun_cartridge",
+      "fires": "rfe_builtin:44_magnum_ap"
+    },
+    {
+      "ammo": "rfe_builtin:magnum_sp_handgun_cartridge",
+      "fires": "rfe_builtin:44_magnum_sp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_magnum_sp_handgun_cartridge",
+      "fires": "rfe_builtin:44_magnum_sp"
+    },
+    {
+      "ammo": "rfe_builtin:magnum_hp_handgun_cartridge",
+      "fires": "rfe_builtin:44_magnum_hp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_magnum_hp_handgun_cartridge",
+      "fires": "rfe_builtin:44_magnum_hp"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+    "rfe_builtin:revolver_speedloader_6rds",
+    "rfe_builtin:infinite_revolver_speedloader_6rds"
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "modes": {
+  }
+}

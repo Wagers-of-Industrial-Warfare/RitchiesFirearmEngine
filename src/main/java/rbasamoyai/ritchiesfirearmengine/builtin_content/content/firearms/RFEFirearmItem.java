@@ -30,6 +30,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.m
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhase;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhaseAccessFilter;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudItemInfoProviders;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilClientImpulse;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
@@ -58,6 +59,12 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         this.baseFirearmModes = baseFirearmModes;
         this.modeOrder = modeOrder;
         this.defaultMode = defaultMode;
+        this.registerHUDProviders();
+    }
+
+    protected void registerHUDProviders() {
+        RFEHudItemInfoProviders.registerAmmoProvider(this, this::getAmmoItemsForHUD);
+        RFEHudItemInfoProviders.registerAmmoInventoryCountProvider(this, this::getInventoryAmmoCountForHUD);
     }
 
     @Override
@@ -336,11 +343,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         return mode.isAiming(itemStack, entity);
     }
 
-    @Nullable
-    public static List<ItemStack> getAmmoItemsForHUD(ItemStack itemStack) {
-        if (!(itemStack.getItem() instanceof RFEFirearmItem firearm))
-            return null;
-        RFEFirearmMode mode = firearm.getCurrentMode(itemStack);
+    public List<ItemStack> getAmmoItemsForHUD(ItemStack itemStack) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
         return mode.requiresAmmo() ? mode.getLoadedAmmo(itemStack) : null;
     }
 
@@ -349,10 +353,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         return mode.getItemLength(itemStack, entity);
     }
 
-    public static Optional<Integer> getInventoryAmmoCountForHUD(ItemStack itemStack, List<ItemStack> inventory, boolean countLooseRounds) {
-        if (!(itemStack.getItem() instanceof RFEFirearmItem firearm))
-            return Optional.empty();
-        RFEFirearmMode mode = firearm.getCurrentMode(itemStack);
+    public Optional<Integer> getInventoryAmmoCountForHUD(ItemStack itemStack, List<ItemStack> inventory, boolean countLooseRounds) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
         RFEFirearmModeAmmoProperties ammoProperties = mode.getAmmoProperties(itemStack);
         Predicate<ItemStack> primaryAmmoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmo().keySet());
         Predicate<ItemStack> magazineAndSpeedloaderPred = RFEUtils.orAllPredicates(ammoProperties.magazines())

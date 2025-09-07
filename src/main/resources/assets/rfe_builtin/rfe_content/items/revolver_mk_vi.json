@@ -261,7 +261,8 @@
       },
       {
         "phase": "finish",
-        "time": 12,"charge_firearm": true,
+        "time": 12,
+        "charge_firearm": true,
         "sound": "rfe_builtin:item.generic.revolver.break_action.close"
       }
     ]

@@ -1,0 +1,121 @@
+{
+  "type": "ritchiesfirearmengine:firearm",
+  "drawing": {
+    "draw_time": 11,
+    "sound": "rfe_builtin:item.generic.pistol.draw"
+  },
+  "mode_change": {
+    "mode_change_time": 1,
+    "sound": "rfe_builtin:item.generic.firearm.mode_change.switch"
+  },
+  "aiming": {
+    "aim_time": 5,
+    "aim_sound": "rfe_builtin:item.generic.shotgun.aim",
+    "unaim_sound": "rfe_builtin:item.generic.shotgun.unaim"
+  },
+  "ammo": {
+    "ammo_required": true,
+    "internal_capacity": 1
+  },
+  "firing": {
+    "fire_mode": "single_action",
+    "cooldown": 2,
+    "sound": "rfe_builtin:item.generic.pistol.shot2"
+  },
+  "reload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1" },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
+          ]
+        },
+        "time": 14,
+        "sounds": [
+          { "time": 0, "sound": "rfe_builtin:item.generic.pistol.breech.open" },
+          { "time": 10, "sound": "rfe_builtin:item.generic.pistol.breech.open" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1" },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
+          ]
+        },
+        "time": 110,
+        "reload_type": "rounds",
+        "reload_count": 1,
+        "reload_delay": 90,
+        "sounds": [
+          { "time": 50, "sound": "rfe_builtin:item.generic.pistol.bullet.unload" },
+          { "time": 88, "sound": "rfe_builtin:item.generic.pistol.bullet.reload" }
+        ],
+        "accessible_phases": {
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "finish",
+        "time": 14,
+        "charge_firearm": true,
+        "sounds": [
+          { "time": 0, "sound": "rfe_builtin:item.generic.pistol.breech.close" },
+          { "time": 10, "sound": "rfe_builtin:item.generic.pistol.breech.close" }
+        ]
+      }
+    ]
+  },
+  "unload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 0 },
+        "time": 14,
+        "sound": "rfe_builtin:item.generic.pistol.breech.open"
+      },
+      {
+        "phase": "unload",
+        "condition": { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 0 },
+        "time": 16,
+        "unload_type": "rounds",
+        "unload_count": 1,
+        "unload_delay": 12,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.pistol.bullet.unload" }
+        ]
+      },
+      {
+        "phase": "finish",
+        "time": 14,
+        "sound": "rfe_builtin:item.generic.pistol.breech.close"
+      }
+    ]
+  },
+  "charge": {
+    "actions": [
+      {
+        "condition": {
+          "or": [
+            { "compare": "ritchiesfirearmengine:is_jammed", "operator": "equals", "value": 1 }
+          ]
+        },
+        "time": 1
+      }
+    ]
+  },
+  "modes": {
+    "safety": {
+      "firing": {
+        "fire_mode": "safety"
+      }
+    }
+  }
+}

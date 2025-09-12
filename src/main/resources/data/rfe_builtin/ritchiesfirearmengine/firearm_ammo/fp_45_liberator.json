@@ -1,0 +1,56 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_liberator"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_liberator"
+    },
+    {
+      "ammo": "rfe_builtin:tracer_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_liberator_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_tracer_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_liberator_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:ap_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_liberator_ap"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_ap_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_liberator_ap"
+    },
+    {
+      "ammo": "rfe_builtin:sp_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_liberator_sp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_sp_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_liberator_sp"
+    },
+    {
+      "ammo": "rfe_builtin:hp_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_liberator_hp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_hp_handgun_cartridge",
+      "fires": "rfe_builtin:45_acp_liberator_hp"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "modes": {
+  }
+}

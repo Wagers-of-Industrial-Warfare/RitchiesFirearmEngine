@@ -296,6 +296,26 @@
       }
     ]
   },
+  "item.generic.pistol.breech.close": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 0.96
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.breech.close"
+  },
+  "item.generic.pistol.breech.open": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 0.93
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.breech.close"
+  },
   "item.generic.pistol.bullet.reload": {
     "sounds": [
       {
@@ -471,6 +491,25 @@
         "name": "rfe_builtin:item/generic/pistol/shot_powerful",
         "volume": 1.0,
         "pitch": 0.92
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.shot"
+  },
+  "item.generic.pistol.shot2": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/revolver/shot",
+        "volume": 1.0
+      },
+      {
+        "name": "rfe_builtin:item/generic/revolver/shot",
+        "volume": 1.0,
+        "pitch": 0.98
+      },
+      {
+        "name": "rfe_builtin:item/generic/revolver/shot",
+        "volume": 1.0,
+        "pitch": 0.97
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.pistol.shot"

@@ -1228,6 +1228,9 @@ public class RFEFirearmMode {
         FirearmDataUtils.setActionTime(itemStack, actionTime);
         if (actionTime > 0)
             return;
+        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        FirearmDataUtils.setOverheated(modeTag, false);
+        FirearmDataUtils.setHeat(modeTag, 0);
         FirearmDataUtils.setAction(itemStack, null);
     }
 

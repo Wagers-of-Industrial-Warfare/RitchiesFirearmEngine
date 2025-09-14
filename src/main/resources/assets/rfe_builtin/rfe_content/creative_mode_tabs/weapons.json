@@ -60,7 +60,10 @@
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:shotgun_magazine_10rds\",Count:1b}}}"
     },
     "rfe_builtin:drilling",
-    "rfe_builtin:m1911",
+    {
+      "item": "rfe_builtin:m1911",
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_7rds\",Count:1b}}}"
+    },
     "rfe_builtin:fp_45_liberator",
     "rfe_builtin:peacemaker",
     "rfe_builtin:revolver_mk_vi",

@@ -2,9 +2,11 @@ package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
@@ -19,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
@@ -94,6 +97,18 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         if (entity instanceof LivingEntity living)
             this.getCurrentMode(itemStack).onTick(itemStack, living, isSelected);
         // TODO clientside effects?
+    }
+
+    @Override
+    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+        var mainMode = pStack.getOrCreateTag().getCompound("MainMode");
+        if (mainMode.contains("FirearmHeat")) {
+            var overheated = FirearmDataUtils.isOverheated(mainMode);
+            var heat = FirearmDataUtils.getHeat(mainMode);
+            if (overheated) pTooltipComponents.add(Component.literal("Overheated").withStyle(ChatFormatting.RED));
+            pTooltipComponents.add(Component.literal("Heat: " + String.format(Locale.US, "%.2f", heat)).withStyle(ChatFormatting.GOLD));
+        }
+        super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
     }
 
     @Override

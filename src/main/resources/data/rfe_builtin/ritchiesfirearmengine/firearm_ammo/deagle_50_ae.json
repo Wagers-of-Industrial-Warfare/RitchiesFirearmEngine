@@ -1,0 +1,57 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:magnum_handgun_cartridge",
+      "fires": "rfe_builtin:50_ae"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_magnum_handgun_cartridge",
+      "fires": "rfe_builtin:50_ae"
+    },
+    {
+      "ammo": "rfe_builtin:magnum_tracer_handgun_cartridge",
+      "fires": "rfe_builtin:50_ae_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_magnum_tracer_handgun_cartridge",
+      "fires": "rfe_builtin:50_ae_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:magnum_ap_handgun_cartridge",
+      "fires": "rfe_builtin:50_ae_ap"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_magnum_ap_handgun_cartridge",
+      "fires": "rfe_builtin:50_ae_ap"
+    },
+    {
+      "ammo": "rfe_builtin:magnum_sp_handgun_cartridge",
+      "fires": "rfe_builtin:50_ae_sp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_magnum_sp_handgun_cartridge",
+      "fires": "rfe_builtin:50_ae_sp"
+    },
+    {
+      "ammo": "rfe_builtin:magnum_hp_handgun_cartridge",
+      "fires": "rfe_builtin:50_ae_hp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_magnum_hp_handgun_cartridge",
+      "fires": "rfe_builtin:50_ae_hp"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+    "#rfe_builtin:single_stack_pistol_magazines"
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "modes": {
+  }
+}

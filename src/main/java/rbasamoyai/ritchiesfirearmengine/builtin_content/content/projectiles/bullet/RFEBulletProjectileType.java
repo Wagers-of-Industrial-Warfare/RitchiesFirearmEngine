@@ -137,7 +137,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         double rem = length % 8d;
         int iterations = Math.max(Mth.ceil(length / 8d), 1);
         Vec3 wholeDiff = diff.normalize().scale(8);
-        Vec3 remDiff = diff.normalize().scale(rem);
+        Vec3 remDiff = rem == 0 ? wholeDiff : diff.normalize().scale(rem);
         Vec3 totalDiff = Vec3.ZERO;
 
         Vec3 rootPos = oldPos;

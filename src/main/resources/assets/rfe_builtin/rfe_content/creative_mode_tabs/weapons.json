@@ -65,6 +65,10 @@
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_7rds\",Count:1b}}}"
     },
     {
+      "item": "rfe_builtin:m9_pistol",
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_15rds\",Count:1b}}}"
+    },
+    {
       "item": "rfe_builtin:deagle_50_ae",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_7rds\",Count:1b}}}"
     },

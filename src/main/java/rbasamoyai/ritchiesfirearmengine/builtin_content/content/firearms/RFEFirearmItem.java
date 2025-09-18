@@ -283,8 +283,11 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         return true;
     }
 
-    public boolean disableAttackAnimation(ItemStack itemStack, Player player) {
-        return true; // TODO melee?
+    public float getAttackStrengthScaleForRendering(ItemStack itemStack, Player player, float original) {
+        if (this.getCurrentAction(itemStack) == Action.DRAW)
+            return this.getCurrentMode(itemStack).getDrawFraction(itemStack, player);
+        // TODO melee?
+        return 1;
     }
 
     @Nullable public Action getCurrentAction(ItemStack itemStack) { return FirearmDataUtils.getAction(itemStack); }

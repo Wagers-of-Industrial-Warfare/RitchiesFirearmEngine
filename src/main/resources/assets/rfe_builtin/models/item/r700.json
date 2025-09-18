@@ -18,11 +18,11 @@
     },
     {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
-      "model": "rfe_builtin:item/r700/r700_charge"
+      "model": "rfe_builtin:item/r700/r700_reload"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
-      "model": "rfe_builtin:item/r700/r700_charge"
+      "model": "rfe_builtin:item/r700/r700_reload"
     }
   ]
 }

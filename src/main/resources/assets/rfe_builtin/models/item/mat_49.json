@@ -67,6 +67,28 @@
         "ritchiesfirearmengine:has_magazine": 1
       },
       "model": "rfe_builtin:item/mat_49/mat_49_magazine_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
+      "model": "rfe_builtin:item/mat_49/mat_49_empty_reload"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_reloading": 1,
+        "ritchiesfirearmengine:has_magazine": 1
+      },
+      "model": "rfe_builtin:item/mat_49/mat_49_magazine_reload"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
+      "model": "rfe_builtin:item/mat_49/mat_49_empty_reload"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_unloading": 1,
+        "ritchiesfirearmengine:has_magazine": 1
+      },
+      "model": "rfe_builtin:item/mat_49/mat_49_magazine_reload"
     }
   ]
 }

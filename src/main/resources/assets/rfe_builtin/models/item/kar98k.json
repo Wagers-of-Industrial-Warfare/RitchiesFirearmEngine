@@ -18,11 +18,11 @@
     },
     {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
-      "model": "rfe_builtin:item/kar98k/kar98k_charge"
+      "model": "rfe_builtin:item/kar98k/kar98k_reload"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
-      "model": "rfe_builtin:item/kar98k/kar98k_charge"
+      "model": "rfe_builtin:item/kar98k/kar98k_reload"
     }
   ]
 }

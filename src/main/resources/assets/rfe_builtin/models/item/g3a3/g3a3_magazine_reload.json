@@ -349,10 +349,12 @@
 			"scale": [0.65, 0.65, 0.65]
 		},
 		"firstperson_righthand": {
-			"translation": [0.25, 3.75, 0.5]
+			"rotation": [16, 20, -20],
+			"translation": [-1, 5.25, -6.75]
 		},
 		"firstperson_lefthand": {
-			"translation": [0.25, 3.75, 0.5]
+			"rotation": [16, 20, -20],
+			"translation": [-1, 5.25, -6.75]
 		},
 		"ground": {
 			"rotation": [0, 0, 90],

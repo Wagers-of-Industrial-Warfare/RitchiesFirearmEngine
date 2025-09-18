@@ -331,11 +331,13 @@
 			"scale": [1.5, 1.5, 1.5]
 		},
 		"firstperson_righthand": {
-			"translation": [0.25, 3.75, -17],
+			"rotation": [10, 5, -15],
+			"translation": [-2.75, 3.75, -10.25],
 			"scale": [2, 2, 2]
 		},
 		"firstperson_lefthand": {
-			"translation": [0.25, 3.75, -17],
+			"rotation": [10, 5, -15],
+			"translation": [-2.75, 3.75, -10.25],
 			"scale": [2, 2, 2]
 		},
 		"ground": {

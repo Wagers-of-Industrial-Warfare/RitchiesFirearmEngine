@@ -45,9 +45,11 @@ jobs:
             -   name: Set up Gradle
                 uses: gradle/actions/setup-gradle@v3
                 with:
+                    cache-write-only: true
+                    cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
                     gradle-home-cache-includes: |
-                        caches
                         loom-cache
+                        fabric-loom
 
             -   name: Build jar
                 env:

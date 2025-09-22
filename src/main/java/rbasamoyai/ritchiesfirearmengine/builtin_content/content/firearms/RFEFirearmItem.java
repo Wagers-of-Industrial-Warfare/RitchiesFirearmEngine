@@ -63,8 +63,18 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
     }
 
     protected void registerHUDProviders() {
+        RFEHudItemInfoProviders.registerHeatProvider(this, this::getHeatAmountForHUD);
+        RFEHudItemInfoProviders.registerHeatCapacityProvider(this, this::getHeatCapacityForHUD);
         RFEHudItemInfoProviders.registerAmmoProvider(this, this::getAmmoItemsForHUD);
         RFEHudItemInfoProviders.registerAmmoInventoryCountProvider(this, this::getInventoryAmmoCountForHUD);
+    }
+
+    public Optional<Float> getHeatAmountForHUD(ItemStack itemStack) {
+        return Optional.of(this.getCurrentMode(itemStack).getHeatAmount(itemStack));
+    }
+
+    public Optional<Float> getHeatCapacityForHUD(ItemStack itemStack) {
+        return Optional.of(this.getCurrentMode(itemStack).getHeatCapacity(itemStack));
     }
 
     @Override

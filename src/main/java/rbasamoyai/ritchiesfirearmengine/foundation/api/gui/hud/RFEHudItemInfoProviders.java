@@ -16,6 +16,36 @@ import java.util.function.Function;
  * General repository for item info providers.
  */
 public class RFEHudItemInfoProviders {
+    /**
+     * Return {@code null} to mark infinite ammo in the gun.
+     */
+    @FunctionalInterface
+    public interface RFEHeatInfoProvider extends Function<ItemStack, Optional<Float>> {
+    }
+
+    private static final Map<Item, RFEHeatInfoProvider> HEAT_PROVIDERS = new Reference2ObjectOpenHashMap<>();
+
+    public static void registerHeatProvider(Item item, RFEHeatInfoProvider prov) {
+        if (HEAT_PROVIDERS.containsKey(item)) throw new IllegalStateException("Already registered heat HUD provider for item " + item);
+        HEAT_PROVIDERS.put(item, prov);
+    }
+
+    public static Optional<Float> getHeatFromItem(ItemStack itemStack) {
+        if (!HEAT_PROVIDERS.containsKey(itemStack.getItem())) return Optional.empty();
+        return HEAT_PROVIDERS.get(itemStack.getItem()).apply(itemStack);
+    }
+
+    private static final Map<Item, RFEHeatInfoProvider> HEAT_CAPACITY_PROVIDERS = new Reference2ObjectOpenHashMap<>();
+
+    public static void registerHeatCapacityProvider(Item item, RFEHeatInfoProvider prov) {
+        if (HEAT_CAPACITY_PROVIDERS.containsKey(item)) throw new IllegalStateException("Already registered heat capacity HUD provider for item " + item);
+        HEAT_CAPACITY_PROVIDERS.put(item, prov);
+    }
+
+    public static Optional<Float> getHeatCapacityFromItem(ItemStack itemStack) {
+        if (!HEAT_CAPACITY_PROVIDERS.containsKey(itemStack.getItem())) return Optional.empty();
+        return HEAT_CAPACITY_PROVIDERS.get(itemStack.getItem()).apply(itemStack);
+    }
 
     private static final Map<Item, RFEAmmoInfoProvider> AMMO_PROVIDERS = new Reference2ObjectOpenHashMap<>();
 
@@ -31,6 +61,7 @@ public class RFEHudItemInfoProviders {
             return null;
         return AMMO_PROVIDERS.get(itemStack.getItem()).apply(itemStack);
     }
+
 
     /**
      * Return {@code null} to mark infinite ammo in the gun.

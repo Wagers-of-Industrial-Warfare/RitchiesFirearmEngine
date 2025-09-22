@@ -218,6 +218,13 @@ public class RFEFirearmMode {
         return magazine.getItem() instanceof MagazineItem magazineItem ? magazineItem.getMagazineCapacity(magazine) : 0;
     }
 
+    public float getHeatAmount(ItemStack itemStack) {
+        return this.getOrCreateModeTag(itemStack).getFloat("FirearmHeat");
+    }
+    public float getHeatCapacity(ItemStack itemStack) {
+        return this.getHandlingProperties(itemStack).heatCapacity();
+    }
+
     public List<ItemStack> getLoadedAmmo(ItemStack itemStack) {
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
         if (this.internalCapacity > 0) {

@@ -1534,6 +1534,18 @@ public class RFEFirearmMode {
 
     public boolean requiresAmmo() { return this.ammoRequired; }
 
+    public float getDrawFraction(ItemStack itemStack, LivingEntity entity) {
+        return this.drawTime <= 0 ? 1 : Mth.clamp(1f - (float) FirearmDataUtils.getActionTime(itemStack) / (float) this.drawTime, 0f, 1f);
+    }
+
+    public float getHeatAmount(ItemStack itemStack) {
+        return this.getOrCreateModeTag(itemStack).getFloat("FirearmHeat");
+    }
+
+    public float getHeatCapacity(ItemStack itemStack) {
+        return this.getHandlingProperties(itemStack).heatCapacity();
+    }
+
     public enum FiringType {
         CLICK,
         AUTOMATIC,

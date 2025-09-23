@@ -22,8 +22,8 @@ public abstract class ItemInHandRendererMixin {
 
     @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getAttackStrengthScale(F)F"))
     private float ritchiesfirearmengine$tick(float original, @Local LocalPlayer localPlayer, @Local(ordinal = 0) ItemStack itemStack) {
-        if (itemStack.getItem() instanceof RFEFirearmItem firearmItem && firearmItem.disableAttackAnimation(itemStack, localPlayer))
-            return 1;
+        if (itemStack.getItem() instanceof RFEFirearmItem firearmItem)
+            return firearmItem.getAttackStrengthScaleForRendering(itemStack, localPlayer, original);
         return original;
     }
 

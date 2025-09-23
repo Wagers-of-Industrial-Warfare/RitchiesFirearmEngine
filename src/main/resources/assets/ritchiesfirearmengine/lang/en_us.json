@@ -1,4 +1,6 @@
 {
+  "gui.ritchiesfirearmengine.heat": "Heat: %s%%",
+  "gui.ritchiesfirearmengine.heat.overheated": "Overheated",
   "gui.ritchiesfirearmengine.pack_default": "(Pack Default)",
   "gui.ritchiesfirearmengine.pack_mismatch.pack.additional": "[%s additional mismatched packs, see log for full list]",
   "gui.ritchiesfirearmengine.pack_mismatch.pack.client": "You have",

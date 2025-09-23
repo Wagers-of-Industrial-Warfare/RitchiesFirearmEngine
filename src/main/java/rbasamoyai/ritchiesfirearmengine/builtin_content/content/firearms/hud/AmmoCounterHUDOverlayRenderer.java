@@ -13,7 +13,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudItemInfoProviders;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRenderer;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.elements.RFEHudIcon;
@@ -22,7 +21,6 @@ import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
@@ -100,7 +98,7 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
         if (this.firearmIcon != null) {
             this.firearmIcon.blit(graphics, originX - this.firearmIcon.blitWidth() / 2, originY - this.firearmIcon.blitHeight() - 4);
         }
-        if (!hideOverheating) {
+        if (!this.hideOverheating) {
             float heat = RFEHudItemInfoProviders.getHeatFromItem(item).orElse(0f);
             float heatCapacity = RFEHudItemInfoProviders.getHeatCapacityFromItem(item).orElse(0f);
             boolean overheated = heat >= heatCapacity;
@@ -113,25 +111,25 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
                 if (this.firearmIcon != null) {
                     var x = originX - this.firearmIcon.blitWidth() / 2;
                     var y = originY - this.firearmIcon.blitHeight() - 4;
-                    var totalWidth = firearmIcon.blitWidth();
+                    var totalWidth = this.firearmIcon.blitWidth();
                     int targetWidth = (int) (totalWidth * percentage);
                     RenderSystem.enableBlend();
                     graphics.setColor(r / 255f, g / 255f, b / 255f, 1f);
-                    graphics.blit(firearmIcon.texture(), x + (totalWidth - targetWidth), y,
-                            targetWidth, firearmIcon.blitHeight(),
-                            firearmIcon.uOffset() - targetWidth, firearmIcon.vOffset(),
-                            targetWidth, firearmIcon.blitHeight(),
-                            firearmIcon.texWidth(), firearmIcon.texHeight()
+                    graphics.blit(this.firearmIcon.texture(), x + (totalWidth - targetWidth), y,
+                            targetWidth, this.firearmIcon.blitHeight(),
+                            this.firearmIcon.uOffset() - targetWidth, this.firearmIcon.vOffset(),
+                            targetWidth, this.firearmIcon.blitHeight(),
+                            this.firearmIcon.texWidth(), this.firearmIcon.texHeight()
                     );
                     graphics.setColor(1f, 1f, 1f, 1f);
                     RenderSystem.disableBlend();
                 }
-                Component modeText = overheated ? Component.literal("Overheated") : Component.literal("Heat: " + String.format(Locale.US, "%.1f", percentage * 100f) + "%");
+                Component modeText = overheated ? Component.translatable("gui.ritchiesfirearmengine.heat.overheated")
+                        : Component.translatable("gui.ritchiesfirearmengine.heat", String.format("%.1f", percentage * 100f));
                 int textWidth = this.font.width(modeText);
                 graphics.drawString(this.font, modeText, originX - textWidth / 2, originY + this.font.lineHeight * 3 + 2, rgb, true);
             }
         }
-        // TODO overheating
         // TODO secondary ammo
         String modeName = this.getModeName(item);
         if (this.modeTranslations.containsKey(modeName)) {

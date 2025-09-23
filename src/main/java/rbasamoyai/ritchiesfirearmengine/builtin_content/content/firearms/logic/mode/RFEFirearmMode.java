@@ -218,13 +218,6 @@ public class RFEFirearmMode {
         return magazine.getItem() instanceof MagazineItem magazineItem ? magazineItem.getMagazineCapacity(magazine) : 0;
     }
 
-    public float getHeatAmount(ItemStack itemStack) {
-        return this.getOrCreateModeTag(itemStack).getFloat("FirearmHeat");
-    }
-    public float getHeatCapacity(ItemStack itemStack) {
-        return this.getHandlingProperties(itemStack).heatCapacity();
-    }
-
     public List<ItemStack> getLoadedAmmo(ItemStack itemStack) {
         CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
         if (this.internalCapacity > 0) {
@@ -1543,6 +1536,14 @@ public class RFEFirearmMode {
 
     public float getDrawFraction(ItemStack itemStack, LivingEntity entity) {
         return this.drawTime <= 0 ? 1 : Mth.clamp(1f - (float) FirearmDataUtils.getActionTime(itemStack) / (float) this.drawTime, 0f, 1f);
+    }
+
+    public float getHeatAmount(ItemStack itemStack) {
+        return this.getOrCreateModeTag(itemStack).getFloat("FirearmHeat");
+    }
+
+    public float getHeatCapacity(ItemStack itemStack) {
+        return this.getHandlingProperties(itemStack).heatCapacity();
     }
 
     public enum FiringType {

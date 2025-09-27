@@ -19,6 +19,10 @@ loom {
     silentMojangMappingsLicense()
 
     forge {
+        mixin {
+            add(sourceSets.main.get(), "${prop("mod_id")}.refmap.json")
+        }
+
         mixinConfigs = listOf(
             "${prop("mod_id")}.mixins.json"
         )

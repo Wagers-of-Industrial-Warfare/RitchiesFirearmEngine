@@ -1325,6 +1325,7 @@ public class RFEFirearmMode {
             FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.DRAW);
             FirearmDataUtils.setActionTime(itemStack, this.drawTime);
             this.clearBurstFiring(itemStack);
+            this.setWindingUp(itemStack, entity, false);
             this.setForceCancelReload(itemStack, entity, false);
             if (this.resetChargeOnUnequip)
                 this.setCharged(itemStack, entity, false);
@@ -1375,6 +1376,8 @@ public class RFEFirearmMode {
             modeTag.remove("UnloadPhase");
             modeTag.remove("UnloadPhaseIndex");
         }
+        if (action != RFEFirearmItem.Action.FIRING && this.isWindingUp(itemStack, entity))
+            this.setWindingUp(itemStack, entity, false);
 
         if (this.isAiming(itemStack, entity) && !this.canAim(itemStack, entity)) {
             this.stopAiming(itemStack, entity);

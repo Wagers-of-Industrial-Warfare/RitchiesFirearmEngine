@@ -97,6 +97,7 @@ public class RFEFirearmMode {
     @Nullable protected final SoundEvent misfireSound;
     // Wind-up
     protected final int windUpTime;
+    protected final boolean canInterruptWindUp;
     @Nullable protected final SoundEvent windUpSound;
     // Wind-down
     protected final int windDownTime;
@@ -167,6 +168,7 @@ public class RFEFirearmMode {
         this.dryFireSound = builder.dryFireSound;
         this.misfireSound = builder.misfireSound;
         this.windUpTime = builder.windUpTime;
+        this.canInterruptWindUp = builder.canInterruptWindUp;
         this.windUpSound = builder.windUpSound;
         this.windDownTime = builder.windDownTime;
         this.windDownSound = builder.windDownSound;
@@ -327,7 +329,7 @@ public class RFEFirearmMode {
 
         if (entity instanceof Player && firing != FiringType.NON_PLAYER_AND_EFFECTS) {
             if (this.windUpTime > 0) {
-                if (!this.isWindingUp(itemStack, entity)) {
+                if (!this.isWindingUp(itemStack, entity) && firing == FiringType.CLICK) {
                     this.setWindingUp(itemStack, entity, true);
                     FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.FIRING);
                     FirearmDataUtils.setActionTime(itemStack, this.windUpTime);
@@ -1415,6 +1417,11 @@ public class RFEFirearmMode {
     }
 
     public void onReleaseAttackKey(ItemStack itemStack, LivingEntity entity) {
+        if (FirearmDataUtils.getAction(itemStack) == RFEFirearmItem.Action.FIRING && this.isWindingUp(itemStack, entity) && this.canInterruptWindUp) {
+            FirearmDataUtils.setAction(itemStack, null);
+            FirearmDataUtils.setActionTime(itemStack, 0);
+            this.setWindingUp(itemStack, entity, false);
+        }
     }
 
     public float getItemLength(ItemStack itemStack, @Nullable LivingEntity entity) {

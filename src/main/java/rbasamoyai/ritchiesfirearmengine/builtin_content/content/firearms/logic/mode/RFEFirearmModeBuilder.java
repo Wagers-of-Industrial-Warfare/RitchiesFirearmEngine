@@ -66,6 +66,7 @@ public class RFEFirearmModeBuilder {
     @Nullable
     protected SoundEvent misfireSound = null;
     protected int windUpTime = 0;
+    protected boolean canInterruptWindUp = false;
     @Nullable
     protected SoundEvent windUpSound = null;
     protected int windDownTime = 0;
@@ -148,6 +149,7 @@ public class RFEFirearmModeBuilder {
         newBuilder.misfires = new ArrayList<>(this.misfires);
         newBuilder.misfireSound = this.misfireSound;
         newBuilder.windUpTime = this.windUpTime;
+        newBuilder.canInterruptWindUp = this.canInterruptWindUp;
         newBuilder.windUpSound = this.windUpSound;
         newBuilder.windDownTime = this.windDownTime;
         newBuilder.windDownSound = this.windDownSound;
@@ -408,6 +410,11 @@ public class RFEFirearmModeBuilder {
         return this;
     }
 
+    public RFEFirearmModeBuilder canInterruptWindUp(boolean canInterruptWindUp) {
+        this.canInterruptWindUp = canInterruptWindUp;
+        return this;
+    }
+
     public RFEFirearmModeBuilder windUpSound(SoundEvent windUpSound) {
         this.windUpSound = windUpSound;
         return this;
@@ -452,6 +459,7 @@ public class RFEFirearmModeBuilder {
         this.misfires.clear();
         this.misfireSound = null;
         this.windUpTime = 0;
+        this.canInterruptWindUp = false;
         this.windUpSound = null;
         this.windDownTime = 0;
         this.windDownSound = null;

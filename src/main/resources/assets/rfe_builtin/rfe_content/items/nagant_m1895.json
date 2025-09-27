@@ -6,6 +6,7 @@
   },
   "mode_change": {
     "mode_change_time": 1,
+    "can_interrupt_wind_up": true,
     "sound": "rfe_builtin:item.generic.firearm.mode_change.switch"
   },
   "aiming": {
@@ -26,6 +27,7 @@
     "charging_behavior": "auto",
     "wind_up": {
       "time": 5,
+      "can_interrupt_wind_up": true,
       "sound": "rfe_builtin:item.generic.revolver.hammer.cocked"
     }
   },

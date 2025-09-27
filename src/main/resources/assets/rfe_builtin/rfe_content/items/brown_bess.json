@@ -34,6 +34,7 @@
     },
     "wind_up": {
       "time": 2,
+      "can_interrupt_wind_up": false,
       "sound": "rfe_builtin:item.generic.musket.fired.click"
     }
   },

@@ -26,6 +26,7 @@
     "charging_behavior": "auto",
     "wind_up": {
       "time": 4,
+      "can_interrupt_wind_up": true,
       "sound": "rfe_builtin:item.generic.revolver.hammer.cocked"
     }
   },

@@ -136,7 +136,9 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                 if (GsonHelper.isObjectNode(firing, "wind_up")) {
                     JsonObject windUp = firing.getAsJsonObject("wind_up");
                     int time = GsonHelper.getAsInt(windUp, "time");
-                    builder.windUpTime(time);
+                    boolean canInterruptWindUp = GsonHelper.getAsBoolean(windUp, "can_interrupt_wind_up", false);
+                    builder.windUpTime(time)
+                            .canInterruptWindUp(canInterruptWindUp);
                     this.windUpEffects(builder, windUp, modeId);
                 }
                 if (GsonHelper.isObjectNode(firing, "wind_down")) {

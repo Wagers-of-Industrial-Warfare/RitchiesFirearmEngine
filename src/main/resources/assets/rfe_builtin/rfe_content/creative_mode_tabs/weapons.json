@@ -18,6 +18,10 @@
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_20rds\",Count:1b}}}"
     },
     {
+      "item": "rfe_builtin:m14_rifle",
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_20rds\",Count:1b}}}"
+    },
+    {
       "item": "rfe_builtin:stg_44",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_30rds\",Count:1b}}}"
     },

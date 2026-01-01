@@ -104,6 +104,17 @@
         "ritchiesfirearmengine:has_magazine": 1
       },
       "model": "rfe_builtin:item/mp_18/mp_18_magazine_reload"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
+      "model": "rfe_builtin:item/mp_18/mp_18_empty_reload"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_unloading": 1,
+        "ritchiesfirearmengine:has_magazine": 1
+      },
+      "model": "rfe_builtin:item/mp_18/mp_18_magazine_reload"
     }
   ]
 }

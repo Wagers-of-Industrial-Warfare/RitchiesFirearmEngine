@@ -1,7 +1,10 @@
 plugins {
     id("dev.architectury.loom") version "1.11.+"
     id("maven-publish")
+    id("io.github.p03w.machete") version "2.0.1"
 }
+
+val ci = System.getenv("CI")?.toBoolean() ?: false
 
 base {
     archivesName.set(prop("mod_id"))
@@ -133,3 +136,6 @@ publishing {
     }
 }
 
+machete {
+    enabled = ci // Enable Machete only on CI
+}

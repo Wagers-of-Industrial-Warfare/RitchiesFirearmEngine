@@ -4,8 +4,6 @@ plugins {
     id("io.github.p03w.machete") version "2.0.1"
 }
 
-val ci = System.getenv("CI")?.toBoolean() ?: false
-
 base {
     archivesName.set(prop("mod_id"))
 }
@@ -137,5 +135,5 @@ publishing {
 }
 
 machete {
-    enabled = ci // Enable Machete only on CI
+    enabled = env.ci() // Enable Machete only on CI
 }

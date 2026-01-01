@@ -849,6 +849,25 @@
       }
     ]
   },
+  "item.generic.rifle.black_powder.shot": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/shot",
+        "volume": 0.90
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/shot",
+        "volume": 1.0,
+        "pitch": 0.88
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/shot",
+        "volume": 1.0,
+        "pitch": 0.87
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.shot"
+  },
   "item.generic.rifle.bolt_cycle": {
     "sounds": [
       {
@@ -955,6 +974,26 @@
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.rifle.draw"
+  },
+  "item.generic.rifle.hammer.cocked": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 0.91
+      },
+      {
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 0.88
+      },
+      {
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 0.87
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.cocked"
   },
   "item.generic.rifle.magazine.reload": {
     "sounds": [

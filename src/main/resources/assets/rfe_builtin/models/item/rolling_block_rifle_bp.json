@@ -1,0 +1,61 @@
+{
+  "parent": "rfe_builtin:item/rolling_block_rifle_bp/rolling_block_rifle_bp_fired",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:aiming": 1 },
+      "model": "rfe_builtin:item/rolling_block_rifle_bp/rolling_block_rifle_bp_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_charged": 1 },
+      "model": "rfe_builtin:item/rolling_block_rifle_bp/rolling_block_rifle_bp_normal"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charged": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/rolling_block_rifle_bp/rolling_block_rifle_bp_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_charging": 1 },
+      "model": "rfe_builtin:item/rolling_block_rifle_bp/rolling_block_rifle_bp_charge"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charging": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/rolling_block_rifle_bp/rolling_block_rifle_bp_charge_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_firing": 1 },
+      "model": "rfe_builtin:item/rolling_block_rifle_bp/rolling_block_rifle_bp_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_firing": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/rolling_block_rifle_bp/rolling_block_rifle_bp_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_safety": 1 },
+      "model": "rfe_builtin:item/rolling_block_rifle_bp/rolling_block_rifle_bp_safety"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_safety": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/rolling_block_rifle_bp/rolling_block_rifle_bp_safety_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
+      "model": "rfe_builtin:item/rolling_block_rifle_bp/rolling_block_rifle_bp_reload"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
+      "model": "rfe_builtin:item/rolling_block_rifle_bp/rolling_block_rifle_bp_reload"
+    }
+  ]
+}

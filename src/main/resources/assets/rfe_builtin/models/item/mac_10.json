@@ -1,0 +1,94 @@
+{
+  "parent": "rfe_builtin:item/mac_10/mac_10_empty",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:aiming": 1 },
+      "model": "rfe_builtin:item/mac_10/mac_10_empty_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:has_magazine": 1 },
+      "model": "rfe_builtin:item/mac_10/mac_10_magazine"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:has_magazine": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/mac_10/mac_10_magazine_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_charging": 1 },
+      "model": "rfe_builtin:item/mac_10/mac_10_empty_charge"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charging": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/mac_10/mac_10_empty_charge_aimed"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charging": 1,
+        "ritchiesfirearmengine:has_magazine": 1
+      },
+      "model": "rfe_builtin:item/mac_10/mac_10_magazine_charge"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charging": 1,
+        "ritchiesfirearmengine:aiming": 1,
+        "ritchiesfirearmengine:has_magazine": 1
+      },
+      "model": "rfe_builtin:item/mac_10/mac_10_magazine_charge_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_firing": 1 },
+      "model": "rfe_builtin:item/mac_10/mac_10_empty_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_firing": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/mac_10/mac_10_empty_fired_aimed"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_firing": 1,
+        "ritchiesfirearmengine:has_magazine": 1
+      },
+      "model": "rfe_builtin:item/mac_10/mac_10_magazine_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_firing": 1,
+        "ritchiesfirearmengine:aiming": 1,
+        "ritchiesfirearmengine:has_magazine": 1
+      },
+      "model": "rfe_builtin:item/mac_10/mac_10_magazine_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
+      "model": "rfe_builtin:item/mac_10/mac_10_empty_reload"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:has_magazine": 1,
+        "ritchiesfirearmengine:is_reloading": 1
+      },
+      "model": "rfe_builtin:item/mac_10/mac_10_magazine_reload"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
+      "model": "rfe_builtin:item/mac_10/mac_10_empty_reload"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:has_magazine": 1,
+        "ritchiesfirearmengine:is_unloading": 1
+      },
+      "model": "rfe_builtin:item/mac_10/mac_10_magazine_reload"
+    }
+  ]
+}

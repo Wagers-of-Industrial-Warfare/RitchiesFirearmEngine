@@ -54,6 +54,10 @@
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_30rds\",Count:1b}}}"
     },
     {
+      "item": "rfe_builtin:sterling_smg",
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_32rds\",Count:1b}}}"
+    },
+    {
       "item": "rfe_builtin:mac_10",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_30rds\",Count:1b}}}"
     },

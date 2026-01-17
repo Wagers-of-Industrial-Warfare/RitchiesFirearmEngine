@@ -61,6 +61,10 @@
       "item": "rfe_builtin:mac_10",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_30rds\",Count:1b}}}"
     },
+    {
+      "item": "rfe_builtin:mp5",
+      "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_30rds\",Count:1b}}}"
+    },
     "rfe_builtin:single_shot_shotgun",
     "rfe_builtin:db_shotgun_sxs",
     "rfe_builtin:db_shotgun_ou",

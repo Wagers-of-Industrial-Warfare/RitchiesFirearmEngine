@@ -1,0 +1,41 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:intermediate_cartridge",
+      "fires": "rfe_builtin:545x39mm_wp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_intermediate_cartridge",
+      "fires": "rfe_builtin:545x39mm_wp"
+    },
+    {
+      "ammo": "rfe_builtin:tracer_intermediate_cartridge",
+      "fires": "rfe_builtin:545x39mm_wp_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_tracer_intermediate_cartridge",
+      "fires": "rfe_builtin:545x39mm_wp_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:ap_intermediate_cartridge",
+      "fires": "rfe_builtin:545x39mm_wp_ap"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_ap_intermediate_cartridge",
+      "fires": "rfe_builtin:545x39mm_wp_ap"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+    "#rfe_builtin:rifle_magazines"
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "modes": {
+  }
+}

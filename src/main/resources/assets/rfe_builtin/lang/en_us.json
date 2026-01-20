@@ -17,6 +17,7 @@
   "gui.rfe_builtin.mode.top_first": "Top barrel first",
   "gui.rfe_builtin.mode.top_first.shotgun": "Top barrel first (shotgun)",
   "item.rfe_builtin.ak_47": "AK-47",
+  "item.rfe_builtin.ak_74": "AK-74",
   "item.rfe_builtin.ammo_packet": "Ammo Packet",
   "item.rfe_builtin.ap_handgun_cartridge": "Armor-Piercing (AP) Handgun Cartridge",
   "item.rfe_builtin.ap_intermediate_cartridge": "Armor-Piercing (AP) Intermediate Cartridge",

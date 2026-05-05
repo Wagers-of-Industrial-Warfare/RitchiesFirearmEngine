@@ -12,7 +12,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEConte
 
 public interface RFESpreadProvider {
 
-    MapCodec<RFESpreadProvider> CODEC = ResourceLocation.CODEC.fieldOf("type").codec()
+    MapCodec<RFESpreadProvider> CODEC = ResourceLocation.CODEC
             .<Serializer<?>>flatXmap(
                     rl -> {
                         try {

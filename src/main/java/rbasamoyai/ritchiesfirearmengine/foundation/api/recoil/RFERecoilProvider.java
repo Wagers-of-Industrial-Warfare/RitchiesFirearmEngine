@@ -12,7 +12,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEConte
 
 public interface RFERecoilProvider {
 
-    MapCodec<RFERecoilProvider> CODEC = ResourceLocation.CODEC.fieldOf("type").codec()
+    MapCodec<RFERecoilProvider> CODEC = ResourceLocation.CODEC
             .<Serializer<?>>flatXmap(
                     rl -> {
                         try {

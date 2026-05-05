@@ -17,7 +17,7 @@ import java.util.Map;
 
 public interface RFEProjectileType {
 
-    Codec<RFEProjectileType> CODEC = ResourceLocation.CODEC.fieldOf("type").codec()
+    Codec<RFEProjectileType> CODEC = ResourceLocation.CODEC
             .<Serializer<?>>flatXmap(
                     rl -> {
                         try {

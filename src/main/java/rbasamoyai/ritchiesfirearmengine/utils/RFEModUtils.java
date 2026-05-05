@@ -8,7 +8,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
 public class RFEModUtils {
 
     public static String getModVersionSpecifier() {
-        return "forge_version";
+        return "neoforge_version";
     }
 
     public static boolean isModPresent(String modId) {

@@ -11,7 +11,7 @@
       {
         "content": "mod",
         "id": "ritchiesfirearmengine",
-        "forge_version": "[0.6.0,)",
+        "forge_version": "[0.7.0,)",
         "relation": "required"
       }
     ],

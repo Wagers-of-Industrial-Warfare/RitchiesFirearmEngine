@@ -1,8 +1,15 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import com.mojang.serialization.Codec;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.PatchedDataComponentMap;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -22,6 +29,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.*
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.condition.FirearmCondition;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhase;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhaseAccessFilter;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.misfires.RFEMisfire;
@@ -37,11 +45,13 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProviderP
 import rbasamoyai.ritchiesfirearmengine.network.ClientboundRunFiringLogicPacket;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundRunFiringLogicPacket;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEByteBufCodecUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -49,12 +59,17 @@ import java.util.function.Predicate;
  */
 public class RFEFirearmMode {
 
+    public static final StreamCodec<RegistryFriendlyByteBuf, ImmutableMap<String, DataComponentPatch>> MODE_DATA_STREAM_CODEC =
+            RFEByteBufCodecUtils.immutableMap(ByteBufCodecs.STRING_UTF8, DataComponentPatch.STREAM_CODEC);
+    public static final Codec<ImmutableMap<String, DataComponentPatch>> MODE_DATA_CODEC =
+            Codec.unboundedMap(Codec.STRING, DataComponentPatch.CODEC).xmap(RFEUtils::toImmutableMap, Function.identity());
+
     protected final String modeId;
     protected final String modeDisplayId;
 
     protected final RFEFirearmModeHandlingProperties defaultDataPackProperties;
 
-    protected final String modeTagId;
+    protected final String modeDataId;
 
     // Drawing
     protected final int drawTime;
@@ -133,7 +148,7 @@ public class RFEFirearmMode {
 
         this.defaultDataPackProperties = RFEFirearmModeHandlingProperties.fromItemDefinition(builder);
 
-        this.modeTagId = builder.modeTagId;
+        this.modeDataId = builder.modeTagId;
 
         this.drawTime = builder.drawTime;
         this.drawSound = builder.drawSound;
@@ -206,24 +221,39 @@ public class RFEFirearmMode {
         return RFEFirearmAmmoHandler.getAmmoProperties(itemStack).getProperties(this.modeId);
     }
 
-    public CompoundTag getOrCreateModeTag(ItemStack itemStack) {
-        CompoundTag topTag = itemStack.getOrCreateTag();
-        if (!topTag.contains(this.modeTagId, Tag.TAG_COMPOUND))
-            topTag.put(this.modeTagId, new CompoundTag());
-        return topTag.getCompound(this.modeTagId);
+    public DataComponentPatch getModeData(ItemStack itemStack) {
+        if (!itemStack.has(RFEDataComponents.FIREARM_MODE_DATA))
+            itemStack.set(RFEDataComponents.FIREARM_MODE_DATA, ImmutableMap.of());
+        Object2ObjectOpenHashMap<String, DataComponentPatch> modeDataMap = new Object2ObjectOpenHashMap<>(itemStack.get(RFEDataComponents.FIREARM_MODE_DATA));
+        if (!modeDataMap.containsKey(this.modeDataId)) {
+            modeDataMap.put(this.modeDataId, DataComponentPatch.EMPTY);
+            itemStack.set(RFEDataComponents.FIREARM_MODE_DATA, RFEUtils.toImmutableMap(modeDataMap));
+        }
+        return modeDataMap.get(this.modeDataId);
+    }
+
+    public void saveModeData(ItemStack itemStack, DataComponentPatch data) {
+        ImmutableMap.Builder<String, DataComponentPatch> modeDataMap = ImmutableMap.builder();
+        modeDataMap.put(this.modeDataId, data);
+        modeDataMap.putAll(itemStack.getOrDefault(RFEDataComponents.FIREARM_MODE_DATA, ImmutableMap.of()));
+        itemStack.set(RFEDataComponents.FIREARM_MODE_DATA, modeDataMap.build());
     }
 
     public int getNominalCapacity(ItemStack itemStack, LivingEntity entity) {
         if (this.internalCapacity > 0)
             return this.nominalCapacity;
-        ItemStack magazine = ItemStack.of(this.getOrCreateModeTag(itemStack).getCompound("DetachedMagazine"));
+        DataComponentPatch modeData = this.getModeData(itemStack);
+        Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+        if (o == null || o.isEmpty())
+            return 0;
+        ItemStack magazine = o.get().copyOne();
         return magazine.getItem() instanceof MagazineItem magazineItem ? magazineItem.getMagazineCapacity(magazine) : 0;
     }
 
     public List<ItemStack> getLoadedAmmo(ItemStack itemStack) {
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        DataComponentPatch modeData = this.getModeData(itemStack);
         if (this.internalCapacity > 0) {
-            return FirearmDataUtils.getRounds(modeTag, "InternalRounds");
+            return FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS);
         } else {
             List<ItemStack> list = new ArrayList<>();
             if (this.plusOneCapacity) {
@@ -231,39 +261,43 @@ public class RFEFirearmMode {
                 if (!loadedRound.isEmpty())
                     list.add(loadedRound);
             }
-            CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
-            ItemStack magazine = ItemStack.of(magazineTag);
-            if (magazine.getItem() instanceof MagazineItem magazineItem)
-                list.addAll(magazineItem.getStoredAmmo(magazine));
+            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+            if (o != null && o.isPresent()) {
+                ItemStack magazine = o.get().copyOne();
+                if (magazine.getItem() instanceof MagazineItem magazineItem)
+                    list.addAll(magazineItem.getStoredAmmo(magazine));
+            }
             return list;
         }
     }
 
     public int getLoadedAmmoCount(ItemStack itemStack, LivingEntity entity, boolean countPlusOne) {
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        DataComponentPatch modeData = this.getModeData(itemStack);
         if (this.internalCapacity > 0)
-            return RFEItemUtils.countItems(FirearmDataUtils.getRounds(modeTag, "InternalRounds"));
+            return RFEItemUtils.countItems(FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS));
         int count = 0;
         if (this.plusOneCapacity && countPlusOne && !this.getLoadedRound(itemStack).isEmpty())
             ++count;
-        CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
-        ItemStack magazine = ItemStack.of(magazineTag);
-        if (magazine.getItem() instanceof MagazineItem magazineItem)
-            count += RFEItemUtils.countItems(magazineItem.getStoredAmmo(magazine));
+        Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+        if (o != null && o.isPresent()) {
+            ItemStack magazine = o.get().copyOne();
+            if (magazine.getItem() instanceof MagazineItem magazineItem)
+                count += RFEItemUtils.countItems(magazineItem.getStoredAmmo(magazine));
+        }
         return count;
     }
 
     public List<ItemStack> getNextRoundsInItem(ItemStack itemStack, LivingEntity entity, int count, boolean strip) {
         List<ItemStack> totalStripped = new LinkedList<>();
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        DataComponentPatch modeData = this.getModeData(itemStack);
         if (this.internalCapacity > 0) {
-            List<ItemStack> list = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
+            List<ItemStack> list = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS);
             List<ItemStack> internalStripped = FirearmDataUtils.stripMultipleAmmo(list, count, this.ammoConsumedLast,
                     !strip, this.trackEmptySlots, this.ignoreEmptySlotsWhenFiring);
             count -= RFEItemUtils.countItems(internalStripped);
             totalStripped.addAll(internalStripped);
             if (strip)
-                FirearmDataUtils.saveRounds(modeTag, "InternalRounds", list);
+                this.saveModeData(itemStack, FirearmDataUtils.saveRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS, list));
         } else {
             if (this.plusOneCapacity) {
                 ItemStack loadedRound = this.getLoadedRound(itemStack);
@@ -274,17 +308,21 @@ public class RFEFirearmMode {
                         this.setLoadedRound(itemStack, ItemStack.EMPTY);
                 }
             }
-            CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
-            ItemStack magazine = ItemStack.of(magazineTag);
-            if (magazine.getItem() instanceof MagazineItem magazineItem) {
-                List<ItemStack> list = magazineItem.getStoredAmmo(magazine);
-                List<ItemStack> magStripped = FirearmDataUtils.stripMultipleAmmo(list, count, this.ammoConsumedLast,
-                        !strip, this.trackEmptySlots, this.ignoreEmptySlotsWhenFiring);
-                count -= RFEItemUtils.countItems(magStripped);
-                totalStripped.addAll(magStripped);
-                if (strip) {
-                    magazineItem.writeStoredAmmo(magazine, list);
-                    modeTag.put("DetachedMagazine", magazine.save(new CompoundTag()));
+            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+            if (o != null && o.isPresent()) {
+                ItemStack magazine = o.get().copyOne();
+                if (magazine.getItem() instanceof MagazineItem magazineItem) {
+                    List<ItemStack> list = magazineItem.getStoredAmmo(magazine);
+                    List<ItemStack> magStripped = FirearmDataUtils.stripMultipleAmmo(list, count, this.ammoConsumedLast,
+                            !strip, this.trackEmptySlots, this.ignoreEmptySlotsWhenFiring);
+                    count -= RFEItemUtils.countItems(magStripped);
+                    totalStripped.addAll(magStripped);
+                    if (strip) {
+                        magazineItem.writeStoredAmmo(magazine, list);
+                        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, modeData);
+                        patched.set(RFEDataComponents.DETACHED_MAGAZINE, RFEItemContainerContents.fromItems(List.of(magazine)));
+                        this.saveModeData(itemStack, patched.asPatch());
+                    }
                 }
             }
         }
@@ -292,25 +330,32 @@ public class RFEFirearmMode {
     }
 
     public ItemStack getLoadedRound(ItemStack itemStack) {
-        return ItemStack.of(this.getOrCreateModeTag(itemStack).getCompound("LoadedRound"));
+        Optional<? extends RFEItemContainerContents> o = this.getModeData(itemStack).get(RFEDataComponents.LOADED_ROUND);
+        return o != null && o.isPresent() ? o.get().copyOne() : ItemStack.EMPTY;
     }
 
     public void setLoadedRound(ItemStack itemStack, ItemStack roundStack) {
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, this.getModeData(itemStack));
         if (roundStack.isEmpty()) {
-            this.getOrCreateModeTag(itemStack).remove("LoadedRound");
+            patched.remove(RFEDataComponents.LOADED_ROUND);
         } else {
-            this.getOrCreateModeTag(itemStack).put("LoadedRound", roundStack.save(new CompoundTag()));
+            patched.set(RFEDataComponents.LOADED_ROUND, RFEItemContainerContents.fromItems(List.of(roundStack)));
         }
+        this.saveModeData(itemStack, patched.asPatch());
     }
 
     public boolean isBusyWithStagedAction(ItemStack itemStack) {
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
-        return modeTag.contains("UnloadPhase") || modeTag.contains("ReloadPhase");
+        DataComponentPatch modeData = this.getModeData(itemStack);
+        Optional<? extends ReloadPhase.PhaseType> reload = modeData.get(RFEDataComponents.RELOAD_PHASE);
+        if (reload != null && reload.isPresent())
+            return true;
+        Optional<? extends ReloadPhase.PhaseType> unload = modeData.get(RFEDataComponents.UNLOAD_PHASE);
+        return unload != null && unload.isPresent();
     }
 
     public boolean canFireProjectile(ItemStack itemStack, LivingEntity entity) {
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
-        if (this.fireMode == FireMode.SAFETY || !FirearmDataUtils.isCharged(modeTag)
+        DataComponentPatch modeData = this.getModeData(itemStack);
+        if (this.fireMode == FireMode.SAFETY || !FirearmDataUtils.isCharged(modeData)
                 || FirearmDataUtils.getActionTime(itemStack) > 0 || this.isWindingUp(itemStack, entity))
             return false;
         if (this.isJammed(itemStack))
@@ -349,38 +394,35 @@ public class RFEFirearmMode {
             this.tryStartBurstFire(itemStack, entity);
 
         RFEFirearmModeHandlingProperties firearmProperties = this.getHandlingProperties(itemStack);
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        DataComponentPatch modeData = this.getModeData(itemStack);
 
         if (this.canOverheat) {
-            FirearmDataUtils.addHeat(modeTag, firearmProperties.heatAddedOnFiring());
-            FirearmDataUtils.setCoolingDelay(modeTag, firearmProperties.coolingDelayTime());
-            if (FirearmDataUtils.getHeat(modeTag) > firearmProperties.heatCapacity())
-                FirearmDataUtils.setOverheated(modeTag, true);
+            modeData = FirearmDataUtils.addHeat(modeData, firearmProperties.heatAddedOnFiring());
+            modeData = FirearmDataUtils.setCoolingDelay(modeData, firearmProperties.coolingDelayTime());
+            if (FirearmDataUtils.getHeat(modeData) > firearmProperties.heatCapacity())
+                modeData = FirearmDataUtils.setOverheated(modeData, true);
+            this.saveModeData(itemStack, modeData);
         }
 
         this.setCharged(itemStack, entity, false);
         FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.FIRING);
         if (this.firingCooldown > 0) {
-            float extraActionTime = Math.max(modeTag.getFloat("ExtraFiringTime"), 0);
+            float extraActionTime = Math.max(FirearmDataUtils.getExtraFiringTime(modeData), 0);
             float time = this.firingCooldown + extraActionTime;
             int actionTime = Mth.floor(time);
             float remainder = time - actionTime;
             FirearmDataUtils.setActionTime(itemStack, actionTime);
-            modeTag.putFloat("ExtraFiringTime", remainder);
+            this.saveModeData(itemStack, FirearmDataUtils.setExtraFiringTime(modeData, remainder));
         }
         this.playFiringEffects(itemStack, entity);
     }
 
     protected boolean isWindingUp(ItemStack itemStack, LivingEntity entity) {
-        return this.getOrCreateModeTag(itemStack).contains("WindingUp");
+        return FirearmDataUtils.isWindingUp(this.getModeData(itemStack));
     }
 
     protected void setWindingUp(ItemStack itemStack, LivingEntity entity, boolean windUp) {
-        if (windUp) {
-            this.getOrCreateModeTag(itemStack).putBoolean("WindingUp", true);
-        } else {
-            this.getOrCreateModeTag(itemStack).remove("WindingUp");
-        }
+        this.saveModeData(itemStack, FirearmDataUtils.setWindingUp(this.getModeData(itemStack), windUp));
     }
 
     public void playWindUpEffects(ItemStack itemStack, LivingEntity entity) {
@@ -537,7 +579,7 @@ public class RFEFirearmMode {
 
     public void onTickFiring(ItemStack itemStack, LivingEntity entity) {
         // TODO winding up and winding down
-        CompoundTag tag = itemStack.getOrCreateTag();
+        DataComponentPatch stackData = itemStack.getComponentsPatch();
         int actionTime = FirearmDataUtils.getActionTime(itemStack);
         if (actionTime > 0)
             --actionTime;
@@ -558,7 +600,7 @@ public class RFEFirearmMode {
         boolean holdingKey = itemStack.getItem() instanceof HoldAttackKeyInteraction holdAttackKeyInteraction
                 && holdAttackKeyInteraction.isHoldingAttackKey(itemStack, entity);
 
-        if (this.canOverheat && FirearmDataUtils.isOverheated(this.getOrCreateModeTag(itemStack))) {
+        if (this.canOverheat && FirearmDataUtils.isOverheated(this.getModeData(itemStack))) {
             FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.COOLDOWN);
             FirearmDataUtils.setActionTime(itemStack, this.cooldownTime);
             return;
@@ -594,10 +636,10 @@ public class RFEFirearmMode {
     }
 
     public boolean canContinueBurstFire(ItemStack itemStack, LivingEntity entity) {
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
-        int burstFireCount = modeTag.getInt("BurstFireCount");
+        DataComponentPatch modeData = this.getModeData(itemStack);
+        int burstFireCount = FirearmDataUtils.getBurstFireCount(modeData);
         if (burstFireCount <= 0 || !this.canFireProjectile(itemStack, entity)) {
-            modeTag.remove("BurstFireCount");
+            this.saveModeData(itemStack, FirearmDataUtils.clearBurstFireCount(modeData));
             return false;
         } else {
             return true;
@@ -606,24 +648,22 @@ public class RFEFirearmMode {
 
     public void tryStartBurstFire(ItemStack itemStack, LivingEntity entity) {
         if (!entity.level().isClientSide && this.fireMode == FireMode.BURST && this.burstRoundCount > 1 && !this.isBurstFiring(itemStack, entity))
-            this.getOrCreateModeTag(itemStack).putInt("BurstFireCount", this.burstRoundCount - 1);
+            this.saveModeData(itemStack, FirearmDataUtils.setBurstFireCount(this.getModeData(itemStack), this.burstRoundCount - 1));
     }
 
     public void decrementBurstFire(ItemStack itemStack, LivingEntity entity) {
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
-        int dec = modeTag.getInt("BurstFireCount") - 1;
-        modeTag.putInt("BurstFireCount", dec);
+        DataComponentPatch modeData = this.getModeData(itemStack);
+        this.saveModeData(itemStack, FirearmDataUtils.setBurstFireCount(modeData, FirearmDataUtils.getBurstFireCount(modeData) - 1));
     }
 
     public boolean isBurstFiring(ItemStack itemStack, LivingEntity entity) {
         if (this.burstRoundCount <= 1 || this.fireMode != FireMode.BURST)
             return false;
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
-        return modeTag.getInt("BurstFireCount") > 0;
+        return FirearmDataUtils.getBurstFireCount(this.getModeData(itemStack)) > 0;
     }
 
     public void clearBurstFiring(ItemStack itemStack) {
-        this.getOrCreateModeTag(itemStack).remove("BurstFireCount");
+        this.saveModeData(itemStack, FirearmDataUtils.clearBurstFireCount(this.getModeData(itemStack)));
     }
 
     // TODO secondary ammo
@@ -633,7 +673,7 @@ public class RFEFirearmMode {
             return false;
         if (FirearmDataUtils.getActionTime(itemStack) > 0)
             return false;
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        DataComponentPatch modeData = this.getModeData(itemStack);
         if (onInput && this.isBusyWithStagedAction(itemStack))
             return false;
         if (!this.reloadPhases.containsKey(phaseType))
@@ -646,8 +686,10 @@ public class RFEFirearmMode {
                 continue;
             FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.RELOAD);
             FirearmDataUtils.setActionTime(itemStack, phase.time());
-            modeTag.putString("ReloadPhase", phase.phaseType().getSerializedName());
-            modeTag.putInt("ReloadPhaseIndex", index);
+            PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, modeData);
+            patched.set(RFEDataComponents.RELOAD_PHASE, phase.phaseType());
+            patched.set(RFEDataComponents.RELOAD_PHASE_INDEX, index);
+            this.saveModeData(itemStack, patched.asPatch());
             return true;
         }
         return false;
@@ -656,21 +698,23 @@ public class RFEFirearmMode {
     public void onTickReload(ItemStack itemStack, LivingEntity entity) {
         if (entity.level().isClientSide)
             return;
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        DataComponentPatch modeData = this.getModeData(itemStack);
         if (!this.ammoRequired) {
-            FirearmDataUtils.cancelReload(itemStack, modeTag);
+            this.saveModeData(itemStack, FirearmDataUtils.cancelReload(itemStack, modeData));
             return;
         }
 
-        ReloadPhase.PhaseType phaseType = ReloadPhase.PhaseType.byId(modeTag.getString("ReloadPhase"));
-        if (phaseType == null) {
-            FirearmDataUtils.cancelReload(itemStack, modeTag);
+        Optional<? extends ReloadPhase.PhaseType> phaseTypeO = modeData.get(RFEDataComponents.RELOAD_PHASE);
+        if (phaseTypeO == null || phaseTypeO.isEmpty()) {
+            this.saveModeData(itemStack, FirearmDataUtils.cancelReload(itemStack, modeData));
             return;
         }
+        ReloadPhase.PhaseType phaseType = phaseTypeO.get();
         List<ReloadPhase> phaseList = this.reloadPhases.get(phaseType);
-        int phaseIndex = modeTag.contains("ReloadPhaseIndex", Tag.TAG_INT) ? modeTag.getInt("ReloadPhaseIndex") : -1;
+        Optional<? extends Integer> phaseIndexO = modeData.get(RFEDataComponents.RELOAD_PHASE_INDEX);
+        int phaseIndex = phaseIndexO != null && phaseIndexO.isPresent() ? phaseIndexO.get() : -1;
         if (phaseIndex < 0 || phaseList.size() <= phaseIndex) {
-            FirearmDataUtils.cancelReload(itemStack, modeTag);
+            this.saveModeData(itemStack, FirearmDataUtils.cancelReload(itemStack, modeData));
             return;
         }
         ReloadPhase phase = phaseList.get(phaseIndex);
@@ -697,13 +741,13 @@ public class RFEFirearmMode {
             RFEItemUtils.addItemToEntity(previousMagazine, entity);
         }
         if (phaseType == ReloadPhase.PhaseType.FINISH) {
-            FirearmDataUtils.cancelReload(itemStack, modeTag);
+            this.saveModeData(itemStack, FirearmDataUtils.cancelReload(itemStack, modeData));
             return;
         }
-        if (this.forceCancelReload(itemStack, entity)) {
-            this.setForceCancelReload(itemStack, entity, false);
+        if (this.shouldForceCancelAction(itemStack, entity)) {
+            this.setForceCancelAction(itemStack, entity, false);
             if (!this.tryRunningReloadAction(itemStack, entity, ReloadPhase.PhaseType.FINISH, false, phase.accessiblePhases(ReloadPhase.PhaseType.FINISH)))
-                FirearmDataUtils.cancelReload(itemStack, modeTag);
+                this.saveModeData(itemStack, FirearmDataUtils.cancelReload(itemStack, modeData));
             return;
         }
 
@@ -713,7 +757,7 @@ public class RFEFirearmMode {
             if (this.tryRunningReloadAction(itemStack, entity, ptype, false, phase.accessiblePhases(ptype)))
                 return;
         }
-        FirearmDataUtils.cancelUnload(itemStack, modeTag);
+        this.saveModeData(itemStack, FirearmDataUtils.cancelReload(itemStack, modeData));
     }
 
     public void indexMagazine(ItemStack itemStack, LivingEntity entity, int indexCount) {
@@ -721,13 +765,15 @@ public class RFEFirearmMode {
             return;
         boolean reverse = indexCount < 0;
         indexCount = Math.abs(indexCount);
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        DataComponentPatch modeData = this.getModeData(itemStack);
         List<ItemStack> ammoList;
         if (this.internalCapacity > 0) {
-            ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
+            ammoList = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS);
         } else {
-            CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
-            ItemStack magazine = ItemStack.of(magazineTag);
+            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+            if (o == null || o.isEmpty())
+                return;
+            ItemStack magazine = o.get().copyOne();
             if (!(magazine.getItem() instanceof MagazineItem magazineItem))
                 return;
             ammoList = magazineItem.getStoredAmmo(magazine);
@@ -750,7 +796,7 @@ public class RFEFirearmMode {
                 ammoList.add(split);
             } else {
                 ItemStack next = ammoList.get(reverse ? 0 : ammoList.size() - 1);
-                if (ItemStack.isSameItemSameTags(next, split)) {
+                if (ItemStack.isSameItemSameComponents(next, split)) {
                     int maxAddable = Math.min(next.getMaxStackSize() - split.getCount(), split.getCount());
                     next.grow(maxAddable);
                     split.shrink(maxAddable);
@@ -762,13 +808,18 @@ public class RFEFirearmMode {
         }
 
         if (this.internalCapacity > 0) {
-            FirearmDataUtils.saveRounds(modeTag, "InternalRounds", ammoList);
+            this.saveModeData(itemStack, FirearmDataUtils.saveRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS, ammoList));
         } else {
-            CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
-            ItemStack magazine = ItemStack.of(magazineTag);
-            if (magazine.getItem() instanceof MagazineItem magazineItem)
-                magazineItem.writeStoredAmmo(magazine, ammoList);
-            modeTag.put("DetachedMagazine", magazine.save(new CompoundTag()));
+            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+            if (o == null || o.isEmpty())
+                return;
+            ItemStack magazine = o.get().copyOne();
+            if (!(magazine.getItem() instanceof MagazineItem magazineItem))
+                return;
+            magazineItem.writeStoredAmmo(magazine, ammoList);
+            PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, modeData);
+            patched.set(RFEDataComponents.DETACHED_MAGAZINE, RFEItemContainerContents.fromItems(List.of(magazine)));
+            this.saveModeData(itemStack, patched.asPatch());
         }
     }
 
@@ -790,7 +841,7 @@ public class RFEFirearmMode {
         int reloadCount = phase.reloadsAtTime(actualTime);
         if (reloadCount < 1)
             return;
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        DataComponentPatch modeData = this.getModeData(itemStack);
         boolean addedLast = phase.ammoAddedLast();
         boolean replaceChamberedRound = phase.replaceChamberedRound() && !addedLast;
         List<ItemStack> ammoList;
@@ -798,7 +849,7 @@ public class RFEFirearmMode {
         ItemStack chambered = ItemStack.EMPTY;
         boolean reloadPlusOneDirectly = false;
         if (this.internalCapacity > 0) {
-            ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
+            ammoList = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS);
             if (this.trackEmptySlots) {
                 int diff = this.internalCapacity - RFEItemUtils.countItemsIncludingSlots(ammoList);
                 for (int i = 0; i < diff; ++i)
@@ -808,14 +859,19 @@ public class RFEFirearmMode {
             if (!phase.ammoAddedLast() && !replaceChamberedRound)
                 chambered = FirearmDataUtils.stripAmmo(ammoList, false, false, this.trackEmptySlots);
         } else {
-            CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
-            ItemStack magazine = ItemStack.of(magazineTag);
-            if (magazine.getItem() instanceof MagazineItem magazineItem) {
-                ammoList = magazineItem.getStoredAmmo(magazine);
-                capacity = magazineItem.getMagazineCapacity(magazine);
-            } else {
+            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+            if (o == null || o.isEmpty()) {
                 ammoList = new ArrayList<>();
                 capacity = 0;
+            } else {
+                ItemStack magazine = o.get().copyOne();
+                if (magazine.getItem() instanceof MagazineItem magazineItem) {
+                    ammoList = magazineItem.getStoredAmmo(magazine);
+                    capacity = magazineItem.getMagazineCapacity(magazine);
+                } else {
+                    ammoList = new ArrayList<>();
+                    capacity = 0;
+                }
             }
             if (this.plusOneCapacity && replaceChamberedRound) {
                 if (capacity == 0)
@@ -870,39 +926,42 @@ public class RFEFirearmMode {
         if (!chambered.isEmpty())
             FirearmDataUtils.addAmmo(ammoList, chambered, false, this.trackEmptySlots);
         if (this.internalCapacity > 0) {
-            FirearmDataUtils.saveRounds(modeTag, "InternalRounds", ammoList);
+            this.saveModeData(itemStack, FirearmDataUtils.saveRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS, ammoList));
         } else if (reloadPlusOneDirectly) {
             ItemStack top = FirearmDataUtils.stripAmmo(ammoList, false, false, false); // rather sloppy but whatever --ritchie
             this.setLoadedRound(itemStack, top);
             for (ItemStack remainder : ammoList)
                 RFEItemUtils.addItemToEntity(remainder, entity);
         } else {
-            CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
-            ItemStack magazine = ItemStack.of(magazineTag);
-            if (magazine.getItem() instanceof MagazineItem magazineItem)
-                magazineItem.writeStoredAmmo(magazine, ammoList);
-            modeTag.put("DetachedMagazine", magazine.save(new CompoundTag()));
+            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+            if (o == null || o.isEmpty())
+                return;
+            ItemStack magazine = o.get().copyOne();
+            if (!(magazine.getItem() instanceof MagazineItem magazineItem))
+                return;
+            magazineItem.writeStoredAmmo(magazine, ammoList);
+            PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, modeData);
+            patched.set(RFEDataComponents.DETACHED_MAGAZINE, RFEItemContainerContents.fromItems(List.of(magazine)));
+            this.saveModeData(itemStack, patched.asPatch());
         }
     }
 
-    public boolean canCancelReloadByClick(ItemStack itemStack, LivingEntity entity) {
+    public boolean canCancelReloadOrUnloadByClick(ItemStack itemStack, LivingEntity entity) {
         RFEFirearmItem.Action action = FirearmDataUtils.getAction(itemStack);
         if (action != RFEFirearmItem.Action.RELOAD && action != RFEFirearmItem.Action.UNLOAD)
             return false;
-        ReloadPhase.PhaseType phaseType = ReloadPhase.PhaseType.byId(this.getOrCreateModeTag(itemStack).getString("ReloadPhase"));
+        DataComponentType<ReloadPhase.PhaseType> type = action == RFEFirearmItem.Action.RELOAD ? RFEDataComponents.RELOAD_PHASE : RFEDataComponents.UNLOAD_PHASE;
+        Optional<? extends ReloadPhase.PhaseType> o = this.getModeData(itemStack).get(type);
+        ReloadPhase.PhaseType phaseType = o != null && o.isPresent() ? o.get() : null;
         return phaseType == ReloadPhase.PhaseType.RELOAD || phaseType == ReloadPhase.PhaseType.UNLOAD;
     }
 
-    public void setForceCancelReload(ItemStack itemStack, LivingEntity entity, boolean set) {
-        if (set) {
-            this.getOrCreateModeTag(itemStack).putBoolean("ForceEndReload", true);
-        } else {
-            this.getOrCreateModeTag(itemStack).remove("ForceEndReload");
-        }
+    public void setForceCancelAction(ItemStack itemStack, LivingEntity entity, boolean forceCancelAction) {
+        this.saveModeData(itemStack, FirearmDataUtils.setForceCancelAction(this.getModeData(itemStack), forceCancelAction));
     }
 
-    public boolean forceCancelReload(ItemStack itemStack, LivingEntity entity) {
-        return this.getOrCreateModeTag(itemStack).contains("ForceEndReload");
+    public boolean shouldForceCancelAction(ItemStack itemStack, LivingEntity entity) {
+        return FirearmDataUtils.shouldForceCancelAction(this.getModeData(itemStack));
     }
 
     public boolean tryRunningUnloadAction(ItemStack itemStack, LivingEntity entity, ReloadPhase.PhaseType phaseType,
@@ -911,7 +970,7 @@ public class RFEFirearmMode {
             return false;
         if (FirearmDataUtils.getActionTime(itemStack) > 0)
             return false;
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        DataComponentPatch modeData = this.getModeData(itemStack);
         if (onInput && this.isBusyWithStagedAction(itemStack))
             return false;
         if (!this.unloadPhases.containsKey(phaseType))
@@ -924,8 +983,10 @@ public class RFEFirearmMode {
                 continue;
             FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.UNLOAD);
             FirearmDataUtils.setActionTime(itemStack, phase.time());
-            modeTag.putString("UnloadPhase", phase.phaseType().getSerializedName());
-            modeTag.putInt("UnloadPhaseIndex", index);
+            PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, modeData);
+            patched.set(RFEDataComponents.UNLOAD_PHASE, phase.phaseType());
+            patched.set(RFEDataComponents.UNLOAD_PHASE_INDEX, index);
+            this.saveModeData(itemStack, patched.asPatch());
             return true;
         }
         return false;
@@ -935,21 +996,23 @@ public class RFEFirearmMode {
     public void onTickUnload(ItemStack itemStack, LivingEntity entity) {
         if (entity.level().isClientSide)
             return;
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        DataComponentPatch modeData = this.getModeData(itemStack);
         if (!this.ammoRequired) {
-            FirearmDataUtils.cancelUnload(itemStack, modeTag);
+            this.saveModeData(itemStack, FirearmDataUtils.cancelUnload(itemStack, modeData));
             return;
         }
 
-        ReloadPhase.PhaseType phaseType = ReloadPhase.PhaseType.byId(modeTag.getString("UnloadPhase"));
-        if (phaseType == null) {
-            FirearmDataUtils.cancelUnload(itemStack, modeTag);
+        Optional<? extends ReloadPhase.PhaseType> phaseTypeO = modeData.get(RFEDataComponents.UNLOAD_PHASE);
+        if (phaseTypeO == null || phaseTypeO.isEmpty()) {
+            this.saveModeData(itemStack, FirearmDataUtils.cancelUnload(itemStack, modeData));
             return;
         }
+        ReloadPhase.PhaseType phaseType = phaseTypeO.get();
         List<ReloadPhase> phaseList = this.unloadPhases.get(phaseType);
-        int phaseIndex = modeTag.contains("UnloadPhaseIndex", Tag.TAG_INT) ? modeTag.getInt("UnloadPhaseIndex") : -1;
+        Optional<? extends Integer> phaseIndexO = modeData.get(RFEDataComponents.UNLOAD_PHASE_INDEX);
+        int phaseIndex = phaseIndexO != null && phaseIndexO.isPresent() ? phaseIndexO.get() : -1;
         if (phaseIndex < 0 || phaseList.size() <= phaseIndex) {
-            FirearmDataUtils.cancelUnload(itemStack, modeTag);
+            this.saveModeData(itemStack, FirearmDataUtils.cancelUnload(itemStack, modeData));
             return;
         }
         ReloadPhase phase = phaseList.get(phaseIndex);
@@ -969,14 +1032,14 @@ public class RFEFirearmMode {
         if (phase.chargeFirearm())
             this.finishCharge(itemStack, entity);
         if (phaseType == ReloadPhase.PhaseType.FINISH) {
-            FirearmDataUtils.cancelUnload(itemStack, modeTag);
+            this.saveModeData(itemStack, FirearmDataUtils.cancelUnload(itemStack, modeData));
             return;
         }
 
-        if (this.canCancelReloadByClick(itemStack, entity)) {
-            this.setForceCancelReload(itemStack, entity, false);
+        if (this.shouldForceCancelAction(itemStack, entity)) {
+            this.setForceCancelAction(itemStack, entity, false);
             if (!this.tryRunningUnloadAction(itemStack, entity, ReloadPhase.PhaseType.FINISH, false, phase.accessiblePhases(ReloadPhase.PhaseType.FINISH)))
-                FirearmDataUtils.cancelUnload(itemStack, modeTag);
+                this.saveModeData(itemStack, FirearmDataUtils.cancelUnload(itemStack, modeData));
             return;
         }
 
@@ -985,7 +1048,7 @@ public class RFEFirearmMode {
             if (this.tryRunningUnloadAction(itemStack, entity, ptype, false, phase.accessiblePhases(ptype)))
                 return;
         }
-        FirearmDataUtils.cancelUnload(itemStack, modeTag);
+        this.saveModeData(itemStack, FirearmDataUtils.cancelUnload(itemStack, modeData));
     }
 
     // TODO secondary ammo
@@ -1001,10 +1064,10 @@ public class RFEFirearmMode {
         int unloadCount = phase.reloadsAtTime(actualTime);
         if (unloadCount < 1)
             return;
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        DataComponentPatch modeData = this.getModeData(itemStack);
         List<ItemStack> ammoList;
         if (this.internalCapacity > 0) {
-            ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
+            ammoList = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS);
             if (this.trackEmptySlots) {
                 int diff = this.internalCapacity - RFEItemUtils.countItemsIncludingSlots(ammoList);
                 for (int i = 0; i < diff; ++i)
@@ -1021,8 +1084,10 @@ public class RFEFirearmMode {
                         return;
                 }
             }
-            CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
-            ItemStack magazine = ItemStack.of(magazineTag);
+            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+            if (o == null || o.isEmpty())
+                return;
+            ItemStack magazine = o.get().copyOne();
             if (!(magazine.getItem() instanceof MagazineItem magazineItem))
                 return;
             ammoList = magazineItem.getStoredAmmo(magazine);
@@ -1031,31 +1096,37 @@ public class RFEFirearmMode {
         for (ItemStack item : items)
             RFEItemUtils.addItemToEntity(item, entity);
         if (this.internalCapacity > 0) {
-            FirearmDataUtils.saveRounds(modeTag, "InternalRounds", ammoList);
+            this.saveModeData(itemStack, FirearmDataUtils.saveRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS, ammoList));
         } else {
-            CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
-            ItemStack magazine = ItemStack.of(magazineTag);
-            if (magazine.getItem() instanceof MagazineItem magazineItem)
-                magazineItem.writeStoredAmmo(magazine, ammoList);
-            modeTag.put("DetachedMagazine", magazine.save(new CompoundTag()));
+            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+            if (o == null || o.isEmpty())
+                return;
+            ItemStack magazine = o.get().copyOne();
+            if (!(magazine.getItem() instanceof MagazineItem magazineItem))
+                return;
+            magazineItem.writeStoredAmmo(magazine, ammoList);
+            PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, modeData);
+            patched.set(RFEDataComponents.DETACHED_MAGAZINE, RFEItemContainerContents.fromItems(List.of(magazine)));
+            this.saveModeData(itemStack, patched.asPatch());
         }
     }
 
     public ItemStack setMagazine(ItemStack itemStack, LivingEntity entity, ItemStack magazineStack) {
         if (this.internalCapacity > 0)
             return ItemStack.EMPTY;
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
-        ItemStack previous = ItemStack.of(modeTag.getCompound("DetachedMagazine"));
+        DataComponentPatch modeData = this.getModeData(itemStack);
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, modeData);
+        ItemStack previous = patched.getOrDefault(RFEDataComponents.DETACHED_MAGAZINE, RFEItemContainerContents.EMPTY).copyOne();
         if (magazineStack.isEmpty()) {
-            modeTag.remove("DetachedMagazine");
+            patched.remove(RFEDataComponents.DETACHED_MAGAZINE);
         } else {
-            modeTag.put("DetachedMagazine", magazineStack.save(new CompoundTag()));
+            patched.set(RFEDataComponents.DETACHED_MAGAZINE, RFEItemContainerContents.fromItems(List.of(magazineStack)));
         }
         return previous;
     }
 
     public void setCharged(ItemStack itemStack, LivingEntity entity, boolean charged) {
-        FirearmDataUtils.setCharged(this.getOrCreateModeTag(itemStack), charged);
+        this.saveModeData(itemStack, FirearmDataUtils.setCharged(this.getModeData(itemStack), charged));
     }
 
     public boolean canChargeInternal(ItemStack itemStack, LivingEntity entity) {
@@ -1078,23 +1149,28 @@ public class RFEFirearmMode {
     }
 
     public void setChargeAction(ItemStack itemStack, LivingEntity entity, int index, ChargeAction action) {
-        this.getOrCreateModeTag(itemStack).putInt("ChargeAction", index);
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, this.getModeData(itemStack));
+        patched.set(RFEDataComponents.CHARGE_ACTION, index);
+        this.saveModeData(itemStack, patched.asPatch());
         FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.CHARGING);
         FirearmDataUtils.setActionTime(itemStack, action.time());
     }
 
     public void resetChargeAction(ItemStack itemStack, LivingEntity entity) {
-        this.getOrCreateModeTag(itemStack).remove("ChargeAction");
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, this.getModeData(itemStack));
+        patched.remove(RFEDataComponents.CHARGE_ACTION);
+        this.saveModeData(itemStack, patched.asPatch());
         FirearmDataUtils.setAction(itemStack, null);
         FirearmDataUtils.setActionTime(itemStack, 0);
     }
 
     @Nullable
     public ChargeAction getCurrentChargeAction(ItemStack itemStack, LivingEntity entity) {
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
-        if (!modeTag.contains("ChargeAction", Tag.TAG_INT))
+        DataComponentPatch modeData = this.getModeData(itemStack);
+        Optional<? extends Integer> o = modeData.get(RFEDataComponents.CHARGE_ACTION);
+        if (o == null || o.isEmpty())
             return null;
-        int index = modeTag.getInt("ChargeAction");
+        int index = o.get();
         return 0 <= index && index < this.chargeActions.size() ? this.chargeActions.get(index) : null;
     }
 
@@ -1134,7 +1210,7 @@ public class RFEFirearmMode {
     }
 
     public void finishCharge(ItemStack itemStack, LivingEntity entity) {
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        DataComponentPatch modeData = this.getModeData(itemStack);
         this.setCharged(itemStack, entity, true);
         this.setJammed(itemStack, entity, false);
         if (entity.level().isClientSide)
@@ -1150,10 +1226,11 @@ public class RFEFirearmMode {
         if (!this.plusOneCapacity && nextRound.isEmpty())
             this.setCharged(itemStack, entity, false);
         if (this.canOverheat) {
-            float heat = FirearmDataUtils.getHeat(modeTag);
+            float heat = FirearmDataUtils.getHeat(modeData);
             heat -= this.getHandlingProperties(itemStack).heatRemovedOnCharge();
             heat = Math.max(0, heat);
-            FirearmDataUtils.setHeat(modeTag, heat);
+            modeData = FirearmDataUtils.setHeat(modeData, heat);
+            this.saveModeData(itemStack, modeData);
         }
         ItemStack chamberedRound = this.getChamberedRound(itemStack);
         if (!chamberedRound.isEmpty()) {
@@ -1175,21 +1252,25 @@ public class RFEFirearmMode {
                         RFEItemUtils.addItemToEntity(loadedRound, entity);
                     }
                 } else if (this.internalCapacity > 0) {
-                    List<ItemStack> ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
+                    List<ItemStack> ammoList = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS);
                     ItemStack ejected = FirearmDataUtils.stripAmmo(ammoList, this.ammoConsumedLast, false, this.trackEmptySlots);
-                    FirearmDataUtils.saveRounds(modeTag, "InternalRounds", ammoList);
+                    this.saveModeData(itemStack, FirearmDataUtils.saveRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS, ammoList));
                     if (!ejected.isEmpty())
                         RFEItemUtils.addItemToEntity(ejected, entity);
                 } else {
-                    CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
-                    ItemStack magazine = ItemStack.of(magazineTag);
-                    if (magazine.getItem() instanceof MagazineItem magazineItem) {
-                        List<ItemStack> ammoList = magazineItem.getStoredAmmo(magazine);
-                        ItemStack ejected = FirearmDataUtils.stripAmmo(ammoList, this.ammoConsumedLast, false, this.trackEmptySlots);
-                        magazineItem.writeStoredAmmo(magazine, ammoList);
-                        modeTag.put("DetachedMagazine", magazine.save(magazineTag));
-                        if (!ejected.isEmpty())
-                            RFEItemUtils.addItemToEntity(ejected, entity);
+                    Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+                    if (o != null && o.isPresent()) {
+                        ItemStack magazine = o.get().copyOne();
+                        if (magazine.getItem() instanceof MagazineItem magazineItem) {
+                            List<ItemStack> ammoList = magazineItem.getStoredAmmo(magazine);
+                            ItemStack ejected = FirearmDataUtils.stripAmmo(ammoList, this.ammoConsumedLast, false, this.trackEmptySlots);
+                            magazineItem.writeStoredAmmo(magazine, ammoList);
+                            PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, modeData);
+                            patched.set(RFEDataComponents.DETACHED_MAGAZINE, RFEItemContainerContents.fromItems(List.of(magazine)));
+                            this.saveModeData(itemStack, patched.asPatch());
+                            if (!ejected.isEmpty())
+                                RFEItemUtils.addItemToEntity(ejected, entity);
+                        }
                     }
                 }
             }
@@ -1197,11 +1278,11 @@ public class RFEFirearmMode {
     }
 
     public void setJammed(ItemStack itemStack, LivingEntity entity, boolean jammed) {
-        FirearmDataUtils.setJammed(this.getOrCreateModeTag(itemStack), jammed);
+        this.saveModeData(itemStack, FirearmDataUtils.setJammed(this.getModeData(itemStack), jammed));
     }
 
     public boolean isJammed(ItemStack itemStack) {
-        return FirearmDataUtils.isJammed(this.getOrCreateModeTag(itemStack));
+        return FirearmDataUtils.isJammed(this.getModeData(itemStack));
     }
 
     public void onTickDraw(ItemStack itemStack, LivingEntity entity) {
@@ -1230,9 +1311,10 @@ public class RFEFirearmMode {
         FirearmDataUtils.setActionTime(itemStack, actionTime);
         if (actionTime > 0)
             return;
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
-        FirearmDataUtils.setOverheated(modeTag, false);
-        FirearmDataUtils.setHeat(modeTag, 0);
+        DataComponentPatch modeData = this.getModeData(itemStack);
+        modeData = FirearmDataUtils.setOverheated(modeData, false);
+        modeData = FirearmDataUtils.setHeat(modeData, 0);
+        this.saveModeData(itemStack, modeData);
         FirearmDataUtils.setAction(itemStack, null);
     }
 
@@ -1328,13 +1410,13 @@ public class RFEFirearmMode {
             FirearmDataUtils.setActionTime(itemStack, this.drawTime);
             this.clearBurstFiring(itemStack);
             this.setWindingUp(itemStack, entity, false);
-            this.setForceCancelReload(itemStack, entity, false);
+            this.setForceCancelAction(itemStack, entity, false);
             if (this.resetChargeOnUnequip)
                 this.setCharged(itemStack, entity, false);
             return;
         }
-        CompoundTag tag = itemStack.getOrCreateTag();
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        DataComponentPatch stackData = itemStack.getComponentsPatch();
+        DataComponentPatch modeData = this.getModeData(itemStack);
         RFEFirearmModeHandlingProperties properties = this.getHandlingProperties(itemStack);
 
         RFEFirearmItem.Action action = FirearmDataUtils.getAction(itemStack);
@@ -1344,7 +1426,7 @@ public class RFEFirearmMode {
         if (action != RFEFirearmItem.Action.FIRING)
             this.clearBurstFiring(itemStack);
         if (action != RFEFirearmItem.Action.RELOAD)
-            this.setForceCancelReload(itemStack, entity, false);
+            this.setForceCancelAction(itemStack, entity, false);
         if (action != null) {
             switch (action) {
                 case RELOAD -> this.onTickReload(itemStack, entity);
@@ -1359,7 +1441,7 @@ public class RFEFirearmMode {
             if (endAction == null)
                 this.startIdleEffects(itemStack, entity);
         } else {
-            if (FirearmDataUtils.isOverheated(modeTag)) {
+            if (FirearmDataUtils.isOverheated(modeData)) {
                 FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.COOLDOWN);
                 FirearmDataUtils.setActionTime(itemStack, this.cooldownTime);
             } else if (this.fireMode == FireMode.SINGLE_ACTION
@@ -1369,15 +1451,18 @@ public class RFEFirearmMode {
             }
         }
 
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, modeData);
         action = FirearmDataUtils.getAction(itemStack);
         if (action != RFEFirearmItem.Action.RELOAD) {
-            modeTag.remove("ReloadPhase");
-            modeTag.remove("ReloadPhaseIndex");
+            patched.remove(RFEDataComponents.RELOAD_PHASE);
+            patched.remove(RFEDataComponents.RELOAD_PHASE_INDEX);
         }
         if (action != RFEFirearmItem.Action.UNLOAD) {
-            modeTag.remove("UnloadPhase");
-            modeTag.remove("UnloadPhaseIndex");
+            patched.remove(RFEDataComponents.UNLOAD_PHASE);
+            patched.remove(RFEDataComponents.UNLOAD_PHASE_INDEX);
         }
+        modeData = patched.asPatch();
+        this.saveModeData(itemStack, modeData);
         if (action != RFEFirearmItem.Action.FIRING && this.isWindingUp(itemStack, entity))
             this.setWindingUp(itemStack, entity, false);
 
@@ -1396,20 +1481,26 @@ public class RFEFirearmMode {
             //      TODO tick ammo slots
             //      TODO tick non-ammo slot
 
-            if (this.canOverheat && !FirearmDataUtils.isOverheated(modeTag)) {
-                int cooldownDelay = FirearmDataUtils.getCoolingDelay(modeTag);
+            if (this.canOverheat && !FirearmDataUtils.isOverheated(modeData)) {
+                int cooldownDelay = FirearmDataUtils.getCoolingDelay(modeData);
                 if (cooldownDelay > 0) {
                     --cooldownDelay;
-                    FirearmDataUtils.setCoolingDelay(modeTag, cooldownDelay);
+                    modeData = FirearmDataUtils.setCoolingDelay(modeData, cooldownDelay);
+                    this.saveModeData(itemStack, modeData);
                 } else {
-                    float heat = FirearmDataUtils.getHeat(modeTag);
+                    float heat = FirearmDataUtils.getHeat(modeData);
                     heat -= properties.heatRemovedPerTick();
                     heat = Math.max(0, heat);
-                    FirearmDataUtils.setHeat(modeTag, heat);
+                    modeData = FirearmDataUtils.setHeat(modeData, heat);
+                    this.saveModeData(itemStack, modeData);
                 }
             }
-            if (action != RFEFirearmItem.Action.FIRING)
-                modeTag.remove("ExtraFiringTime");
+            if (action != RFEFirearmItem.Action.FIRING) {
+                patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, modeData);
+                patched.remove(RFEDataComponents.EXTRA_FIRING_TIME);
+                modeData = patched.asPatch();
+                this.saveModeData(itemStack, modeData);
+            }
         }
     }
 
@@ -1429,14 +1520,16 @@ public class RFEFirearmMode {
     }
 
     public int countFreeAmmoSpaces(ItemStack itemStack) {
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        DataComponentPatch modeData = this.getModeData(itemStack);
         if (this.internalCapacity > 0) {
-            List<ItemStack> ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
+            List<ItemStack> ammoList = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS);
             int count = RFEItemUtils.countItems(ammoList);
             return this.nominalCapacity - count;
         } else {
-            CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
-            ItemStack magazine = ItemStack.of(magazineTag);
+            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+            if (o == null || o.isEmpty())
+                return 0;
+            ItemStack magazine = o.get().copyOne();
             if (magazine.getItem() instanceof MagazineItem magazineItem) {
                 int capacity = magazineItem.getMagazineCapacity(magazine);
                 List<ItemStack> ammoList = magazineItem.getStoredAmmo(magazine);
@@ -1450,7 +1543,7 @@ public class RFEFirearmMode {
 
     public int countExtraAmmoSpaces(ItemStack itemStack) {
         if (this.internalCapacity > 0) {
-            List<ItemStack> ammoList = FirearmDataUtils.getRounds(this.getOrCreateModeTag(itemStack), "InternalRounds");
+            List<ItemStack> ammoList = FirearmDataUtils.getRounds(this.getModeData(itemStack), RFEDataComponents.INTERNAL_ROUNDS);
             int count = RFEItemUtils.countItems(ammoList);
             int extraSlots = this.internalCapacity - this.nominalCapacity;
             int extraAmmo = Math.max(0, count - this.nominalCapacity);
@@ -1461,13 +1554,15 @@ public class RFEFirearmMode {
     }
 
     public boolean hasAmmo(ItemStack itemStack) {
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        DataComponentPatch modeData = this.getModeData(itemStack);
         if (this.internalCapacity > 0) {
-            List<ItemStack> ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
+            List<ItemStack> ammoList = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS);
             return RFEItemUtils.countItems(ammoList) > 0;
         } else {
-            CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
-            ItemStack magazine = ItemStack.of(magazineTag);
+            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+            if (o == null || o.isEmpty())
+                return false;
+            ItemStack magazine = o.get().copyOne();
             if (magazine.getItem() instanceof MagazineItem magazineItem) {
                 List<ItemStack> ammoList = magazineItem.getStoredAmmo(magazine);
                 return RFEItemUtils.countItems(ammoList) > 0;
@@ -1478,18 +1573,20 @@ public class RFEFirearmMode {
     }
 
     protected ItemStack getChamberedRound(ItemStack itemStack) {
-        CompoundTag modeTag = this.getOrCreateModeTag(itemStack);
+        DataComponentPatch modeData = this.getModeData(itemStack);
         ItemStack chamberedRound;
         if (this.internalCapacity > 0) {
-            List<ItemStack> ammoList = FirearmDataUtils.getRounds(modeTag, "InternalRounds");
+            List<ItemStack> ammoList = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS);
             if (ammoList.isEmpty())
                 return ItemStack.EMPTY;
             chamberedRound = ammoList.get(this.ammoConsumedLast ? ammoList.size() - 1 : 0);
         } else if (this.plusOneCapacity) {
             return this.getLoadedRound(itemStack);
         } else {
-            CompoundTag magazineTag = modeTag.getCompound("DetachedMagazine");
-            ItemStack magazine = ItemStack.of(magazineTag);
+            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+            if (o == null || o.isEmpty())
+                return ItemStack.EMPTY;
+            ItemStack magazine = o.get().copyOne();
             if (!(magazine.getItem() instanceof MagazineItem magazineItem))
                 return ItemStack.EMPTY;
             List<ItemStack> ammoList = magazineItem.getStoredAmmo(magazine);
@@ -1513,15 +1610,15 @@ public class RFEFirearmMode {
     }
 
     public boolean isCharged(ItemStack itemStack) {
-        return FirearmDataUtils.isCharged(this.getOrCreateModeTag(itemStack));
+        return FirearmDataUtils.isCharged(this.getModeData(itemStack));
     }
 
     public boolean hasMagazine(ItemStack itemStack) {
         if (this.internalCapacity > 0)
             return false;
-        CompoundTag magazineTag = this.getOrCreateModeTag(itemStack).getCompound("DetachedMagazine");
-        ItemStack magazine = ItemStack.of(magazineTag);
-        return magazine.getItem() instanceof MagazineItem;
+        DataComponentPatch modeData = this.getModeData(itemStack);
+        Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+        return o != null && o.isPresent() && o.get().copyOne().getItem() instanceof MagazineItem;
     }
 
     public boolean entityHasMagazine(ItemStack itemStack, LivingEntity entity) {
@@ -1549,7 +1646,7 @@ public class RFEFirearmMode {
     }
 
     public float getHeatAmount(ItemStack itemStack) {
-        return this.getOrCreateModeTag(itemStack).getFloat("FirearmHeat");
+        return FirearmDataUtils.getHeat(this.getModeData(itemStack));
     }
 
     public float getHeatCapacity(ItemStack itemStack) {

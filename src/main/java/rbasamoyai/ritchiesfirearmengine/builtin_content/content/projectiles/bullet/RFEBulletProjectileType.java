@@ -1,6 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bullet;
 
-import com.google.gson.JsonObject;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -8,7 +8,8 @@ import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -307,10 +308,8 @@ public class RFEBulletProjectileType implements RFEProjectileType {
                         living.push(vec3.x, verticalVel, vec3.z);
                 }
 
-                if (!level.isClientSide && owner instanceof LivingEntity ownerLiving) {
-                    EnchantmentHelper.doPostHurtEffects(living, owner);
-                    EnchantmentHelper.doPostDamageEffects(ownerLiving, living);
-                }
+                if (level instanceof ServerLevel slevel)
+                    EnchantmentHelper.doPostAttackEffects(slevel, living, damagesource);
 
                 this.doPostHurtEffects(instance, level, living);
                 // TODO custom on hit sound effect for players
@@ -426,20 +425,14 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     }
 
     public static class Serializer implements RFEProjectileType.Serializer<RFEBulletProjectileType> {
-        @Override
-        public RFEBulletProjectileType fromJson(JsonObject obj) {
-            return new RFEBulletProjectileType(RFEBaseProjectilePropertiesBuilder.fromJson(obj));
-        }
+        public static final MapCodec<RFEBulletProjectileType> CODEC = RFEBaseProjectilePropertiesBuilder.CODEC
+                .xmap(RFEBulletProjectileType::new, RFEBulletProjectileType::makeProjectileProperties);
 
-        @Override
-        public RFEBulletProjectileType fromNetwork(FriendlyByteBuf buf) {
-            return new RFEBulletProjectileType(RFEBaseProjectilePropertiesBuilder.fromNetwork(buf));
-        }
+        public static final StreamCodec<RegistryFriendlyByteBuf, RFEBulletProjectileType> STREAM_CODEC =
+                RFEBaseProjectilePropertiesBuilder.STREAM_CODEC.map(RFEBulletProjectileType::new, RFEBulletProjectileType::makeProjectileProperties);
 
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, RFEBulletProjectileType type) {
-            RFEBaseProjectilePropertiesBuilder.toNetwork(buf, makeProjectileProperties(type));
-        }
+        @Override public MapCodec<RFEBulletProjectileType> codec() { return CODEC; }
+        @Override public StreamCodec<RegistryFriendlyByteBuf, RFEBulletProjectileType> streamCodec() { return STREAM_CODEC; }
     }
 
 }

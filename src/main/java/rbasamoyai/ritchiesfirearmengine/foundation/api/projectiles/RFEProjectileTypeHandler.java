@@ -2,33 +2,38 @@ package rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.JsonOps;
+import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashBigSet;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.RFEPacket;
-import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
 public class RFEProjectileTypeHandler {
+
+    public static final StreamCodec<ByteBuf, RFEProjectileType> LOADED_TYPE_STREAM_CODEC = ResourceLocation.STREAM_CODEC.map(
+            rl -> Objects.requireNonNull(RFEProjectileTypeHandler.getProjectileType(rl)),
+            t -> Objects.requireNonNull(RFEProjectileTypeHandler.getProjectileTypeId(t)));
 
     private static final Map<ResourceLocation, RFEProjectileType> PROJECTILE_TYPES = new Object2ReferenceOpenHashMap<>();
     private static final Map<RFEProjectileType, ResourceLocation> PROJECTILE_TYPE_IDS = new Reference2ObjectOpenHashMap<>();
@@ -48,13 +53,8 @@ public class RFEProjectileTypeHandler {
             for (Map.Entry<ResourceLocation, JsonElement> entry : data.entrySet()) {
                 ResourceLocation id = entry.getKey();
                 try {
-                    JsonElement el = entry.getValue();
-                    if (!el.isJsonObject())
-                        throw new JsonParseException("Expected JSON object for RFE projectile type");
-                    JsonObject obj = el.getAsJsonObject();
-                    ResourceLocation typeId = RFEUtils.location(GsonHelper.getAsString(obj, "type"));
-                    RFEProjectileType.Serializer<?> ser = RFEContentBuilderRegistry.getProjectileTypeSerializer(typeId);
-                    RFEProjectileType type = ser.fromJson(obj);
+                    RFEProjectileType type = RFEProjectileType.CODEC.parse(JsonOps.INSTANCE, entry.getValue())
+                            .getOrThrow(m -> new IllegalStateException("Error reading RFE projectile type properties: " + m));
                     PROJECTILE_TYPES.put(id, type);
                     PROJECTILE_TYPE_IDS.put(type, id);
                     if (type instanceof RFEProjectileType.HasCombinedProjectiles combined) {
@@ -90,46 +90,22 @@ public class RFEProjectileTypeHandler {
         RFENetwork.sendToPlayer(new ClientboundSyncRFEProjectileTypesPacket(), player);
     }
 
-    public record ClientboundSyncRFEProjectileTypesPacket(Map<ResourceLocation, RFEProjectileType> projectileTypes) implements RFEPacket {
+    public record ClientboundSyncRFEProjectileTypesPacket(Object2ReferenceOpenHashMap<ResourceLocation, RFEProjectileType> projectileTypes) implements RFEPacket {
         ClientboundSyncRFEProjectileTypesPacket() { this(getProjectileTypesNoSubprojectiles()); }
 
-        private static Map<ResourceLocation, RFEProjectileType> getProjectileTypesNoSubprojectiles() {
-            Map<ResourceLocation, RFEProjectileType> result = new Object2ReferenceOpenHashMap<>(PROJECTILE_TYPES);
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundSyncRFEProjectileTypesPacket> STREAM_CODEC =
+                ByteBufCodecs.map(Object2ReferenceOpenHashMap::new, ResourceLocation.STREAM_CODEC, RFEProjectileType.STREAM_CODEC)
+                        .map(ClientboundSyncRFEProjectileTypesPacket::new, ClientboundSyncRFEProjectileTypesPacket::projectileTypes);
+
+        private static Object2ReferenceOpenHashMap<ResourceLocation, RFEProjectileType> getProjectileTypesNoSubprojectiles() {
+            Object2ReferenceOpenHashMap<ResourceLocation, RFEProjectileType> result = new Object2ReferenceOpenHashMap<>(PROJECTILE_TYPES);
             for (ResourceLocation subprojectileId : SUBPROJECTILE_TYPE_IDS)
                 result.remove(subprojectileId);
             return result;
         }
 
-        public static ClientboundSyncRFEProjectileTypesPacket decode(FriendlyByteBuf buf) {
-            Map<ResourceLocation, RFEProjectileType> projectileTypes = new Object2ReferenceOpenHashMap<>();
-            int sz = buf.readVarInt();
-            for (int i = 0; i < sz; ++i) {
-                ResourceLocation typeId = buf.readResourceLocation();
-                RFEProjectileType.Serializer<?> ser = RFEContentBuilderRegistry.getProjectileTypeSerializer(buf.readResourceLocation());
-                RFEProjectileType projectileType = ser.fromNetwork(buf);
-                projectileTypes.put(typeId, projectileType);
-            }
-            return new ClientboundSyncRFEProjectileTypesPacket(projectileTypes);
-        }
-
         @Override
-        public void rootEncode(FriendlyByteBuf buf) {
-            buf.writeVarInt(this.projectileTypes.size());
-            for (Map.Entry<ResourceLocation, RFEProjectileType> entry : this.projectileTypes.entrySet()) {
-                buf.writeResourceLocation(entry.getKey());
-                buf.writeResourceLocation(RFEContentBuilderRegistry.getProjectileTypeSerializerId(entry.getValue().getSerializer()));
-                toNetworkCasted(buf, entry.getValue());
-            }
-        }
-
-        @SuppressWarnings("unchecked")
-        private static <T extends RFEProjectileType> void toNetworkCasted(FriendlyByteBuf buf, T type) {
-            RFEProjectileType.Serializer<T> ser = (RFEProjectileType.Serializer<T>) type.getSerializer();
-            ser.toNetwork(buf, type);
-        }
-
-        @Override
-        public void handle(Executor exec, PacketListener listener, @Nullable ServerPlayer sender) {
+        public void handle(Executor exec, PacketListener listener, Player player) {
             PROJECTILE_TYPES.clear();
             PROJECTILE_TYPES.putAll(this.projectileTypes);
             PROJECTILE_TYPE_IDS.clear();

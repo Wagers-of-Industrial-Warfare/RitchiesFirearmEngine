@@ -1,37 +1,23 @@
 package rbasamoyai.ritchiesfirearmengine.network;
 
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.entity.player.Player;
 import rbasamoyai.ritchiesfirearmengine.utils.EnvExecute;
 
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.concurrent.Executor;
 
-public record ClientboundValidateRFEContentPacksPacket(Map<String, String> versions) implements RFEPacket {
+public record ClientboundValidateRFEContentPacksPacket(LinkedHashMap<String, String> versions) implements RFEPacket {
 
-    public static ClientboundValidateRFEContentPacksPacket decode(FriendlyByteBuf buf) {
-        Map<String, String> versions = new LinkedHashMap<>();
-        int sz = buf.readVarInt();
-        for (int i = 0; i < sz; ++i) {
-            String packId = buf.readUtf();
-            String versionRange = buf.readUtf();
-            versions.put(packId, versionRange);
-        }
-        return new ClientboundValidateRFEContentPacksPacket(versions);
-    }
+    public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundValidateRFEContentPacksPacket> STREAM_CODEC =
+            ByteBufCodecs.map(LinkedHashMap::new, ByteBufCodecs.STRING_UTF8, ByteBufCodecs.STRING_UTF8)
+                    .map(ClientboundValidateRFEContentPacksPacket::new, ClientboundValidateRFEContentPacksPacket::versions).cast();
 
     @Override
-    public void rootEncode(FriendlyByteBuf buf) {
-        buf.writeVarInt(this.versions.size());
-        for (Map.Entry<String, String> entry : this.versions.entrySet())
-            buf.writeUtf(entry.getKey()).writeUtf(entry.getValue());
-    }
-
-    @Override
-    public void handle(Executor exec, PacketListener listener, @Nullable ServerPlayer sender) {
+    public void handle(Executor exec, PacketListener listener, Player player) {
         EnvExecute.runOnClient(() -> () -> RFEClientNetworkHandlers.validateRFEContentPacks(this));
     }
 

@@ -3,6 +3,7 @@ package rbasamoyai.ritchiesfirearmengine.network;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.network.DisconnectionDetails;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Tuple;
@@ -54,7 +55,7 @@ public class RFEClientNetworkHandlers {
             return;
         mc.level.disconnect();
         Component reason = Component.literal("Different RFE pack versions on client and server, please ensure they are the same");
-        mc.getConnection().onDisconnect(reason);
+        mc.getConnection().onDisconnect(new DisconnectionDetails(reason));
 
         Map<String, Tuple<String, String>> mismatched = RFEUtils.provideMismatchedRFEContentPacks(clientVersions, packet.versions());
         RitchiesFirearmEngine.LOGGER.error("Pack mismatch between client and server ({} pack(s)). See below:", mismatched.size());

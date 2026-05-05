@@ -188,7 +188,7 @@ public abstract sealed class FirearmCondition implements Predicate<Map<ResourceL
             if (!macroEnabled)
                 throw new IllegalStateException("Cannot use macro in firearm condition macro definition");
             ResourceLocation macroLoc = RFEUtils.location(GsonHelper.getAsString(obj, "macro"));
-            return FirearmCondtionMacroHandler.getMacro(macroLoc);
+            return FirearmConditionMacroHandler.getMacro(macroLoc);
         }
         throw new JsonParseException("Invalid firearm condition type, must be one of 'compare', 'and', 'or'" + (macroEnabled ? ", 'macro" : ""));
     }

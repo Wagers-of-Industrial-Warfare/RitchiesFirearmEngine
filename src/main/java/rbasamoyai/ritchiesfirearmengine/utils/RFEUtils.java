@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.utils;
 
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Rarity;
@@ -12,23 +13,23 @@ import java.util.stream.Collectors;
 public class RFEUtils {
 
     /**
-     * Alias for {@link ResourceLocation#ResourceLocation(String)} to facilitate
+     * Alias for {@link ResourceLocation#parse(String)} to facilitate
      * porting to 1.21+.
      *
      * @param loc the {@link ResourceLocation} in {@code <namespace>:<path>} form
      * @return a new {@link ResourceLocation} of the passed id
      */
-    public static ResourceLocation location(String loc) { return new ResourceLocation(loc); }
+    public static ResourceLocation location(String loc) { return ResourceLocation.parse(loc); }
 
     /**
-     * Alias for {@link ResourceLocation#ResourceLocation(String)} to facilitate
+     * Alias for {@link ResourceLocation#fromNamespaceAndPath(String, String)} to facilitate
      * porting to 1.21+.
      *
      * @param namespace the id namespace
      * @param path the id path
      * @return a new {@link ResourceLocation} of the form {@code <namespace>:<path>}
      */
-    public static ResourceLocation location(String namespace, String path) { return new ResourceLocation(namespace, path); }
+    public static ResourceLocation location(String namespace, String path) { return ResourceLocation.fromNamespaceAndPath(namespace, path); }
 
     private static final Map<String, Rarity> RFE_RARITY_MAPPING = Arrays.stream(Rarity.values())
             .collect(Collectors.toMap(r -> r.name().toLowerCase(Locale.ROOT), Function.identity()));
@@ -73,4 +74,9 @@ public class RFEUtils {
 
     private RFEUtils() {}
 
+    public static <K, V> ImmutableMap<K, V> toImmutableMap(Map<K, V> map) {
+        ImmutableMap.Builder<K, V> builder = ImmutableMap.builder();
+        builder.putAll(map);
+        return builder.build();
+    }
 }

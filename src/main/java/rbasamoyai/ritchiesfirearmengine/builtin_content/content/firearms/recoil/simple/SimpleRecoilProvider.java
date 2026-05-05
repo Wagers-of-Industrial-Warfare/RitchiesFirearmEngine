@@ -1,8 +1,11 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.recoil.simple;
 
-import com.google.gson.JsonObject;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.GsonHelper;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -23,27 +26,22 @@ public record SimpleRecoilProvider(float verticalRecoil, float horizontalRecoil,
     }
 
     public static class Serializer implements RFERecoilProvider.Serializer<SimpleRecoilProvider> {
-        @Override
-        public SimpleRecoilProvider fromJson(JsonObject obj) {
-            float verticalRecoil = GsonHelper.getAsFloat(obj, "vertical_recoil");
-            float horizontalRecoil = GsonHelper.getAsFloat(obj, "horizontal_recoil");
-            float shake = GsonHelper.getAsFloat(obj, "camera_shake", 0);
-            float recoilDecrease = Math.max(0, GsonHelper.getAsFloat(obj, "recoil_decrease"));
-            return new SimpleRecoilProvider(verticalRecoil, horizontalRecoil, shake, recoilDecrease);
-        }
+        private static final MapCodec<SimpleRecoilProvider> CODEC = RecordCodecBuilder.mapCodec(o -> o.group(
+                Codec.FLOAT.fieldOf("vertical_recoil").forGetter(SimpleRecoilProvider::verticalRecoil),
+                Codec.FLOAT.fieldOf("horizontal_recoil").forGetter(SimpleRecoilProvider::horizontalRecoil),
+                Codec.floatRange(0f, Float.MAX_VALUE).optionalFieldOf("camera_shake", 0f).forGetter(SimpleRecoilProvider::shake),
+                Codec.floatRange(0f, Float.MAX_VALUE).fieldOf("recoil_decrease").forGetter(SimpleRecoilProvider::recoilDecrease)
+        ).apply(o, SimpleRecoilProvider::new));
 
-        @Override
-        public SimpleRecoilProvider fromNetwork(FriendlyByteBuf buf) {
-            return new SimpleRecoilProvider(buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat());
-        }
+        private static final StreamCodec<RegistryFriendlyByteBuf, SimpleRecoilProvider> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.FLOAT, SimpleRecoilProvider::verticalRecoil,
+                ByteBufCodecs.FLOAT, SimpleRecoilProvider::horizontalRecoil,
+                ByteBufCodecs.FLOAT, SimpleRecoilProvider::shake,
+                ByteBufCodecs.FLOAT, SimpleRecoilProvider::recoilDecrease,
+                SimpleRecoilProvider::new);
 
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, SimpleRecoilProvider prov) {
-            buf.writeFloat(prov.verticalRecoil)
-                    .writeFloat(prov.horizontalRecoil)
-                    .writeFloat(prov.shake)
-                    .writeFloat(prov.recoilDecrease);
-        }
+        @Override public MapCodec<SimpleRecoilProvider> codec() { return CODEC; }
+        @Override public StreamCodec<RegistryFriendlyByteBuf, SimpleRecoilProvider> streamCodec() { return STREAM_CODEC; }
     }
 
 }

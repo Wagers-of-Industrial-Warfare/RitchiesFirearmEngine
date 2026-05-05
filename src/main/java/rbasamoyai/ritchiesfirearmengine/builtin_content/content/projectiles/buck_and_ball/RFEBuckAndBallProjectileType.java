@@ -1,8 +1,9 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.buck_and_ball;
 
-import com.google.gson.JsonObject;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.GsonHelper;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -55,25 +56,19 @@ public class RFEBuckAndBallProjectileType implements RFEProjectileType, RFEProje
     }
 
     public static class Serializer implements RFEProjectileType.Serializer<RFEBuckAndBallProjectileType> {
-        @Override
-        public RFEBuckAndBallProjectileType fromJson(JsonObject obj) {
-            RFEBulletProjectileType ballType = BuiltInRFEPlugin.ProjectileTypes.BULLET.fromJson(GsonHelper.getAsJsonObject(obj, "ball_properties"));
-            RFEShotgunProjectileType buckType = BuiltInRFEPlugin.ProjectileTypes.SHOTGUN.fromJson(GsonHelper.getAsJsonObject(obj, "buck_properties"));
-            return new RFEBuckAndBallProjectileType(ballType, buckType);
-        }
+        public static final MapCodec<RFEBuckAndBallProjectileType> CODEC = RecordCodecBuilder.mapCodec(o -> o.group(
+                RFEBulletProjectileType.Serializer.CODEC.fieldOf("ball_properties").forGetter(t -> t.ballProjectileType),
+                RFEShotgunProjectileType.Serializer.CODEC.fieldOf("buck_properties").forGetter(t -> t.buckProjectileType)
+        ).apply(o, RFEBuckAndBallProjectileType::new));
 
-        @Override
-        public RFEBuckAndBallProjectileType fromNetwork(FriendlyByteBuf buf) {
-            RFEBulletProjectileType ballType = BuiltInRFEPlugin.ProjectileTypes.BULLET.fromNetwork(buf);
-            RFEShotgunProjectileType buckType = BuiltInRFEPlugin.ProjectileTypes.SHOTGUN.fromNetwork(buf);
-            return new RFEBuckAndBallProjectileType(ballType, buckType);
-        }
+        public static final StreamCodec<RegistryFriendlyByteBuf, RFEBuckAndBallProjectileType> STREAM_CODEC = StreamCodec.composite(
+                RFEBulletProjectileType.Serializer.STREAM_CODEC, t -> t.ballProjectileType,
+                RFEShotgunProjectileType.Serializer.STREAM_CODEC, t -> t.buckProjectileType,
+                RFEBuckAndBallProjectileType::new);
 
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, RFEBuckAndBallProjectileType type) {
-            BuiltInRFEPlugin.ProjectileTypes.BULLET.toNetwork(buf, type.ballProjectileType);
-            BuiltInRFEPlugin.ProjectileTypes.SHOTGUN.toNetwork(buf, type.buckProjectileType);
-        }
+        @Override public MapCodec<RFEBuckAndBallProjectileType> codec() { return CODEC; }
+
+        @Override public StreamCodec<RegistryFriendlyByteBuf, RFEBuckAndBallProjectileType> streamCodec() { return STREAM_CODEC; }
     }
 
 }

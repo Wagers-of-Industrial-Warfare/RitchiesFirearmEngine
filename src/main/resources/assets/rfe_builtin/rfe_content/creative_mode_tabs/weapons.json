@@ -4,77 +4,77 @@
   "contents": [
     "rfe_builtin:r700",
     {
-      "item": "rfe_builtin:lee_enfield_no_4",
+      "id": "rfe_builtin:lee_enfield_no_4",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_10rds\",Count:1b}}}"
     },
     "rfe_builtin:kar98k",
     "rfe_builtin:gewehr_88",
     {
-      "item": "rfe_builtin:mas_49_56",
+      "id": "rfe_builtin:mas_49_56",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_10rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:g3a3",
+      "id": "rfe_builtin:g3a3",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_20rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:m14_rifle",
+      "id": "rfe_builtin:m14_rifle",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_20rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:stg_44",
+      "id": "rfe_builtin:stg_44",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_30rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:ak_47",
+      "id": "rfe_builtin:ak_47",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_30rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:ak_74",
+      "id": "rfe_builtin:ak_74",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_30rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:m4_carbine",
+      "id": "rfe_builtin:m4_carbine",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_30rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:m4a1_carbine",
+      "id": "rfe_builtin:m4a1_carbine",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_30rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:m16a3_rifle",
+      "id": "rfe_builtin:m16a3_rifle",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_30rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:m16a4_rifle",
+      "id": "rfe_builtin:m16a4_rifle",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:rifle_magazine_30rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:mat_49",
+      "id": "rfe_builtin:mat_49",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_32rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:mp_18",
+      "id": "rfe_builtin:mp_18",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_30rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:mp_18_experimental",
+      "id": "rfe_builtin:mp_18_experimental",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_30rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:mp_28",
+      "id": "rfe_builtin:mp_28",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_30rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:sterling_smg",
+      "id": "rfe_builtin:sterling_smg",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_32rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:mac_10",
+      "id": "rfe_builtin:mac_10",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_30rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:mp5",
+      "id": "rfe_builtin:mp5",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_30rds\",Count:1b}}}"
     },
     "rfe_builtin:single_shot_shotgun",
@@ -84,27 +84,27 @@
     "rfe_builtin:m1897_shotgun_trench",
     "rfe_builtin:m1014_shotgun",
     {
-      "item": "rfe_builtin:saiga_12",
+      "id": "rfe_builtin:saiga_12",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:shotgun_magazine_10rds\",Count:1b}}}"
     },
     "rfe_builtin:drilling",
     {
-      "item": "rfe_builtin:m1911",
+      "id": "rfe_builtin:m1911",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_7rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:m9_pistol",
+      "id": "rfe_builtin:m9_pistol",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_15rds\",Count:1b}}}"
     },
     {
-      "item": "rfe_builtin:deagle_50_ae",
+      "id": "rfe_builtin:deagle_50_ae",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:pistol_magazine_7rds\",Count:1b}}}"
     },
     "rfe_builtin:fp_45_liberator",
     "rfe_builtin:peacemaker",
     "rfe_builtin:revolver_mk_vi",
     {
-      "item": "rfe_builtin:nagant_m1895",
+      "id": "rfe_builtin:nagant_m1895",
       "tag": "{MainMode:{DetachedMagazine:{id:\"rfe_builtin:revolver_cylinder_7rds\",Count:1b}}}"
     },
     "rfe_builtin:revolver_44_mag",

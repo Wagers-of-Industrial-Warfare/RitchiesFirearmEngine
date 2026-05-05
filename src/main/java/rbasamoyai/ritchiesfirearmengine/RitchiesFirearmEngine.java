@@ -2,6 +2,7 @@ package rbasamoyai.ritchiesfirearmengine;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -9,23 +10,21 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AddPackFindersEvent;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.event.OnDatapackSyncEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.RegisterEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.OnDatapackSyncEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPluginManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
@@ -41,12 +40,10 @@ public class RitchiesFirearmEngine {
     public static final String MOD_ID = "ritchiesfirearmengine";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public RitchiesFirearmEngine() {
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-        IEventBus forgeBus = MinecraftForge.EVENT_BUS;
+    public RitchiesFirearmEngine(IEventBus modBus, Dist dist, ModContainer container) {
+        IEventBus forgeBus = NeoForge.EVENT_BUS;
 
         modBus.addListener(this::onRegisterObjects);
-        modBus.addListener(this::commonSetup);
         modBus.addListener(this::onAddPackFinders);
 
         forgeBus.addListener(this::onAddReloadListeners);
@@ -59,17 +56,11 @@ public class RitchiesFirearmEngine {
         forgeBus.addListener(this::onLevelTick);
         forgeBus.addListener(this::onLeftClickBlock);
 
-        RFEConfig.registerConfigs(modBus);
+        RFEConfig.registerConfigs(modBus, container);
 
         RFEPackLoader.prepareResources();
 
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> RFEClientForge.init(modBus, forgeBus));
-    }
-
-    private void commonSetup(final FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> {
-            RFENetwork.init();
-        });
+        RFENetwork.init();
     }
 
     private void onRegisterObjects(final RegisterEvent event) {
@@ -83,8 +74,11 @@ public class RitchiesFirearmEngine {
             RFEPackLoader.loadCreativeModeTabs(cons);
             RFEPluginManager.loadCreativeModeTabs(cons);
         } else if (key == Registries.PARTICLE_TYPE) {
-            BiConsumer<ResourceLocation, ParticleType<?>> cons = (loc, tab) -> event.register(Registries.PARTICLE_TYPE, loc, () -> tab);
+            BiConsumer<ResourceLocation, ParticleType<?>> cons = (loc, type) -> event.register(Registries.PARTICLE_TYPE, loc, () -> type);
             RFEPluginManager.loadParticleTypes(cons);
+        } else if (key == Registries.DATA_COMPONENT_TYPE) {
+            BiConsumer<ResourceLocation, DataComponentType<?>> cons = (loc, type) -> event.register(Registries.DATA_COMPONENT_TYPE, loc, () -> type);
+            RFEPluginManager.loadDataComponentTypes(cons);
         }
     }
 
@@ -126,13 +120,12 @@ public class RitchiesFirearmEngine {
         RFECommonEvents.onPlayerLoggedIn(event.getEntity());
     }
 
-    private void onLevelTick(final TickEvent.LevelTickEvent event) {
-        if (event.phase == TickEvent.Phase.END)
-            RFECommonEvents.onLevelTick(event.level);
+    private void onLevelTick(final LevelTickEvent.Post event) {
+        RFECommonEvents.onLevelTickEnd(event.getLevel());
     }
 
     private void onLeftClickBlock(final PlayerInteractEvent.LeftClickBlock event) {
-        if (event.isCancelable() && RFECommonEvents.onLeftClickBlock(event.getEntity()))
+        if (RFECommonEvents.onLeftClickBlock(event.getEntity()))
             event.setCanceled(true);
     }
 

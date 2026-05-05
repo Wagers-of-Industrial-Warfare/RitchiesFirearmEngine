@@ -1,13 +1,15 @@
 package rbasamoyai.ritchiesfirearmengine.network;
 
-import net.minecraft.network.FriendlyByteBuf;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
-import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+import net.neoforged.neoforge.network.PacketDistributor;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.AmmoPacketItemPropertiesHandler.ClientboundSyncAmmoPacketPropertiesPacket;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItemPropertiesHandler.ClientboundSyncMagazinePropertiesPacket;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler.ClientboundSyncFirearmAmmoPropertiesPacket;
@@ -22,73 +24,71 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.penetration.R
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProviderPackHandler.ClientboundSyncRecoilProvidersPacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProviderPackHandler.ClientboundSyncSpreadProvidersPacket;
 
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 public class RFENetwork {
 
-    private static SimpleChannel NETWORK = construct();
-    public static final String VERSION = "1.0.0";
+    private static final Int2ObjectMap<StreamCodec<RegistryFriendlyByteBuf, ? extends RFEPacket>> ID_TO_STREAM_CODEC = new Int2ObjectOpenHashMap<>();
+    private static final Object2IntMap<Class<? extends RFEPacket>> TYPE_TO_ID = new Object2IntOpenHashMap<>();
 
-    private static SimpleChannel construct() {
-        SimpleChannel network = NetworkRegistry.ChannelBuilder.named(RitchiesFirearmEngine.resource("network"))
-                .clientAcceptedVersions(VERSION::equals)
-                .serverAcceptedVersions(VERSION::equals)
-                .networkProtocolVersion(() -> VERSION)
-                .simpleChannel();
+    public static final String VERSION = "2.0.0";
 
+    public static final StreamCodec<RegistryFriendlyByteBuf, RFEPacket> PACKET_STREAM_CODEC = ByteBufCodecs.VAR_INT.<RegistryFriendlyByteBuf>cast()
+            .dispatch(RFENetwork::getPacketId, RFENetwork::getStreamCodec);
+
+    public static void init() {
         int id = 0;
 
-        buildMessage(network, id++, ClientboundValidateRFEContentPacksPacket.class, ClientboundValidateRFEContentPacksPacket::decode);
-        buildMessage(network, id++, ServerboundFirearmActionPacket.class, ServerboundFirearmActionPacket::new);
-        buildMessage(network, id++, ServerboundSetAttackKeyPacket.class, ServerboundSetAttackKeyPacket::new);
-        buildMessage(network, id++, ServerboundRunFiringLogicPacket.class, ServerboundRunFiringLogicPacket::decode);
-        buildMessage(network, id++, ClientboundSyncMagazinePropertiesPacket.class, ClientboundSyncMagazinePropertiesPacket::decode);
-        buildMessage(network, id++, ClientboundSyncAmmoPacketPropertiesPacket.class, ClientboundSyncAmmoPacketPropertiesPacket::decode);
-        buildMessage(network, id++, ClientboundSpawnRFEProjectilePacket.class, ClientboundSpawnRFEProjectilePacket::decode);
-        buildMessage(network, id++, ClientboundUpdateRFEProjectilePacket.class, ClientboundUpdateRFEProjectilePacket::decode);
-        buildMessage(network, id++, ClientboundRemoveRFEProjectilePacket.class, ClientboundRemoveRFEProjectilePacket::decode);
-        buildMessage(network, id++, ClientboundRemoveAllProjectilesPacket.class, ClientboundRemoveAllProjectilesPacket::decode);
-        buildMessage(network, id++, ClientboundSyncRFEProjectileTypesPacket.class, ClientboundSyncRFEProjectileTypesPacket::decode);
-        buildMessage(network, id++, ClientboundSyncFirearmAmmoPropertiesPacket.class, ClientboundSyncFirearmAmmoPropertiesPacket::decode);
-        buildMessage(network, id++, ClientboundSyncFirearmHandlingPropertiesPacket.class, ClientboundSyncFirearmHandlingPropertiesPacket::decode);
-        buildMessage(network, id++, ClientboundSyncSpreadProvidersPacket.class, ClientboundSyncSpreadProvidersPacket::decode);
-        buildMessage(network, id++, ClientboundSyncRecoilProvidersPacket.class, ClientboundSyncRecoilProvidersPacket::decode);
-        buildMessage(network, id++, ClientboundSyncHitMultipliersPacket.class, ClientboundSyncHitMultipliersPacket::decode);
-        buildMessage(network, id++, ClientboundRunFiringLogicPacket.class, ClientboundRunFiringLogicPacket::decode);
-        buildMessage(network, id++, ClientboundSyncProjectilePenetrationPacket.class, ClientboundSyncProjectilePenetrationPacket::decode);
-
-        return network;
+        addMessage(id++, ClientboundValidateRFEContentPacksPacket.class, ClientboundValidateRFEContentPacksPacket.STREAM_CODEC);
+        addMessage(id++, ServerboundFirearmActionPacket.class, ServerboundFirearmActionPacket.STREAM_CODEC);
+        addMessage(id++, ServerboundSetAttackKeyPacket.class, ServerboundSetAttackKeyPacket.STREAM_CODEC);
+        addMessage(id++, ServerboundRunFiringLogicPacket.class, ServerboundRunFiringLogicPacket.STREAM_CODEC);
+        addMessage(id++, ClientboundSyncMagazinePropertiesPacket.class, ClientboundSyncMagazinePropertiesPacket.STREAM_CODEC);
+        addMessage(id++, ClientboundSyncAmmoPacketPropertiesPacket.class, ClientboundSyncAmmoPacketPropertiesPacket.STREAM_CODEC);
+        addMessage(id++, ClientboundSpawnRFEProjectilePacket.class, ClientboundSpawnRFEProjectilePacket.STREAM_CODEC);
+        addMessage(id++, ClientboundUpdateRFEProjectilePacket.class, ClientboundUpdateRFEProjectilePacket.STREAM_CODEC);
+        addMessage(id++, ClientboundRemoveRFEProjectilePacket.class, ClientboundRemoveRFEProjectilePacket.STREAM_CODEC);
+        addMessage(id++, ClientboundRemoveAllProjectilesPacket.class, ClientboundRemoveAllProjectilesPacket.STREAM_CODEC);
+        addMessage(id++, ClientboundSyncRFEProjectileTypesPacket.class, ClientboundSyncRFEProjectileTypesPacket.STREAM_CODEC);
+        addMessage(id++, ClientboundSyncFirearmAmmoPropertiesPacket.class, ClientboundSyncFirearmAmmoPropertiesPacket.STREAM_CODEC);
+        addMessage(id++, ClientboundSyncFirearmHandlingPropertiesPacket.class, ClientboundSyncFirearmHandlingPropertiesPacket.STREAM_CODEC);
+        addMessage(id++, ClientboundSyncSpreadProvidersPacket.class, ClientboundSyncSpreadProvidersPacket.STREAM_CODEC);
+        addMessage(id++, ClientboundSyncRecoilProvidersPacket.class, ClientboundSyncRecoilProvidersPacket.STREAM_CODEC);
+        addMessage(id++, ClientboundSyncHitMultipliersPacket.class, ClientboundSyncHitMultipliersPacket.STREAM_CODEC);
+        addMessage(id++, ClientboundRunFiringLogicPacket.class, ClientboundRunFiringLogicPacket.STREAM_CODEC);
+        addMessage(id++, ClientboundSyncProjectilePenetrationPacket.class, ClientboundSyncProjectilePenetrationPacket.STREAM_CODEC);
     }
 
-    private static <MSG extends RFEPacket> void buildMessage(SimpleChannel network, int id, Class<MSG> msg, Function<FriendlyByteBuf, MSG> decoder) {
-        network.messageBuilder(msg, id)
-                .decoder(decoder)
-                .encoder(RFEPacket::rootEncode)
-                .consumerMainThread(RFENetwork::consumeRFEPacket)
-                .add();
+    private static <MSG extends RFEPacket> void addMessage(int id, Class<MSG> clazz, StreamCodec<RegistryFriendlyByteBuf, MSG> streamCodec) {
+        TYPE_TO_ID.put(clazz, id);
+        ID_TO_STREAM_CODEC.put(id, streamCodec);
     }
 
-    private static <MSG extends RFEPacket> void consumeRFEPacket(MSG packet, Supplier<NetworkEvent.Context> sup) {
-        NetworkEvent.Context ctx = sup.get();
-        packet.handle(ctx::enqueueWork, ctx.getNetworkManager().getPacketListener(), ctx.getSender());
-        ctx.setPacketHandled(true);
+    public static int getPacketId(RFEPacket pkt) {
+        int id = TYPE_TO_ID.getOrDefault(pkt.getClass(), -1);
+        if (id == -1)
+            throw new IllegalStateException("Attempted to serialize packet with illegal id: " + id);
+        return id;
     }
 
-    public static <MSG extends RFEPacket> void sendToServer(MSG msg) { NETWORK.sendToServer(msg); }
-
-    public static <MSG extends RFEPacket> void sendToPlayer(MSG msg, ServerPlayer player) {
-        NETWORK.send(PacketDistributor.PLAYER.with(() -> player), msg);
+    public static StreamCodec<RegistryFriendlyByteBuf, ? extends RFEPacket> getStreamCodec(int id) {
+        if (!ID_TO_STREAM_CODEC.containsKey(id))
+            throw new IllegalStateException("Attempted to deserialize packet with illegal id: " + id);
+        return ID_TO_STREAM_CODEC.get(id);
     }
 
-    public static <MSG extends RFEPacket> void sendToAll(MSG msg) {
-        NETWORK.send(PacketDistributor.SERVER.noArg(), msg);
+    public static void sendToServer(RFEPacket msg) {
+        PacketDistributor.sendToServer(new RFENeoForgePacket(msg));
     }
 
-    public static <MSG extends RFEPacket> void sendToAllInDimension(MSG msg, Level level) {
-        NETWORK.send(PacketDistributor.DIMENSION.with(level::dimension), msg);
+    public static void sendToPlayer(RFEPacket msg, ServerPlayer player) {
+        PacketDistributor.sendToPlayer(player, new RFENeoForgePacket(msg));
     }
 
-    public static void init() {}
+    public static void sendToAll(RFEPacket msg) {
+        PacketDistributor.sendToAllPlayers(new RFENeoForgePacket(msg));
+    }
+
+    public static void sendToAllInDimension(RFEPacket msg, ServerLevel level) {
+        PacketDistributor.sendToPlayersInDimension(level, new RFENeoForgePacket(msg));
+    }
 
 }

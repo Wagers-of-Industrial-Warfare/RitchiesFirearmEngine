@@ -12,8 +12,6 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFEProjectileRenderer;
@@ -64,24 +62,22 @@ public class RFEBulletProjectileRenderer extends RFEProjectileRenderer {
         poseStack.pushPose();
         if (vel.horizontalDistanceSqr() > 1e-4d && Math.abs(vel.y) > 1e-2d) {
             Vec3 horizontal = new Vec3(vel.x, 0, vel.z).normalize();
-            poseStack.mulPoseMatrix(RFEMatrixUtils.mat4x4fFacing(vel.normalize().reverse(), horizontal));
-            poseStack.mulPoseMatrix(RFEMatrixUtils.mat4x4fFacing(horizontal, new Vec3(0, 0, -1)));
+            poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(vel.normalize().reverse(), horizontal));
+            poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(horizontal, new Vec3(0, 0, -1)));
         } else {
-            poseStack.mulPoseMatrix(RFEMatrixUtils.mat4x4fFacing(vel.normalize(), new Vec3(0, 0, -1)));
+            poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(vel.normalize(), new Vec3(0, 0, -1)));
         }
 
         light = this.tracerLight ? LightTexture.FULL_BRIGHT : light;
         PoseStack.Pose lastPose = poseStack.last();
-        Matrix4f pose = lastPose.pose();
-        Matrix3f normal = lastPose.normal();
 
         VertexConsumer vcons = buffers.getBuffer(COLOR);
-        renderBox(vcons, pose, normal, this.rHead, this.gHead, this.bHead, this.rTail, this.gTail, this.bTail, length, this.thickness, light);
+        renderBox(vcons, lastPose, this.rHead, this.gHead, this.bHead, this.rTail, this.gTail, this.bTail, length, this.thickness, light);
 
         poseStack.popPose();
     }
 
-    private static void renderBox(VertexConsumer builder, Matrix4f pose, Matrix3f normal, int rHead, int gHead, int bHead,
+    private static void renderBox(VertexConsumer builder, PoseStack.Pose pose, int rHead, int gHead, int bHead,
                                   int rTail, int gTail, int bTail, float length, float thickness, int light) {
         float x1 = -thickness;
         float y1 = -thickness;
@@ -91,50 +87,49 @@ public class RFEBulletProjectileRenderer extends RFEProjectileRenderer {
         float z2 = thickness;
 
         // Front
-        vertex(builder, pose, normal, rTail, gTail, bTail, x1, y1, z1, light);
-        vertex(builder, pose, normal, rTail, gTail, bTail, x1, y2, z1, light);
-        vertex(builder, pose, normal, rTail, gTail, bTail, x2, y2, z1, light);
-        vertex(builder, pose, normal, rTail, gTail, bTail, x2, y1, z1, light);
+        vertex(builder, pose, rTail, gTail, bTail, x1, y1, z1, light);
+        vertex(builder, pose, rTail, gTail, bTail, x1, y2, z1, light);
+        vertex(builder, pose, rTail, gTail, bTail, x2, y2, z1, light);
+        vertex(builder, pose, rTail, gTail, bTail, x2, y1, z1, light);
 
         // Right
-        vertex(builder, pose, normal, rTail, gTail, bTail, x1, y1, z1, light);
-        vertex(builder, pose, normal, rHead, gHead, bHead, x1, y1, z2, light);
-        vertex(builder, pose, normal, rHead, gHead, bHead, x1, y2, z2, light);
-        vertex(builder, pose, normal, rTail, gTail, bTail, x1, y2, z1, light);
+        vertex(builder, pose, rTail, gTail, bTail, x1, y1, z1, light);
+        vertex(builder, pose, rHead, gHead, bHead, x1, y1, z2, light);
+        vertex(builder, pose, rHead, gHead, bHead, x1, y2, z2, light);
+        vertex(builder, pose, rTail, gTail, bTail, x1, y2, z1, light);
 
         // Back
-        vertex(builder, pose, normal, rHead, gHead, bHead, x1, y1, z2, light);
-        vertex(builder, pose, normal, rHead, gHead, bHead, x2, y1, z2, light);
-        vertex(builder, pose, normal, rHead, gHead, bHead, x2, y2, z2, light);
-        vertex(builder, pose, normal, rHead, gHead, bHead, x1, y2, z2, light);
+        vertex(builder, pose, rHead, gHead, bHead, x1, y1, z2, light);
+        vertex(builder, pose, rHead, gHead, bHead, x2, y1, z2, light);
+        vertex(builder, pose, rHead, gHead, bHead, x2, y2, z2, light);
+        vertex(builder, pose, rHead, gHead, bHead, x1, y2, z2, light);
 
         // Left
-        vertex(builder, pose, normal, rTail, gTail, bTail, x2, y1, z1, light);
-        vertex(builder, pose, normal, rTail, gTail, bTail, x2, y2, z1, light);
-        vertex(builder, pose, normal, rHead, gHead, bHead, x2, y2, z2, light);
-        vertex(builder, pose, normal, rHead, gHead, bHead, x2, y1, z2, light);
+        vertex(builder, pose, rTail, gTail, bTail, x2, y1, z1, light);
+        vertex(builder, pose, rTail, gTail, bTail, x2, y2, z1, light);
+        vertex(builder, pose, rHead, gHead, bHead, x2, y2, z2, light);
+        vertex(builder, pose, rHead, gHead, bHead, x2, y1, z2, light);
 
         // Down
-        vertex(builder, pose, normal, rHead, gHead, bHead, x2, y1, z2, light);
-        vertex(builder, pose, normal, rHead, gHead, bHead, x1, y1, z2, light);
-        vertex(builder, pose, normal, rTail, gTail, bTail, x1, y1, z1, light);
-        vertex(builder, pose, normal, rTail, gTail, bTail, x2, y1, z1, light);
+        vertex(builder, pose, rHead, gHead, bHead, x2, y1, z2, light);
+        vertex(builder, pose, rHead, gHead, bHead, x1, y1, z2, light);
+        vertex(builder, pose, rTail, gTail, bTail, x1, y1, z1, light);
+        vertex(builder, pose, rTail, gTail, bTail, x2, y1, z1, light);
 
         // Up
-        vertex(builder, pose, normal, rTail, gTail, bTail, x1, y2, z1, light);
-        vertex(builder, pose, normal, rHead, gHead, bHead, x1, y2, z2, light);
-        vertex(builder, pose, normal, rHead, gHead, bHead, x2, y2, z2, light);
-        vertex(builder, pose, normal, rTail, gTail, bTail, x2, y2, z1, light);
+        vertex(builder, pose, rTail, gTail, bTail, x1, y2, z1, light);
+        vertex(builder, pose, rHead, gHead, bHead, x1, y2, z2, light);
+        vertex(builder, pose, rHead, gHead, bHead, x2, y2, z2, light);
+        vertex(builder, pose, rTail, gTail, bTail, x2, y2, z1, light);
     }
 
-    private static void vertex(VertexConsumer builder, Matrix4f pose, Matrix3f normal, int r, int g, int b, float x, float y, float z, int light) {
-        builder.vertex(pose, x, y, z)
-                .color(r, g, b, 255)
-                .uv(0, 0)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(normal, 0, 1, 0)
-                .endVertex();
+    private static void vertex(VertexConsumer builder, PoseStack.Pose pose, int r, int g, int b, float x, float y, float z, int light) {
+        builder.addVertex(pose, x, y, z)
+                .setColor(r, g, b, 255)
+                .setUv(0, 0)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(light)
+                .setNormal(pose, 0, 1, 0);
     }
 
     public static class Serializer implements RFEProjectileRenderer.Serializer {

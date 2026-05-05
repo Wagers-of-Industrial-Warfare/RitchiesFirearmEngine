@@ -1,7 +1,15 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.default_index;
 
+import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,7 +21,10 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEDefa
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.condition.FirearmCondtionMacroHandler;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEItemContainerContents;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.condition.FirearmConditionMacroHandler;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmMode;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhase;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.misfires.RainMisfire;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.misfires.RandomMisfire;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.misfires.SubmergedMisfire;
@@ -43,7 +54,11 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProviderP
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProvider;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProviderPackHandler;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.function.UnaryOperator;
 
 /**
  * Because it's always best to lead by example.
@@ -82,7 +97,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
 
     @Override
     public void afterPackLoading() {
-        FirearmCondtionMacroHandler.loadMacros();
+        FirearmConditionMacroHandler.loadMacros();
     }
 
     @Override
@@ -101,6 +116,11 @@ public class BuiltInRFEPlugin implements RFEPlugin {
     @Override
     public void registerPluginParticleTypes(BiConsumer<ResourceLocation, ParticleType<?>> registry) {
         ParticleTypes.register(registry);
+    }
+
+    @Override
+    public void registerPluginDataComponentTypes(BiConsumer<ResourceLocation, DataComponentType<?>> registry) {
+        RFEDataComponents.register(registry);
     }
 
     /**
@@ -284,8 +304,9 @@ public class BuiltInRFEPlugin implements RFEPlugin {
     }
 
     public static class ParticleTypes {
-        public static final ParticleType<BlackPowderSmokeOptions> BLACK_POWDER_SMOKE = new ParticleType<>(true, BlackPowderSmokeOptions.DESERIALIZER) {
-            @Override public Codec<BlackPowderSmokeOptions> codec() { return BlackPowderSmokeOptions.CODEC; }
+        public static final ParticleType<BlackPowderSmokeOptions> BLACK_POWDER_SMOKE = new ParticleType<>(true) {
+            @Override public MapCodec<BlackPowderSmokeOptions> codec() { return BlackPowderSmokeOptions.CODEC; }
+            @Override public StreamCodec<? super RegistryFriendlyByteBuf, BlackPowderSmokeOptions> streamCodec() { return BlackPowderSmokeOptions.STREAM_CODEC; }
         };
 
         public static void register(BiConsumer<ResourceLocation, ParticleType<?>> registry) {
@@ -293,6 +314,104 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         }
 
         private ParticleTypes() {}
+    }
+
+    public static class RFEDataComponents {
+        private static final Map<ResourceLocation, DataComponentType<?>> TYPES = new LinkedHashMap<>();
+
+        public static final DataComponentType<RFEItemContainerContents> ROUNDS = register("rounds",
+                builder -> builder.persistent(RFEItemContainerContents.CODEC).networkSynchronized(RFEItemContainerContents.STREAM_CODEC));
+
+        public static final DataComponentType<String> FIREARM_MODE = register("firearm_mode",
+                builder -> builder.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
+
+        public static final DataComponentType<ImmutableMap<String, DataComponentPatch>> FIREARM_MODE_DATA = register("firearm_mode_data",
+                builder -> builder.persistent(RFEFirearmMode.MODE_DATA_CODEC).networkSynchronized(RFEFirearmMode.MODE_DATA_STREAM_CODEC));
+
+        public static final DataComponentType<Boolean> IS_CHARGED = register("is_charged",
+                builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
+        public static final DataComponentType<Boolean> IS_JAMMED = register("is_jammed",
+                builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
+        public static final DataComponentType<Integer> ACTION_TIME = register("action_time",
+                builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
+        public static final DataComponentType<RFEFirearmItem.Action> FIREARM_ACTION = register("firearm_action",
+                builder -> builder.persistent(RFEFirearmItem.Action.CODEC).networkSynchronized(RFEFirearmItem.Action.STREAM_CODEC));
+
+        public static final DataComponentType<Float> FIREARM_HEAT = register("firearm_heat",
+                builder -> builder.persistent(Codec.FLOAT).networkSynchronized(ByteBufCodecs.FLOAT));
+
+        public static final DataComponentType<Integer> COOLING_DELAY = register("cooling_delay",
+                builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
+        public static final DataComponentType<Boolean> OVERHEATED = register("overheated",
+                builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
+        public static final DataComponentType<Boolean> HOLDING_ATTACK_KEY = register("holding_attack_key",
+                builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
+        public static final DataComponentType<Boolean> AIMING = register("aiming",
+                builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
+        public static final DataComponentType<Integer> AIMING_TIME = register("aiming_time",
+                builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
+        public static final DataComponentType<Boolean> WINDING_UP = register("winding_up",
+                builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
+        public static final DataComponentType<Float> EXTRA_FIRING_TIME = register("extra_firing_time",
+                builder -> builder.persistent(Codec.FLOAT).networkSynchronized(ByteBufCodecs.FLOAT));
+
+        public static final DataComponentType<Integer> BURST_FIRE_COUNT = register("burst_fire_count",
+                builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
+        public static final DataComponentType<RFEItemContainerContents> DETACHED_MAGAZINE = register("detached_magazine",
+                builder -> builder.persistent(RFEItemContainerContents.CODEC).networkSynchronized(RFEItemContainerContents.STREAM_CODEC));
+
+        public static final DataComponentType<RFEItemContainerContents> INTERNAL_ROUNDS = register("internal_rounds",
+                builder -> builder.persistent(RFEItemContainerContents.CODEC).networkSynchronized(RFEItemContainerContents.STREAM_CODEC));
+
+        public static final DataComponentType<RFEItemContainerContents> LOADED_ROUND = register("loaded_round",
+                builder -> builder.persistent(RFEItemContainerContents.CODEC).networkSynchronized(RFEItemContainerContents.STREAM_CODEC));
+
+        public static final DataComponentType<ReloadPhase.PhaseType> RELOAD_PHASE = register("reload_phase",
+                builder -> builder.persistent(ReloadPhase.PhaseType.CODEC).networkSynchronized(ReloadPhase.PhaseType.STREAM_CODEC));
+
+        public static final DataComponentType<ReloadPhase.PhaseType> UNLOAD_PHASE = register("unload_phase",
+                builder -> builder.persistent(ReloadPhase.PhaseType.CODEC).networkSynchronized(ReloadPhase.PhaseType.STREAM_CODEC));
+
+        public static final DataComponentType<Integer> RELOAD_PHASE_INDEX = register("reload_phase_index",
+                builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
+        public static final DataComponentType<Integer> UNLOAD_PHASE_INDEX = register("unload_phase_index",
+                builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
+        public static final DataComponentType<Boolean> FORCE_CANCEL_ACTION = register("force_cancel_action",
+                builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
+        public static final DataComponentType<Integer> CHARGE_ACTION = register("charge_action",
+                builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
+        public static final DataComponentType<UUID> RECOIL_IDENTIFIER = register("recoil_identifier",
+                builder -> builder.persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC));
+
+        public static final DataComponentType<UUID> SPREAD_IDENTIFIER = register("spread_identifier",
+                builder -> builder.persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC));
+
+        private static <V> DataComponentType<V> register(String id, UnaryOperator<DataComponentType.Builder<V>> builderOp) {
+            ResourceLocation loc = RitchiesFirearmEngine.resource(id);
+            if (TYPES.containsKey(loc))
+                throw new IllegalStateException("Already registered data component type " + loc);
+            DataComponentType<V> type = builderOp.apply(DataComponentType.builder()).build();
+            TYPES.put(loc, type);
+            return type;
+        }
+
+        public static void register(BiConsumer<ResourceLocation, DataComponentType<?>> registry) { TYPES.forEach(registry); }
+
+        private RFEDataComponents() {}
     }
 
 }

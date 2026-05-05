@@ -3,16 +3,13 @@ package rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.creativ
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
@@ -31,14 +28,15 @@ public class RFECreativeModeTabBuilder {
         builder.icon(() -> {
             try {
                 return readItem(copy.get("icon"));
-            } catch (CommandSyntaxException e) {
+            } catch (IllegalStateException e) {
                 LOGGER.warn("Invalid item tag for icon of tab {}: {}", tabId, e);
                 return ItemStack.EMPTY;
             }
         });
 
-        String background = GsonHelper.getAsString(obj, "background", "items.png");
-        builder.backgroundSuffix(background);
+        String background = GsonHelper.getAsString(obj, "background", "minecraft:textures/gui/container/creative_inventory/tab_items.png");
+        ResourceLocation bgLoc = RFEUtils.location(background);
+        builder.backgroundTexture(bgLoc);
 
         builder.displayItems((params, output) -> {
             JsonArray tabContentsJson = GsonHelper.getAsJsonArray(copy, "contents");
@@ -51,7 +49,7 @@ public class RFECreativeModeTabBuilder {
                         continue;
                     }
                     output.accept(itemStack);
-                } catch (CommandSyntaxException e) {
+                } catch (IllegalStateException e) {
                     LOGGER.warn("Invalid item tag at index {} for item tab {}: {}", i, tabId, e);
                 }
             }
@@ -60,26 +58,15 @@ public class RFECreativeModeTabBuilder {
         return builder.build();
     }
 
-    private static ItemStack readItem(JsonElement element) throws CommandSyntaxException {
-        ResourceLocation loc;
-        CompoundTag tag = null;
+    private static ItemStack readItem(JsonElement element) throws IllegalStateException {
         if (GsonHelper.isStringValue(element)) {
-            loc = RFEUtils.location(element.getAsString());
+            ResourceLocation loc = RFEUtils.location(element.getAsString());
+            return new ItemStack(BuiltInRegistries.ITEM.getOptional(loc).orElseThrow(() -> new IllegalStateException("Missing item " + loc)));
         } else if (element.isJsonObject()) {
-            JsonObject detailedItemObj = element.getAsJsonObject();
-            loc = RFEUtils.location(GsonHelper.getAsString(detailedItemObj, "item"));
-            if (GsonHelper.isStringValue(detailedItemObj, "tag"))
-                tag = TagParser.parseTag(GsonHelper.getAsString(detailedItemObj, "tag"));
+            return ItemStack.STRICT_SINGLE_ITEM_CODEC.parse(JsonOps.INSTANCE, element.getAsJsonObject()).getOrThrow();
         } else {
             return ItemStack.EMPTY;
         }
-        Item item = BuiltInRegistries.ITEM.get(loc);
-        ItemStack itemStack = new ItemStack(item);
-        if (itemStack.isEmpty())
-            return ItemStack.EMPTY;
-        if (tag != null)
-            itemStack.setTag(tag);
-        return itemStack;
     }
 
     private static CreativeModeTab.Builder builder() {

@@ -1,14 +1,19 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.spread.random;
 
-import com.google.gson.JsonObject;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.GsonHelper;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProvider;
+
+import java.util.Optional;
 
 public record SimpleSpreadProvider(float radius, float unaimedRadius, boolean tighten) implements RFESpreadProvider {
 
@@ -23,25 +28,20 @@ public record SimpleSpreadProvider(float radius, float unaimedRadius, boolean ti
     }
 
     public static class Serializer implements RFESpreadProvider.Serializer<SimpleSpreadProvider> {
-        @Override
-        public SimpleSpreadProvider fromJson(JsonObject obj) {
-            float spread = GsonHelper.getAsFloat(obj, "spread");
-            float unaimedSpread = GsonHelper.getAsFloat(obj, "unaimed_spread", spread);
-            boolean tighten = GsonHelper.getAsBoolean(obj, "tighten", false);
-            return new SimpleSpreadProvider(spread, unaimedSpread, tighten);
-        }
+        private static final MapCodec<SimpleSpreadProvider> CODEC = RecordCodecBuilder.mapCodec(o -> o.group(
+                Codec.floatRange(0, Float.MAX_VALUE).fieldOf("spread").forGetter(SimpleSpreadProvider::radius),
+                Codec.floatRange(0, Float.MAX_VALUE).optionalFieldOf("unaimed_spread").forGetter(p -> Optional.of(p.unaimedRadius)),
+                Codec.BOOL.optionalFieldOf("tighten", false).forGetter(SimpleSpreadProvider::tighten)
+        ).apply(o, (r, ur, t) -> new SimpleSpreadProvider(r, ur.orElse(r), t)));
 
-        @Override
-        public SimpleSpreadProvider fromNetwork(FriendlyByteBuf buf) {
-            return new SimpleSpreadProvider(buf.readFloat(), buf.readFloat(), buf.readBoolean());
-        }
+        private static final StreamCodec<RegistryFriendlyByteBuf, SimpleSpreadProvider> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.FLOAT, SimpleSpreadProvider::radius,
+                ByteBufCodecs.FLOAT, SimpleSpreadProvider::unaimedRadius,
+                ByteBufCodecs.BOOL, SimpleSpreadProvider::tighten,
+                SimpleSpreadProvider::new);
 
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, SimpleSpreadProvider prov) {
-            buf.writeFloat(prov.radius)
-                    .writeFloat(prov.unaimedRadius)
-                    .writeBoolean(prov.tighten);
-        }
+        @Override public MapCodec<SimpleSpreadProvider> codec() { return CODEC; }
+        @Override public StreamCodec<RegistryFriendlyByteBuf, SimpleSpreadProvider> streamCodec() { return STREAM_CODEC; }
     }
 
 }

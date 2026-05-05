@@ -1,10 +1,12 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 
 import javax.annotation.Nullable;
@@ -15,109 +17,122 @@ public class FirearmDataUtils {
     // Charging methods
 
     public static boolean isCharged(ItemStack itemStack) {
-        return isCharged(itemStack.getOrCreateTag());
+        return isCharged(itemStack.getComponents());
     }
 
-    public static boolean isCharged(CompoundTag tag) {
-        return tag.contains("Charged");
+    public static boolean isCharged(DataComponentMap components) {
+        return components.has(RFEDataComponents.IS_CHARGED);
+    }
+
+    public static boolean isCharged(DataComponentPatch components) {
+        Optional<? extends Boolean> o = components.get(RFEDataComponents.IS_CHARGED);
+        return o != null && o.isPresent();
     }
 
     public static void setCharged(ItemStack itemStack, boolean charged) {
-        setCharged(itemStack.getOrCreateTag(), charged);
+        if (charged) {
+            itemStack.set(RFEDataComponents.IS_CHARGED, true);
+        } else {
+            itemStack.remove(RFEDataComponents.IS_CHARGED);
+        }
     }
 
-    public static void setCharged(CompoundTag tag, boolean charged) {
+    public static DataComponentPatch setCharged(DataComponentPatch data, boolean charged) {
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
         if (charged) {
-            tag.putBoolean("Charged", true);
+            patched.set(RFEDataComponents.IS_CHARGED, true);
         } else {
-            tag.remove("Charged");
+            patched.remove(RFEDataComponents.IS_CHARGED);
         }
+        return patched.asPatch();
     }
 
     // Jamming methods
 
     public static boolean isJammed(ItemStack itemStack) {
-        return isJammed(itemStack.getOrCreateTag());
+        return isJammed(itemStack.getComponentsPatch());
     }
 
-    public static boolean isJammed(CompoundTag tag) {
-        return tag.contains("Jammed");
+    public static boolean isJammed(DataComponentPatch data) {
+        Optional<? extends Boolean> o = data.get(RFEDataComponents.IS_JAMMED);
+        return o != null && o.isPresent();
     }
 
     public static void setJammed(ItemStack itemStack, boolean jammed) {
-        setJammed(itemStack.getOrCreateTag(), jammed);
+        if (jammed) {
+            itemStack.set(RFEDataComponents.IS_JAMMED, true);
+        } else {
+            itemStack.remove(RFEDataComponents.IS_JAMMED);
+        }
     }
 
-    public static void setJammed(CompoundTag tag, boolean jammed) {
+    public static DataComponentPatch setJammed(DataComponentPatch data, boolean jammed) {
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
         if (jammed) {
-            tag.putBoolean("Jammed", true);
+            patched.set(RFEDataComponents.IS_JAMMED, true);
         } else {
-            tag.remove("Jammed");
+            patched.remove(RFEDataComponents.IS_JAMMED);
         }
+        return patched.asPatch();
     }
 
     // Ammunition methods
 
-    public static ListTag writeAmmoList(List<ItemStack> ammo) {
-        ListTag list = new ListTag();
-        int emptyCount = 0;
-        for (ItemStack itemStack : ammo) {
-            if (itemStack.isEmpty()) {
-                ++emptyCount;
-            } else {
-                while (emptyCount > 0) {
-                    CompoundTag emptyTag = ItemStack.EMPTY.save(new CompoundTag());
-                    byte count = (byte) Math.min(emptyCount, 64);
-                    emptyTag.putByte("Count", count);
-                    emptyCount -= count;
-                    list.add(emptyTag);
-                }
-                list.add(itemStack.save(new CompoundTag()));
-            }
-        }
-        while (emptyCount > 0) {
-            CompoundTag emptyTag = ItemStack.EMPTY.save(new CompoundTag());
-            byte count = (byte) Math.min(emptyCount, 64);
-            emptyTag.putByte("Count", count);
-            emptyCount -= count;
-            list.add(emptyTag);
-        }
-        return list;
-    }
+//    public static ListTag writeAmmoList(List<ItemStack> ammo) {
+//        ListTag list = new ListTag();
+//        int emptyCount = 0;
+//        for (ItemStack itemStack : ammo) {
+//            if (itemStack.isEmpty()) {
+//                ++emptyCount;
+//            } else {
+//                while (emptyCount > 0) {
+//                    byte count = (byte) Math.min(emptyCount, 64);
+//                    emptyTag.putByte("count", count);
+//                    emptyCount -= count;
+//                    list.add(emptyTag);
+//                }
+//                list.add(itemStack.save(new CompoundTag()));
+//            }
+//        }
+//        while (emptyCount > 0) {
+//            CompoundTag emptyTag = ItemStack.EMPTY.save(new CompoundTag());
+//            byte count = (byte) Math.min(emptyCount, 64);
+//            emptyTag.putByte("Count", count);
+//            emptyCount -= count;
+//            list.add(emptyTag);
+//        }
+//        return list;
+//    }
 
-    public static List<ItemStack> readAmmoList(ListTag tag) {
-        int sz = tag.size();
+    // TODO figure out compact placeholders
+
+    public static List<ItemStack> readAmmoList(RFEItemContainerContents contents) {
+        int sz = contents.getSlots();
         List<ItemStack> list = new LinkedList<>();
-        for (int i = 0; i < sz; ++i) {
-            CompoundTag itemTag = tag.getCompound(i);
-            ItemStack item = ItemStack.of(itemTag);
-            if (item.isEmpty()) {
-                int count = itemTag.getByte("Count");
-                for (int j = 0; j < count; ++j)
-                    list.add(ItemStack.EMPTY);
-            } else {
-                list.add(item);
-            }
-        }
+        for (int i = 0; i < sz; ++i)
+            list.add(contents.getStackInSlot(i));
         return list;
     }
 
-    public static List<ItemStack> getRounds(CompoundTag tag, String tagKey) {
-        if (!tag.contains(tagKey, Tag.TAG_LIST))
+    public static List<ItemStack> getRounds(DataComponentPatch data, DataComponentType<RFEItemContainerContents> type) {
+        Optional<? extends RFEItemContainerContents> o = data.get(type);
+        if (o == null || o.isEmpty())
             return new LinkedList<>();
-        return readAmmoList(tag.getList(tagKey, Tag.TAG_COMPOUND));
+        return readAmmoList(o.get());
     }
 
-    public static List<ItemStack> getRounds(ItemStack itemStack, String tagKey) {
-        return getRounds(itemStack.getOrCreateTag(), tagKey);
+    public static List<ItemStack> getRounds(ItemStack itemStack, DataComponentType<RFEItemContainerContents> type) {
+        return getRounds(itemStack.getComponentsPatch(), type);
     }
 
-    public static void saveRounds(CompoundTag tag, String tagKey, List<ItemStack> ammo) {
-        tag.put(tagKey, writeAmmoList(ammo));
+    public static void saveRounds(ItemStack itemStack, DataComponentType<RFEItemContainerContents> type, List<ItemStack> ammo) {
+        itemStack.set(type, RFEItemContainerContents.fromItems(ammo));
     }
 
-    public static void saveRounds(ItemStack itemStack, String tagKey, List<ItemStack> ammo) {
-        saveRounds(itemStack.getOrCreateTag(), tagKey, ammo);
+    public static DataComponentPatch saveRounds(DataComponentPatch source, DataComponentType<RFEItemContainerContents> type, List<ItemStack> ammo) {
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, source);
+        patched.set(type, RFEItemContainerContents.fromItems(ammo));
+        return patched.asPatch();
     }
 
     /**
@@ -226,7 +241,7 @@ public class FirearmDataUtils {
             while ((last ? lister.hasPrevious() : lister.hasNext()) && !copy.isEmpty()) {
                 ItemStack ammoSlot = last ? lister.previous() : lister.next();
                 if (!ammoSlot.isEmpty()) {
-                    if (ItemStack.isSameItemSameTags(ammoSlot, priorSlot)) {
+                    if (ItemStack.isSameItemSameComponents(ammoSlot, priorSlot)) {
                         int maxCompress = Math.min(ammoSlot.getCount(), priorSlot.getMaxStackSize() - priorSlot.getCount());
                         priorSlot.grow(maxCompress);
                         ammoSlot.shrink(maxCompress);
@@ -238,7 +253,7 @@ public class FirearmDataUtils {
                     }
                     continue;
                 }
-                if (ItemStack.isSameItemSameTags(copy, priorSlot) && priorSlot.getCount() < priorSlot.getMaxStackSize()) {
+                if (ItemStack.isSameItemSameComponents(copy, priorSlot) && priorSlot.getCount() < priorSlot.getMaxStackSize()) {
                     priorSlot.grow(1);
                     copy.shrink(1);
                     lister.remove();
@@ -251,7 +266,7 @@ public class FirearmDataUtils {
             int index = last ? ammo.size() - 1 : 0;
             ItemStack toStack = ammo.get(index);
             int partial = 0;
-            if (ItemStack.isSameItemSameTags(copy, toStack)) {
+            if (ItemStack.isSameItemSameComponents(copy, toStack)) {
                 int stackable = Math.min(toStack.getMaxStackSize(), copy.getCount() + toStack.getCount()) - toStack.getCount();
                 toStack.grow(stackable);
                 copy.shrink(stackable);
@@ -293,139 +308,265 @@ public class FirearmDataUtils {
     }
 
     public static void setActionTime(ItemStack itemStack, int cooldown) {
-        itemStack.getOrCreateTag().putInt("ActionTime", cooldown);
+        itemStack.set(RFEDataComponents.ACTION_TIME, cooldown);
     }
 
     public static int getActionTime(ItemStack itemStack) {
-        return itemStack.getOrCreateTag().getInt("ActionTime");
+        return itemStack.getOrDefault(RFEDataComponents.ACTION_TIME, 0);
     }
 
     public static void setAction(ItemStack itemStack, @Nullable RFEFirearmItem.Action action) {
         if (action != null) {
-            itemStack.getOrCreateTag().putString("Action", action.getSerializedName());
+            itemStack.set(RFEDataComponents.FIREARM_ACTION, action);
         } else {
-            itemStack.getOrCreateTag().remove("Action");
+            itemStack.remove(RFEDataComponents.FIREARM_ACTION);
         }
     }
 
-    public static void cancelReload(ItemStack itemStack, CompoundTag tag) {
-        tag.remove("ReloadPhase");
-        tag.remove("ReloadPhaseIndex");
+    public static DataComponentPatch cancelReload(ItemStack itemStack, DataComponentPatch data) {
         FirearmDataUtils.setAction(itemStack, null);
         FirearmDataUtils.setActionTime(itemStack, 0);
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
+        patched.remove(RFEDataComponents.RELOAD_PHASE);
+        patched.remove(RFEDataComponents.RELOAD_PHASE_INDEX);
+        return patched.asPatch();
     }
 
-    public static void cancelUnload(ItemStack itemStack, CompoundTag tag) {
-        tag.remove("UnloadPhase");
-        tag.remove("UnloadPhaseIndex");
+    public static DataComponentPatch cancelUnload(ItemStack itemStack, DataComponentPatch data) {
         FirearmDataUtils.setAction(itemStack, null);
         FirearmDataUtils.setActionTime(itemStack, 0);
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
+        patched.remove(RFEDataComponents.UNLOAD_PHASE);
+        patched.remove(RFEDataComponents.UNLOAD_PHASE_INDEX);
+        return patched.asPatch();
     }
 
     @Nullable
     public static RFEFirearmItem.Action getAction(ItemStack itemStack) {
-        return RFEFirearmItem.Action.byId(itemStack.getOrCreateTag().getString("Action"));
+        return itemStack.get(RFEDataComponents.FIREARM_ACTION);
     }
 
     // Heating methods
 
     public static void setHeat(ItemStack itemStack, float heat) {
-        setHeat(itemStack.getOrCreateTag(), heat);
+        itemStack.set(RFEDataComponents.FIREARM_HEAT, heat);
     }
 
-    public static void setHeat(CompoundTag tag, float heat) {
-        tag.putFloat("FirearmHeat", heat);
+    public static DataComponentPatch setHeat(DataComponentPatch data, float heat) {
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
+        patched.set(RFEDataComponents.FIREARM_HEAT, heat);
+        return patched.asPatch();
     }
 
     public static float getHeat(ItemStack itemStack) {
-        return getHeat(itemStack.getOrCreateTag());
+        return getHeat(itemStack.getComponentsPatch());
     }
 
-    public static float getHeat(CompoundTag tag) {
-        return tag.getFloat("FirearmHeat");
+    public static float getHeat(DataComponentPatch data) {
+        Optional<? extends Float> o = data.get(RFEDataComponents.FIREARM_HEAT);
+        return o != null && o.isPresent() ? o.get() : 0f;
     }
 
     public static void addHeat(ItemStack itemStack, float addedHeat) {
-        addHeat(itemStack.getOrCreateTag(), addedHeat);
+        itemStack.set(RFEDataComponents.FIREARM_HEAT, itemStack.getOrDefault(RFEDataComponents.FIREARM_HEAT, 0).floatValue() + addedHeat);
     }
 
-    public static void addHeat(CompoundTag tag, float addedHeat) {
-        setHeat(tag, getHeat(tag) + addedHeat);
+    public static DataComponentPatch addHeat(DataComponentPatch data, float addedHeat) {
+        return setHeat(data, getHeat(data) + addedHeat);
     }
 
     public static void setCoolingDelay(ItemStack itemStack, int delay) {
-        setCoolingDelay(itemStack.getOrCreateTag(), delay);
+        itemStack.set(RFEDataComponents.COOLING_DELAY, delay);
     }
 
-    public static void setCoolingDelay(CompoundTag tag, int delay) {
-        tag.putInt("CoolingDelay", delay);
+    public static DataComponentPatch setCoolingDelay(DataComponentPatch data, int delay) {
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
+        patched.set(RFEDataComponents.COOLING_DELAY, delay);
+        return patched.asPatch();
     }
 
     public static int getCoolingDelay(ItemStack itemStack) {
-        return getCoolingDelay(itemStack.getOrCreateTag());
+        return getCoolingDelay(itemStack.getComponentsPatch());
     }
 
-    public static int getCoolingDelay(CompoundTag tag) {
-        return tag.getInt("CoolingDelay");
+    public static int getCoolingDelay(DataComponentPatch data) {
+        Optional<? extends Integer> o = data.get(RFEDataComponents.COOLING_DELAY);
+        return o != null && o.isPresent() ? o.get() : 0;
     }
 
     public static void setOverheated(ItemStack itemStack, boolean overheated) {
-        setOverheated(itemStack.getOrCreateTag(), overheated);
-    }
-
-    public static void setOverheated(CompoundTag tag, boolean overheated) {
         if (overheated) {
-            tag.putBoolean("Overheated", true);
+            itemStack.set(RFEDataComponents.OVERHEATED, true);
         } else {
-            tag.remove("Overheated");
+            itemStack.remove(RFEDataComponents.OVERHEATED);
         }
     }
 
-    public static boolean isOverheated(ItemStack itemStack) {
-        return isOverheated(itemStack.getOrCreateTag());
+    public static DataComponentPatch setOverheated(DataComponentPatch data, boolean overheated) {
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
+        if (overheated) {
+            patched.set(RFEDataComponents.OVERHEATED, true);
+        } else {
+            patched.remove(RFEDataComponents.OVERHEATED);
+        }
+        return patched.asPatch();
     }
 
-    public static boolean isOverheated(CompoundTag tag) {
-        return tag.contains("Overheated");
+    public static boolean isOverheated(ItemStack itemStack) {
+        return isOverheated(itemStack.getComponentsPatch());
+    }
+
+    public static boolean isOverheated(DataComponentPatch data) {
+        Optional<? extends Boolean> o = data.get(RFEDataComponents.OVERHEATED);
+        return o != null && o.isPresent();
     }
 
     // Key methods
 
     public static void setHoldingAttackKey(ItemStack itemStack, boolean holdingAttackKey) {
         if (holdingAttackKey) {
-            itemStack.getOrCreateTag().putBoolean("HoldingAttackKey", true);
+            itemStack.set(RFEDataComponents.HOLDING_ATTACK_KEY, true);
         } else {
-            itemStack.getOrCreateTag().remove("HoldingAttackKey");
+            itemStack.remove(RFEDataComponents.HOLDING_ATTACK_KEY);
         }
     }
 
     public static boolean isHoldingAttackKey(ItemStack itemStack) {
-        return itemStack.getOrCreateTag().contains("HoldingAttackKey");
+        return itemStack.has(RFEDataComponents.HOLDING_ATTACK_KEY);
     }
 
     // Aiming methods
 
     public static void setAiming(ItemStack itemStack, boolean aiming) {
         if (aiming) {
-            itemStack.getOrCreateTag().putBoolean("Aiming", aiming);
+            itemStack.set(RFEDataComponents.AIMING, true);
         } else {
-            itemStack.getOrCreateTag().remove("Aiming");
+            itemStack.remove(RFEDataComponents.AIMING);
         }
     }
 
     public static boolean isAiming(ItemStack itemStack) {
-        return itemStack.getOrCreateTag().contains("Aiming");
+        return itemStack.has(RFEDataComponents.AIMING);
     }
 
     public static void setAimingTime(ItemStack itemStack, int time) {
-        itemStack.getOrCreateTag().putInt("AimingTime", time);
+        itemStack.set(RFEDataComponents.AIMING_TIME, time);
     }
 
     public static int getAimingTime(ItemStack itemStack) {
-        return itemStack.getOrCreateTag().getInt("AimingTime");
+        return itemStack.getOrDefault(RFEDataComponents.AIMING_TIME, 0);
+    }
+    
+    // Windup methods
+
+    public static void setWindingUp(ItemStack itemStack, boolean windingUp) {
+        if (windingUp) {
+            itemStack.set(RFEDataComponents.WINDING_UP, true);
+        } else {
+            itemStack.remove(RFEDataComponents.WINDING_UP);
+        }
     }
 
-    private FirearmDataUtils() {
+    public static DataComponentPatch setWindingUp(DataComponentPatch data, boolean windingUp) {
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
+        if (windingUp) {
+            patched.set(RFEDataComponents.WINDING_UP, true);
+        } else {
+            patched.remove(RFEDataComponents.WINDING_UP);
+        }
+        return patched.asPatch();
     }
+
+    public static boolean isWindingUp(ItemStack itemStack) {
+        return isWindingUp(itemStack.getComponentsPatch());
+    }
+
+    public static boolean isWindingUp(DataComponentPatch data) {
+        Optional<? extends Boolean> o = data.get(RFEDataComponents.WINDING_UP);
+        return o != null && o.isPresent();
+    }
+    
+    // Extra firing time methods
+
+    public static void setExtraFiringTime(ItemStack itemStack, float extraFiringTime) {
+        itemStack.set(RFEDataComponents.EXTRA_FIRING_TIME, extraFiringTime);
+    }
+
+    public static DataComponentPatch setExtraFiringTime(DataComponentPatch data, float extraFiringTime) {
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
+        patched.set(RFEDataComponents.EXTRA_FIRING_TIME, extraFiringTime);
+        return patched.asPatch();
+    }
+
+    public static float getExtraFiringTime(ItemStack itemStack) {
+        return getExtraFiringTime(itemStack.getComponentsPatch());
+    }
+
+    public static float getExtraFiringTime(DataComponentPatch data) {
+        Optional<? extends Float> o = data.get(RFEDataComponents.EXTRA_FIRING_TIME);
+        return o != null && o.isPresent() ? o.get() : 0f;
+    }
+    
+    // Burst fire methods
+
+    public static void setBurstFireCount(ItemStack itemStack, int burstFireCount) {
+        itemStack.set(RFEDataComponents.BURST_FIRE_COUNT, burstFireCount);
+    }
+
+    public static DataComponentPatch setBurstFireCount(DataComponentPatch data, int burstFireCount) {
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
+        patched.set(RFEDataComponents.BURST_FIRE_COUNT, burstFireCount);
+        return patched.asPatch();
+    }
+
+    public static void clearBurstFireCount(ItemStack itemStack) {
+        itemStack.remove(RFEDataComponents.BURST_FIRE_COUNT);
+    }
+
+    public static DataComponentPatch clearBurstFireCount(DataComponentPatch data) {
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
+        patched.remove(RFEDataComponents.BURST_FIRE_COUNT);
+        return patched.asPatch();
+    }
+
+    public static int getBurstFireCount(ItemStack itemStack) {
+        return getBurstFireCount(itemStack.getComponentsPatch());
+    }
+
+    public static int getBurstFireCount(DataComponentPatch data) {
+        Optional<? extends Integer> o = data.get(RFEDataComponents.BURST_FIRE_COUNT);
+        return o != null && o.isPresent() ? o.get() : 0;
+    }
+    
+    // Force cancel action methods
+
+    public static void setForceCancelAction(ItemStack itemStack, boolean forceCancelAction) {
+        if (forceCancelAction) {
+            itemStack.set(RFEDataComponents.FORCE_CANCEL_ACTION, true);
+        } else {
+            itemStack.remove(RFEDataComponents.FORCE_CANCEL_ACTION);
+        }
+    }
+
+    public static DataComponentPatch setForceCancelAction(DataComponentPatch data, boolean forceCancelAction) {
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
+        if (forceCancelAction) {
+            patched.set(RFEDataComponents.FORCE_CANCEL_ACTION, true);
+        } else {
+            patched.remove(RFEDataComponents.FORCE_CANCEL_ACTION);
+        }
+        return patched.asPatch();
+    }
+
+    public static boolean shouldForceCancelAction(ItemStack itemStack) {
+        return shouldForceCancelAction(itemStack.getComponentsPatch());
+    }
+
+    public static boolean shouldForceCancelAction(DataComponentPatch data) {
+        Optional<? extends Boolean> o = data.get(RFEDataComponents.FORCE_CANCEL_ACTION);
+        return o != null && o.isPresent();
+    }
+
+    private FirearmDataUtils() {}
 
 }

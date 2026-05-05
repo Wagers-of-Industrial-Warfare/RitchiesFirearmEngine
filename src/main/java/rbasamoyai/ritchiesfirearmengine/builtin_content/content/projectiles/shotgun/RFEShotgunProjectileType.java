@@ -1,8 +1,13 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.shotgun;
 
-import com.google.gson.JsonObject;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.GsonHelper;
+import com.mojang.datafixers.util.Either;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -19,19 +24,21 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEMathUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEProjectileUtils;
 
+import java.util.Objects;
+
 public class RFEShotgunProjectileType extends RFEBulletProjectileType {
 
     private final int count;
-    private final float verticalDispersion;
     private final float horizontalDispersion;
+    private final float verticalDispersion;
     private final double size;
 
-    public RFEShotgunProjectileType(RFEBaseProjectilePropertiesBuilder builder, int count, float verticalDispersion,
-                                    float horizontalDispersion, double size) {
+    public RFEShotgunProjectileType(RFEBaseProjectilePropertiesBuilder builder, int count, float horizontalDispersion,
+                                    float verticalDispersion, double size) {
         super(builder);
         this.count = count;
-        this.verticalDispersion = verticalDispersion;
         this.horizontalDispersion = horizontalDispersion;
+        this.verticalDispersion = verticalDispersion;
         this.size = size;
     }
 
@@ -71,45 +78,33 @@ public class RFEShotgunProjectileType extends RFEBulletProjectileType {
     @Override public RFEProjectileType.Serializer<?> getSerializer() { return BuiltInRFEPlugin.ProjectileTypes.SHOTGUN; }
 
     public static class Serializer implements RFEProjectileType.Serializer<RFEShotgunProjectileType> {
-        @Override
-        public RFEShotgunProjectileType fromJson(JsonObject obj) {
-            RFEBaseProjectilePropertiesBuilder builder = RFEBaseProjectilePropertiesBuilder.fromJson(obj);
-            int count = GsonHelper.getAsInt(obj, "subprojectile_count");
-            if (count < 1)
-                throw new IllegalStateException("Cannot have less than 1 shotgun sub-projectile");
-            float horizontalDispersion;
-            float verticalDispersion;
-            if (obj.has("dispersion")) {
-                horizontalDispersion = verticalDispersion = GsonHelper.getAsFloat(obj, "dispersion");
-            } else {
-                horizontalDispersion = GsonHelper.getAsFloat(obj, "horizontal_dispersion");
-                verticalDispersion = GsonHelper.getAsFloat(obj, "vertical_dispersion");
-            }
-            double size = GsonHelper.getAsDouble(obj, "size", 0.05d);
-            horizontalDispersion = Math.max(horizontalDispersion, 0);
-            verticalDispersion = Math.max(verticalDispersion, 0);
-            size = Math.max(size, 0);
-            return new RFEShotgunProjectileType(builder, count, horizontalDispersion, verticalDispersion, size);
-        }
+        private static final MapCodec<Pair<Float, Float>> HORIZONTAL_VERTICAL_DISPERSION_CODEC = RecordCodecBuilder.mapCodec(o -> o.group(
+                Codec.floatRange(0, Float.MAX_VALUE).fieldOf("horizontal_dispersion").forGetter(Pair::getFirst),
+                Codec.floatRange(0, Float.MAX_VALUE).fieldOf("vertical_dispersion").forGetter(Pair::getSecond)
+        ).apply(o, Pair::new));
 
-        @Override
-        public RFEShotgunProjectileType fromNetwork(FriendlyByteBuf buf) {
-            RFEBaseProjectilePropertiesBuilder builder = RFEBaseProjectilePropertiesBuilder.fromNetwork(buf);
-            int count = buf.readVarInt();
-            float horizontalDispersion = buf.readFloat();
-            float verticalDispersion = buf.readFloat();
-            double size = buf.readDouble();
-            return new RFEShotgunProjectileType(builder, count, horizontalDispersion, verticalDispersion, size);
-        }
+        private static final MapCodec<Pair<Float, Float>> DISPERSION_CODEC = Codec.mapEither(
+                Codec.floatRange(0, Float.MAX_VALUE).fieldOf("dispersion"), HORIZONTAL_VERTICAL_DISPERSION_CODEC)
+                .xmap(either -> Either.unwrap(either.mapLeft(d -> new Pair<>(d, d))),
+                        pair -> Objects.equals(pair.getFirst(), pair.getSecond()) ? Either.left(pair.getFirst()) : Either.right(pair));
 
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, RFEShotgunProjectileType type) {
-            RFEBaseProjectilePropertiesBuilder.toNetwork(buf, RFEBulletProjectileType.makeProjectileProperties(type));
-            buf.writeVarInt(type.count)
-                    .writeFloat(type.horizontalDispersion)
-                    .writeFloat(type.verticalDispersion)
-                    .writeDouble(type.size);
-        }
+        public static final MapCodec<RFEShotgunProjectileType> CODEC = RecordCodecBuilder.mapCodec(o -> o.group(
+                RFEBaseProjectilePropertiesBuilder.CODEC.forGetter(RFEShotgunProjectileType::makeProjectileProperties),
+                Codec.intRange(1, Integer.MAX_VALUE).fieldOf("subprojectile_count").forGetter(type -> type.count),
+                DISPERSION_CODEC.forGetter(type -> new Pair<>(type.horizontalDispersion, type.verticalDispersion)),
+                Codec.doubleRange(0, Double.MAX_VALUE).optionalFieldOf("size", 0.05d).forGetter(type -> type.size)
+        ).apply(o, (prop, count, disp, size) -> new RFEShotgunProjectileType(prop, count, disp.getFirst(), disp.getSecond(), size)));
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, RFEShotgunProjectileType> STREAM_CODEC = StreamCodec.composite(
+                RFEBaseProjectilePropertiesBuilder.STREAM_CODEC, RFEShotgunProjectileType::makeProjectileProperties,
+                ByteBufCodecs.VAR_INT, type -> type.count,
+                ByteBufCodecs.FLOAT, type -> type.horizontalDispersion,
+                ByteBufCodecs.FLOAT, type -> type.verticalDispersion,
+                ByteBufCodecs.DOUBLE, type -> type.size,
+                RFEShotgunProjectileType::new);
+
+        @Override public MapCodec<RFEShotgunProjectileType> codec() { return CODEC; }
+        @Override public StreamCodec<RegistryFriendlyByteBuf, RFEShotgunProjectileType> streamCodec() { return STREAM_CODEC; }
     }
 
 }

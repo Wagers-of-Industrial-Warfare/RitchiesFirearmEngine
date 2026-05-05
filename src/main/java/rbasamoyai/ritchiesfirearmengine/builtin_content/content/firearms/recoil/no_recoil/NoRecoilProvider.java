@@ -1,7 +1,8 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.recoil.no_recoil;
 
-import com.google.gson.JsonObject;
-import net.minecraft.network.FriendlyByteBuf;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -26,9 +27,11 @@ public class NoRecoilProvider implements RFERecoilProvider {
     }
 
     public static class Serializer implements RFERecoilProvider.Serializer<NoRecoilProvider> {
-        @Override public NoRecoilProvider fromJson(JsonObject obj) { return INSTANCE; }
-        @Override public NoRecoilProvider fromNetwork(FriendlyByteBuf buf) { return INSTANCE; }
-        @Override public void toNetwork(FriendlyByteBuf buf, NoRecoilProvider prov) {}
+        private static final MapCodec<NoRecoilProvider> CODEC = MapCodec.unit(INSTANCE);
+        private static final StreamCodec<RegistryFriendlyByteBuf, NoRecoilProvider> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+
+        @Override public MapCodec<NoRecoilProvider> codec() { return CODEC; }
+        @Override public StreamCodec<RegistryFriendlyByteBuf, NoRecoilProvider> streamCodec() { return STREAM_CODEC; }
     }
 
 }

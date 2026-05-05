@@ -2,6 +2,7 @@ package rbasamoyai.ritchiesfirearmengine.mixin.client;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
@@ -17,12 +18,12 @@ public abstract class GuiMixin {
     @Shadow @Final protected Minecraft minecraft;
 
     @WrapMethod(method = "renderCrosshair")
-    private void ritchiesfirearmengine$renderCrosshair(GuiGraphics guiGraphics, Operation<Void> original) {
+    private void ritchiesfirearmengine$renderCrosshair(GuiGraphics guiGraphics, DeltaTracker deltaTracker, Operation<Void> original) {
         ItemStack mainhandItem = this.minecraft.player.getMainHandItem();
         // TODO offhand, custom crosshairs
         if (mainhandItem.getItem() instanceof IFirearmItem firearm && firearm.isAiming(mainhandItem, this.minecraft.player))
             return;
-        original.call(guiGraphics);
+        original.call(guiGraphics, deltaTracker);
     }
 
 }

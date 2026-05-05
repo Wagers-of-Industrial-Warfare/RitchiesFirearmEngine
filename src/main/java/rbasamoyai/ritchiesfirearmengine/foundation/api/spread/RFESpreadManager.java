@@ -1,11 +1,11 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.api.spread;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -45,7 +45,7 @@ public class RFESpreadManager {
             return null;
         Map<InteractionHand, TaggedSpreadInstance> instances = SPREAD_INSTANCES.get(entity);
 
-        if (!itemStack.getOrCreateTag().contains("ritchiesfirearmengine:spread_identifier"))
+        if (!itemStack.has(RFEDataComponents.SPREAD_IDENTIFIER))
             return null;
         UUID uuid = getOrCreateSpreadId(entity, itemStack);
 
@@ -89,11 +89,10 @@ public class RFESpreadManager {
             return;
         Map<InteractionHand, TaggedSpreadInstance> instances = SPREAD_INSTANCES.get(entity);
 
-        CompoundTag tag = itemStack.getOrCreateTag();
-        if (!tag.contains("ritchiesfirearmengine:spread_identifier"))
+        if (!itemStack.has(RFEDataComponents.SPREAD_IDENTIFIER))
             return;
-        UUID uuid = tag.getUUID("ritchiesfirearmengine:spread_identifier");
-        tag.remove("ritchiesfirearmengine:spread_identifier");
+        UUID uuid = itemStack.get(RFEDataComponents.SPREAD_IDENTIFIER);
+        itemStack.remove(RFEDataComponents.SPREAD_IDENTIFIER);
         for (Iterator<TaggedSpreadInstance> iter = instances.values().iterator(); iter.hasNext(); ) {
             TaggedSpreadInstance instance = iter.next();
             if (instance.uuid.equals(uuid))
@@ -108,23 +107,21 @@ public class RFESpreadManager {
     }
 
     private static UUID getOrCreateSpreadId(LivingEntity entity, ItemStack itemStack) {
-        CompoundTag tag = itemStack.getOrCreateTag();
-        if (!tag.contains("ritchiesfirearmengine:spread_identifier"))
-            tag.putUUID("ritchiesfirearmengine:spread_identifier", Mth.createInsecureUUID(entity.getRandom()));
-        return tag.getUUID("ritchiesfirearmengine:spread_identifier");
+        if (!itemStack.has(RFEDataComponents.SPREAD_IDENTIFIER))
+            itemStack.set(RFEDataComponents.SPREAD_IDENTIFIER, Mth.createInsecureUUID(entity.getRandom()));
+        return itemStack.get(RFEDataComponents.SPREAD_IDENTIFIER);
     }
 
     @Nullable
     public static UUID getSpreadId(ItemStack itemStack) {
-        CompoundTag tag = itemStack.getOrCreateTag();
-        return tag.contains("ritchiesfirearmengine:spread_identifier") ? tag.getUUID("ritchiesfirearmengine:spread_identifier") : null;
+        return itemStack.get(RFEDataComponents.SPREAD_IDENTIFIER);
     }
 
     public static void setSpreadId(ItemStack itemStack, @Nullable UUID uuid) {
         if (uuid == null) {
-            itemStack.getOrCreateTag().remove("ritchiesfirearmengine:spread_identifier");
+            itemStack.remove(RFEDataComponents.SPREAD_IDENTIFIER);
         } else {
-            itemStack.getOrCreateTag().putUUID("ritchiesfirearmengine:spread_identifier", uuid);
+            itemStack.set(RFEDataComponents.SPREAD_IDENTIFIER, uuid);
         }
     }
 

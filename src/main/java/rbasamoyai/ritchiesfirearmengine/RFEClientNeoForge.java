@@ -4,27 +4,33 @@ import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraftforge.client.event.*;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import net.neoforged.neoforge.common.NeoForge;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEClientPluginManager;
 
-public class RFEClientForge {
+@Mod(value = RitchiesFirearmEngine.MOD_ID, dist = Dist.CLIENT)
+public class RFEClientNeoForge {
 
-    public static void init(IEventBus modBus, IEventBus forgeBus) {
-        modBus.addListener(RFEClientForge::onClientSetup);
-        modBus.addListener(RFEClientForge::onRegisterClientReloadListeners);
-        modBus.addListener(RFEClientForge::onRegisterKeyMappings);
-        modBus.addListener(RFEClientForge::onRegisterParticleProviders);
+    public RFEClientNeoForge(IEventBus modBus, ModContainer container) {
+        modBus.addListener(RFEClientNeoForge::onClientSetup);
+        modBus.addListener(RFEClientNeoForge::onRegisterClientReloadListeners);
+        modBus.addListener(RFEClientNeoForge::onRegisterKeyMappings);
+        modBus.addListener(RFEClientNeoForge::onRegisterParticleProviders);
 
-        forgeBus.addListener(RFEClientForge::onMouseInput);
-        forgeBus.addListener(RFEClientForge::onKeyInput);
-        forgeBus.addListener(RFEClientForge::onComputeFov);
-        forgeBus.addListener(RFEClientForge::onClientLogout);
-        forgeBus.addListener(RFEClientForge::onRenderLevel);
-        forgeBus.addListener(RFEClientForge::onRenderGuiOverlay);
-        forgeBus.addListener(RFEClientForge::onSetupCamera);
+        IEventBus forgeBus = NeoForge.EVENT_BUS;
+        forgeBus.addListener(RFEClientNeoForge::onMouseInput);
+        forgeBus.addListener(RFEClientNeoForge::onKeyInput);
+        forgeBus.addListener(RFEClientNeoForge::onComputeFov);
+        forgeBus.addListener(RFEClientNeoForge::onClientLogout);
+        forgeBus.addListener(RFEClientNeoForge::onRenderLevel);
+        forgeBus.addListener(RFEClientNeoForge::onRenderGuiOverlay);
+        forgeBus.addListener(RFEClientNeoForge::onSetupCamera);
     }
 
     private static void onClientSetup(final FMLClientSetupEvent event) {
@@ -94,13 +100,13 @@ public class RFEClientForge {
     private static void onRenderLevel(final RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_ENTITIES) {
             RFEClient.renderAfterEntities(event.getPoseStack(), event.getProjectionMatrix(), event.getRenderTick(),
-                    event.getPartialTick(), event.getCamera(), event.getFrustum());
+                    event.getPartialTick().getGameTimeDeltaTicks(), event.getCamera(), event.getFrustum());
         }
     }
 
-    private static void onRenderGuiOverlay(final RenderGuiOverlayEvent.Pre event) {
-        if (event.getOverlay().overlay() == VanillaGuiOverlay.HOTBAR.type().overlay()) {
-            RFEClient.renderHUDOverlay(event.getGuiGraphics(), event.getPartialTick());
+    private static void onRenderGuiOverlay(final RenderGuiLayerEvent.Pre event) {
+        if (event.getName() == VanillaGuiLayers.HOTBAR) {
+            RFEClient.renderHUDOverlay(event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaTicks());
         }
         // TODO crosshair
     }

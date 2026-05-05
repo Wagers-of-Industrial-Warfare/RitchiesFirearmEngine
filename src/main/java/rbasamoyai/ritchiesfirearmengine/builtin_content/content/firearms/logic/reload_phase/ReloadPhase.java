@@ -8,7 +8,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -16,6 +19,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.CompareValueSource;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.condition.FirearmCondition;
@@ -194,6 +198,9 @@ public class ReloadPhase {
         UNLOAD,
         INDEX,
         FINISH;
+
+        public static final Codec<PhaseType> CODEC = StringRepresentable.fromEnum(PhaseType::values);
+        public static final StreamCodec<FriendlyByteBuf, PhaseType> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(PhaseType.class);
 
         private static final Map<String, PhaseType> BY_ID = Arrays.stream(values())
                 .collect(Collectors.toMap(PhaseType::getSerializedName, Function.identity()));

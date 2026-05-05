@@ -14,9 +14,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.AmmoPredicate;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudItemInfoProviders;
@@ -24,7 +24,6 @@ import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +96,7 @@ public class MagazineItem extends Item {
     public int getReloadCooldown(ItemStack itemStack) { return this.reloadCooldown; }
 
     public List<ItemStack> getStoredAmmo(ItemStack itemStack) {
-        List<ItemStack> stored = FirearmDataUtils.getRounds(itemStack, "Rounds");
+        List<ItemStack> stored = FirearmDataUtils.getRounds(itemStack, BuiltInRFEPlugin.RFEDataComponents.ROUNDS);
         if (this.trackEmptySlots) {
             int diff = capacity - RFEItemUtils.countItemsIncludingSlots(stored);
             for (int i = 0; i < diff; ++i)
@@ -107,7 +106,7 @@ public class MagazineItem extends Item {
     }
 
     public void writeStoredAmmo(ItemStack itemStack, List<ItemStack> ammo) {
-        FirearmDataUtils.saveRounds(itemStack, "Rounds", ammo);
+        FirearmDataUtils.saveRounds(itemStack, BuiltInRFEPlugin.RFEDataComponents.ROUNDS, ammo);
     }
 
     public int countAmmo(ItemStack itemStack) {
@@ -197,8 +196,8 @@ public class MagazineItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-        super.appendHoverText(itemStack, level, tooltip, flag);
+    public void appendHoverText(ItemStack itemStack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(itemStack, context, tooltip, flag);
         List<ItemStack> storedAmmo = this.getStoredAmmo(itemStack);
         Map<Item, Integer> storedIndex = new LinkedHashMap<>();
         for (ItemStack ammoStack : storedAmmo) {

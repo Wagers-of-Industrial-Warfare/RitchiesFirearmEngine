@@ -7,6 +7,7 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bullet.RFEBulletProjectileType;
@@ -26,7 +27,7 @@ public class RFEProjectileClipContext extends ClipContext {
 
     public RFEProjectileClipContext(RFEBulletProjectileType type, RFEProjectileInstance instance, Vec3 from, Vec3 to,
                                     ClipContext.Block block, ClipContext.Fluid fluid, RandomSource random) {
-        super(from, to, block, fluid, null);
+        super(from, to, block, fluid, CollisionContext.empty());
         this.type = type;
         this.instance = instance;
         this.random = random;

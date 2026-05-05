@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins;
 
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
@@ -21,6 +22,8 @@ public interface RFEPlugin {
     default void registerPluginCreativeModeTabs(BiConsumer<ResourceLocation, CreativeModeTab> registry) {}
 
     default void registerPluginParticleTypes(BiConsumer<ResourceLocation, ParticleType<?>> registry) {}
+
+    default void registerPluginDataComponentTypes(BiConsumer<ResourceLocation, DataComponentType<?>> registry) {}
 
     record Info(String modId, String classPath) {
     }

@@ -1,35 +1,35 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.api;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.network.FriendlyByteBuf;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.ExtraCodecs;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEByteBufCodecUtils;
 
-import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.LinkedHashMap;
 
 public record RFEFirearmProperties<T>(T defaultProperties, ImmutableMap<String, T> propertiesByMode) {
 
     public T getProperties(String mode) { return this.propertiesByMode.getOrDefault(mode, this.defaultProperties); }
 
-    public static <T> void toNetwork(FriendlyByteBuf buf, RFEFirearmProperties<T> properties, BiConsumer<FriendlyByteBuf, T> encoder) {
-        encoder.accept(buf, properties.defaultProperties);
-        buf.writeVarInt(properties.propertiesByMode.size());
-        for (Map.Entry<String, T> entry : properties.propertiesByMode.entrySet()) {
-            buf.writeUtf(entry.getKey());
-            encoder.accept(buf, entry.getValue());
-        }
+    public static <T> Codec<RFEFirearmProperties<T>> makeCodec(MapCodec<T> codec) {
+        return RecordCodecBuilder.create(o -> o.group(
+                codec.forGetter(RFEFirearmProperties::defaultProperties),
+                ExtraCodecs.strictUnboundedMap(Codec.STRING, codec.codec())
+                        .xmap(map -> ImmutableMap.<String, T>builder().putAll(map).build(), LinkedHashMap::new)
+                        .optionalFieldOf("modes", ImmutableMap.of()).forGetter(RFEFirearmProperties::propertiesByMode)
+        ).apply(o, RFEFirearmProperties::new));
     }
 
-    public static <T> RFEFirearmProperties<T> fromNetwork(FriendlyByteBuf buf, Function<FriendlyByteBuf, T> decoder) {
-        T defaultProperties = decoder.apply(buf);
-        int sz = buf.readVarInt();
-        ImmutableMap.Builder<String, T> propertiesByMode = ImmutableMap.builder();
-        for (int i = 0; i < sz; ++i) {
-            String mode = buf.readUtf();
-            T properties = decoder.apply(buf);
-            propertiesByMode.put(mode, properties);
-        }
-        return new RFEFirearmProperties<>(defaultProperties, propertiesByMode.build());
+    public static <T> StreamCodec<RegistryFriendlyByteBuf, RFEFirearmProperties<T>> makeStreamCodec(StreamCodec<RegistryFriendlyByteBuf, T> propertiesStreamCodec) {
+        return StreamCodec.composite(
+                propertiesStreamCodec, RFEFirearmProperties::defaultProperties,
+                RFEByteBufCodecUtils.immutableMap(ByteBufCodecs.STRING_UTF8, propertiesStreamCodec), RFEFirearmProperties::propertiesByMode,
+                RFEFirearmProperties::new);
     }
 
 }

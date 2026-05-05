@@ -18,6 +18,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.AmmoPredicate;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
@@ -56,7 +57,7 @@ public class AmmoPacketItem extends Item {
 
     @Override public boolean isFoil(ItemStack itemStack) { return this.glint || super.isFoil(itemStack); }
 
-    @Override public int getUseDuration(ItemStack itemStack) { return this.useDuration; }
+    @Override public int getUseDuration(ItemStack itemStack, LivingEntity entity) { return this.useDuration; }
 
     @Override public UseAnim getUseAnimation(ItemStack itemStack) { return UseAnim.DRINK; }
 
@@ -87,11 +88,11 @@ public class AmmoPacketItem extends Item {
     }
 
     public List<ItemStack> getStoredAmmo(ItemStack itemStack) {
-        return FirearmDataUtils.getRounds(itemStack, "Rounds");
+        return FirearmDataUtils.getRounds(itemStack, BuiltInRFEPlugin.RFEDataComponents.ROUNDS);
     }
 
     public void writeStoredAmmo(ItemStack itemStack, List<ItemStack> ammo) {
-        FirearmDataUtils.saveRounds(itemStack, "Rounds", ammo);
+        FirearmDataUtils.saveRounds(itemStack, BuiltInRFEPlugin.RFEDataComponents.ROUNDS, ammo);
     }
 
     public int countAmmo(ItemStack itemStack) {
@@ -170,8 +171,8 @@ public class AmmoPacketItem extends Item {
     public int getReloadCooldown(ItemStack itemStack) { return this.reloadCooldown; }
 
     @Override
-    public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-        super.appendHoverText(itemStack, level, tooltip, flag);
+    public void appendHoverText(ItemStack itemStack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(itemStack, context, tooltip, flag);
         List<ItemStack> storedAmmo = this.getStoredAmmo(itemStack);
         Map<Item, Integer> storedIndex = new Object2IntLinkedOpenHashMap<>();
         for (ItemStack ammoStack : storedAmmo)

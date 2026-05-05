@@ -1,11 +1,16 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles;
 
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
@@ -13,6 +18,7 @@ import rbasamoyai.ritchiesfirearmengine.network.RFEClientNetworkHandlers;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.RFEPacket;
 import rbasamoyai.ritchiesfirearmengine.utils.EnvExecute;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEByteBufCodecUtils;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -41,12 +47,12 @@ public class RFEProjectileManager {
             projectile.tick(level);
             if (projectile.isRemoved()) {
                 iter.remove();
-                if (!level.isClientSide)
-                    RFENetwork.sendToAllInDimension(new ClientboundRemoveRFEProjectilePacket(projectile.uuid(), level.dimension()), level);
+                if (level instanceof ServerLevel slevel)
+                    RFENetwork.sendToAllInDimension(new ClientboundRemoveRFEProjectilePacket(projectile.uuid(), level.dimension()), slevel);
             } else if (projectile.forceSync()) {
                 projectile.setForceSync(false);
-                if (!level.isClientSide)
-                    RFENetwork.sendToAllInDimension(ClientboundUpdateRFEProjectilePacket.fromProjectile(projectile, level), level);
+                if (level instanceof ServerLevel slevel)
+                    RFENetwork.sendToAllInDimension(ClientboundUpdateRFEProjectilePacket.fromProjectile(projectile, level), slevel);
             }
         }
         if (projectiles.isEmpty())
@@ -72,8 +78,8 @@ public class RFEProjectileManager {
             PROJECTILES_TO_ADD.put(level, new HashMap<>());
         Map<UUID, RFEProjectileInstance> map = PROJECTILES_TO_ADD.get(level);
         map.put(instance.uuid(), instance);
-        if (!level.isClientSide)
-            RFENetwork.sendToAllInDimension(ClientboundSpawnRFEProjectilePacket.fromProjectile(instance, level), level);
+        if (level instanceof ServerLevel slevel)
+            RFENetwork.sendToAllInDimension(ClientboundSpawnRFEProjectilePacket.fromProjectile(instance, level), slevel);
     }
 
     public static void syncAllProjectilesToPlayer(ServerPlayer player, Level level) {
@@ -115,51 +121,32 @@ public class RFEProjectileManager {
             return new ClientboundSpawnRFEProjectilePacket(instance, instance.getOwner() == null ? null : instance.getOwner().getId(), level.dimension());
         }
 
-        public static ClientboundSpawnRFEProjectilePacket decode(FriendlyByteBuf buf) {
-            ResourceLocation typeId = buf.readResourceLocation();
-            UUID uuid = buf.readUUID();
-            Vec3 position = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
-            Vec3 velocity = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
-            boolean leftOwner = buf.readBoolean();
-            double distanceTravelled = buf.readDouble();
-            Integer ownerId = null;
-            if (buf.readBoolean())
-                ownerId = buf.readVarInt();
-            ResourceKey<Level> level = buf.readResourceKey(Registries.DIMENSION);
-            RFEProjectileType type = Objects.requireNonNull(RFEProjectileTypeHandler.getProjectileType(typeId));
-            RFEProjectileInstance instance = new RFEProjectileInstance(type);
-            instance.setPosition(position);
-            instance.setOldPosition(position);
-            instance.setVelocity(velocity);
-            instance.setUUID(uuid);
-            instance.setLeftOwner(leftOwner);
-            instance.setDistanceTravelled(distanceTravelled);
-            return new ClientboundSpawnRFEProjectilePacket(instance, ownerId, level);
-        }
+        private static final StreamCodec<RegistryFriendlyByteBuf, RFEProjectileInstance> INSTANCE_SPAWN_STREAM_CODEC = StreamCodec.composite(
+                RFEProjectileTypeHandler.LOADED_TYPE_STREAM_CODEC, RFEProjectileInstance::projectileType,
+                UUIDUtil.STREAM_CODEC, RFEProjectileInstance::uuid,
+                RFEByteBufCodecUtils.VEC3_STREAM_CODEC, RFEProjectileInstance::position,
+                RFEByteBufCodecUtils.VEC3_STREAM_CODEC, RFEProjectileInstance::velocity,
+                ByteBufCodecs.BOOL, RFEProjectileInstance::leftOwner,
+                ByteBufCodecs.DOUBLE, RFEProjectileInstance::distanceTravelled,
+                (type, uuid, pos, vel, leftOwner, distanceTravelled) -> {
+                    RFEProjectileInstance instance = new RFEProjectileInstance(type);
+                    instance.setPosition(pos);
+                    instance.setOldPosition(pos);
+                    instance.setVelocity(vel);
+                    instance.setUUID(uuid);
+                    instance.setLeftOwner(leftOwner);
+                    instance.setDistanceTravelled(distanceTravelled);
+                    return instance;
+                });
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundSpawnRFEProjectilePacket> STREAM_CODEC = StreamCodec.composite(
+                INSTANCE_SPAWN_STREAM_CODEC, ClientboundSpawnRFEProjectilePacket::instance,
+                ByteBufCodecs.optional(ByteBufCodecs.VAR_INT).map(o -> o.orElse(null), Optional::ofNullable), ClientboundSpawnRFEProjectilePacket::ownerId,
+                ResourceKey.streamCodec(Registries.DIMENSION), ClientboundSpawnRFEProjectilePacket::level,
+                ClientboundSpawnRFEProjectilePacket::new);
 
         @Override
-        public void rootEncode(FriendlyByteBuf buf) {
-            ResourceLocation id = Objects.requireNonNull(RFEProjectileTypeHandler.getProjectileTypeId(this.instance.projectileType()));
-            Vec3 position = this.instance.position();
-            Vec3 velocity = this.instance.velocity();
-            buf.writeResourceLocation(id)
-                    .writeUUID(this.instance.uuid())
-                    .writeDouble(position.x)
-                    .writeDouble(position.y)
-                    .writeDouble(position.z)
-                    .writeDouble(velocity.x)
-                    .writeDouble(velocity.y)
-                    .writeDouble(velocity.z);
-            buf.writeBoolean(this.instance.leftOwner())
-                    .writeDouble(this.instance.distanceTravelled());
-            buf.writeBoolean(this.instance.getOwner() != null);
-            if (this.instance.getOwner() != null)
-                buf.writeVarInt(this.instance.getOwner().getId());
-            buf.writeResourceKey(this.level);
-        }
-
-        @Override
-        public void handle(Executor exec, PacketListener listener, @Nullable ServerPlayer sender) {
+        public void handle(Executor exec, PacketListener listener, Player player) {
             EnvExecute.runOnClient(() -> () -> RFEClientNetworkHandlers.spawnRFEProjectile(this));
         }
     }
@@ -171,69 +158,61 @@ public class RFEProjectileManager {
                     instance.leftOwner(), instance.distanceTravelled(), instance.age(), level.dimension());
         }
 
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundUpdateRFEProjectilePacket> STREAM_CODEC =
+                StreamCodec.of(ClientboundUpdateRFEProjectilePacket::rootEncode, ClientboundUpdateRFEProjectilePacket::decode);
+
         public static ClientboundUpdateRFEProjectilePacket decode(FriendlyByteBuf buf) {
             UUID uuid = buf.readUUID();
-            Vec3 position = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
-            Vec3 oldPosition = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
-            Vec3 velocity = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
+            Vec3 position = RFEByteBufCodecUtils.VEC3_STREAM_CODEC.decode(buf);
+            Vec3 oldPosition = RFEByteBufCodecUtils.VEC3_STREAM_CODEC.decode(buf);
+            Vec3 velocity = RFEByteBufCodecUtils.VEC3_STREAM_CODEC.decode(buf);
             boolean leftOwner = buf.readBoolean();
             double distanceTravelled = buf.readDouble();
             int age = buf.readVarInt();
             ResourceKey<Level> level = buf.readResourceKey(Registries.DIMENSION);
             return new ClientboundUpdateRFEProjectilePacket(uuid, position, oldPosition, velocity, leftOwner, distanceTravelled, age, level);
         }
-        
-        @Override
-        public void rootEncode(FriendlyByteBuf buf) {
-            buf.writeUUID(this.uuid)
-                    .writeDouble(this.position.x)
-                    .writeDouble(this.position.y)
-                    .writeDouble(this.position.z)
-                    .writeDouble(this.oldPosition.x)
-                    .writeDouble(this.oldPosition.y)
-                    .writeDouble(this.oldPosition.z)
-                    .writeDouble(this.velocity.x)
-                    .writeDouble(this.velocity.y)
-                    .writeDouble(this.velocity.z);
-            buf.writeBoolean(this.leftOwner)
-                    .writeDouble(this.distanceTravelled);
-            buf.writeVarInt(this.age)
-                    .writeResourceKey(this.level);
+
+        public static void rootEncode(FriendlyByteBuf buf, ClientboundUpdateRFEProjectilePacket pkt) {
+            buf.writeUUID(pkt.uuid);
+            RFEByteBufCodecUtils.VEC3_STREAM_CODEC.encode(buf, pkt.position);
+            RFEByteBufCodecUtils.VEC3_STREAM_CODEC.encode(buf, pkt.oldPosition);
+            RFEByteBufCodecUtils.VEC3_STREAM_CODEC.encode(buf, pkt.velocity);
+            buf.writeBoolean(pkt.leftOwner)
+                    .writeDouble(pkt.distanceTravelled);
+            buf.writeVarInt(pkt.age)
+                    .writeResourceKey(pkt.level);
         }
 
         @Override
-        public void handle(Executor exec, PacketListener listener, @Nullable ServerPlayer sender) {
+        public void handle(Executor exec, PacketListener listener, Player player) {
             EnvExecute.runOnClient(() -> () -> RFEClientNetworkHandlers.updateRFEProjectile(this));
         }
     }
 
     public record ClientboundRemoveRFEProjectilePacket(UUID uuid, ResourceKey<Level> level) implements RFEPacket {
-        public static ClientboundRemoveRFEProjectilePacket decode(FriendlyByteBuf buf) {
-            return new ClientboundRemoveRFEProjectilePacket(buf.readUUID(), buf.readResourceKey(Registries.DIMENSION));
-        }
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundRemoveRFEProjectilePacket> STREAM_CODEC = StreamCodec.composite(
+                UUIDUtil.STREAM_CODEC, ClientboundRemoveRFEProjectilePacket::uuid,
+                ResourceKey.streamCodec(Registries.DIMENSION), ClientboundRemoveRFEProjectilePacket::level,
+                ClientboundRemoveRFEProjectilePacket::new);
 
         @Override
-        public void rootEncode(FriendlyByteBuf buf) {
-            buf.writeUUID(this.uuid).writeResourceKey(this.level);
-        }
-
-        @Override
-        public void handle(Executor exec, PacketListener listener, @Nullable ServerPlayer sender) {
+        public void handle(Executor exec, PacketListener listener, Player player) {
             EnvExecute.runOnClient(() -> () -> RFEClientNetworkHandlers.removeRFEProjectile(this));
         }
     }
 
-    public record ClientboundRemoveAllProjectilesPacket() implements RFEPacket {
-        public static ClientboundRemoveAllProjectilesPacket decode(FriendlyByteBuf buf) {
-            return new ClientboundRemoveAllProjectilesPacket();
-        }
+    public static class ClientboundRemoveAllProjectilesPacket implements RFEPacket {
+        public static final ClientboundRemoveAllProjectilesPacket INSTANCE = new ClientboundRemoveAllProjectilesPacket();
 
-        @Override public void rootEncode(FriendlyByteBuf buf) {}
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundRemoveAllProjectilesPacket> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
         @Override
-        public void handle(Executor exec, PacketListener listener, @Nullable ServerPlayer sender) {
+        public void handle(Executor exec, PacketListener listener, Player player) {
             clearAllProjectiles();
         }
+
+        private ClientboundRemoveAllProjectilesPacket() {}
     }
 
 }

@@ -1,25 +1,25 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms;
 
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
@@ -29,6 +29,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.m
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmModeHandlingProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhase;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhaseAccessFilter;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudItemInfoProviders;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilClientImpulse;
@@ -52,8 +53,6 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
     protected final List<String> modeOrder;
     protected final String defaultMode;
 
-    public static final UUID MOVEMENT_SPEED_MODIFIER_ID = Mth.createInsecureUUID();
-
     protected RFEFirearmItem(Properties properties, Map<String, RFEFirearmMode> baseFirearmModes, List<String> modeOrder, String defaultMode) {
         super(properties.stacksTo(1));
         this.baseFirearmModes = baseFirearmModes;
@@ -70,17 +69,18 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
     }
 
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-        ImmutableMultimap.Builder<Attribute, AttributeModifier> map = ImmutableMultimap.builder();
-        if (slot == EquipmentSlot.MAINHAND || slot == EquipmentSlot.OFFHAND) {
-            RFEFirearmMode mode = this.getCurrentMode(stack);
-            RFEFirearmModeHandlingProperties properties = mode.getHandlingProperties(stack);
-            if (Math.abs(properties.movementSpeedModifier()) > 0.01d) {
-                map.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(MOVEMENT_SPEED_MODIFIER_ID, "ritchiesfirearmengine.handling.movement_speed",
-                        properties.movementSpeedModifier(), AttributeModifier.Operation.MULTIPLY_TOTAL));
-            }
+    public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
+        List<ItemAttributeModifiers.Entry> modifiers = new ArrayList<>(2);
+        RFEFirearmMode mode = this.getCurrentMode(stack);
+        RFEFirearmModeHandlingProperties properties = mode.getHandlingProperties(stack);
+        float speedModifierValue = properties.movementSpeedModifier();
+        if (speedModifierValue != 0f) {
+            AttributeModifier speedModifier = new AttributeModifier(RitchiesFirearmEngine.resource("handling_movement_speed"),
+                    speedModifierValue, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            modifiers.add(new ItemAttributeModifiers.Entry(Attributes.MOVEMENT_SPEED.getDelegate(), speedModifier, EquipmentSlotGroup.MAINHAND));
+            modifiers.add(new ItemAttributeModifiers.Entry(Attributes.MOVEMENT_SPEED.getDelegate(), speedModifier, EquipmentSlotGroup.OFFHAND));
         }
-        return map.build();
+        return new ItemAttributeModifiers(modifiers, true);
     }
 
     @Override
@@ -99,7 +99,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
     }
 
     @Override
-    public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
+    public boolean onEntitySwing(ItemStack stack, LivingEntity entity, InteractionHand hand) {
         return true; // TODO other swinging
     }
 
@@ -113,8 +113,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
     }
 
     public RFEFirearmMode getCurrentMode(ItemStack stack) {
-        CompoundTag tag = stack.getOrCreateTag();
-        String stateRef = tag.contains("FirearmMode", Tag.TAG_STRING) ? tag.getString("FirearmMode") : this.defaultMode;
+        String stateRef = stack.getOrDefault(BuiltInRFEPlugin.RFEDataComponents.FIREARM_MODE, this.defaultMode);
         return this.baseFirearmModes.getOrDefault(stateRef, this.getDefaultMode());
     }
 
@@ -131,8 +130,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
                 firearmMode.fireFirearm(stack, entity, RFEFirearmMode.FiringType.CLICK);
         } else if (firearmMode.canChargeInternal(stack, entity)) {
             firearmMode.onCharge(stack, entity);
-        } else if (firearmMode.canCancelReloadByClick(stack, entity)) {
-            firearmMode.setForceCancelReload(stack, entity, true);
+        } else if (firearmMode.canCancelReloadOrUnloadByClick(stack, entity)) {
+            firearmMode.setForceCancelAction(stack, entity, true);
         }
         // TODO alternative API for entity interaction
         return true;
@@ -166,12 +165,10 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
     public void onSwitchMode(ItemStack itemStack, LivingEntity entity) {
         if (this.modeOrder.size() == 1)
             return;
-        CompoundTag tag = itemStack.getOrCreateTag();
-        String stateRef = tag.contains("FirearmMode", Tag.TAG_STRING) ? tag.getString("FirearmMode") : this.defaultMode;
+        String stateRef = itemStack.getOrDefault(BuiltInRFEPlugin.RFEDataComponents.FIREARM_MODE, this.defaultMode);
         int index = this.modeOrder.indexOf(stateRef);
         if (index == -1) {
             this.warnInvalidModeAndReset(itemStack);
-            tag.putString("FirearmMode", this.defaultMode);
             return;
         }
         ++index;
@@ -187,8 +184,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
     }
 
     public void completeSwitchMode(ItemStack itemStack, LivingEntity entity) {
-        CompoundTag tag = itemStack.getOrCreateTag();
-        String stateRef = tag.contains("FirearmMode", Tag.TAG_STRING) ? tag.getString("FirearmMode") : this.defaultMode;
+        String stateRef = itemStack.getOrDefault(BuiltInRFEPlugin.RFEDataComponents.FIREARM_MODE, this.defaultMode);
         int index = this.modeOrder.indexOf(stateRef);
         if (index == -1) {
             this.warnInvalidModeAndReset(itemStack);
@@ -198,12 +194,12 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         if (index >= this.modeOrder.size())
             index = 0;
         String nextStateRef = this.modeOrder.get(index);
-        tag.putString("FirearmMode", nextStateRef);
+        itemStack.set(BuiltInRFEPlugin.RFEDataComponents.FIREARM_MODE, nextStateRef);
     }
 
     protected void warnInvalidModeAndReset(ItemStack itemStack) {
         RitchiesFirearmEngine.LOGGER.warn("Firearm {} has invalid mode setup", BuiltInRegistries.ITEM.getKey(this));
-        itemStack.getOrCreateTag().putString("FirearmMode", this.defaultMode);
+        itemStack.set(BuiltInRFEPlugin.RFEDataComponents.FIREARM_MODE, this.defaultMode);
     }
 
     @Override
@@ -323,7 +319,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         return startUsing ? ItemUtils.startUsingInstantly(level, player, hand) : super.use(level, player, hand);
     }
 
-    @Override public int getUseDuration(ItemStack itemStack) { return 72000; }
+    @Override public int getUseDuration(ItemStack stack, LivingEntity entity) { return 72000; }
 
     @Override
     public ItemStack finishUsingItem(ItemStack itemStack, Level level, LivingEntity entity) {
@@ -408,6 +404,9 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         DRAW(false),
         SWITCH_MODE(true),
         COOLDOWN(false);
+
+        public static final Codec<Action> CODEC = StringRepresentable.fromEnum(Action::values);
+        public static final StreamCodec<FriendlyByteBuf, Action> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(Action.class);
 
         private static final Map<String, Action> BY_ID = Arrays.stream(values())
                 .collect(Collectors.toMap(Action::getSerializedName, Function.identity()));

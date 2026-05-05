@@ -3,31 +3,31 @@ package rbasamoyai.ritchiesfirearmengine.foundation.api.spread;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.PacketListener;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.spread.no_spread.NoSpreadProvider;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEFirearmProperties;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.RFEPacket;
-import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
@@ -38,6 +38,8 @@ public class RFESpreadProviderPackHandler {
     private static final RFEFirearmProperties<RFESpreadProvider> NO_SPREAD = new RFEFirearmProperties<>(NoSpreadProvider.INSTANCE, ImmutableMap.of());
 
     private static final Logger LOGGER = LogUtils.getLogger();
+
+    private static final Codec<RFEFirearmProperties<RFESpreadProvider>> CODEC = RFEFirearmProperties.makeCodec(RFESpreadProvider.CODEC);
 
     public static class ReloadListener extends SimpleJsonResourceReloadListener {
         private static final Gson GSON = new Gson();
@@ -53,38 +55,14 @@ public class RFESpreadProviderPackHandler {
                 try {
                     Item item = BuiltInRegistries.ITEM.getOptional(id)
                             .orElseThrow(() -> new IllegalStateException("Item " + id + " does not exist"));
-                    JsonElement el = entry.getValue();
-                    if (!el.isJsonObject())
-                        throw new JsonParseException("Expected JSON object when parsing firearm item spread properties");
-                    JsonObject obj = el.getAsJsonObject();
-                    SPREAD_PROVIDERS.put(item, readSpreadProviderProperties(obj, id));
+                    RFEFirearmProperties<RFESpreadProvider> properties = CODEC.parse(JsonOps.INSTANCE, entry.getValue())
+                            .getOrThrow(s -> new IllegalStateException("Error decoding JSON: " + s));
+                    SPREAD_PROVIDERS.put(item, properties);
                 } catch (Exception e) {
                     LOGGER.error("Error loading firearm spread properties for item {}: {}", id, e);
                 }
             }
         }
-    }
-
-    private static RFEFirearmProperties<RFESpreadProvider> readSpreadProviderProperties(JsonObject obj, ResourceLocation id) {
-        RFESpreadProvider defaultProvider = readSpreadProvider(obj);
-        ImmutableMap.Builder<String, RFESpreadProvider> propertiesByMode = ImmutableMap.builder();
-        if (GsonHelper.isObjectNode(obj, "modes")) {
-            JsonObject modesObj = obj.getAsJsonObject("modes");
-            for (Map.Entry<String, JsonElement> entry : modesObj.entrySet()) {
-                String modeName = entry.getKey();
-                JsonElement el = entry.getValue();
-                if (!el.isJsonObject())
-                    throw new JsonParseException("Expected JSON object when parsing spread provider for mode '" + modeName + "' of firearm item " + id);
-                propertiesByMode.put(modeName, readSpreadProvider(el.getAsJsonObject()));
-            }
-        }
-        return new RFEFirearmProperties<>(defaultProvider, propertiesByMode.build());
-    }
-
-    private static RFESpreadProvider readSpreadProvider(JsonObject obj) {
-        ResourceLocation typeId = RFEUtils.location(GsonHelper.getAsString(obj, "type"));
-        RFESpreadProvider.Serializer<?> ser = RFEContentBuilderRegistry.getSpreadProviderSerializer(typeId);
-        return ser.fromJson(obj);
     }
 
     public static RFEFirearmProperties<RFESpreadProvider> getSpreadProviders(Item item) { return SPREAD_PROVIDERS.getOrDefault(item, NO_SPREAD); }
@@ -99,44 +77,18 @@ public class RFESpreadProviderPackHandler {
         RFENetwork.sendToPlayer(new ClientboundSyncSpreadProvidersPacket(), player);
     }
 
-    public record ClientboundSyncSpreadProvidersPacket(Map<Item, RFEFirearmProperties<RFESpreadProvider>> spreadProviders) implements RFEPacket {
+    public record ClientboundSyncSpreadProvidersPacket(Reference2ObjectOpenHashMap<Item, RFEFirearmProperties<RFESpreadProvider>> spreadProviders) implements RFEPacket {
         private ClientboundSyncSpreadProvidersPacket() { this(new Reference2ObjectOpenHashMap<>(SPREAD_PROVIDERS)); }
 
-        public static ClientboundSyncSpreadProvidersPacket decode(FriendlyByteBuf buf) {
-            int sz = buf.readVarInt();
-            ImmutableMap.Builder<Item, RFEFirearmProperties<RFESpreadProvider>> provs = ImmutableMap.builder();
-            for (int i = 0; i < sz; ++i) {
-                ResourceLocation itemLoc = buf.readResourceLocation();
-                RFEFirearmProperties<RFESpreadProvider> prov = RFEFirearmProperties.fromNetwork(buf, ClientboundSyncSpreadProvidersPacket::fromNetwork);
-                BuiltInRegistries.ITEM.getOptional(itemLoc).ifPresent(item -> provs.put(item, prov));
-            }
-            return new ClientboundSyncSpreadProvidersPacket(provs.build());
-        }
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundSyncSpreadProvidersPacket> STREAM_CODEC =
+                ByteBufCodecs.map(Reference2ObjectOpenHashMap::new, ByteBufCodecs.registry(Registries.ITEM),
+                        RFEFirearmProperties.makeStreamCodec(RFESpreadProvider.STREAM_CODEC))
+                        .map(ClientboundSyncSpreadProvidersPacket::new, ClientboundSyncSpreadProvidersPacket::spreadProviders);
 
         @Override
-        public void rootEncode(FriendlyByteBuf buf) {
-            buf.writeVarInt(this.spreadProviders.size());
-            for (Map.Entry<Item, RFEFirearmProperties<RFESpreadProvider>> entry : this.spreadProviders.entrySet()) {
-                buf.writeResourceLocation(BuiltInRegistries.ITEM.getKey(entry.getKey()));
-                RFEFirearmProperties.toNetwork(buf, entry.getValue(), ClientboundSyncSpreadProvidersPacket::toNetworkCasted);
-            }
-        }
-
-        @Override
-        public void handle(Executor exec, PacketListener listener, @Nullable ServerPlayer sender) {
+        public void handle(Executor exec, PacketListener listener, Player player) {
             SPREAD_PROVIDERS.clear();
             SPREAD_PROVIDERS.putAll(this.spreadProviders);
-        }
-
-        private static <T extends RFESpreadProvider> void toNetworkCasted(FriendlyByteBuf buf, T prov) {
-            RFESpreadProvider.Serializer<T> ser = (RFESpreadProvider.Serializer<T>) prov.getSerializer();
-            buf.writeResourceLocation(RFEContentBuilderRegistry.getSpreadProviderSerializerId(ser));
-            ser.toNetwork(buf, prov);
-        }
-
-        private static RFESpreadProvider fromNetwork(FriendlyByteBuf buf) {
-            RFESpreadProvider.Serializer<?> ser = RFEContentBuilderRegistry.getSpreadProviderSerializer(buf.readResourceLocation());
-            return ser.fromNetwork(buf);
         }
     }
 

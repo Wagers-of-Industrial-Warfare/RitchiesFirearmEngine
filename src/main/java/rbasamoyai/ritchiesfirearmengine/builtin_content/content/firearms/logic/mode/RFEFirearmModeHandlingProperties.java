@@ -1,19 +1,35 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
+import net.minecraft.util.StringRepresentable;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.ChargingBehavior;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.misfires.RFEMisfire;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public record RFEFirearmModeHandlingProperties(float movementSpeedModifier, ChargingBehavior chargingBehavior, float heatCapacity,
                                                float heatRemovedPerTick, float heatRemovedOnCharge, float heatAddedOnFiring,
                                                int coolingDelayTime, ImmutableList<RFEMisfire> misfires) {
+
+    public static final Codec<RFEFirearmModeHandlingProperties> CODEC = RecordCodecBuilder.create(o -> o.group(
+            Codec.floatRange(-1f, 10f).optionalFieldOf("movement_speed_modifier", 0f).forGetter(RFEFirearmModeHandlingProperties::movementSpeedModifier),
+            StringRepresentable.fromEnum(ChargingBehavior::values).optionalFieldOf("charging_behavior", ChargingBehavior.HOLD).forGetter(RFEFirearmModeHandlingProperties::chargingBehavior),
+            Codec.floatRange(0, Float.MAX_VALUE).optionalFieldOf("heat_capacity", 0f).forGetter(RFEFirearmModeHandlingProperties::heatCapacity),
+            Codec.floatRange(0, Float.MAX_VALUE).optionalFieldOf("heat_removed_per_tick", 0f).forGetter(RFEFirearmModeHandlingProperties::heatRemovedPerTick),
+            Codec.floatRange(0, Float.MAX_VALUE).optionalFieldOf("heat_removed_on_charge", 0f).forGetter(RFEFirearmModeHandlingProperties::heatRemovedOnCharge),
+            Codec.floatRange(0, Float.MAX_VALUE).optionalFieldOf("heat_added_on_firing", 0f).forGetter(RFEFirearmModeHandlingProperties::heatAddedOnFiring),
+            Codec.intRange(0, Integer.MAX_VALUE).optionalFieldOf("cooling_delay_time", 0).forGetter(RFEFirearmModeHandlingProperties::coolingDelayTime),
+            RFEMisfire.LIST_CODEC.xmap(li -> ImmutableList.<RFEMisfire>builder().addAll(li).build(), Lists::newArrayList)
+                    .optionalFieldOf("misfire_chances", ImmutableList.of()).forGetter(RFEFirearmModeHandlingProperties::misfires)
+    ).apply(o, RFEFirearmModeHandlingProperties::new));
+
+    public static final StreamCodec<FriendlyByteBuf, RFEFirearmModeHandlingProperties> STREAM_CODEC =
+            StreamCodec.of(RFEFirearmModeHandlingProperties::toNetwork, RFEFirearmModeHandlingProperties::fromNetwork);
 
     public static RFEFirearmModeHandlingProperties fromItemDefinition(RFEFirearmModeBuilder builder) {
         return new RFEFirearmModeHandlingProperties(builder.movementSpeedModifier, builder.chargingBehavior, builder.heatCapacity,
@@ -52,73 +68,6 @@ public record RFEFirearmModeHandlingProperties(float movementSpeedModifier, Char
         for (RFEMisfire misfire : properties.misfires) {
             buf.writeResourceLocation(RFEContentBuilderRegistry.getMisfireProviderId(misfire.getMisfireProvider()))
                     .writeFloat(misfire.getChance());
-        }
-    }
-
-    public static class Builder {
-        protected float movementSpeedModifier = 1;
-        protected ChargingBehavior chargingBehavior = ChargingBehavior.HOLD;
-        protected float heatCapacity = 0;
-        protected float heatRemovedPerTick = 0;
-        protected float heatRemovedOnCharge = 0;
-        protected float heatAddedOnFiring = 0;
-        protected int coolingDelayTime = 0;
-        protected final List<RFEMisfire> misfires = new ArrayList<>();
-
-        public Builder movementSpeedModifier(float movementSpeedModifier) {
-            this.movementSpeedModifier = Mth.clamp(movementSpeedModifier, -1, 10);
-            return this;
-        }
-
-        public Builder chargingBehavior(ChargingBehavior chargingBehavior) {
-            this.chargingBehavior = chargingBehavior;
-            return this;
-        }
-
-        public Builder heatCapacity(float heatCapacity) {
-            if (heatCapacity < 0)
-                throw new IllegalStateException("Cannot specify cooldown time less than 0");
-            this.heatCapacity = heatCapacity;
-            return this;
-        }
-
-        public Builder heatRemovedPerTick(float heatRemovedPerTick) {
-            if (heatRemovedPerTick < 0)
-                throw new IllegalStateException("Cannot specify default heat removed per tick less than 0");
-            this.heatRemovedPerTick = heatRemovedPerTick;
-            return this;
-        }
-
-        public Builder heatRemovedOnCharge(float heatRemovedOnCharge) {
-            if (heatRemovedOnCharge < 0)
-                throw new IllegalStateException("Cannot specify default heat removed on charge less than 0");
-            this.heatRemovedOnCharge = heatRemovedOnCharge;
-            return this;
-        }
-
-        public Builder heatAddedOnFiring(float heatAddedOnFiring) {
-            if (heatAddedOnFiring < 0)
-                throw new IllegalStateException("Cannot specify default heat added on firing less than 0");
-            this.heatAddedOnFiring = heatAddedOnFiring;
-            return this;
-        }
-
-        public Builder coolingDelay(int coolingDelayTime) {
-            if (coolingDelayTime < 0)
-                throw new IllegalStateException("Cannot specify default cooling delay less than 0");
-            this.coolingDelayTime = coolingDelayTime;
-            return this;
-        }
-
-        public Builder addMisfire(RFEMisfire misfire) {
-            this.misfires.add(misfire);
-            return this;
-        }
-
-        public RFEFirearmModeHandlingProperties build() {
-            return new RFEFirearmModeHandlingProperties(this.movementSpeedModifier, this.chargingBehavior, this.heatCapacity,
-                    this.heatRemovedPerTick, this.heatRemovedOnCharge, this.heatAddedOnFiring, this.coolingDelayTime,
-                    ImmutableList.<RFEMisfire>builder().addAll(this.misfires).build());
         }
     }
 

@@ -4,20 +4,23 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.mojang.datafixers.util.Either;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.util.Mth;
 import net.minecraft.util.profiling.ProfilerFiller;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEBlockPredicate;
@@ -27,9 +30,12 @@ import rbasamoyai.ritchiesfirearmengine.foundation.data_packing.RFEJsonResourceR
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.RFEPacket;
 
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 public class RFEProjectilePenetrationHandler {
 
@@ -53,10 +59,10 @@ public class RFEProjectilePenetrationHandler {
             for (Map.Entry<ResourceLocation, JsonElement> entry : data.entries()) {
                 ResourceLocation id = entry.getKey();
                 try {
-                    JsonElement el = entry.getValue();
-                    if (!el.isJsonObject())
-                        throw new JsonParseException("Expected JSON object for RFE projectile penetration properties");
-                    loadProperties(el.getAsJsonObject(), builtObjects.computeIfAbsent(id, k -> new PropertiesBuilder()));
+                    PropertiesLayer layer = PropertiesLayer.CODEC.parse(JsonOps.INSTANCE, entry.getValue())
+                            .getOrThrow(s -> new IllegalStateException("Error decoding JSON: " + s));
+                    PropertiesBuilder builder = builtObjects.computeIfAbsent(id, k -> new PropertiesBuilder());
+                    applyLoadedData(builder, layer);
                 } catch (Exception e) {
                     LOGGER.error("Error loading projectile penetration properties {}: {}", id, e);
                 }
@@ -67,66 +73,7 @@ public class RFEProjectilePenetrationHandler {
         }
     }
     
-    private static final PenetrationStats DEFAULT_JSON_STATS = new PenetrationStats(1, 0.25f);
-
-    private static void loadProperties(JsonObject obj, PropertiesBuilder oldBuilder) {
-        if (GsonHelper.isObjectNode(obj, "default_entity_penetration"))
-            oldBuilder.defaultEntityPenetration = statsFromJson(obj.getAsJsonObject("default_entity_penetration"));
-        if (GsonHelper.getAsBoolean(obj, "replace_entity_penetration", false))
-            oldBuilder.entityPenetration.clear();
-        if (GsonHelper.isArrayNode(obj, "entity_penetration")) {
-            for (JsonElement el : GsonHelper.getAsJsonArray(obj, "entity_penetration")) {
-                if (el.isJsonObject()) {
-                    JsonObject statsObj = el.getAsJsonObject();
-                    RFEEntityTypePredicate pred = RFEEntityTypePredicate.of(GsonHelper.getAsString(statsObj, "type"));
-                    oldBuilder.entityPenetration.put(pred, statsFromJson(statsObj));
-                } else if (GsonHelper.isStringValue(el)) {
-                    oldBuilder.entityPenetration.put(RFEEntityTypePredicate.of(el.getAsString()), DEFAULT_JSON_STATS);
-                } else {
-                    throw new JsonParseException("Entity penetration entry must either be JSON object or string (resource location)");
-                }
-            }
-        }
-        if (GsonHelper.isObjectNode(obj, "default_block_penetration"))
-            oldBuilder.defaultBlockPenetration = statsFromJson(obj.getAsJsonObject("default_block_penetration"));
-        if (GsonHelper.getAsBoolean(obj, "replace_block_penetration", false))
-            oldBuilder.blockPenetration.clear();
-        if (GsonHelper.isArrayNode(obj, "block_penetration")) {
-            for (JsonElement el : GsonHelper.getAsJsonArray(obj, "block_penetration")) {
-                if (el.isJsonObject()) {
-                    JsonObject statsObj = el.getAsJsonObject();
-                    RFEBlockPredicate pred = RFEBlockPredicate.of(GsonHelper.getAsString(statsObj, "block"));
-                    oldBuilder.blockPenetration.put(pred, statsFromJson(statsObj));
-                } else if (GsonHelper.isStringValue(el)) {
-                    oldBuilder.blockPenetration.put(RFEBlockPredicate.of(el.getAsString()), DEFAULT_JSON_STATS);
-                } else {
-                    throw new JsonParseException("Block penetration entry must either be JSON object or string (resource location)");
-                }
-            }
-        }
-        if (GsonHelper.isObjectNode(obj, "default_block_breaking"))
-            oldBuilder.defaultBlockBreaking = statsFromJson(obj.getAsJsonObject("default_block_breaking"));
-        if (GsonHelper.getAsBoolean(obj, "replace_block_breaking", false))
-            oldBuilder.blockBreaking.clear();
-        if (GsonHelper.isArrayNode(obj, "block_breaking")) {
-            for (JsonElement el : GsonHelper.getAsJsonArray(obj, "block_breaking")) {
-                if (el.isJsonObject()) {
-                    JsonObject statsObj = el.getAsJsonObject();
-                    RFEBlockPredicate pred = RFEBlockPredicate.of(GsonHelper.getAsString(statsObj, "block"));
-                    oldBuilder.blockBreaking.put(pred, statsFromJson(statsObj));
-                } else if (GsonHelper.isStringValue(el)) {
-                    oldBuilder.blockBreaking.put(RFEBlockPredicate.of(el.getAsString()), DEFAULT_JSON_STATS);
-                } else {
-                    throw new JsonParseException("Block breaking entry must either be JSON object or string (resource location)");
-                }
-            }
-        }
-    }
-    
-    private static PenetrationStats statsFromJson(JsonObject obj) {
-        return new PenetrationStats(Mth.clamp(GsonHelper.getAsFloat(obj, "chance", 1), 0, 1),
-                Mth.clamp(GsonHelper.getAsFloat(obj, "damage_to_projectile", 0.25f), 0, 1));
-    }
+    private static final PenetrationStats DEFAULT_PENETRATION_STATS = new PenetrationStats(1, 0.25f);
 
     public static RFEProjectilePenetrationProperties getPenetrationProperties(ResourceLocation id) {
         return PENETRATION_PROPERTIES.getOrDefault(id, DEFAULT_PENETRATION);
@@ -135,6 +82,26 @@ public class RFEProjectilePenetrationHandler {
     public static void syncToAll() { RFENetwork.sendToAll(new ClientboundSyncProjectilePenetrationPacket()); }
 
     public static void syncToPlayer(ServerPlayer player) { RFENetwork.sendToPlayer(new ClientboundSyncProjectilePenetrationPacket(), player); }
+
+    private static void applyLoadedData(PropertiesBuilder builder, PropertiesLayer layer) {
+        if (layer.defaultEntityPenetration != null)
+            builder.defaultEntityPenetration = layer.defaultEntityPenetration;
+        if (layer.replaceEntityPenetration)
+            builder.entityPenetration.clear();
+        builder.entityPenetration.putAll(layer.entityPenetration);
+
+        if (layer.defaultBlockPenetration != null)
+            builder.defaultBlockPenetration = layer.defaultBlockPenetration;
+        if (layer.replaceBlockPenetration)
+            builder.blockPenetration.clear();
+        builder.blockPenetration.putAll(layer.blockPenetration);
+
+        if (layer.defaultBlockBreaking != null)
+            builder.defaultBlockBreaking = layer.defaultBlockBreaking;
+        if (layer.replaceBlockBreaking)
+            builder.blockBreaking.clear();
+        builder.blockBreaking.putAll(layer.blockBreaking);
+    }
 
     private static class PropertiesBuilder {
         public PenetrationStats defaultEntityPenetration = new PenetrationStats(0, 0);
@@ -154,31 +121,65 @@ public class RFEProjectilePenetrationHandler {
         }
     }
 
-    public record ClientboundSyncProjectilePenetrationPacket(Map<ResourceLocation, RFEProjectilePenetrationProperties> map) implements RFEPacket {
-        public static ClientboundSyncProjectilePenetrationPacket decode(FriendlyByteBuf buf) {
-            int sz = buf.readVarInt();
-            Map<ResourceLocation, RFEProjectilePenetrationProperties> map = new Object2ReferenceOpenHashMap<>();
-            for (int i = 0; i < sz; ++i) {
-                ResourceLocation id = buf.readResourceLocation();
-                RFEProjectilePenetrationProperties properties = RFEProjectilePenetrationProperties.fromNetwork(buf);
-                map.put(id, properties);
-            }
-            return new ClientboundSyncProjectilePenetrationPacket(map);
-        }
+    private record PropertiesLayer(@Nullable PenetrationStats defaultEntityPenetration, boolean replaceEntityPenetration,
+                                   Map<RFEEntityTypePredicate, PenetrationStats> entityPenetration,
+                                   @Nullable PenetrationStats defaultBlockPenetration, boolean replaceBlockPenetration,
+                                   Map<RFEBlockPredicate, PenetrationStats> blockPenetration,
+                                   @Nullable PenetrationStats defaultBlockBreaking, boolean replaceBlockBreaking,
+                                   Map<RFEBlockPredicate, PenetrationStats> blockBreaking) {
+        private static final Codec<Pair<RFEEntityTypePredicate, PenetrationStats>> ENTITY_PENETRATION_CODEC =
+                Codec.either(
+                        RecordCodecBuilder.<Pair<RFEEntityTypePredicate, PenetrationStats>>create(o -> o.group(
+                                RFEEntityTypePredicate.CODEC.fieldOf("type").forGetter(Pair::getFirst),
+                                PenetrationStats.CODEC.forGetter(Pair::getSecond)
+                        ).apply(o, Pair::of)),
+                        RFEEntityTypePredicate.CODEC
+                ).xmap(either -> Either.unwrap(either.mapRight(pred -> new Pair<>(pred, DEFAULT_PENETRATION_STATS))), Either::left);
 
+        private static final Codec<Map<RFEEntityTypePredicate, PenetrationStats>> ENTITY_PENETRATION_MAP_CODEC =
+                ENTITY_PENETRATION_CODEC.listOf()
+                        .xmap(li -> li.stream().collect(Collectors.toMap(Pair::getFirst, Pair::getSecond)),
+                                map -> map.entrySet().stream().map(e -> new Pair<>(e.getKey(), e.getValue())).toList());
+
+        private static final Codec<Pair<RFEBlockPredicate, PenetrationStats>> BLOCK_PENETRATION_CODEC =
+                Codec.either(
+                        RecordCodecBuilder.<Pair<RFEBlockPredicate, PenetrationStats>>create(o -> o.group(
+                                RFEBlockPredicate.CODEC.fieldOf("block").forGetter(Pair::getFirst),
+                                PenetrationStats.CODEC.forGetter(Pair::getSecond)
+                        ).apply(o, Pair::of)),
+                        RFEBlockPredicate.CODEC
+                ).xmap(either -> Either.unwrap(either.mapRight(pred -> new Pair<>(pred, DEFAULT_PENETRATION_STATS))), Either::left);
+
+        private static final Codec<Map<RFEBlockPredicate, PenetrationStats>> BLOCK_PENETRATION_MAP_CODEC =
+                BLOCK_PENETRATION_CODEC.listOf()
+                        .xmap(li -> li.stream().collect(Collectors.toMap(Pair::getFirst, Pair::getSecond)),
+                                map -> map.entrySet().stream().map(e -> new Pair<>(e.getKey(), e.getValue())).toList());
+
+        private static final Codec<PropertiesLayer> CODEC = RecordCodecBuilder.create(o -> o.group(
+                PenetrationStats.CODEC.codec().optionalFieldOf("default_entity_penetration").xmap(op -> op.orElse(null), Optional::ofNullable)
+                        .forGetter(PropertiesLayer::defaultEntityPenetration),
+                Codec.BOOL.optionalFieldOf("replace_entity_penetration", false).forGetter(PropertiesLayer::replaceEntityPenetration),
+                ENTITY_PENETRATION_MAP_CODEC.optionalFieldOf("entity_penetration", Map.of()).forGetter(PropertiesLayer::entityPenetration),
+                PenetrationStats.CODEC.codec().optionalFieldOf("default_block_penetration").xmap(op -> op.orElse(null), Optional::ofNullable)
+                        .forGetter(PropertiesLayer::defaultBlockPenetration),
+                Codec.BOOL.optionalFieldOf("replace_block_penetration", false).forGetter(PropertiesLayer::replaceBlockPenetration),
+                BLOCK_PENETRATION_MAP_CODEC.optionalFieldOf("block_penetration", Map.of()).forGetter(PropertiesLayer::blockPenetration),
+                PenetrationStats.CODEC.codec().optionalFieldOf("default_block_breaking").xmap(op -> op.orElse(null), Optional::ofNullable)
+                        .forGetter(PropertiesLayer::defaultBlockBreaking),
+                Codec.BOOL.optionalFieldOf("replace_block_breaking", false).forGetter(PropertiesLayer::replaceBlockBreaking),
+                BLOCK_PENETRATION_MAP_CODEC.optionalFieldOf("block_breaking", Map.of()).forGetter(PropertiesLayer::blockBreaking)
+        ).apply(o, PropertiesLayer::new));
+    }
+
+    public record ClientboundSyncProjectilePenetrationPacket(Object2ReferenceOpenHashMap<ResourceLocation, RFEProjectilePenetrationProperties> map) implements RFEPacket {
         ClientboundSyncProjectilePenetrationPacket() { this(new Object2ReferenceOpenHashMap<>(PENETRATION_PROPERTIES)); }
 
-        @Override
-        public void rootEncode(FriendlyByteBuf buf) {
-            buf.writeVarInt(this.map.size());
-            for (Map.Entry<ResourceLocation, RFEProjectilePenetrationProperties> entry : this.map.entrySet()) {
-                buf.writeResourceLocation(entry.getKey());
-                RFEProjectilePenetrationProperties.toNetwork(buf, entry.getValue());
-            }
-        }
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundSyncProjectilePenetrationPacket> STREAM_CODEC =
+                ByteBufCodecs.map(Object2ReferenceOpenHashMap::new, ResourceLocation.STREAM_CODEC, RFEProjectilePenetrationProperties.STREAM_CODEC)
+                        .map(ClientboundSyncProjectilePenetrationPacket::new, ClientboundSyncProjectilePenetrationPacket::map);
 
         @Override
-        public void handle(Executor exec, PacketListener listener, @Nullable ServerPlayer sender) {
+        public void handle(Executor exec, PacketListener listener, Player player) {
             PENETRATION_PROPERTIES.clear();
             PENETRATION_PROPERTIES.putAll(this.map);
         }

@@ -34,7 +34,7 @@ public class RFECommonEvents {
         RFEProjectileManager.clearAllProjectiles();
         RFESpreadManager.clearTrackedSpread();
         RFERecoilManager.clearTrackedRecoil();
-        RFENetwork.sendToAll(new RFEProjectileManager.ClientboundRemoveAllProjectilesPacket());
+        RFENetwork.sendToAll(RFEProjectileManager.ClientboundRemoveAllProjectilesPacket.INSTANCE);
 
         if (singleplayer)
             return;
@@ -89,7 +89,7 @@ public class RFECommonEvents {
             RFENetwork.sendToPlayer(new ClientboundValidateRFEContentPacksPacket(RFEPackLoader.getPackVersions()), splayer);
     }
 
-    public static void onLevelTick(Level level) {
+    public static void onLevelTickEnd(Level level) {
         RFEProjectileManager.tick(level);
         RFESpreadManager.tick(level);
         RFERecoilManager.tick(level);

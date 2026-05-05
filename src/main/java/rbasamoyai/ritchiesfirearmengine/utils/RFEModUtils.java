@@ -1,8 +1,7 @@
 package rbasamoyai.ritchiesfirearmengine.utils;
 
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.forgespi.language.IModFileInfo;
-import net.minecraftforge.forgespi.language.IModInfo;
+import net.neoforged.fml.loading.LoadingModList;
+import net.neoforged.neoforgespi.language.IModInfo;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 
@@ -13,11 +12,11 @@ public class RFEModUtils {
     }
 
     public static boolean isModPresent(String modId) {
-        return ModList.get().getModFileById(modId) != null;
+        return LoadingModList.get().getModFileById(modId) != null;
     }
 
     public static boolean isModPresentAndSatisfiesVersion(String modId, String version) {
-        IModFileInfo modFileInfo = ModList.get().getModFileById(modId);
+        net.neoforged.neoforgespi.language.IModFileInfo modFileInfo = LoadingModList.get().getModFileById(modId);
         if (modFileInfo == null)
             return false;
         VersionRange range;

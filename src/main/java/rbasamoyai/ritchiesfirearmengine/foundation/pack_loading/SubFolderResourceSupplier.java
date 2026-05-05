@@ -3,6 +3,7 @@ package rbasamoyai.ritchiesfirearmengine.foundation.pack_loading;
 import com.google.common.collect.Lists;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.AbstractPackResources;
+import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
@@ -58,8 +59,8 @@ public class SubFolderResourceSupplier implements PackResources {
         }
     }
 
+    @Override public PackLocationInfo location() { return this.delegate.location(); }
     @Override public String packId() { return this.delegate.packId(); }
-    @Override public boolean isBuiltin() { return this.delegate.isBuiltin(); }
     @Override public void close() { this.delegate.close(); }
 
 }

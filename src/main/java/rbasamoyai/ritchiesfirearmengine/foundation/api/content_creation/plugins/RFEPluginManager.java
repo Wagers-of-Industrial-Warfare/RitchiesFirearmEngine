@@ -1,6 +1,7 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
@@ -89,6 +90,12 @@ public class RFEPluginManager {
         LOGGER.info("Registering RFE plugin particle types");
         for (RFEPlugin plugin : PLUGINS.values())
             plugin.registerPluginParticleTypes(registry);
+    }
+
+    public static void loadDataComponentTypes(BiConsumer<ResourceLocation, DataComponentType<?>> registry) {
+        LOGGER.info("Registering RFE plugin data component types");
+        for (RFEPlugin plugin : PLUGINS.values())
+            plugin.registerPluginDataComponentTypes(registry);
     }
 
     private RFEPluginManager() {}

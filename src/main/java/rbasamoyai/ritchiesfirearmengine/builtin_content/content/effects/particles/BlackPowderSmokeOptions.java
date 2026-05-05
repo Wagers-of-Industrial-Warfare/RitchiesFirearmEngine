@@ -1,35 +1,23 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.effects.particles;
 
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 
 public record BlackPowderSmokeOptions(float scale) implements ParticleOptions {
 
-    public static final ParticleOptions.Deserializer<BlackPowderSmokeOptions> DESERIALIZER = new Deserializer<>() {
-        @Override
-        public BlackPowderSmokeOptions fromCommand(ParticleType<BlackPowderSmokeOptions> type, StringReader reader) throws CommandSyntaxException {
-            reader.expect(' ');
-            return new BlackPowderSmokeOptions(reader.readFloat());
-        }
+    public static final MapCodec<BlackPowderSmokeOptions> CODEC = Codec.FLOAT.fieldOf("scale")
+            .xmap(BlackPowderSmokeOptions::new, BlackPowderSmokeOptions::scale);
 
-        @Override
-        public BlackPowderSmokeOptions fromNetwork(ParticleType<BlackPowderSmokeOptions> type, FriendlyByteBuf buf) {
-            return new BlackPowderSmokeOptions(buf.readFloat());
-        }
-    };
-
-    public static final Codec<BlackPowderSmokeOptions> CODEC = Codec.FLOAT.fieldOf("scale")
-            .xmap(BlackPowderSmokeOptions::new, BlackPowderSmokeOptions::scale).codec();
+    public static final StreamCodec<RegistryFriendlyByteBuf, BlackPowderSmokeOptions> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.FLOAT, BlackPowderSmokeOptions::scale,
+            BlackPowderSmokeOptions::new);
 
     @Override public ParticleType<?> getType() { return BuiltInRFEPlugin.ParticleTypes.BLACK_POWDER_SMOKE; }
-
-    @Override public void writeToNetwork(FriendlyByteBuf buf) { buf.writeFloat(this.scale); }
-
-    @Override public String writeToString() { return String.format("%f", this.scale); }
 
 }

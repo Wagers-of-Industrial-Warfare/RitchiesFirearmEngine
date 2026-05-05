@@ -5,22 +5,25 @@ import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.FileUtil;
+import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackSelectionConfig;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.repository.FolderRepositorySource;
-import net.minecraft.server.packs.repository.Pack;
-import net.minecraft.server.packs.repository.PackSource;
-import net.minecraft.server.packs.repository.RepositorySource;
+import net.minecraft.server.packs.repository.*;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.forgespi.language.IModFileInfo;
-import net.minecraftforge.forgespi.language.IModInfo;
-import net.minecraftforge.forgespi.locating.IModFile;
+import net.minecraft.world.level.validation.ContentValidationException;
+import net.minecraft.world.level.validation.DirectoryValidator;
+import net.minecraft.world.level.validation.ForbiddenSymlinkInfo;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforgespi.language.IModFileInfo;
+import net.neoforged.neoforgespi.language.IModInfo;
+import net.neoforged.neoforgespi.locating.IModFile;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -73,6 +76,8 @@ public class RFEPackLoader {
 
     private static void findResources() {
         LOGGER.info("Finding built-in mod RFE content packs");
+        DirectoryValidator validator = new DirectoryValidator(path -> false);
+        FolderPackDetector folderPackDetector = new FolderPackDetector(validator);
         for (IModFileInfo modFileInfo : ModList.get().getModFiles()) {
             IModFile modFile = modFileInfo.getFile();
             Path resourcePath = modFile.findResource(".").normalize();
@@ -80,9 +85,15 @@ public class RFEPackLoader {
             for (IModInfo modInfo : modFile.getModInfos())
                 modNamespaces.add(modInfo.getModId());
             try {
-                Pack.ResourcesSupplier packResourcesSupplier = FolderRepositorySource.detectPackResources(resourcePath, false);
-                if (packResourcesSupplier != null)
-                    loadContentPackMetadata("mod/" + modFileInfo.moduleName(), resourcePath, packResourcesSupplier, new BuiltInPackContext(modNamespaces));
+                List<ForbiddenSymlinkInfo> list = new ArrayList<>();
+                Pack.ResourcesSupplier resourcesSupplier = folderPackDetector.detectPackResources(resourcePath, list);
+                if (!list.isEmpty()) {
+                    LOGGER.warn("Ignoring potential pack entry: {}", ContentValidationException.getMessage(resourcePath, list));
+                } else if (resourcesSupplier != null) {
+                    String packId = "mod/" + modFileInfo.moduleName();
+                    PackLocationInfo locationInfo = new PackLocationInfo(packId, Component.literal(packId), PackSource.DEFAULT, Optional.empty());
+                    loadContentPackMetadata(locationInfo, resourcePath, resourcesSupplier, new BuiltInPackContext(modNamespaces));
+                }
             } catch (Exception exception) {
                 throw new IllegalStateException("Could not load built-in mod RFE content pack metadata", exception);
             }
@@ -92,7 +103,11 @@ public class RFEPackLoader {
         LOGGER.info("Finding local RFE content packs in {}", packsPath.toAbsolutePath());
         try {
             FileUtil.createDirectoriesSafe(packsPath);
-            FolderRepositorySource.discoverPacks(packsPath, false, (path, sup) -> loadContentPackMetadata("file/" + nameFromPath(path), path, sup, null));
+            FolderRepositorySource.discoverPacks(packsPath, validator, (path, sup) -> {
+                String packId = "file/" + nameFromPath(path);
+                PackLocationInfo locationInfo = new PackLocationInfo(packId, Component.literal(packId), PackSource.DEFAULT, Optional.empty());
+                loadContentPackMetadata(locationInfo, path, sup, null);
+            });
         } catch (IOException exception) {
             throw new IllegalStateException("Could not load local RFE content pack metadata", exception);
         }
@@ -100,6 +115,8 @@ public class RFEPackLoader {
 
     private static void loadModBuiltInPacks() {
         LOGGER.info("Loading built-in mod RFE content packs");
+        DirectoryValidator validator = new DirectoryValidator(path -> false);
+        FolderPackDetector folderPackDetector = new FolderPackDetector(validator);
         for (IModFileInfo modFileInfo : ModList.get().getModFiles()) {
             IModFile modFile = modFileInfo.getFile();
             Path resourcePath = modFile.findResource(".").normalize();
@@ -107,9 +124,15 @@ public class RFEPackLoader {
             for (IModInfo modInfo : modFile.getModInfos())
                 modNamespaces.add(modInfo.getModId());
             try {
-                Pack.ResourcesSupplier packResourcesSupplier = FolderRepositorySource.detectPackResources(resourcePath, false);
-                if (packResourcesSupplier != null)
-                    loadContentPack("mod/" + modFileInfo.moduleName(), resourcePath, packResourcesSupplier, new BuiltInPackContext(modNamespaces));
+                List<ForbiddenSymlinkInfo> list = new ArrayList<>();
+                Pack.ResourcesSupplier resourcesSupplier = folderPackDetector.detectPackResources(resourcePath, list);
+                if (!list.isEmpty()) {
+                    LOGGER.warn("Ignoring potential pack entry: {}", ContentValidationException.getMessage(resourcePath, list));
+                } else if (resourcesSupplier != null) {
+                    String packId = "mod/" + modFileInfo.moduleName();
+                    PackLocationInfo locationInfo = new PackLocationInfo(packId, Component.literal(packId), PackSource.DEFAULT, Optional.empty());
+                    loadContentPack(locationInfo, resourcesSupplier, new BuiltInPackContext(modNamespaces));
+                }
             } catch (Exception exception) {
                 throw new IllegalStateException("Could not load built-in mod RFE content packs", exception);
             }
@@ -119,18 +142,24 @@ public class RFEPackLoader {
     private static void loadLocalPacks() {
         Path packsPath = Path.of(".", "rfe_packs").normalize();
         LOGGER.info("Loading local RFE content packs in {}", packsPath.toAbsolutePath());
+        DirectoryValidator validator = new DirectoryValidator(path -> false);
         try {
             FileUtil.createDirectoriesSafe(packsPath);
-            FolderRepositorySource.discoverPacks(packsPath, false, (path, sup) -> loadContentPack("file/" + nameFromPath(path), path, sup, null));
+            FolderRepositorySource.discoverPacks(packsPath, validator, (path, sup) -> {
+                String packId = "file/" + nameFromPath(path);
+                PackLocationInfo locationInfo = new PackLocationInfo(packId, Component.literal(packId), PackSource.DEFAULT, Optional.empty());
+                loadContentPack(locationInfo, sup, null);
+            });
         } catch (IOException exception) {
             throw new IllegalStateException("Could not load local RFE content packs", exception);
         }
     }
 
-    private static void loadContentPackMetadata(String packId, Path packPath, Pack.ResourcesSupplier packResourcesSupplier,
+    private static void loadContentPackMetadata(PackLocationInfo locationInfo, Path packPath, Pack.ResourcesSupplier packResourcesSupplier,
                                                 @Nullable BuiltInPackContext builtInContext) {
         boolean builtIn = builtInContext != null;
-        try (PackResources packResources = packResourcesSupplier.open(packId)) {
+        String packId = locationInfo.id();
+        try (PackResources packResources = packResourcesSupplier.openPrimary(locationInfo)) {
             RFEPackMetadata metadata = packResources.getMetadataSection(RFEPackMetadata.TYPE);
             if (metadata == null) {
                 if (!builtIn)
@@ -153,26 +182,32 @@ public class RFEPackLoader {
         }
     }
 
-    private static void loadContentPack(String packId, Path packPath, Pack.ResourcesSupplier packResourcesSupplier,
+    private static void loadContentPack(PackLocationInfo locationInfo, Pack.ResourcesSupplier packResourcesSupplier,
                                         @Nullable BuiltInPackContext builtInContext) {
         boolean builtIn = builtInContext != null;
-        try (PackResources packResources = packResourcesSupplier.open(packId)) {
-            RFEPackMetadata metadata = FOUND_METADATA_BY_PATH.get(packId);
-            if (metadata == null)
+        String packId = locationInfo.id();
+        int mcMetaPackVersion = SharedConstants.getCurrentVersion().getPackVersion(PackType.CLIENT_RESOURCES);
+        Pack.Metadata mcMetadata = Pack.readPackMetadata(locationInfo, packResourcesSupplier, mcMetaPackVersion);
+        if (mcMetadata == null)
+            throw new RFEPackLoadingException("Could not load content data for RFE content pack " + packId);
+        try (PackResources packResources = packResourcesSupplier.openFull(locationInfo, mcMetadata)) {
+            RFEPackMetadata rfeMetadata = FOUND_METADATA_BY_PATH.get(packId);
+            if (rfeMetadata == null)
                 return;
-            validatePackFromMetadata(metadata, packId, builtInContext);
+            validatePackFromMetadata(rfeMetadata, packId, builtInContext);
 
-            RFEPluginManager.registerAndInitPlugins(packId, metadata);
-            RFEContentData contentData = RFEContentData.loadContentData(packResources, metadata);
+            RFEPluginManager.registerAndInitPlugins(packId, rfeMetadata);
+
+            RFEContentData contentData = RFEContentData.loadContentData(packResources, rfeMetadata);
             if (contentData == null)
                 throw new IllegalStateException("Could not load content data for RFE content pack " + packId);
-            Pack resourcePack = loadMinecraftPack(packResources, PackType.CLIENT_RESOURCES, packId, metadata, builtIn);
+            Pack resourcePack = loadMinecraftPack(packResources, PackType.CLIENT_RESOURCES, packId, rfeMetadata, builtIn);
             if (resourcePack == null)
                 throw new IllegalStateException("Could not load resource pack for RFE content pack " + packId);
-            Pack dataPack = loadMinecraftPack(packResources, PackType.SERVER_DATA, packId, metadata, builtIn);
+            Pack dataPack = loadMinecraftPack(packResources, PackType.SERVER_DATA, packId, rfeMetadata, builtIn);
             if (dataPack == null)
                 throw new IllegalStateException("Could not load data pack for RFE content pack " + packId);
-            LOADED_CONTENT_PACKS.put(packId, new RFEContentPack(metadata, contentData, resourcePack, dataPack));
+            LOADED_CONTENT_PACKS.put(packId, new RFEContentPack(rfeMetadata, contentData, resourcePack, dataPack));
         } catch (Exception exception) {
             throw new RFEPackLoadingException("Fatal exception encountered loading RFE content pack " + packId + ": " + exception);
         }
@@ -261,8 +296,10 @@ public class RFEPackLoader {
                                           RFEPackMetadata metadata, boolean builtIn) {
         Component displayTitle = Component.literal(metadata.displayName() + " ")
                 .append(Component.translatable("gui.ritchiesfirearmengine.pack_default"));
-        PackResources resources = builtIn ? packResources : new SubFolderResourceSupplier(packResources, packType.getDirectory());
-        return Pack.readMetaAndCreate(packId, displayTitle, true, $ -> resources, packType, Pack.Position.BOTTOM, PackSource.DEFAULT);
+        PackLocationInfo locInfo = new PackLocationInfo(packId, displayTitle, PackSource.DEFAULT, Optional.empty());
+        Pack.ResourcesSupplier resources = builtIn ? BuiltInPackSource.fixedResources(packResources)
+                : BuiltInPackSource.fixedResources(new SubFolderResourceSupplier(packResources, packType.getDirectory()));
+        return Pack.readMetaAndCreate(locInfo, resources, packType, new PackSelectionConfig(true, Pack.Position.BOTTOM, false));
     }
 
     private static String nameFromPath(Path path) { return path.getFileName().toString(); }
@@ -325,8 +362,8 @@ public class RFEPackLoader {
         cons.accept(new RFEPackRepository(packList));
     }
 
-    public static Map<String, String> getPackVersions() {
-        Map<String, String> versions = new LinkedHashMap<>();
+    public static LinkedHashMap<String, String> getPackVersions() {
+        LinkedHashMap<String, String> versions = new LinkedHashMap<>();
         for (RFEContentPack pack : LOADED_CONTENT_PACKS.values())
             versions.put(pack.metadata().namespace(), pack.metadata().version());
         return versions;

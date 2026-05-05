@@ -1,11 +1,11 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.api.recoil;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -45,7 +45,7 @@ public class RFERecoilManager {
             return null;
         Map<InteractionHand, TaggedRecoilInstance> instances = RECOIL_INSTANCES.get(entity);
 
-        if (!itemStack.getOrCreateTag().contains("ritchiesfirearmengine:recoil_identifier"))
+        if (!itemStack.has(RFEDataComponents.RECOIL_IDENTIFIER))
             return null;
         UUID uuid = getOrCreateRecoilId(entity, itemStack);
 
@@ -89,11 +89,10 @@ public class RFERecoilManager {
             return;
         Map<InteractionHand, TaggedRecoilInstance> instances = RECOIL_INSTANCES.get(entity);
 
-        CompoundTag tag = itemStack.getOrCreateTag();
-        if (!tag.contains("ritchiesfirearmengine:recoil_identifier"))
+        if (!itemStack.has(RFEDataComponents.RECOIL_IDENTIFIER))
             return;
-        UUID uuid = tag.getUUID("ritchiesfirearmengine:recoil_identifier");
-        tag.remove("ritchiesfirearmengine:recoil_identifier");
+        UUID uuid = itemStack.get(RFEDataComponents.RECOIL_IDENTIFIER);
+        itemStack.remove(RFEDataComponents.RECOIL_IDENTIFIER);
         for (Iterator<TaggedRecoilInstance> iter = instances.values().iterator(); iter.hasNext(); ) {
             TaggedRecoilInstance instance = iter.next();
             if (instance.uuid.equals(uuid))
@@ -108,23 +107,21 @@ public class RFERecoilManager {
     }
 
     private static UUID getOrCreateRecoilId(LivingEntity entity, ItemStack itemStack) {
-        CompoundTag tag = itemStack.getOrCreateTag();
-        if (!tag.contains("ritchiesfirearmengine:recoil_identifier"))
-            tag.putUUID("ritchiesfirearmengine:recoil_identifier", Mth.createInsecureUUID(entity.getRandom()));
-        return tag.getUUID("ritchiesfirearmengine:recoil_identifier");
+        if (!itemStack.has(RFEDataComponents.RECOIL_IDENTIFIER))
+            itemStack.set(RFEDataComponents.RECOIL_IDENTIFIER, Mth.createInsecureUUID(entity.getRandom()));
+        return itemStack.get(RFEDataComponents.RECOIL_IDENTIFIER);
     }
 
     @Nullable
     public static UUID getRecoilId(ItemStack itemStack) {
-        CompoundTag tag = itemStack.getOrCreateTag();
-        return tag.contains("ritchiesfirearmengine:recoil_identifier") ? tag.getUUID("ritchiesfirearmengine:recoil_identifier") : null;
+        return itemStack.get(RFEDataComponents.RECOIL_IDENTIFIER);
     }
 
     public static void setRecoilId(ItemStack itemStack, @Nullable UUID uuid) {
         if (uuid == null) {
-            itemStack.getOrCreateTag().remove("ritchiesfirearmengine:recoil_identifier");
+            itemStack.remove(RFEDataComponents.RECOIL_IDENTIFIER);
         } else {
-            itemStack.getOrCreateTag().putUUID("ritchiesfirearmengine:recoil_identifier", uuid);
+            itemStack.set(RFEDataComponents.RECOIL_IDENTIFIER, uuid);
         }
     }
 

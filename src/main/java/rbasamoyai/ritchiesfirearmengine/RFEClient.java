@@ -167,7 +167,7 @@ public class RFEClient {
         Minecraft mc = Minecraft.getInstance();
         // TODO offhand modifier - take lowest fov modifier
         ItemStack itemStack = player.getMainHandItem();
-        float partialTicks = mc.getPartialTick();
+        float partialTicks = mc.getTimer().getGameTimeDeltaTicks();
         return itemStack.getItem() instanceof FovModifyingItem fovModifier ? fovModifier.getFov(itemStack, player, currentFovModifier, partialTicks) : currentFovModifier;
     }
 
@@ -175,7 +175,7 @@ public class RFEClient {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.isPaused() && mc.hasSingleplayerServer())
             return;
-        float dt = mc.getDeltaFrameTime();
+        float dt = mc.getTimer().getRealtimeDeltaTicks(); // TODO look for correct for frame time
         float dCamPitch = 0;
         float dCamYaw = 0;
         float dCamRoll = 0;

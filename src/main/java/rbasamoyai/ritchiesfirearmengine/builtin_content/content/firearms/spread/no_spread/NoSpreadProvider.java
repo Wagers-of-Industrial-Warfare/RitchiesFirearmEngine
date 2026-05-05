@@ -1,7 +1,8 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.spread.no_spread;
 
-import com.google.gson.JsonObject;
-import net.minecraft.network.FriendlyByteBuf;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -24,9 +25,11 @@ public class NoSpreadProvider implements RFESpreadProvider {
     }
 
     public static class Serializer implements RFESpreadProvider.Serializer<NoSpreadProvider> {
-        @Override public NoSpreadProvider fromJson(JsonObject obj) { return INSTANCE; }
-        @Override public NoSpreadProvider fromNetwork(FriendlyByteBuf buf) { return INSTANCE; }
-        @Override public void toNetwork(FriendlyByteBuf buf, NoSpreadProvider prov) {}
+        private static final MapCodec<NoSpreadProvider> CODEC = MapCodec.unit(INSTANCE);
+        private static final StreamCodec<RegistryFriendlyByteBuf, NoSpreadProvider> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+
+        @Override public MapCodec<NoSpreadProvider> codec() { return CODEC; }
+        @Override public StreamCodec<RegistryFriendlyByteBuf, NoSpreadProvider> streamCodec() { return STREAM_CODEC; }
     }
 
 }

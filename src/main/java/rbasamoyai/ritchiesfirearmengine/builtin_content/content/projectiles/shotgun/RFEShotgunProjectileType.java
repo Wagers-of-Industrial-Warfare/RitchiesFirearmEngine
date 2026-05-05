@@ -92,7 +92,7 @@ public class RFEShotgunProjectileType extends RFEBulletProjectileType {
                 RFEBaseProjectilePropertiesBuilder.CODEC.forGetter(RFEShotgunProjectileType::makeProjectileProperties),
                 Codec.intRange(1, Integer.MAX_VALUE).fieldOf("subprojectile_count").forGetter(type -> type.count),
                 DISPERSION_CODEC.forGetter(type -> new Pair<>(type.horizontalDispersion, type.verticalDispersion)),
-                Codec.doubleRange(0, Double.MAX_VALUE).optionalFieldOf("size", 0.05d).forGetter(type -> type.size)
+                Codec.doubleRange(0d, 4d).optionalFieldOf("size", 0.05d).forGetter(type -> type.size)
         ).apply(o, (prop, count, disp, size) -> new RFEShotgunProjectileType(prop, count, disp.getFirst(), disp.getSecond(), size)));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, RFEShotgunProjectileType> STREAM_CODEC = StreamCodec.composite(

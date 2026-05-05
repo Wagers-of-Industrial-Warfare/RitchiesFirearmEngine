@@ -7,6 +7,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlotGroup;
@@ -18,6 +19,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
@@ -307,8 +309,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        ItemStack itemStack = player.getItemInHand(hand);
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+        ItemStack itemStack = player.getItemInHand(usedHand);
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
         boolean startUsing = false;
         if (mode.canAim(itemStack, player)) {
@@ -316,7 +318,23 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
             startUsing = true;
         }
         // TODO other interactions
-        return startUsing ? ItemUtils.startUsingInstantly(level, player, hand) : super.use(level, player, hand);
+        return startUsing ? ItemUtils.startUsingInstantly(level, player, usedHand) : super.use(level, player, usedHand);
+    }
+
+    @Override
+    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+        Player player = context.getPlayer();
+        if (player == null)
+            return super.onItemUseFirst(stack, context);
+        ItemStack itemStack = context.getItemInHand();
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        boolean startUsing = false;
+        if (mode.canAim(itemStack, player)) {
+            mode.startAiming(itemStack, player);
+            startUsing = true;
+        }
+        // TODO other interactions
+        return startUsing ? ItemUtils.startUsingInstantly(context.getLevel(), player, context.getHand()).getResult() : super.onItemUseFirst(stack, context);
     }
 
     @Override public int getUseDuration(ItemStack stack, LivingEntity entity) { return 72000; }

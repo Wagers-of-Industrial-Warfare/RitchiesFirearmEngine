@@ -163,7 +163,7 @@ public final class RFEItemContainerContents {
     record Slot(int index, ItemStack item, int spacingCount) {
         public static final Codec<Slot> CODEC = RecordCodecBuilder.create(o -> o.group(
                 Codec.intRange(0, MAX_SIZE - 1).fieldOf("slot").forGetter(Slot::index),
-                ItemStack.CODEC.fieldOf("item").forGetter(Slot::item),
+                ItemStack.OPTIONAL_CODEC.fieldOf("item").forGetter(Slot::item),
                 Codec.intRange(0, 100).optionalFieldOf("spacing", 0).forGetter(Slot::spacingCount))
                         .apply(o, Slot::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, Slot> STREAM_CODEC = StreamCodec.composite(

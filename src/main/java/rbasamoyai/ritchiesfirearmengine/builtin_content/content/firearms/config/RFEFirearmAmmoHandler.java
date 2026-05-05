@@ -271,7 +271,7 @@ public class RFEFirearmAmmoHandler {
             properties.replaceMagazines = replaceMagazines;
             properties.magazines.addAll(magazines);
             properties.replaceSpeedloaders = replaceSpeedloaders;
-            properties.speedloaders.addAll(magazines);
+            properties.speedloaders.addAll(speedloaders);
             properties.replaceSecondaryAmmo = replaceSecondaryAmmo;
             properties.secondaryAmmo.addAll(secondaryAmmo);
             properties.noUnlimitedProjectile = noUnlimitedProjectile;

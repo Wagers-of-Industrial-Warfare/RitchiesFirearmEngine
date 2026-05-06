@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
 
 import java.util.*;
 import java.util.function.Function;
@@ -79,4 +81,12 @@ public class RFEUtils {
         builder.putAll(map);
         return builder.build();
     }
+
+    public static void explode(Level level, Explosion explosion, boolean spawnParticles) {
+        if (net.neoforged.neoforge.event.EventHooks.onExplosionStart(level, explosion))
+            return;
+        explosion.explode();
+        explosion.finalizeExplosion(spawnParticles);
+    }
+
 }

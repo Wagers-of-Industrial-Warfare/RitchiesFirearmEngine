@@ -123,6 +123,36 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     }
 
     @Override
+    public void shootWithoutEntity(RFEProjectileInstance instance, double dx, double dy, double dz, Level level) {
+        Vec3 aimDir = new Vec3(dx, dy, dz);
+        RFEAimAngles aimAngles = RFEMathUtils.getAnglesFromVec(aimDir, 0f, 0f);
+        Vec3 spawnPos = instance.getPosition(1);
+        instance.setVelocity(aimDir.normalize().scale(this.muzzleVelocity));
+        this.tick(level, instance);
+        if (this.fullHitscan)
+            instance.setRemoved();
+
+        if (this.smoke > 0 && level instanceof ServerLevel slevel) {
+            RandomSource random = level.getRandom();
+            double speed = Math.sqrt(this.smoke);
+            double spawnDispersion = Math.min(this.smoke * 0.15, 1);
+            ParticleOptions option = new BlackPowderSmokeOptions(this.smoke);
+            for (int i = 0; i < 10; ++i) {
+                double sx = spawnPos.x + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
+                double sy = spawnPos.y + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
+                double sz = spawnPos.z + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
+                Vec3 smokeVelocity = RFEMathUtils.calculateAimVector(aimAngles.pitch() + (random.nextFloat() - random.nextFloat()) * 30f,
+                        aimAngles.yaw() + (random.nextFloat() - random.nextFloat()) * 30f);
+                double pdx = smokeVelocity.x * speed * (0.9 * 0.1 * random.nextDouble());
+                double pdy = smokeVelocity.y * speed * (0.9 * 0.1 * random.nextDouble());
+                double pdz = smokeVelocity.z * speed * (0.9 * 0.1 * random.nextDouble());
+                for (ServerPlayer splayer : slevel.players())
+                    slevel.sendParticles(splayer, option, true, sx, sy, sz, 0, pdx, pdy, pdz, 1);
+            }
+        }
+    }
+
+    @Override
     public void tick(Level level, RFEProjectileInstance instance) {
         Vec3 oldPos = instance.position();
         Vec3 velocity = instance.velocity();
@@ -233,6 +263,8 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         instance.setVelocity(newVelocity.add(0, -this.gravity, 0));
         // TODO effects
 
+        if (instance.age() > this.maxAge)
+            this.onExpiry(instance, level);
         if (instance.age() > this.maxAge || instance.health() <= 0f)
             instance.setRemoved();
     }
@@ -395,6 +427,8 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         if (level instanceof ServerLevel serverLevel)
             serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, blockstate), hitLoc.x, hitLoc.y, hitLoc.z, 8, 0, 0, 0, 0);
     }
+
+    protected void onExpiry(RFEProjectileInstance instance, Level level) {}
 
     public RFEProjectilePenetrationProperties getPenetrationProperties() {
         ResourceLocation id = this.penetrationId != null ? this.penetrationId : RFEProjectileTypeHandler.getProjectileTypeId(this);

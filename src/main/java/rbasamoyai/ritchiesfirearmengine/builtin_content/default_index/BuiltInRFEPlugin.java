@@ -41,12 +41,14 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.vulnerable_to_birdshot.BirdshotHitMultiplierGore;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.buck_and_ball.RFEBuckAndBallProjectileType;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bullet.RFEBulletProjectileType;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.explosive.RFEExplosiveProjectileType;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.shotgun.RFEShotgunProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplierHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.misfires.RFEMisfire;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.penetration.RFEProjectilePenetrationHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProvider;
@@ -228,14 +230,22 @@ public class BuiltInRFEPlugin implements RFEPlugin {
     }
 
     public static class ProjectileTypes {
-        public static final RFEBulletProjectileType.Serializer BULLET = new RFEBulletProjectileType.Serializer();
-        public static final RFEShotgunProjectileType.Serializer SHOTGUN = new RFEShotgunProjectileType.Serializer();
-        public static final RFEBuckAndBallProjectileType.Serializer BUCK_AND_BALL = new RFEBuckAndBallProjectileType.Serializer();
+        private static final Map<ResourceLocation, RFEProjectileType.Serializer<?>> SERIALIZERS = new LinkedHashMap<>();
+        public static final RFEBulletProjectileType.Serializer BULLET = register("bullet", new RFEBulletProjectileType.Serializer());
+        public static final RFEShotgunProjectileType.Serializer SHOTGUN = register("shotgun", new RFEShotgunProjectileType.Serializer());
+        public static final RFEBuckAndBallProjectileType.Serializer BUCK_AND_BALL = register("buck_and_ball", new RFEBuckAndBallProjectileType.Serializer());
+        public static final RFEExplosiveProjectileType.Serializer EXPLOSIVE = register("explosive", new RFEExplosiveProjectileType.Serializer());
+
+        private static <T extends RFEProjectileType.Serializer<?>> T register(String id, T ser) {
+            ResourceLocation loc = RitchiesFirearmEngine.resource(id);
+            if (SERIALIZERS.containsKey(loc))
+                throw new IllegalStateException("Already registered data component type " + loc);
+            SERIALIZERS.put(loc, ser);
+            return ser;
+        }
 
         public static void register() {
-            RFEContentBuilderRegistry.registerProjectileTypeSerializer(RitchiesFirearmEngine.resource("bullet"), BULLET);
-            RFEContentBuilderRegistry.registerProjectileTypeSerializer(RitchiesFirearmEngine.resource("shotgun"), SHOTGUN);
-            RFEContentBuilderRegistry.registerProjectileTypeSerializer(RitchiesFirearmEngine.resource("buck_and_ball"), BUCK_AND_BALL);
+            SERIALIZERS.forEach(RFEContentBuilderRegistry::registerProjectileTypeSerializer);
         }
 
         private ProjectileTypes() {}

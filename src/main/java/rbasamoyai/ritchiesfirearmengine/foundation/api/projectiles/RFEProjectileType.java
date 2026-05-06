@@ -43,6 +43,8 @@ public interface RFEProjectileType {
     void shoot(RFEProjectileInstance instance, double dx, double dy, double dz, ItemStack itemStack, LivingEntity entity,
                RFESpreadInstance spreadInstance);
 
+    void shootWithoutEntity(RFEProjectileInstance instance, double dx, double dy, double dz, Level level);
+
     void tick(Level level, RFEProjectileInstance instance);
 
     AABB getAABB(Level level, RFEProjectileInstance instance);

@@ -45,6 +45,20 @@ public class RFEBuckAndBallProjectileType implements RFEProjectileType, RFEProje
         this.buckProjectileType.shoot(buckInstance, dx, dy, dz, itemStack, entity, spread);
     }
 
+    @Override
+    public void shootWithoutEntity(RFEProjectileInstance instance, double dx, double dy, double dz, Level level) {
+        instance.setRemoved();
+
+        RFEProjectileInstance ballInstance = this.ballProjectileType.createInstance();
+        ballInstance.setPosition(instance.position());
+        this.ballProjectileType.shootWithoutEntity(ballInstance, dx, dy, dz, level);
+        RFEProjectileManager.queueAddedProjectile(ballInstance, level);
+
+        RFEProjectileInstance buckInstance = this.buckProjectileType.createInstance();
+        buckInstance.setPosition(instance.position());
+        this.buckProjectileType.shootWithoutEntity(buckInstance, dx, dy, dz, level);
+    }
+
     @Override public void tick(Level level, RFEProjectileInstance instance) { instance.setRemoved(); }
     @Override public AABB getAABB(Level level, RFEProjectileInstance instance) { return AABB.ofSize(instance.position(), 0, 0, 0); }
 

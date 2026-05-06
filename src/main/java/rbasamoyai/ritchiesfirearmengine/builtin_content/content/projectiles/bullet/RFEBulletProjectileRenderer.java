@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
@@ -130,6 +131,11 @@ public class RFEBulletProjectileRenderer extends RFEProjectileRenderer {
                 .setOverlay(OverlayTexture.NO_OVERLAY)
                 .setLight(light)
                 .setNormal(pose, 0, 1, 0);
+    }
+
+    @Override
+    protected int getBlockLightLevel(RFEProjectileInstance instance, Level level, BlockPos pos) {
+        return this.tracerLight ? 15 : super.getBlockLightLevel(instance, level, pos);
     }
 
     public static class Serializer implements RFEProjectileRenderer.Serializer {

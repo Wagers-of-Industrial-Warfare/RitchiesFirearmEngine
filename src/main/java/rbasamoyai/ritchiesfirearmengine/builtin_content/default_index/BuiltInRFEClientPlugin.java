@@ -9,6 +9,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.hud.Amm
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.hud.NoHUDOverlayRenderer;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.NoOpProjectileRenderer;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEModelProjectileRenderer;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFESpriteProjectileRenderer;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bullet.RFEBulletProjectileRenderer;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEClientContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEClientPlugin;
@@ -24,6 +25,7 @@ public class BuiltInRFEClientPlugin implements RFEClientPlugin {
         RFEClientContentBuilderRegistry.registerProjectileRendererType(RitchiesFirearmEngine.resource("no_op"), new NoOpProjectileRenderer.Serializer());
         RFEClientContentBuilderRegistry.registerProjectileRendererType(RitchiesFirearmEngine.resource("bullet"), new RFEBulletProjectileRenderer.Serializer());
         RFEClientContentBuilderRegistry.registerProjectileRendererType(RitchiesFirearmEngine.resource("model"), new RFEModelProjectileRenderer.Serializer());
+        RFEClientContentBuilderRegistry.registerProjectileRendererType(RitchiesFirearmEngine.resource("sprite"), new RFESpriteProjectileRenderer.Serializer());
 
         RFEClientContentBuilderRegistry.registerHUDOverlayRendererType(RitchiesFirearmEngine.resource("no_hud"), new NoHUDOverlayRenderer.Serializer());
         RFEClientContentBuilderRegistry.registerHUDOverlayRendererType(RitchiesFirearmEngine.resource("ammo_counter"), new AmmoCounterHUDOverlayRenderer.Serializer());

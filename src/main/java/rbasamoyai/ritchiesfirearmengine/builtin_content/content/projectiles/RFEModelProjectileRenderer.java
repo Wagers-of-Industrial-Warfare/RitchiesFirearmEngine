@@ -17,8 +17,10 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFEProjectileRenderer;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEMatrixUtils;
 
 import java.util.List;
 
@@ -39,12 +41,24 @@ public class RFEModelProjectileRenderer extends RFEProjectileRenderer {
         RandomSource rand = RandomSource.create();
         BakedModel model = Minecraft.getInstance().getModelManager().getModel(ModelResourceLocation.inventory(this.modelLoc));
         VertexConsumer vCons = buffers.getBuffer(Sheets.translucentItemSheet());
+        poseStack.pushPose();
+        poseStack.scale(this.scale, this.scale, this.scale);
+        Vec3 vel = instance.velocity();
+        if (vel.horizontalDistanceSqr() > 1e-4d && Math.abs(vel.y) > 1e-2d) {
+            Vec3 horizontal = new Vec3(vel.x, 0, vel.z).normalize();
+            poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(vel.normalize().reverse(), horizontal));
+            poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(horizontal, new Vec3(0, 0, -1)));
+        } else {
+            poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(vel.normalize(), new Vec3(0, 0, -1)));
+        }
+        PoseStack.Pose pose = poseStack.last();
         for (Direction dir : Direction.values()) {
             rand.setSeed(42L);
-            renderQuadList(poseStack.last(), vCons, 1f, 1f, 1f, 1f, model.getQuads(null, dir, rand), light);
+            renderQuadList(pose, vCons, 1f, 1f, 1f, 1f, model.getQuads(null, dir, rand), light);
         }
         rand.setSeed(42L);
-        renderQuadList(poseStack.last(), vCons, 1f, 1f, 1f, 1f, model.getQuads(null, null, rand), light);
+        renderQuadList(pose, vCons, 1f, 1f, 1f, 1f, model.getQuads(null, null, rand), light);
+        poseStack.popPose();
     }
 
     private static void renderQuadList(PoseStack.Pose pose, VertexConsumer consumer, float red, float green, float blue, float alpha, List<BakedQuad> quads, int packedLight) {

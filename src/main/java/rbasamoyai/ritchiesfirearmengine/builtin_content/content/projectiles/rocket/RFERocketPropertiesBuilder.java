@@ -1,0 +1,61 @@
+package rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.rocket;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.Holder;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.sounds.SoundEvent;
+
+import javax.annotation.Nullable;
+import java.util.Optional;
+
+public class RFERocketPropertiesBuilder {
+
+    public static final MapCodec<RFERocketPropertiesBuilder> CODEC = RecordCodecBuilder.mapCodec(o -> o.group(
+            Codec.intRange(0, Integer.MAX_VALUE).optionalFieldOf("rocket_activation_time", 0).forGetter(t -> t.rocketActivationTime),
+            Codec.DOUBLE.fieldOf("acceleration").forGetter(t -> t.acceleration),
+            Codec.doubleRange(0d, Double.MAX_VALUE).fieldOf("terminal_velocity").forGetter(t -> t.terminalVelocity),
+            SoundEvent.CODEC.optionalFieldOf("rocket_sound")
+                    .xmap(op -> op.map(Holder::value).orElse(null), s -> s == null ? Optional.empty() : Optional.of(Holder.direct(s)))
+                    .forGetter(t -> t.rocketSound)
+    ).apply(o, RFERocketPropertiesBuilder::fromCodec));
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, RFERocketPropertiesBuilder> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT, t -> t.rocketActivationTime,
+            ByteBufCodecs.DOUBLE, t -> t.acceleration,
+            ByteBufCodecs.DOUBLE, t -> t.terminalVelocity,
+            ByteBufCodecs.optional(SoundEvent.STREAM_CODEC)
+                    .map(o -> o.map(Holder::value).orElse(null), s -> s == null ? Optional.empty() : Optional.of(Holder.direct(s))), t -> t.rocketSound,
+            RFERocketPropertiesBuilder::fromStreamCodec);
+
+    public int rocketActivationTime;
+    public double acceleration;
+    public double terminalVelocity;
+    @Nullable public SoundEvent rocketSound;
+
+    public RFERocketPropertiesBuilder() {}
+
+    private static RFERocketPropertiesBuilder fromCodec(int rocketActivationTime, double acceleration,
+                                                        double terminalVelocity, @Nullable SoundEvent rocketSound) {
+        RFERocketPropertiesBuilder properties = new RFERocketPropertiesBuilder();
+        properties.rocketActivationTime = rocketActivationTime;
+        properties.acceleration = acceleration;
+        properties.terminalVelocity = terminalVelocity;
+        properties.rocketSound = rocketSound;
+        return properties;
+    }
+
+    private static RFERocketPropertiesBuilder fromStreamCodec(int rocketActivationTime, double acceleration,
+                                                              double terminalVelocity, @Nullable SoundEvent rocketSound) {
+        RFERocketPropertiesBuilder properties = new RFERocketPropertiesBuilder();
+        properties.rocketActivationTime = rocketActivationTime;
+        properties.acceleration = acceleration;
+        properties.terminalVelocity = terminalVelocity;
+        properties.rocketSound = rocketSound;
+        return properties;
+    }
+
+}

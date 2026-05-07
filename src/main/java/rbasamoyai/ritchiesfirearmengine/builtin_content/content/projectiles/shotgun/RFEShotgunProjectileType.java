@@ -33,9 +33,9 @@ public class RFEShotgunProjectileType extends RFEBulletProjectileType {
     private final float verticalDispersion;
     private final double size;
 
-    public RFEShotgunProjectileType(RFEBaseProjectilePropertiesBuilder builder, int count, float horizontalDispersion,
+    public RFEShotgunProjectileType(RFEBaseProjectilePropertiesBuilder baseProperties, int count, float horizontalDispersion,
                                     float verticalDispersion, double size) {
-        super(builder);
+        super(baseProperties);
         this.count = count;
         this.horizontalDispersion = horizontalDispersion;
         this.verticalDispersion = verticalDispersion;

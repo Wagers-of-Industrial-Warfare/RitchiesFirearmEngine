@@ -42,6 +42,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.buck_and_ball.RFEBuckAndBallProjectileType;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bullet.RFEBulletProjectileType;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.explosive.RFEExplosiveProjectileType;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.rocket.RFEExplosiveRocketProjectileType;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.shotgun.RFEShotgunProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPlugin;
@@ -235,6 +236,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         public static final RFEShotgunProjectileType.Serializer SHOTGUN = register("shotgun", new RFEShotgunProjectileType.Serializer());
         public static final RFEBuckAndBallProjectileType.Serializer BUCK_AND_BALL = register("buck_and_ball", new RFEBuckAndBallProjectileType.Serializer());
         public static final RFEExplosiveProjectileType.Serializer EXPLOSIVE = register("explosive", new RFEExplosiveProjectileType.Serializer());
+        public static final RFEExplosiveRocketProjectileType.Serializer EXPLOSIVE_ROCKET = register("explosive_rocket", new RFEExplosiveRocketProjectileType.Serializer());
 
         private static <T extends RFEProjectileType.Serializer<?>> T register(String id, T ser) {
             ResourceLocation loc = RitchiesFirearmEngine.resource(id);

@@ -72,20 +72,20 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     protected final float smoke;
     @Nullable protected final SoundEvent passSound;
 
-    public RFEBulletProjectileType(RFEBaseProjectilePropertiesBuilder builder) {
-        this.fullHitscan = builder.fullHitscan;
-        this.muzzleVelocity = builder.muzzleVelocity;
-        this.drag = builder.drag;
-        this.quadraticDrag = builder.quadraticDrag;
-        this.gravity = builder.gravity;
-        this.maxAge = builder.maxAge;
-        this.knockback = builder.knockback;
-        this.damageModel = builder.damageModel;
-        this.damageTypeKey = builder.damageTypeKey;
-        this.hitMultiplierId = builder.hitMultiplierId;
-        this.penetrationId = builder.penetrationId;
-        this.smoke = builder.smoke;
-        this.passSound = builder.passSound;
+    public RFEBulletProjectileType(RFEBaseProjectilePropertiesBuilder baseProperties) {
+        this.fullHitscan = baseProperties.fullHitscan;
+        this.muzzleVelocity = baseProperties.muzzleVelocity;
+        this.drag = baseProperties.drag;
+        this.quadraticDrag = baseProperties.quadraticDrag;
+        this.gravity = baseProperties.gravity;
+        this.maxAge = baseProperties.maxAge;
+        this.knockback = baseProperties.knockback;
+        this.damageModel = baseProperties.damageModel;
+        this.damageTypeKey = baseProperties.damageTypeKey;
+        this.hitMultiplierId = baseProperties.hitMultiplierId;
+        this.penetrationId = baseProperties.penetrationId;
+        this.smoke = baseProperties.smoke;
+        this.passSound = baseProperties.passSound;
     }
 
     @Override
@@ -247,26 +247,37 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             totalDiff = totalDiff.add(nextDiff);
         }
 
-        Vec3 newVelocity = instance.velocity();
         instance.setOldPosition(oldPos);
         instance.setPosition(newPos);
 
         instance.setDistanceTravelled(instance.distanceTravelled() + newPos.subtract(oldPos).length());
         // TODO handle velocity when collision
 
-        if (this.quadraticDrag) {
-            double dragMag = this.drag * newVelocity.lengthSqr();
-            newVelocity = newVelocity.scale(Math.max(1 - dragMag / newVelocity.length(), 0));
-        } else {
-            newVelocity = newVelocity.scale(Math.max(1 - this.drag, 0));
-        }
-        instance.setVelocity(newVelocity.add(0, -this.gravity, 0));
+        instance.setVelocity(this.applyAccelerationToVelocity(level, instance, instance.velocity()));
         // TODO effects
 
         if (instance.age() > this.maxAge)
             this.onExpiry(instance, level);
         if (instance.age() > this.maxAge || instance.health() <= 0f)
             instance.setRemoved();
+    }
+
+    /**
+     * Apply acceleration to the instance velocity. DO NOT modify the instance velocity! Only modify the passed velocity
+     * vector.
+     * @param level the level of the projectile instance
+     * @param instance the projectile instance being accelerated
+     * @param velocity the current velocity of the projectile instance
+     * @return the new velocity of the projectile instance
+     */
+    protected Vec3 applyAccelerationToVelocity(Level level, RFEProjectileInstance instance, Vec3 velocity) {
+        if (this.quadraticDrag) {
+            double dragMag = this.drag * velocity.lengthSqr();
+            velocity = velocity.scale(Math.max(1 - dragMag / velocity.length(), 0));
+        } else {
+            velocity = velocity.scale(Math.max(1 - this.drag, 0));
+        }
+        return velocity.add(0, -this.gravity, 0);
     }
 
     @Override

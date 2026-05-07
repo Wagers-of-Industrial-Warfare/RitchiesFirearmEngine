@@ -506,12 +506,12 @@
 	"gui_light": "front",
 	"display": {
 		"thirdperson_righthand": {
-			"translation": [0, 2, -3.5],
-			"scale": [0.65, 0.65, 0.65]
+			"translation": [-1, 2.25, -5],
+			"scale": [0.75, 0.75, 0.75]
 		},
 		"thirdperson_lefthand": {
-			"translation": [0, 2, -3.5],
-			"scale": [0.65, 0.65, 0.65]
+			"translation": [-1, 2.25, -5],
+			"scale": [0.75, 0.75, 0.75]
 		},
 		"firstperson_righthand": {
 			"translation": [0.25, 3.75, -6.75]
@@ -538,6 +538,7 @@
 		{
 			"name": "firearm",
 			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
 			"children": [
 				0,
@@ -558,30 +559,35 @@
 				{
 					"name": "trigger",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [15]
 				},
 				{
 					"name": "charging_handle",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [16, 17]
 				},
 				{
 					"name": "forward_assist",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [18]
 				},
 				{
 					"name": "magazine",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 5,
 					"children": [19, 20]
 				},
 				{
 					"name": "carrying_handle",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [
 						21,
@@ -592,6 +598,7 @@
 						{
 							"name": "rear_sight",
 							"origin": [8, 8, 8],
+							"scope": 0,
 							"color": 0,
 							"children": [
 								26,
@@ -600,6 +607,7 @@
 								{
 									"name": "rear_sight_1",
 									"origin": [8, 8, 8],
+									"scope": 0,
 									"color": 0,
 									"children": [29]
 								}
@@ -610,24 +618,28 @@
 				{
 					"name": "fire_select",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [30, 31]
 				},
 				{
 					"name": "magazine_catch",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [32]
 				},
 				{
 					"name": "group",
 					"origin": [7.25, 5.5, 16.5],
+					"scope": 0,
 					"color": 0,
 					"children": [33]
 				},
 				{
 					"name": "stock",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 5,
 					"children": [
 						34,
@@ -637,6 +649,7 @@
 						{
 							"name": "strap_mount",
 							"origin": [8, 8, 8],
+							"scope": 0,
 							"color": 5,
 							"children": [38]
 						}
@@ -645,12 +658,14 @@
 				{
 					"name": "front_sight",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 5,
 					"children": [39, 40, 41, 42, 43, 44, 45]
 				},
 				{
 					"name": "dust_cover",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [46]
 				}

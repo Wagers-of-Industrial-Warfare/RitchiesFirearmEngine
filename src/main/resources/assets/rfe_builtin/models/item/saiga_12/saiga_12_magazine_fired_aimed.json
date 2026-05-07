@@ -259,12 +259,12 @@
 	"gui_light": "front",
 	"display": {
 		"thirdperson_righthand": {
-			"translation": [0, 2.5, -2.5],
-			"scale": [0.65, 0.65, 0.65]
+			"translation": [-1, 2.5, -3.5],
+			"scale": [0.75, 0.75, 0.75]
 		},
 		"thirdperson_lefthand": {
-			"translation": [0, 2.5, -2.5],
-			"scale": [0.65, 0.65, 0.65]
+			"translation": [-1, 2.5, -3.5],
+			"scale": [0.75, 0.75, 0.75]
 		},
 		"firstperson_righthand": {
 			"rotation": [0, 0.25, 0],
@@ -295,6 +295,7 @@
 		{
 			"name": "firearm",
 			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
 			"children": [
 				0,
@@ -316,30 +317,35 @@
 				{
 					"name": "trigger",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [16]
 				},
 				{
 					"name": "magazine",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [17]
 				},
 				{
 					"name": "fire_select",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [18]
 				},
 				{
 					"name": "bolt",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [19, 20]
 				},
 				{
 					"name": "rib",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [21, 22]
 				}

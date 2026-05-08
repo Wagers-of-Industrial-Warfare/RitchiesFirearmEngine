@@ -27,6 +27,31 @@
       {
         "phase": "prepare",
         "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
+            {
+              "or": [
+                { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 0 },
+                {
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than", "value": 0 }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "time": 1,
+        "accessible_phases": {
+          "unload": "all",
+          "reload": { "include": [0] },
+          "finish": { "include": [2] }
+        }
+      },
+      {
+        "phase": "prepare",
+        "condition": {
           "or": [
             {
               "and": [
@@ -50,32 +75,7 @@
         "time": 13,
         "sound": "rfe_builtin:item.generic.rifle.rack_start",
         "accessible_phases": {
-          "reload": { "exclude": [9] },
-          "finish": { "include": [2] }
-        }
-      },
-      {
-        "phase": "prepare",
-        "condition": {
-          "and": [
-            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
-            {
-              "or": [
-                { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 0 },
-                {
-                  "and": [
-                    { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than", "value": 0 }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        "time": 1,
-        "accessible_phases": {
-          "unload": "all",
-          "reload": { "include": [9] },
+          "reload": { "exclude": [0] },
           "finish": { "include": [2] }
         }
       },
@@ -95,8 +95,26 @@
         ],
         "accessible_phases": {
           "unload": "none",
-          "reload": { "include": [9] },
+          "reload": { "include": [0] },
           "finish": { "include": [2] }
+        }
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 0 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 }
+          ]
+        },
+        "time": 18,
+        "reload_type": "magazines",
+        "reload_time": 15,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.rifle.magazine.reload" }
+        ],
+        "accessible_phases": {
+          "finish": { "include": [1, 2] }
         }
       },
       {
@@ -260,24 +278,6 @@
           "unload": "none",
           "reload": { "exclude": [9] },
           "finish": { "include": [0] }
-        }
-      },
-      {
-        "phase": "reload",
-        "condition": {
-          "and": [
-            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 0 },
-            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 }
-          ]
-        },
-        "time": 18,
-        "reload_type": "magazines",
-        "reload_time": 15,
-        "sounds": [
-          { "time": 10, "sound": "rfe_builtin:item.generic.rifle.magazine.reload" }
-        ],
-        "accessible_phases": {
-          "finish": { "include": [1, 2] }
         }
       },
       {

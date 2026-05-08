@@ -50,6 +50,7 @@ public class RFEConfig {
 
     public static class Client {
         public final ConfigValue<Integer> maxMagazineItemTypesDisplayed;
+        public final BooleanValue renderCrosshairOnShoulderSurfingAim;
 
         Client(ModConfigSpec.Builder builder) {
             builder.comment("Ritchie's Firearm Engine client configuration settings")
@@ -59,6 +60,11 @@ public class RFEConfig {
                     .comment("The maximum amount of item types displayed in item tooltips. Default 5, must be at least 1.")
                     .translation("ritchiesfirearmengine.configgui.maxMagazineItemTypesDisplayed")
                     .define("maxMagazineItemTypesDisplayed", 5, this::validateMaxMagazineItemTypesDisplayed);
+
+            this.renderCrosshairOnShoulderSurfingAim = builder
+                    .comment("Whether the firearm crosshair should render on aiming when Shoulder Surfing is installed and in the over-the-shoudler view. Default true.")
+                    .translation("ritchiesfirearmengine.configgui.renderCrosshairOnShoulderSurfingAim")
+                    .define("renderCrosshairOnShoulderSurfingAim", true);
 
             builder.pop();
         }

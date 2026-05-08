@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.IFirearmItem;
+import rbasamoyai.ritchiesfirearmengine.remix.RFEClientRemix;
 
 @Mixin(Gui.class)
 public abstract class GuiMixin {
@@ -21,7 +22,9 @@ public abstract class GuiMixin {
     private void ritchiesfirearmengine$renderCrosshair(GuiGraphics guiGraphics, DeltaTracker deltaTracker, Operation<Void> original) {
         ItemStack mainhandItem = this.minecraft.player.getMainHandItem();
         // TODO offhand, custom crosshairs
-        if (mainhandItem.getItem() instanceof IFirearmItem firearm && firearm.isAiming(mainhandItem, this.minecraft.player))
+        if (mainhandItem.getItem() instanceof IFirearmItem firearm
+                && firearm.isAiming(mainhandItem, this.minecraft.player)
+                && !RFEClientRemix.blockCrosshairRenderingBlock())
             return;
         original.call(guiGraphics, deltaTracker);
     }

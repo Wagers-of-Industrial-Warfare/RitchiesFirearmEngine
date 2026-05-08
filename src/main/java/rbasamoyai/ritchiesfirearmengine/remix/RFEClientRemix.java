@@ -10,7 +10,10 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.world.item.ItemStack;
+import rbasamoyai.ritchiesfirearmengine.RFEModsNeoForge;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.HoldAttackKeyInteraction;
+import rbasamoyai.ritchiesfirearmengine.foundation.compat.shoulder_surfing.ShoulderSurfingCompat;
+import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 import rbasamoyai.ritchiesfirearmengine.foundation.gui.RFEItemSlotTextureDecorations;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundSetAttackKeyPacket;
@@ -55,6 +58,13 @@ public class RFEClientRemix {
             RFENetwork.sendToServer(new ServerboundSetAttackKeyPacket(false));
             hold.onReleaseAttackKey(mainhandItem, mc.player);
         }
+    }
+
+    public static boolean blockCrosshairRenderingBlock() {
+        if (RFEModsNeoForge.SHOULDERSURFING.runIfInstalled(() -> () -> ShoulderSurfingCompat.isShoulderSurfing()).orElse(false)
+            && RFEConfig.CLIENT.renderCrosshairOnShoulderSurfingAim.get())
+            return true;
+        return false;
     }
 
     private RFEClientRemix() {}

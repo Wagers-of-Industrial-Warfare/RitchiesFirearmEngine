@@ -4,7 +4,7 @@
   "hide_firearm_ammo": false,
   "enlarge_firearm_ammo": true,
   "show_inventory_ammo": true,
-  "count_loose_rounds": false,
+  "count_loose_rounds": true,
   "firearm_icon": {
     "texture": "rfe_builtin:textures/gui/hud/weapon_icon/m14_rifle.png",
     "width": 64,

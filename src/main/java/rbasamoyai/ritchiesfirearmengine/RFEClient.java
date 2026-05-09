@@ -14,6 +14,7 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -32,6 +33,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEClientPluginManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRenderer;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRendererPacksHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.RFEItemAttachmentsRenderingPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFEProjectileRenderer;
@@ -275,6 +277,11 @@ public class RFEClient {
 
         float getRoll();
         void setRoll(float roll);
+    }
+
+    public static void registerModels(Consumer<ModelResourceLocation> registry) {
+        RFEProjectileRendererPacksHandler.registerAdditionalModels(registry);
+        RFEItemAttachmentsRenderingPacksHandler.registerAdditionalModels(registry);
     }
 
 }

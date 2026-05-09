@@ -103,7 +103,11 @@ public class RFEBulletProjectileType implements RFEProjectileType {
 
         if (this.smoke > 0 && entity.level() instanceof ServerLevel slevel) {
             RandomSource random = entity.getRandom();
-            Vec3 smokePos = spawnPos.add(aimDir.scale(RFEItemLengths.getItemLength(itemStack, entity)));
+            float itemLength = RFEItemLengths.getItemLength(itemStack, entity);
+            RFEAimAngles smokeAimAngles = aimAngles;
+            if (itemLength < 0)
+                smokeAimAngles = new RFEAimAngles(-smokeAimAngles.pitch(), smokeAimAngles.yaw() + 180f);
+            Vec3 smokePos = spawnPos.add(aimDir.scale(itemLength));
             double speed = Math.sqrt(this.smoke);
             double spawnDispersion = Math.min(this.smoke * 0.15, 1);
             ParticleOptions option = new BlackPowderSmokeOptions(this.smoke);
@@ -111,8 +115,8 @@ public class RFEBulletProjectileType implements RFEProjectileType {
                 double sx = smokePos.x + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
                 double sy = smokePos.y + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
                 double sz = smokePos.z + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
-                Vec3 smokeVelocity = RFEMathUtils.calculateAimVector(aimAngles.pitch() + (random.nextFloat() - random.nextFloat()) * 30f,
-                        aimAngles.yaw() + (random.nextFloat() - random.nextFloat()) * 30f);
+                Vec3 smokeVelocity = RFEMathUtils.calculateAimVector(smokeAimAngles.pitch() + (random.nextFloat() - random.nextFloat()) * 30f,
+                        smokeAimAngles.yaw() + (random.nextFloat() - random.nextFloat()) * 30f);
                 double pdx = smokeVelocity.x * speed * (0.9 * 0.1 * random.nextDouble());
                 double pdy = smokeVelocity.y * speed * (0.9 * 0.1 * random.nextDouble());
                 double pdz = smokeVelocity.z * speed * (0.9 * 0.1 * random.nextDouble());
@@ -426,7 +430,8 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         if (RFEConfig.SERVER.enableBlockBreaking.get()) {
             RFEProjectilePenetrationProperties penetrationProperties = this.getPenetrationProperties();
             RFEProjectilePenetrationProperties.PenetrationStats blockBreaking = penetrationProperties.getBlockBreakingStats(blockstate);
-            if (instance.health() >= blockBreaking.bulletDamage() && level.random.nextFloat() < blockBreaking.chance()) {
+            if (blockstate.getDestroySpeed(level, hitPos) != -1 && instance.health() >= blockBreaking.bulletDamage()
+                    && level.random.nextFloat() < blockBreaking.chance()) {
                 level.destroyBlock(hitPos, true, instance.getOwner());
                 return;
             }

@@ -28,8 +28,7 @@ public class RFEExplosiveProjectilePropertiesBuilder {
             Codec.doubleRange(0d, 4d).optionalFieldOf("size", 0.3d).forGetter(t -> t.size),
             Codec.floatRange(0f, 1f).fieldOf("detonation_threshold_damage").forGetter(t -> t.detonationThresholdDamage),
             Codec.intRange(0, Integer.MAX_VALUE).optionalFieldOf("arming_time", 0).forGetter(t -> t.armingTime),
-            RFEBulletProjectileType.Serializer.CODEC.codec().optionalFieldOf("penetrator_properties")
-                        .xmap(op -> op.orElse(null), Optional::ofNullable).forGetter(t -> t.penetratorProjectileType)
+            RFEBulletProjectileType.Serializer.CODEC.codec().optionalFieldOf("penetrator_properties").forGetter(t -> Optional.ofNullable(t.penetratorProjectileType))
     ).apply(o, RFEExplosiveProjectilePropertiesBuilder::fromCodec));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, RFEExplosiveProjectilePropertiesBuilder> STREAM_CODEC = StreamCodec.composite(
@@ -52,14 +51,14 @@ public class RFEExplosiveProjectilePropertiesBuilder {
     public RFEExplosiveProjectilePropertiesBuilder() {}
 
     private static RFEExplosiveProjectilePropertiesBuilder fromCodec(Pair<Float, Float> explosionPower, double size,
-            float detonationThresholdDamage, int armingTime, @Nullable RFEBulletProjectileType penetratorProjectileType) {
+            float detonationThresholdDamage, int armingTime, Optional<RFEBulletProjectileType> penetratorProjectileType) {
         RFEExplosiveProjectilePropertiesBuilder properties = new RFEExplosiveProjectilePropertiesBuilder();
         properties.blockExplosionPower = explosionPower.getFirst();
         properties.entityExplosionPower = explosionPower.getSecond();
         properties.size = size;
         properties.detonationThresholdDamage = detonationThresholdDamage;
         properties.armingTime = armingTime;
-        properties.penetratorProjectileType = penetratorProjectileType;
+        properties.penetratorProjectileType = penetratorProjectileType.orElse(null);
         return properties;
     }
 

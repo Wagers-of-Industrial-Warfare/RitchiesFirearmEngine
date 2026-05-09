@@ -42,7 +42,8 @@ public class RFEProjectileClipContext extends ClipContext {
             if (hitResult != null) {
                 RFEProjectilePenetrationProperties penetrationProperties = this.type.getPenetrationProperties();
                 RFEProjectilePenetrationProperties.PenetrationStats blockPenetration = penetrationProperties.getBlockPenetrationStats(state);
-                if (this.instance.health() >= blockPenetration.bulletDamage() && this.random.nextFloat() < blockPenetration.chance()) {
+                if (state.getDestroySpeed(level, pos) != -1 && this.instance.health() >= blockPenetration.bulletDamage()
+                        && this.random.nextFloat() < blockPenetration.chance()) {
                     this.penetratedBlocks.put(pos.immutable(), state);
                     this.instance.removeHealth(blockPenetration.bulletDamage());
                     return Shapes.empty();

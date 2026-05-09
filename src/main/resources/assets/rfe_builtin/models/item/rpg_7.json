@@ -1,0 +1,39 @@
+{
+  "parent": "rfe_builtin:item/rpg_7/rpg_7_fired",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:aiming": 1 },
+      "model": "rfe_builtin:item/rpg_7/rpg_7_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_charged": 1 },
+      "model": "rfe_builtin:item/rpg_7/rpg_7_normal"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charged": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/rpg_7/rpg_7_normal_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_firing": 1 },
+      "model": "rfe_builtin:item/rpg_7/rpg_7_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_firing": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/rpg_7/rpg_7_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
+      "model": "rfe_builtin:item/rpg_7/rpg_7_reload"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
+      "model": "rfe_builtin:item/rpg_7/rpg_7_reload"
+    }
+  ]
+}

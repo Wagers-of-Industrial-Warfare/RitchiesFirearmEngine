@@ -1,0 +1,23 @@
+{
+  "default_entity_penetration": {
+    "chance": 1,
+    "damage_to_projectile": 0.01
+  },
+  "replace_entity_penetration": false,
+  "entity_penetration": [
+  ],
+  "default_block_penetration": {
+    "chance": 1,
+    "damage_to_projectile": 0.4
+  },
+  "replace_block_penetration": false,
+  "block_penetration": [
+  ],
+  "default_block_breaking": {
+    "chance": 0,
+    "damage_to_projectile": 1
+  },
+  "replace_block_breaking": false,
+  "block_breaking": [
+  ]
+}

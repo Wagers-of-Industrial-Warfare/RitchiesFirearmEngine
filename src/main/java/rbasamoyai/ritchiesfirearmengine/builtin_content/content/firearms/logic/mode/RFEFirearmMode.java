@@ -29,6 +29,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.*
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.condition.FirearmCondition;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhase;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhaseAccessFilter;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemContainerContents;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
@@ -139,6 +140,10 @@ public class RFEFirearmMode {
     protected final int cooldownTime;
     @Nullable protected final SoundEvent cooldownSound;
 
+    // Attachments
+    @Nullable protected final ResourceLocation loadedRoundAttachmentSlot;
+    @Nullable protected final ResourceLocation magazineAttachmentSlot;
+
     // Misc
     protected final float itemLength;
 
@@ -205,6 +210,9 @@ public class RFEFirearmMode {
         this.cooldownSound = builder.cooldownSound;
 
         this.itemLength = builder.itemLength;
+
+        this.loadedRoundAttachmentSlot = builder.loadedRoundAttachmentSlot;
+        this.magazineAttachmentSlot = builder.magazineAttachmentSlot;
     }
 
     public String getModeId() { return this.modeId; }
@@ -287,7 +295,7 @@ public class RFEFirearmMode {
         return count;
     }
 
-    public List<ItemStack> getNextRoundsInItem(ItemStack itemStack, LivingEntity entity, int count, boolean strip) {
+    public List<ItemStack> getNextRoundsInItem(ItemStack itemStack, @Nullable LivingEntity entity, int count, boolean strip) {
         List<ItemStack> totalStripped = new LinkedList<>();
         if (this.internalCapacity > 0) {
             DataComponentPatch modeData = this.getModeData(itemStack);
@@ -842,7 +850,6 @@ public class RFEFirearmMode {
         int reloadCount = phase.reloadsAtTime(actualTime);
         if (reloadCount < 1)
             return;
-        DataComponentPatch modeData = this.getModeData(itemStack);
         boolean addedLast = phase.ammoAddedLast();
         boolean replaceChamberedRound = phase.replaceChamberedRound() && !addedLast;
         List<ItemStack> ammoList;
@@ -850,7 +857,7 @@ public class RFEFirearmMode {
         ItemStack chambered = ItemStack.EMPTY;
         boolean reloadPlusOneDirectly = false;
         if (this.internalCapacity > 0) {
-            ammoList = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS);
+            ammoList = FirearmDataUtils.getRounds(this.getModeData(itemStack), RFEDataComponents.INTERNAL_ROUNDS);
             if (this.trackEmptySlots) {
                 int diff = this.internalCapacity - RFEItemUtils.countItemsIncludingSlots(ammoList);
                 for (int i = 0; i < diff; ++i)
@@ -860,7 +867,7 @@ public class RFEFirearmMode {
             if (!phase.ammoAddedLast() && !replaceChamberedRound)
                 chambered = FirearmDataUtils.stripAmmo(ammoList, false, false, this.trackEmptySlots);
         } else {
-            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+            Optional<? extends RFEItemContainerContents> o = this.getModeData(itemStack).get(RFEDataComponents.DETACHED_MAGAZINE);
             if (o == null || o.isEmpty()) {
                 ammoList = new ArrayList<>();
                 capacity = 0;
@@ -926,6 +933,7 @@ public class RFEFirearmMode {
         }
         if (!chambered.isEmpty())
             FirearmDataUtils.addAmmo(ammoList, chambered, false, this.trackEmptySlots);
+        DataComponentPatch modeData = this.getModeData(itemStack);
         if (this.internalCapacity > 0) {
             this.saveModeData(itemStack, FirearmDataUtils.saveRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS, ammoList));
         } else if (reloadPlusOneDirectly) {
@@ -1649,6 +1657,20 @@ public class RFEFirearmMode {
 
     public float getHeatCapacity(ItemStack itemStack) {
         return this.getHandlingProperties(itemStack).heatCapacity();
+    }
+
+    public void addAttachments(ItemStack itemStack, Map<ResourceLocation, ItemStack> attachments) {
+        if (this.loadedRoundAttachmentSlot != null && !attachments.containsKey(this.loadedRoundAttachmentSlot)) {
+            List<ItemStack> nextRound = this.getNextRoundsInItem(itemStack, null, 1, false);
+            if (!nextRound.isEmpty())
+                attachments.put(this.loadedRoundAttachmentSlot, nextRound.get(0).copy());
+        }
+        if (this.magazineAttachmentSlot != null && !attachments.containsKey(this.magazineAttachmentSlot)) {
+            DataComponentPatch modeData = this.getModeData(itemStack);
+            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+            if (o != null && o.isPresent())
+                attachments.put(this.magazineAttachmentSlot, o.get().copyOne());
+        }
     }
 
     public enum FiringType {

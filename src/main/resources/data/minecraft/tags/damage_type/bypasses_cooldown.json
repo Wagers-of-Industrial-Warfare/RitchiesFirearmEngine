@@ -1,6 +1,8 @@
 {
   "replace": false,
   "values": [
-    "rfe_builtin:bullet"
+    "rfe_builtin:armor_penetrator",
+    "rfe_builtin:bullet",
+    "rfe_builtin:explosive"
   ]
 }

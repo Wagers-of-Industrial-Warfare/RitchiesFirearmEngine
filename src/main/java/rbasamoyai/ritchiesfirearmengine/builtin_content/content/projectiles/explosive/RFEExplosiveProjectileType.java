@@ -63,6 +63,13 @@ public class RFEExplosiveProjectileType extends RFEBulletProjectileType implemen
         this.explode(instance, instance.position(), level); // Explode regardless of arming time
     }
 
+    @Override
+    public void tick(Level level, RFEProjectileInstance instance) {
+        super.tick(level, instance);
+        if (instance.health() <= this.detonationThresholdDamage && instance.age() >= this.armingTime)
+            this.explode(instance, instance.position(), level);
+    }
+
     protected void explode(RFEProjectileInstance instance, Vec3 position, Level level) {
         // Block explosion first
         Registry<DamageType> reg = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
@@ -85,7 +92,7 @@ public class RFEExplosiveProjectileType extends RFEBulletProjectileType implemen
 
         if (this.penetratorProjectileType != null) {
             RFEProjectileInstance penetratorInstance = this.penetratorProjectileType.createInstance();
-            penetratorInstance.setPosition(instance.position());
+            penetratorInstance.setPosition(position);
             penetratorInstance.setOwner(instance.getOwner());
             Vec3 vel = instance.velocity();
             this.penetratorProjectileType.shootWithoutEntity(penetratorInstance, vel.x, vel.y, vel.z, level);

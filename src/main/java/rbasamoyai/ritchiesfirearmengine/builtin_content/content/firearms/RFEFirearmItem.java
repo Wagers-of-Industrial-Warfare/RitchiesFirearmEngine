@@ -1,9 +1,11 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms;
 
 import com.mojang.serialization.Codec;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
@@ -34,6 +36,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.r
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudItemInfoProviders;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.IHasRFEItemAttachments;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilClientImpulse;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
@@ -49,17 +52,20 @@ import java.util.stream.Collectors;
 /**
  * Basic firearms class.
  */
-public abstract class RFEFirearmItem extends Item implements IFirearmItem {
+public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasRFEItemAttachments {
 
     protected final Map<String, RFEFirearmMode> baseFirearmModes;
     protected final List<String> modeOrder;
     protected final String defaultMode;
+    protected final Set<ResourceLocation> globalAttachments;
 
-    protected RFEFirearmItem(Properties properties, Map<String, RFEFirearmMode> baseFirearmModes, List<String> modeOrder, String defaultMode) {
+    protected RFEFirearmItem(Properties properties, Map<String, RFEFirearmMode> baseFirearmModes, List<String> modeOrder,
+                             String defaultMode, Set<ResourceLocation> globalAttachments) {
         super(properties.stacksTo(1));
         this.baseFirearmModes = baseFirearmModes;
         this.modeOrder = modeOrder;
         this.defaultMode = defaultMode;
+        this.globalAttachments = globalAttachments;
         this.registerHUDProviders();
     }
 
@@ -110,7 +116,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
         return slotChanged;
     }
 
-    public Map<String, RFEFirearmMode> getFirearmModes(ItemStack stack, LivingEntity entity) {
+    public Map<String, RFEFirearmMode> getFirearmModes(ItemStack stack, @Nullable LivingEntity entity) {
         return new LinkedHashMap<>(this.baseFirearmModes);
     }
 
@@ -412,6 +418,14 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem {
 
     public Optional<Float> getHeatCapacityForHUD(ItemStack itemStack) {
         return Optional.of(this.getCurrentMode(itemStack).getHeatCapacity(itemStack));
+    }
+
+    @Override
+    public Map<ResourceLocation, ItemStack> getAttachments(ItemStack stack) {
+        Map<ResourceLocation, ItemStack> attachmentsRet = new Object2ObjectOpenHashMap<>();
+        for (RFEFirearmMode mode : this.getFirearmModes(stack, null).values())
+            mode.addAttachments(stack, attachmentsRet);
+        return attachmentsRet;
     }
 
     public enum Action implements StringRepresentable {

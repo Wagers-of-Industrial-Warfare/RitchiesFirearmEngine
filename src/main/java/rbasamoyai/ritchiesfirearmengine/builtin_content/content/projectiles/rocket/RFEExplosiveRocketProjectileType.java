@@ -54,6 +54,8 @@ public class RFEExplosiveRocketProjectileType extends RFEExplosiveProjectileType
             if (direction.lengthSqr() < 1e-4d)
                 direction = new Vec3(0, 1, 0); // Accelerate upwards as default
             velocity = velocity.add(direction.scale(this.acceleration));
+            if (velocity.length() > this.terminalVelocity)
+                velocity = velocity.normalize().scale(this.terminalVelocity);
         }
         return super.applyAccelerationToVelocity(level, instance, velocity);
     }

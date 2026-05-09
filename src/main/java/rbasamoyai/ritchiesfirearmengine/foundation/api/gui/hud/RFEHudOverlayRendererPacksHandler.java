@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.logging.LogUtils;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -26,7 +26,7 @@ public class RFEHudOverlayRendererPacksHandler {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final Map<Item, RFEHudOverlayRenderer> HUD_OVERLAY_RENDERERS_BY_ID = new Object2ObjectOpenHashMap<>();
+    private static final Map<Item, RFEHudOverlayRenderer> HUD_OVERLAY_RENDERERS_BY_ID = new Reference2ObjectOpenHashMap<>();
 
     public static class ReloadListener extends SimpleJsonResourceReloadListener {
         private static final Gson GSON = new Gson();

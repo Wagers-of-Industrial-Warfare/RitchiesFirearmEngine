@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
@@ -12,6 +13,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class RFEProjectileRenderer {
@@ -39,6 +41,8 @@ public abstract class RFEProjectileRenderer {
         }
         return camera.isVisible(aabb);
     }
+
+    public void registerAdditionalModels(Consumer<ModelResourceLocation> registry) {}
 
     @FunctionalInterface
     public interface Serializer extends Function<JsonObject, RFEProjectileRenderer> {

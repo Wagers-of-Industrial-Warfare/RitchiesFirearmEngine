@@ -6,6 +6,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemContainerContents;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 

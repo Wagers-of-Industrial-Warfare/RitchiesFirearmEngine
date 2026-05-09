@@ -97,6 +97,9 @@ public class RFEFirearmModeBuilder {
     protected float heatAddedOnFiring = 0; // Datapackable
     protected int coolingDelayTime = 0; // Datapackable
 
+    @Nullable protected ResourceLocation magazineAttachmentSlot = null;
+    @Nullable protected ResourceLocation loadedRoundAttachmentSlot = null;
+
     public RFEFirearmModeBuilder(String modeId) {
         this.modeId = modeId;
         this.modeDisplayId = this.modeId;
@@ -174,6 +177,9 @@ public class RFEFirearmModeBuilder {
         newBuilder.heatAddedOnFiring = this.heatAddedOnFiring;
         newBuilder.coolingDelayTime = this.coolingDelayTime;
 
+        newBuilder.magazineAttachmentSlot = this.magazineAttachmentSlot;
+        newBuilder.loadedRoundAttachmentSlot = this.loadedRoundAttachmentSlot;
+
         return newBuilder;
     }
 
@@ -193,7 +199,7 @@ public class RFEFirearmModeBuilder {
     }
 
     public RFEFirearmModeBuilder itemLength(float itemLength) {
-        this.itemLength = Mth.clamp(itemLength, 0, 100);
+        this.itemLength = Mth.clamp(itemLength, -100, 100);
         return this;
     }
 
@@ -579,6 +585,16 @@ public class RFEFirearmModeBuilder {
         if (coolingDelayTime < 0)
             throw new IllegalStateException("Cannot specify default cooling delay less than 0");
         this.coolingDelayTime = coolingDelayTime;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder loadedRoundAttachmentSlot(@Nullable ResourceLocation loadedRoundAttachmentSlot) {
+        this.loadedRoundAttachmentSlot = loadedRoundAttachmentSlot;
+        return this;
+    }
+    
+    public RFEFirearmModeBuilder magazineAttachmentSlot(@Nullable ResourceLocation magazineAttachmentSlot) {
+        this.magazineAttachmentSlot = magazineAttachmentSlot;
         return this;
     }
 

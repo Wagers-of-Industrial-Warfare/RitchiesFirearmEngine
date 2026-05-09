@@ -14,6 +14,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bull
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEClientContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEClientPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRendererPacksHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.RFEItemAttachmentsRenderingPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFEProjectileRendererPacksHandler;
 
 import java.util.function.BiConsumer;
@@ -35,6 +36,7 @@ public class BuiltInRFEClientPlugin implements RFEClientPlugin {
     public void registerResourceListeners(BiConsumer<ResourceLocation, PreparableReloadListener> registry) {
         registry.accept(RitchiesFirearmEngine.resource("projectile_renderers"), RFEProjectileRendererPacksHandler.ReloadListener.INSTANCE);
         registry.accept(RitchiesFirearmEngine.resource("hud_overlay_renderers"), RFEHudOverlayRendererPacksHandler.ReloadListener.INSTANCE);
+        registry.accept(RitchiesFirearmEngine.resource("item_attachment_renderers"), RFEItemAttachmentsRenderingPacksHandler.ReloadListener.INSTANCE);
     }
 
     @Override

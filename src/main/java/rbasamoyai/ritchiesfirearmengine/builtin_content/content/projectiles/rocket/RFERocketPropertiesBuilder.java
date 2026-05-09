@@ -19,8 +19,7 @@ public class RFERocketPropertiesBuilder {
             Codec.DOUBLE.fieldOf("acceleration").forGetter(t -> t.acceleration),
             Codec.doubleRange(0d, Double.MAX_VALUE).fieldOf("terminal_velocity").forGetter(t -> t.terminalVelocity),
             SoundEvent.CODEC.optionalFieldOf("rocket_sound")
-                    .xmap(op -> op.map(Holder::value).orElse(null), s -> s == null ? Optional.empty() : Optional.of(Holder.direct(s)))
-                    .forGetter(t -> t.rocketSound)
+                    .forGetter(t -> t.rocketSound == null ? Optional.empty() : Optional.of(Holder.direct(t.rocketSound)))
     ).apply(o, RFERocketPropertiesBuilder::fromCodec));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, RFERocketPropertiesBuilder> STREAM_CODEC = StreamCodec.composite(
@@ -39,12 +38,12 @@ public class RFERocketPropertiesBuilder {
     public RFERocketPropertiesBuilder() {}
 
     private static RFERocketPropertiesBuilder fromCodec(int rocketActivationTime, double acceleration,
-                                                        double terminalVelocity, @Nullable SoundEvent rocketSound) {
+                                                        double terminalVelocity, Optional<Holder<SoundEvent>> rocketSound) {
         RFERocketPropertiesBuilder properties = new RFERocketPropertiesBuilder();
         properties.rocketActivationTime = rocketActivationTime;
         properties.acceleration = acceleration;
         properties.terminalVelocity = terminalVelocity;
-        properties.rocketSound = rocketSound;
+        properties.rocketSound = rocketSound.map(Holder::value).orElse(null);
         return properties;
     }
 

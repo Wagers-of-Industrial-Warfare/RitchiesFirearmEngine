@@ -1,0 +1,20 @@
+{
+  "parent": "rfe_builtin:item/heat_rocket",
+  "gui_light": "front",
+  "display": {
+    "thirdperson_righthand": {
+    },
+    "thirdperson_lefthand": {
+    },
+    "firstperson_righthand": {
+    },
+    "firstperson_lefthand": {
+    },
+    "ground": {
+    },
+    "gui": {
+    },
+    "fixed": {
+    }
+  }
+}

@@ -221,6 +221,23 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
             }
         }
 
+        if (GsonHelper.isStringValue(obj, "loaded_round_attachment_slot")) {
+            String loadedRoundAttachmentSlot = GsonHelper.getAsString(obj, "loaded_round_attachment_slot");
+            if (loadedRoundAttachmentSlot.isEmpty()) {
+                builder.loadedRoundAttachmentSlot(null);
+            } else {
+                builder.loadedRoundAttachmentSlot(ResourceLocation.parse(loadedRoundAttachmentSlot));
+            }
+        }
+        if (GsonHelper.isStringValue(obj, "magazine_attachment_slot")) {
+            String magazineAttachmentSlot = GsonHelper.getAsString(obj, "magazine_attachment_slot");
+            if (magazineAttachmentSlot.isEmpty()) {
+                builder.magazineAttachmentSlot(null);
+            } else {
+                builder.magazineAttachmentSlot(ResourceLocation.parse(magazineAttachmentSlot));
+            }
+        }
+
         return builder;
     }
 

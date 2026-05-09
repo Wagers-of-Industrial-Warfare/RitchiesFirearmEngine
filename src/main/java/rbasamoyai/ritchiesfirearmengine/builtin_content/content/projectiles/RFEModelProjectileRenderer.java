@@ -23,15 +23,16 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFE
 import rbasamoyai.ritchiesfirearmengine.utils.RFEMatrixUtils;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class RFEModelProjectileRenderer extends RFEProjectileRenderer {
 
-    protected final ResourceLocation modelLoc;
+    protected final ModelResourceLocation modelLoc;
     protected final boolean tracerLight;
     protected final float scale;
 
     public RFEModelProjectileRenderer(ResourceLocation modelLoc, boolean tracerLight, float scale) {
-        this.modelLoc = modelLoc;
+        this.modelLoc = ModelResourceLocation.standalone(modelLoc);
         this.tracerLight = tracerLight;
         this.scale = scale;
     }
@@ -39,7 +40,7 @@ public class RFEModelProjectileRenderer extends RFEProjectileRenderer {
     @Override
     public void renderProjectile(RFEProjectileInstance instance, Level level, float partialTick, PoseStack poseStack, MultiBufferSource buffers, int light) {
         RandomSource rand = RandomSource.create();
-        BakedModel model = Minecraft.getInstance().getModelManager().getModel(ModelResourceLocation.inventory(this.modelLoc));
+        BakedModel model = Minecraft.getInstance().getModelManager().getModel(this.modelLoc);
         VertexConsumer vCons = buffers.getBuffer(Sheets.translucentItemSheet());
         poseStack.pushPose();
         poseStack.scale(this.scale, this.scale, this.scale);
@@ -51,6 +52,7 @@ public class RFEModelProjectileRenderer extends RFEProjectileRenderer {
         } else {
             poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(vel.normalize(), new Vec3(0, 0, -1)));
         }
+        poseStack.translate(-0.5f, -0.5f, -0.5f);
         PoseStack.Pose pose = poseStack.last();
         for (Direction dir : Direction.values()) {
             rand.setSeed(42L);
@@ -82,6 +84,12 @@ public class RFEModelProjectileRenderer extends RFEProjectileRenderer {
     @Override
     protected int getBlockLightLevel(RFEProjectileInstance instance, Level level, BlockPos pos) {
         return this.tracerLight ? 15 : super.getBlockLightLevel(instance, level, pos);
+    }
+
+    @Override
+    public void registerAdditionalModels(Consumer<ModelResourceLocation> registry) {
+        super.registerAdditionalModels(registry);
+        registry.accept(this.modelLoc);
     }
 
     public static class Serializer implements RFEProjectileRenderer.Serializer {

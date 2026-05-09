@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.remix;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -9,7 +10,9 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.client.ClientHooks;
 import rbasamoyai.ritchiesfirearmengine.RFEModsNeoForge;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.HoldAttackKeyInteraction;
 import rbasamoyai.ritchiesfirearmengine.foundation.compat.shoulder_surfing.ShoulderSurfingCompat;
@@ -65,6 +68,10 @@ public class RFEClientRemix {
             && RFEConfig.CLIENT.renderCrosshairOnShoulderSurfingAim.get())
             return true;
         return false;
+    }
+
+    public static void handleItemCameraTransforms(PoseStack poseStack, BakedModel model, ItemDisplayContext context, boolean leftHand) {
+        ClientHooks.handleCameraTransforms(poseStack, model, context, leftHand);
     }
 
     private RFEClientRemix() {}

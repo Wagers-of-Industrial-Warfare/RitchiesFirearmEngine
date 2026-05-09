@@ -21,7 +21,6 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEDefa
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEItemContainerContents;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.condition.FirearmConditionMacroHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhase;
@@ -39,6 +38,8 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.fixed.FixedHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.vulnerable_to_birdshot.BirdshotHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.vulnerable_to_birdshot.BirdshotHitMultiplierGore;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemAttachmentContents;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemContainerContents;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.buck_and_ball.RFEBuckAndBallProjectileType;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bullet.RFEBulletProjectileType;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.explosive.RFEExplosiveProjectileType;
@@ -406,9 +407,14 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         public static final DataComponentType<Integer> CHARGE_ACTION = register("charge_action",
                 builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
+        public static final DataComponentType<RFEItemAttachmentContents> ITEM_ATTACHMENTS = register("item_attachments",
+                builder -> builder.persistent(RFEItemAttachmentContents.CODEC).networkSynchronized(RFEItemAttachmentContents.STREAM_CODEC));
+
+        // TODO move to base RFE index
         public static final DataComponentType<UUID> RECOIL_IDENTIFIER = register("recoil_identifier",
                 builder -> builder.persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC));
 
+        // TODO move to base RFE index
         public static final DataComponentType<UUID> SPREAD_IDENTIFIER = register("spread_identifier",
                 builder -> builder.persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC));
 

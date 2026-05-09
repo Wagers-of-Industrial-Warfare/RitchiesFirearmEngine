@@ -156,19 +156,27 @@ public class RFEProjectilePenetrationHandler {
                                 map -> map.entrySet().stream().map(e -> new Pair<>(e.getKey(), e.getValue())).toList());
 
         private static final Codec<PropertiesLayer> CODEC = RecordCodecBuilder.create(o -> o.group(
-                PenetrationStats.CODEC.codec().optionalFieldOf("default_entity_penetration").xmap(op -> op.orElse(null), Optional::ofNullable)
-                        .forGetter(PropertiesLayer::defaultEntityPenetration),
+                PenetrationStats.CODEC.codec().optionalFieldOf("default_entity_penetration").forGetter(pl -> Optional.ofNullable(pl.defaultEntityPenetration)),
                 Codec.BOOL.optionalFieldOf("replace_entity_penetration", false).forGetter(PropertiesLayer::replaceEntityPenetration),
                 ENTITY_PENETRATION_MAP_CODEC.optionalFieldOf("entity_penetration", Map.of()).forGetter(PropertiesLayer::entityPenetration),
-                PenetrationStats.CODEC.codec().optionalFieldOf("default_block_penetration").xmap(op -> op.orElse(null), Optional::ofNullable)
-                        .forGetter(PropertiesLayer::defaultBlockPenetration),
+                PenetrationStats.CODEC.codec().optionalFieldOf("default_block_penetration").forGetter(pl -> Optional.ofNullable(pl.defaultBlockPenetration)),
                 Codec.BOOL.optionalFieldOf("replace_block_penetration", false).forGetter(PropertiesLayer::replaceBlockPenetration),
                 BLOCK_PENETRATION_MAP_CODEC.optionalFieldOf("block_penetration", Map.of()).forGetter(PropertiesLayer::blockPenetration),
-                PenetrationStats.CODEC.codec().optionalFieldOf("default_block_breaking").xmap(op -> op.orElse(null), Optional::ofNullable)
-                        .forGetter(PropertiesLayer::defaultBlockBreaking),
+                PenetrationStats.CODEC.codec().optionalFieldOf("default_block_breaking").forGetter(pl -> Optional.ofNullable(pl.defaultBlockBreaking)),
                 Codec.BOOL.optionalFieldOf("replace_block_breaking", false).forGetter(PropertiesLayer::replaceBlockBreaking),
                 BLOCK_PENETRATION_MAP_CODEC.optionalFieldOf("block_breaking", Map.of()).forGetter(PropertiesLayer::blockBreaking)
-        ).apply(o, PropertiesLayer::new));
+        ).apply(o, PropertiesLayer::fromCodec));
+
+        private static PropertiesLayer fromCodec(Optional<PenetrationStats> defaultEntityPenetration, boolean replaceEntityPenetration,
+                                                 Map<RFEEntityTypePredicate, PenetrationStats> entityPenetration,
+                                                 Optional<PenetrationStats> defaultBlockPenetration, boolean replaceBlockPenetration,
+                                                 Map<RFEBlockPredicate, PenetrationStats> blockPenetration,
+                                                 Optional<PenetrationStats> defaultBlockBreaking, boolean replaceBlockBreaking,
+                                                 Map<RFEBlockPredicate, PenetrationStats> blockBreaking) {
+            return new PropertiesLayer(defaultEntityPenetration.orElse(null), replaceEntityPenetration,
+                    entityPenetration, defaultBlockPenetration.orElse(null), replaceBlockPenetration, blockPenetration,
+                    defaultBlockBreaking.orElse(null), replaceBlockBreaking, blockBreaking);
+        }
     }
 
     public record ClientboundSyncProjectilePenetrationPacket(Object2ReferenceOpenHashMap<ResourceLocation, RFEProjectilePenetrationProperties> map) implements RFEPacket {

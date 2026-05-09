@@ -3,7 +3,9 @@ package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
@@ -17,16 +19,14 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.m
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class RFEDefaultFirearmItem extends RFEFirearmItem {
 
-    public RFEDefaultFirearmItem(Properties properties, Map<String, RFEFirearmMode> baseFirearmModes, List<String> modeOrder) {
-        super(properties, baseFirearmModes, modeOrder, "default");
+    public RFEDefaultFirearmItem(Properties properties, Map<String, RFEFirearmMode> baseFirearmModes, List<String> modeOrder,
+                                 Set<ResourceLocation> globalAttachments) {
+        super(properties, baseFirearmModes, modeOrder, "default", globalAttachments);
     }
 
     @Override
@@ -66,8 +66,9 @@ public class RFEDefaultFirearmItem extends RFEFirearmItem {
                     modeOrder.add(modeName);
                 }
             }
+            // TODO global attachments
 
-            return new RFEDefaultFirearmItem(properties, firearmModes, modeOrder);
+            return new RFEDefaultFirearmItem(properties, firearmModes, modeOrder, new ObjectOpenHashSet<>());
         }
     }
 

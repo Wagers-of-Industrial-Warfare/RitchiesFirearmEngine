@@ -22,6 +22,7 @@ public class RFEClientNeoForge {
         modBus.addListener(RFEClientNeoForge::onRegisterClientReloadListeners);
         modBus.addListener(RFEClientNeoForge::onRegisterKeyMappings);
         modBus.addListener(RFEClientNeoForge::onRegisterParticleProviders);
+        modBus.addListener(RFEClientNeoForge::onModelRegistry);
 
         IEventBus forgeBus = NeoForge.EVENT_BUS;
         forgeBus.addListener(RFEClientNeoForge::onMouseInput);
@@ -42,10 +43,10 @@ public class RFEClientNeoForge {
     }
 
     private static void onRegisterParticleProviders(final RegisterParticleProvidersEvent event) {
-        RFEClient.onRegisterParticleProviders(new ForgeParticleRegistry(event));
+        RFEClient.onRegisterParticleProviders(new NeoForgeParticleRegistry(event));
     }
 
-    private record ForgeParticleRegistry(RegisterParticleProvidersEvent event) implements RFEClient.ParticleRegistry {
+    private record NeoForgeParticleRegistry(RegisterParticleProvidersEvent event) implements RFEClient.ParticleRegistry {
         @Override
         public void registerSpecial(ParticleType<?> type, ParticleProvider<?> provider) {
             this.innerRegisterSpecial(type, provider);
@@ -112,10 +113,10 @@ public class RFEClientNeoForge {
     }
 
     private static void onSetupCamera(final ViewportEvent.ComputeCameraAngles event) {
-        RFEClient.modifyCameraAngles(new ForgeSetCameraAngles(event));
+        RFEClient.modifyCameraAngles(new NeoForgeSetCameraAngles(event));
     }
 
-    private record ForgeSetCameraAngles(ViewportEvent.ComputeCameraAngles event) implements RFEClient.SetCameraAngles {
+    private record NeoForgeSetCameraAngles(ViewportEvent.ComputeCameraAngles event) implements RFEClient.SetCameraAngles {
         @Override public float getPitch() { return this.event.getPitch(); }
         @Override public void setPitch(float pitch) { this.event.setPitch(pitch); }
 
@@ -124,6 +125,10 @@ public class RFEClientNeoForge {
 
         @Override public float getRoll() { return this.event.getRoll(); }
         @Override public void setRoll(float roll) { this.event.setRoll(roll); }
+    }
+
+    private static void onModelRegistry(final ModelEvent.RegisterAdditional event) {
+        RFEClient.registerModels(event::register);
     }
 
 }

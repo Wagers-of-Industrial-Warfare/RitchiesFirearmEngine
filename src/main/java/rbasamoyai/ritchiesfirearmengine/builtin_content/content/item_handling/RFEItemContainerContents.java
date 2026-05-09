@@ -1,4 +1,4 @@
-package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic;
+package rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling;
 
 import com.google.common.collect.Iterables;
 import com.mojang.serialization.Codec;

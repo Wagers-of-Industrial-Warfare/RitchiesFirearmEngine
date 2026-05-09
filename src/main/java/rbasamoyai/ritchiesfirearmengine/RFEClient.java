@@ -16,6 +16,8 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -33,7 +35,6 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEClientPluginManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRenderer;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRendererPacksHandler;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.RFEItemAttachmentsRenderingPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFEProjectileRenderer;
@@ -280,8 +281,16 @@ public class RFEClient {
     }
 
     public static void registerModels(Consumer<ModelResourceLocation> registry) {
-        RFEProjectileRendererPacksHandler.registerAdditionalModels(registry);
-        RFEItemAttachmentsRenderingPacksHandler.registerAdditionalModels(registry);
+        Minecraft mc = Minecraft.getInstance();
+        ResourceManager resourceManager = mc.getResourceManager();
+        String[] itemFolders = new String[]{ "item_attachments", "projectiles" };
+        for (String folder : itemFolders) {
+            for (ResourceLocation id : resourceManager.listResources("models/item/" + folder, rl -> rl.getPath().endsWith(".json")).keySet()) {
+                String path = id.getPath();
+                path = path.substring(7, path.length() - 5);
+                registry.accept(ModelResourceLocation.standalone(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), path)));
+            }
+        }
     }
 
 }

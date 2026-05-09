@@ -2,6 +2,7 @@ package rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.roc
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.sounds.SoundEvent;
@@ -9,6 +10,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.effects.particles.BlackPowderSmokeOptions;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEBaseProjectilePropertiesBuilder;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.explosive.RFEExplosiveProjectilePropertiesBuilder;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.explosive.RFEExplosiveProjectileType;
@@ -23,6 +25,7 @@ public class RFEExplosiveRocketProjectileType extends RFEExplosiveProjectileType
     protected final int rocketActivationTime;
     protected final double acceleration;
     protected final double terminalVelocity;
+    protected final boolean rocketSmoke;
     @Nullable protected final SoundEvent rocketSound;
 
     public RFEExplosiveRocketProjectileType(RFEBaseProjectilePropertiesBuilder baseProperties,
@@ -32,6 +35,7 @@ public class RFEExplosiveRocketProjectileType extends RFEExplosiveProjectileType
         this.rocketActivationTime = rocketProperties.rocketActivationTime;
         this.acceleration = rocketProperties.acceleration;
         this.terminalVelocity = rocketProperties.terminalVelocity;
+        this.rocketSmoke = rocketProperties.rocketSmoke;
         this.rocketSound = rocketProperties.rocketSound;
         int deltaVelSgn = Mth.sign(this.terminalVelocity - this.muzzleVelocity);
         if (Mth.sign(this.acceleration) != deltaVelSgn && deltaVelSgn != 0)
@@ -41,6 +45,19 @@ public class RFEExplosiveRocketProjectileType extends RFEExplosiveProjectileType
     @Override
     public void tick(Level level, RFEProjectileInstance instance) {
         super.tick(level, instance);
+        if (this.rocketSmoke) {
+            Vec3 diff = instance.position().subtract(instance.oldPosition());
+            int particles = Mth.ceil(Math.min(diff.length() / 2, 1));
+            Vec3 delta = diff.scale(1f / particles);
+            Vec3 startPos = instance.oldPosition();
+            for (int i = 0; i < particles; ++i) {
+                double px = startPos.x + delta.x * i;
+                double py = startPos.y + delta.y * i;
+                double pz = startPos.z + delta.z * i;
+                level.addParticle(new BlackPowderSmokeOptions(0.75f), px, py, pz, 0, 0, 0);
+                level.addParticle(ParticleTypes.FLAME, px, py, pz, 0, 0, 0);
+            }
+        }
         if (!instance.isRemoved() && this.rocketSound != null && !level.isClientSide) {
             Vec3 pos = instance.position();
             level.playSound(null, pos.x, pos.y, pos.z, this.rocketSound, SoundSource.NEUTRAL);
@@ -67,6 +84,7 @@ public class RFEExplosiveRocketProjectileType extends RFEExplosiveProjectileType
         properties.rocketActivationTime = type.rocketActivationTime;
         properties.acceleration = type.acceleration;
         properties.terminalVelocity = type.terminalVelocity;
+        properties.rocketSmoke = type.rocketSmoke;
         properties.rocketSound = type.rocketSound;
         return properties;
     }

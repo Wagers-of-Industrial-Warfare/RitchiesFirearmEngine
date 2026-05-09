@@ -23,7 +23,6 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFE
 import rbasamoyai.ritchiesfirearmengine.utils.RFEMatrixUtils;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public class RFEModelProjectileRenderer extends RFEProjectileRenderer {
 
@@ -44,7 +43,7 @@ public class RFEModelProjectileRenderer extends RFEProjectileRenderer {
         VertexConsumer vCons = buffers.getBuffer(Sheets.translucentItemSheet());
         poseStack.pushPose();
         poseStack.scale(this.scale, this.scale, this.scale);
-        Vec3 vel = instance.velocity();
+        Vec3 vel = instance.velocity().scale(-1);
         if (vel.horizontalDistanceSqr() > 1e-4d && Math.abs(vel.y) > 1e-2d) {
             Vec3 horizontal = new Vec3(vel.x, 0, vel.z).normalize();
             poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(vel.normalize().reverse(), horizontal));
@@ -84,12 +83,6 @@ public class RFEModelProjectileRenderer extends RFEProjectileRenderer {
     @Override
     protected int getBlockLightLevel(RFEProjectileInstance instance, Level level, BlockPos pos) {
         return this.tracerLight ? 15 : super.getBlockLightLevel(instance, level, pos);
-    }
-
-    @Override
-    public void registerAdditionalModels(Consumer<ModelResourceLocation> registry) {
-        super.registerAdditionalModels(registry);
-        registry.accept(this.modelLoc);
     }
 
     public static class Serializer implements RFEProjectileRenderer.Serializer {

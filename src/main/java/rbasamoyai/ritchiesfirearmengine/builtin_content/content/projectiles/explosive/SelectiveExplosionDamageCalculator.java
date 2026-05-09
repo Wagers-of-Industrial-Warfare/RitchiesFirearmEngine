@@ -11,15 +11,21 @@ public class SelectiveExplosionDamageCalculator extends ExplosionDamageCalculato
 
     private final boolean enableBlockDamage;
     private final boolean enableEntityDamage;
+    private final float entityDamageScale;
+    private final float entityKnockbackScale;
 
-    public SelectiveExplosionDamageCalculator(boolean enableBlockDamage, boolean enableEntityDamage) {
+    public SelectiveExplosionDamageCalculator(boolean enableBlockDamage, boolean enableEntityDamage, float entityDamageScale, float entityKnockbackScale) {
         this.enableBlockDamage = enableBlockDamage;
         this.enableEntityDamage = enableEntityDamage;
+        this.entityDamageScale = entityDamageScale;
+        this.entityKnockbackScale = entityKnockbackScale;
     }
 
-    public static SelectiveExplosionDamageCalculator blockDamage() { return new SelectiveExplosionDamageCalculator(true, false); }
+    public static SelectiveExplosionDamageCalculator blockDamage() { return new SelectiveExplosionDamageCalculator(true, false, 1.0f, 1.0f); }
 
-    public static SelectiveExplosionDamageCalculator entityDamage() { return new SelectiveExplosionDamageCalculator(false, true); }
+    public static SelectiveExplosionDamageCalculator entityDamage(float damageScale, float knockbackScale) {
+        return new SelectiveExplosionDamageCalculator(false, true, damageScale, knockbackScale);
+    }
 
     @Override
     public boolean shouldBlockExplode(Explosion explosion, BlockGetter reader, BlockPos pos, BlockState state, float power) {
@@ -33,7 +39,12 @@ public class SelectiveExplosionDamageCalculator extends ExplosionDamageCalculato
 
     @Override
     public float getKnockbackMultiplier(Entity entity) {
-        return this.enableEntityDamage ? super.getKnockbackMultiplier(entity) : 0f;
+        return this.enableEntityDamage ? super.getKnockbackMultiplier(entity) * this.entityKnockbackScale : 0f;
+    }
+
+    @Override
+    public float getEntityDamageAmount(Explosion explosion, Entity entity) {
+        return super.getEntityDamageAmount(explosion, entity) * this.entityDamageScale;
     }
 
 }

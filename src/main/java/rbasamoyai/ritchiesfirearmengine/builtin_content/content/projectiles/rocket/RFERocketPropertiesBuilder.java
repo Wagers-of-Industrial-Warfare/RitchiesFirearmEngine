@@ -18,6 +18,7 @@ public class RFERocketPropertiesBuilder {
             Codec.intRange(0, Integer.MAX_VALUE).optionalFieldOf("rocket_activation_time", 0).forGetter(t -> t.rocketActivationTime),
             Codec.DOUBLE.fieldOf("acceleration").forGetter(t -> t.acceleration),
             Codec.doubleRange(0d, Double.MAX_VALUE).fieldOf("terminal_velocity").forGetter(t -> t.terminalVelocity),
+            Codec.BOOL.optionalFieldOf("rocket_smoke", false).forGetter(t -> t.rocketSmoke),
             SoundEvent.CODEC.optionalFieldOf("rocket_sound")
                     .forGetter(t -> t.rocketSound == null ? Optional.empty() : Optional.of(Holder.direct(t.rocketSound)))
     ).apply(o, RFERocketPropertiesBuilder::fromCodec));
@@ -26,6 +27,7 @@ public class RFERocketPropertiesBuilder {
             ByteBufCodecs.VAR_INT, t -> t.rocketActivationTime,
             ByteBufCodecs.DOUBLE, t -> t.acceleration,
             ByteBufCodecs.DOUBLE, t -> t.terminalVelocity,
+            ByteBufCodecs.BOOL, t -> t.rocketSmoke,
             ByteBufCodecs.optional(SoundEvent.STREAM_CODEC)
                     .map(o -> o.map(Holder::value).orElse(null), s -> s == null ? Optional.empty() : Optional.of(Holder.direct(s))), t -> t.rocketSound,
             RFERocketPropertiesBuilder::fromStreamCodec);
@@ -33,26 +35,29 @@ public class RFERocketPropertiesBuilder {
     public int rocketActivationTime;
     public double acceleration;
     public double terminalVelocity;
+    public boolean rocketSmoke;
     @Nullable public SoundEvent rocketSound;
 
     public RFERocketPropertiesBuilder() {}
 
-    private static RFERocketPropertiesBuilder fromCodec(int rocketActivationTime, double acceleration,
-                                                        double terminalVelocity, Optional<Holder<SoundEvent>> rocketSound) {
+    private static RFERocketPropertiesBuilder fromCodec(int rocketActivationTime, double acceleration, double terminalVelocity,
+                                                        boolean rocketSmoke, Optional<Holder<SoundEvent>> rocketSound) {
         RFERocketPropertiesBuilder properties = new RFERocketPropertiesBuilder();
         properties.rocketActivationTime = rocketActivationTime;
         properties.acceleration = acceleration;
         properties.terminalVelocity = terminalVelocity;
+        properties.rocketSmoke = rocketSmoke;
         properties.rocketSound = rocketSound.map(Holder::value).orElse(null);
         return properties;
     }
 
-    private static RFERocketPropertiesBuilder fromStreamCodec(int rocketActivationTime, double acceleration,
-                                                              double terminalVelocity, @Nullable SoundEvent rocketSound) {
+    private static RFERocketPropertiesBuilder fromStreamCodec(int rocketActivationTime, double acceleration, double terminalVelocity,
+                                                              boolean rocketSmoke, @Nullable SoundEvent rocketSound) {
         RFERocketPropertiesBuilder properties = new RFERocketPropertiesBuilder();
         properties.rocketActivationTime = rocketActivationTime;
         properties.acceleration = acceleration;
         properties.terminalVelocity = terminalVelocity;
+        properties.rocketSmoke = rocketSmoke;
         properties.rocketSound = rocketSound;
         return properties;
     }

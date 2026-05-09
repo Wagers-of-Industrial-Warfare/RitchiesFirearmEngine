@@ -8,9 +8,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -24,15 +22,12 @@ import rbasamoyai.ritchiesfirearmengine.foundation.data_packing.RFEJsonResourceR
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
 
 public class RFEItemAttachmentsRenderingPacksHandler {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final Map<Item, RFEItemAttachmentsRenderData> ATTACHMENTS = new Reference2ObjectOpenHashMap<>();
-    private static final Set<ModelResourceLocation> MODELS = new ObjectOpenHashSet<>();
 
     public static class ReloadListener extends RFEJsonResourceReloadListener {
         private static final Gson GSON = new Gson();
@@ -43,7 +38,6 @@ public class RFEItemAttachmentsRenderingPacksHandler {
         @Override
         protected void apply(Multimap<ResourceLocation, JsonElement> map, ResourceManager resourceManager, ProfilerFiller profiler) {
             ATTACHMENTS.clear();
-            MODELS.clear();
 
             Map<Item, RendererBuilder> builders = new Reference2ObjectOpenHashMap<>();
 
@@ -67,13 +61,6 @@ public class RFEItemAttachmentsRenderingPacksHandler {
 
             for (Map.Entry<Item, RendererBuilder> entry : builders.entrySet())
                 ATTACHMENTS.put(entry.getKey(), entry.getValue().build());
-
-            for (RFEItemAttachmentsRenderData renderData : ATTACHMENTS.values()) {
-                for (Map<ResourceLocation, SlotAttachmentRenderData> renderDataMap : renderData.renderDataByItemAndSlot().values()) {
-                    for (SlotAttachmentRenderData slotRenderData : renderDataMap.values())
-                        MODELS.add(slotRenderData.model());
-                }
-            }
         }
     }
 
@@ -87,8 +74,6 @@ public class RFEItemAttachmentsRenderingPacksHandler {
         Map<ResourceLocation, SlotAttachmentRenderData> renderDataBySlot = renderDataByItemAndSlot.get(attachment.getItem());
         return Optional.ofNullable(renderDataBySlot.get(slot));
     }
-
-    public static void registerAdditionalModels(Consumer<ModelResourceLocation> registry) { MODELS.forEach(registry); }
 
     private static class RendererBuilder {
         public final Map<Item, Map<ResourceLocation, SlotAttachmentRenderData>> renderDataByItemAndSlot = new Reference2ObjectOpenHashMap<>();

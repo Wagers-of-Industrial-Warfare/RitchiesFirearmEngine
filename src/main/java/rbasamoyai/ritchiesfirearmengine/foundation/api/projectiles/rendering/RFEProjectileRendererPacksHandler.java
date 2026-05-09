@@ -6,8 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
@@ -23,15 +21,12 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectile
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
 
 public class RFEProjectileRendererPacksHandler {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final Map<ResourceLocation, RFEProjectileRenderer> PROJECTILE_RENDERERS_BY_ID = new Object2ObjectOpenHashMap<>();
-    private static final Set<ModelResourceLocation> MODELS = new ObjectOpenHashSet<>();
 
     public static class ReloadListener extends SimpleJsonResourceReloadListener {
         private static final Gson GSON = new Gson();
@@ -42,7 +37,6 @@ public class RFEProjectileRendererPacksHandler {
         @Override
         protected void apply(Map<ResourceLocation, JsonElement> data, ResourceManager resourceManager, ProfilerFiller profiler) {
             PROJECTILE_RENDERERS_BY_ID.clear();
-            MODELS.clear();
 
             for (Map.Entry<ResourceLocation, JsonElement> entry : data.entrySet()) {
                 ResourceLocation id = entry.getKey();
@@ -58,9 +52,6 @@ public class RFEProjectileRendererPacksHandler {
                     LOGGER.error("Error loading RFE projectile renderer for projectile type {}, defaulting to no-op renderer: {}", id, e);
                 }
             }
-
-            for (RFEProjectileRenderer renderer : PROJECTILE_RENDERERS_BY_ID.values())
-                renderer.registerAdditionalModels(MODELS::add);
         }
     }
 
@@ -71,7 +62,5 @@ public class RFEProjectileRendererPacksHandler {
     public static RFEProjectileRenderer getProjectileRenderer(RFEProjectileInstance instance) {
         return getProjectileRenderer(instance.projectileType());
     }
-
-    public static void registerAdditionalModels(Consumer<ModelResourceLocation> registry) { MODELS.forEach(registry); }
 
 }

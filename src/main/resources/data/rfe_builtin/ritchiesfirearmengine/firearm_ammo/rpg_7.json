@@ -8,6 +8,14 @@
     {
       "ammo": "rfe_builtin:infinite_heat_rocket",
       "fires": "rfe_builtin:pg_7vl"
+    },
+    {
+      "ammo": "rfe_builtin:he_frag_rocket",
+      "fires": "rfe_builtin:og_7v"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_he_frag_rocket",
+      "fires": "rfe_builtin:og_7v"
     }
   ],
   "replace_magazines": false,

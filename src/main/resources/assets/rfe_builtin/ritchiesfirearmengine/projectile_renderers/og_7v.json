@@ -1,0 +1,6 @@
+{
+  "renderer": "ritchiesfirearmengine:model",
+  "model": "rfe_builtin:item/projectiles/og_7v",
+  "tracer_light": false,
+  "scale": 0.75
+}

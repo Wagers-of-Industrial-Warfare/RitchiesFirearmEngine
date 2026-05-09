@@ -101,13 +101,13 @@ public class RFEClientNeoForge {
     private static void onRenderLevel(final RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_ENTITIES) {
             RFEClient.renderAfterEntities(event.getPoseStack(), event.getProjectionMatrix(), event.getRenderTick(),
-                    event.getPartialTick().getGameTimeDeltaTicks(), event.getCamera(), event.getFrustum());
+                    event.getPartialTick().getGameTimeDeltaPartialTick(true), event.getCamera(), event.getFrustum());
         }
     }
 
     private static void onRenderGuiOverlay(final RenderGuiLayerEvent.Pre event) {
         if (event.getName() == VanillaGuiLayers.HOTBAR) {
-            RFEClient.renderHUDOverlay(event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaTicks());
+            RFEClient.renderHUDOverlay(event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
         }
         // TODO crosshair
     }

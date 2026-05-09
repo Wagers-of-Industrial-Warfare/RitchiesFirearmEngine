@@ -13,6 +13,7 @@
     "rfe_builtin:infinite_buckshot_shell",
     "rfe_builtin:infinite_expanding_slug_shell",
     "rfe_builtin:infinite_handgun_cartridge",
+    "rfe_builtin:infinite_he_frag_rocket",
     "rfe_builtin:infinite_heat_rocket",
     "rfe_builtin:infinite_hp_handgun_cartridge",
     "rfe_builtin:infinite_hp_intermediate_cartridge",

@@ -8,6 +8,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
@@ -32,9 +33,12 @@ public class RFEExplosiveProjectileType extends RFEBulletProjectileType implemen
 
     protected final float blockExplosionPower;
     protected final float entityExplosionPower;
+    protected final float entityDamageScale;
+    protected final float entityKnockbackScale;
     protected final double size;
     protected final float detonationThresholdDamage;
     protected final int armingTime;
+    protected final ResourceKey<DamageType> explosionDamageTypeKey;
     @Nullable protected final RFEBulletProjectileType penetratorProjectileType;
 
     public RFEExplosiveProjectileType(RFEBaseProjectilePropertiesBuilder baseProperties,
@@ -42,9 +46,12 @@ public class RFEExplosiveProjectileType extends RFEBulletProjectileType implemen
         super(baseProperties);
         this.blockExplosionPower = explosiveProperties.blockExplosionPower;
         this.entityExplosionPower = explosiveProperties.entityExplosionPower;
+        this.entityDamageScale = explosiveProperties.entityDamageScale;
+        this.entityKnockbackScale = explosiveProperties.entityKnockbackScale;
         this.size = explosiveProperties.size;
         this.detonationThresholdDamage = explosiveProperties.detonationThresholdDamage;
         this.armingTime = explosiveProperties.armingTime;
+        this.explosionDamageTypeKey = explosiveProperties.explosionDamageTypeKey;
         this.penetratorProjectileType = explosiveProperties.penetratorProjectileType;
         if (this.armingTime > this.maxAge)
             throw new IllegalStateException("arming_time cannot be greater than max_age");
@@ -74,7 +81,7 @@ public class RFEExplosiveProjectileType extends RFEBulletProjectileType implemen
         // Block explosion first
         Registry<DamageType> reg = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
         LivingEntity livingOwner = instance.getOwner() instanceof LivingEntity living ? living : null;
-        DamageSource damageSource = reg.getHolder(this.damageTypeKey)
+        DamageSource damageSource = reg.getHolder(this.explosionDamageTypeKey)
                 .map(type -> new DamageSource(type, null, livingOwner))
                 .orElseGet(() -> level.damageSources().explosion(null, livingOwner));
 
@@ -85,9 +92,9 @@ public class RFEExplosiveProjectileType extends RFEBulletProjectileType implemen
                 ParticleTypes.EXPLOSION_EMITTER, SoundEvents.GENERIC_EXPLODE);
         RFEUtils.explode(level, blockExplosion, level.isClientSide);
 
-        level.explode(null, damageSource, SelectiveExplosionDamageCalculator.entityDamage(), position.x, position.y,
-                position.z, this.entityExplosionPower, false, Level.ExplosionInteraction.NONE, ParticleTypes.EXPLOSION,
-                ParticleTypes.EXPLOSION_EMITTER, SoundEvents.GENERIC_EXPLODE);
+        level.explode(null, damageSource, SelectiveExplosionDamageCalculator.entityDamage(this.entityDamageScale, this.entityKnockbackScale),
+                position.x, position.y, position.z, this.entityExplosionPower, false, Level.ExplosionInteraction.NONE,
+                ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER, SoundEvents.GENERIC_EXPLODE);
         instance.setRemoved();
 
         if (this.penetratorProjectileType != null) {
@@ -113,9 +120,12 @@ public class RFEExplosiveProjectileType extends RFEBulletProjectileType implemen
         RFEExplosiveProjectilePropertiesBuilder properties = new RFEExplosiveProjectilePropertiesBuilder();
         properties.blockExplosionPower = type.blockExplosionPower;
         properties.entityExplosionPower = type.entityExplosionPower;
+        properties.entityDamageScale = type.entityDamageScale;
+        properties.entityKnockbackScale = type.entityKnockbackScale;
         properties.size = type.size;
         properties.detonationThresholdDamage = type.detonationThresholdDamage;
         properties.armingTime = type.armingTime;
+        properties.explosionDamageTypeKey = type.explosionDamageTypeKey;
         properties.penetratorProjectileType = type.penetratorProjectileType;
         return properties;
     }

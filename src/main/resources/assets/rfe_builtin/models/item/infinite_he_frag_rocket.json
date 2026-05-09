@@ -1,0 +1,6 @@
+{
+  "parent": "rfe_builtin:item/he_frag_rocket",
+  "textures": {
+    "ritchiesfirearmengine:slot_overlay0": "rfe_builtin:item/capacity_counters/infinite"
+  }
+}

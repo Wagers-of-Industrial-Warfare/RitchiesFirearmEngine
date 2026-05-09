@@ -1,0 +1,8 @@
+{
+  "slot_rendering": {
+    "rfe_builtin:loaded_rocket": {
+      "model": "rfe_builtin:item/item_attachments/leap_rocket_rpg_7",
+      "translation": [0, -1.5, -16]
+    }
+  }
+}

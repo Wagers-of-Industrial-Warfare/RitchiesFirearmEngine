@@ -4,6 +4,8 @@
     "rfe_builtin:he_frag_rocket",
     "rfe_builtin:heat_rocket",
     "rfe_builtin:infinite_he_frag_rocket",
-    "rfe_builtin:infinite_heat_rocket"
+    "rfe_builtin:infinite_heat_rocket",
+    "rfe_builtin:infinite_leap_rocket",
+    "rfe_builtin:leap_rocket"
   ]
 }

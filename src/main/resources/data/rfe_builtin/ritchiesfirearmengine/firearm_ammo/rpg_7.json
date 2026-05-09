@@ -16,6 +16,14 @@
     {
       "ammo": "rfe_builtin:infinite_he_frag_rocket",
       "fires": "rfe_builtin:og_7v"
+    },
+    {
+      "ammo": "rfe_builtin:leap_rocket",
+      "fires": "rfe_builtin:dg_7vl"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_leap_rocket",
+      "fires": "rfe_builtin:dg_7vl"
     }
   ],
   "replace_magazines": false,

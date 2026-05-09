@@ -317,7 +317,7 @@
 			"scale": [0.75, 0.75, 0.75]
 		},
 		"firstperson_righthand": {
-			"rotation": [0, 0.25, 0],
+			"rotation": [0, 0, 0],
 			"translation": [-8, 6, 10],
 			"scale": [1, 1, 0.5]
 		},

@@ -18,6 +18,14 @@
       "fires": "rfe_builtin:og_7v"
     },
     {
+      "ammo": "rfe_builtin:he_frag_rocket_boosted",
+      "fires": "rfe_builtin:og_7ve"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_he_frag_rocket_boosted",
+      "fires": "rfe_builtin:og_7ve"
+    },
+    {
       "ammo": "rfe_builtin:leap_rocket",
       "fires": "rfe_builtin:dg_7vl"
     },

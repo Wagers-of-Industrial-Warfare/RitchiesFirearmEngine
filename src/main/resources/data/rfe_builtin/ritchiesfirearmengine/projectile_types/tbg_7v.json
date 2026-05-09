@@ -1,5 +1,5 @@
 {
-  "type": "ritchiesfirearmengine:explosive",
+  "type": "ritchiesfirearmengine:explosive_rocket",
   "muzzle_velocity": 5.75,
   "drag": 0.0075,
   "quadratic_drag": true,
@@ -17,11 +17,15 @@
   "penetration": "rfe_builtin:default_rocket",
   "smoke": 1.75,
   "pass_sound": "rfe_builtin:projectile.generic.whizz",
-  "block_explosion_power": 2,
-  "entity_explosion_power": 7,
-  "entity_explosion_damage_scale": 0.65,
-  "entity_explosion_knockback_scale": 0.25,
+  "block_explosion_power": 4,
+  "entity_explosion_power": 5,
+  "entity_explosion_damage_scale": 1.25,
+  "entity_explosion_knockback_scale": 0.5,
   "detonation_threshold_damage": 0.15,
   "arming_time": 0,
-  "explosion_damage_type": "rfe_builtin:explosion"
+  "explosion_damage_type": "rfe_builtin:explosion",
+  "rocket_activation_time": 2,
+  "terminal_velocity": 13,
+  "acceleration": 8,
+  "rocket_smoke": true
 }

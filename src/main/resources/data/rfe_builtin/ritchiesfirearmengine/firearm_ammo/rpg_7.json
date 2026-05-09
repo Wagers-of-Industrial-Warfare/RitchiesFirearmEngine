@@ -24,6 +24,14 @@
     {
       "ammo": "rfe_builtin:infinite_leap_rocket",
       "fires": "rfe_builtin:dg_7vl"
+    },
+    {
+      "ammo": "rfe_builtin:thermobaric_rocket",
+      "fires": "rfe_builtin:tbg_7v"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_thermobaric_rocket",
+      "fires": "rfe_builtin:tbg_7v"
     }
   ],
   "replace_magazines": false,

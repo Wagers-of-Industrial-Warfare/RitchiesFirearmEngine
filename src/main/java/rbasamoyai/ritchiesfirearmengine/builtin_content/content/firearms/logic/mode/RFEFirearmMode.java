@@ -1223,10 +1223,12 @@ public class RFEFirearmMode {
     }
 
     public void finishCharge(ItemStack itemStack, LivingEntity entity) {
-        DataComponentPatch modeData = this.getModeData(itemStack);
         this.setCharged(itemStack, entity, true);
         this.setJammed(itemStack, entity, false);
         if (entity.level().isClientSide)
+            return;
+        RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
+        if (ammoProperties.unlimitedProjectile() != null)
             return;
         if (this.plusOneCapacity && this.getLoadedRound(itemStack).isEmpty()) {
             List<ItemStack> nextAmmoList = this.getNextRoundsInItem(itemStack, entity, 1, true);
@@ -1239,6 +1241,7 @@ public class RFEFirearmMode {
         if (!this.plusOneCapacity && nextRound.isEmpty())
             this.setCharged(itemStack, entity, false);
         if (this.canOverheat) {
+            DataComponentPatch modeData = this.getModeData(itemStack);
             float heat = FirearmDataUtils.getHeat(modeData);
             heat -= this.getHandlingProperties(itemStack).heatRemovedOnCharge();
             heat = Math.max(0, heat);
@@ -1248,7 +1251,6 @@ public class RFEFirearmMode {
         ItemStack chamberedRound = this.getChamberedRound(itemStack);
         if (!chamberedRound.isEmpty()) {
             boolean valid = false;
-            RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
             for (AmmoPredicate pred : ammoProperties.primaryAmmo().keySet()) {
                 if (pred.test(chamberedRound)) {
                     valid = true;
@@ -1265,12 +1267,14 @@ public class RFEFirearmMode {
                         RFEItemUtils.addItemToEntity(loadedRound, entity);
                     }
                 } else if (this.internalCapacity > 0) {
+                    DataComponentPatch modeData = this.getModeData(itemStack);
                     List<ItemStack> ammoList = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS);
                     ItemStack ejected = FirearmDataUtils.stripAmmo(ammoList, this.ammoConsumedLast, false, this.trackEmptySlots);
                     this.saveModeData(itemStack, FirearmDataUtils.saveRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS, ammoList));
                     if (!ejected.isEmpty())
                         RFEItemUtils.addItemToEntity(ejected, entity);
                 } else {
+                    DataComponentPatch modeData = this.getModeData(itemStack);
                     Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
                     if (o != null && o.isPresent()) {
                         ItemStack magazine = o.get().copyOne();

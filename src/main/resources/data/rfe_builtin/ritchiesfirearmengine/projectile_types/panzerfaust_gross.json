@@ -1,0 +1,38 @@
+{
+  "type": "ritchiesfirearmengine:explosive",
+  "muzzle_velocity": 2.25,
+  "drag": 0.0075,
+  "quadratic_drag": true,
+  "gravity": 0.03,
+  "max_age": 120,
+  "knockback": 0.5,
+  "damage_model": [
+    {
+      "distance": 1,
+      "damage": 22
+    }
+  ],
+  "damage_type": "rfe_builtin:bullet",
+  "hit_multiplier": "rfe_builtin:generic_headshot",
+  "penetration": "rfe_builtin:default_rocket",
+  "smoke": 1.5,
+  "pass_sound": "rfe_builtin:projectile.generic.whizz",
+  "explosion_power": 4,
+  "detonation_threshold_damage": 0.15,
+  "arming_time": 0,
+  "explosion_damage_type": "rfe_builtin:explosion",
+  "penetrator_properties": {
+    "full_hitscan": true,
+    "hitscan_range": 6,
+    "knockback": 0.2,
+    "damage_model": [
+      {
+        "distance": 1,
+        "damage": 17
+      }
+    ],
+    "damage_type": "rfe_builtin:armor_penetrator",
+    "hit_multiplier": "rfe_builtin:generic_headshot",
+    "penetration": "rfe_builtin:default_penetrator"
+  }
+}

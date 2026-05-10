@@ -367,6 +367,9 @@ public class RFEFirearmMode {
         if (this.fireMode == FireMode.SAFETY || !FirearmDataUtils.isCharged(modeData)
                 || FirearmDataUtils.getActionTime(itemStack) > 0 || this.isWindingUp(itemStack, entity))
             return false;
+        RFEFirearmModeHandlingProperties handlingProperties = this.getHandlingProperties(itemStack);
+        if (handlingProperties.maxShots() > 0 && FirearmDataUtils.getShotCount(itemStack) >= handlingProperties.maxShots())
+            return false;
         if (this.isJammed(itemStack))
             return false;
         if (!this.ammoRequired || this.canDryFire)
@@ -568,6 +571,7 @@ public class RFEFirearmMode {
             spreadInstance.updateSpread(itemStack, entity);
             RFEProjectileManager.queueAddedProjectile(projectile, entity.level());
         }
+        FirearmDataUtils.setShotCount(itemStack, FirearmDataUtils.getShotCount(itemStack) + firingInputs.size());
 
         this.fireFirearm(itemStack, entity, FiringType.NON_PLAYER_AND_EFFECTS);
     }

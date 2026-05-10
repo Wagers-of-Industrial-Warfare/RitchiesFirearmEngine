@@ -2,6 +2,9 @@ package rbasamoyai.ritchiesfirearmengine.foundation.api.misfires;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.LivingEntity;
@@ -33,6 +36,11 @@ public interface RFEMisfire {
             Codec.FLOAT)
             .xmap(map -> map.entrySet().stream().map(e -> e.getKey().apply(e.getValue())).toList(),
                     li -> li.stream().collect(Collectors.toMap(RFEMisfire::getMisfireProvider, RFEMisfire::getChance)));
+
+    StreamCodec<RegistryFriendlyByteBuf, RFEMisfire> STREAM_CODEC = StreamCodec.composite(
+            ResourceLocation.STREAM_CODEC.map(RFEContentBuilderRegistry::getMisfireProvider, RFEContentBuilderRegistry::getMisfireProviderId), RFEMisfire::getMisfireProvider,
+            ByteBufCodecs.FLOAT, RFEMisfire::getChance,
+            Provider::apply);
 
     boolean canMisfire(ItemStack itemStack, LivingEntity entity);
     float getChance();

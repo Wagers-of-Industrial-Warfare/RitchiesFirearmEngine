@@ -96,6 +96,7 @@ public class RFEFirearmModeBuilder {
     protected float heatRemovedOnCharge = 0; // Datapackable
     protected float heatAddedOnFiring = 0; // Datapackable
     protected int coolingDelayTime = 0; // Datapackable
+    protected int maxShots = 0; // Datapackable
 
     @Nullable protected ResourceLocation magazineAttachmentSlot = null;
     @Nullable protected ResourceLocation loadedRoundAttachmentSlot = null;
@@ -176,6 +177,8 @@ public class RFEFirearmModeBuilder {
         newBuilder.heatRemovedOnCharge = this.heatRemovedOnCharge;
         newBuilder.heatAddedOnFiring = this.heatAddedOnFiring;
         newBuilder.coolingDelayTime = this.coolingDelayTime;
+
+        newBuilder.maxShots = this.maxShots;
 
         newBuilder.magazineAttachmentSlot = this.magazineAttachmentSlot;
         newBuilder.loadedRoundAttachmentSlot = this.loadedRoundAttachmentSlot;
@@ -595,6 +598,13 @@ public class RFEFirearmModeBuilder {
     
     public RFEFirearmModeBuilder magazineAttachmentSlot(@Nullable ResourceLocation magazineAttachmentSlot) {
         this.magazineAttachmentSlot = magazineAttachmentSlot;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder maxShots(@Nullable int maxShots) {
+        if (maxShots < 0)
+            throw new IllegalStateException("Cannot specify max shots less than 0 (set to 0 to disable max shots)");
+        this.maxShots = maxShots;
         return this;
     }
 

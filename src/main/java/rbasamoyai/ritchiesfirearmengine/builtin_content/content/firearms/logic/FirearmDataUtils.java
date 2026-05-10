@@ -568,6 +568,27 @@ public class FirearmDataUtils {
         return o != null && o.isPresent();
     }
 
+    // Shot count methods
+
+    public static void setShotCount(ItemStack itemStack, int shotCount) {
+        itemStack.set(RFEDataComponents.SHOT_COUNT, shotCount);
+    }
+
+    public static DataComponentPatch setShotCount(DataComponentPatch data, int shotCount) {
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
+        patched.set(RFEDataComponents.SHOT_COUNT, shotCount);
+        return patched.asPatch();
+    }
+
+    public static int getShotCount(ItemStack itemStack) {
+        return getShotCount(itemStack.getComponentsPatch());
+    }
+
+    public static int getShotCount(DataComponentPatch data) {
+        Optional<? extends Integer> o = data.get(RFEDataComponents.SHOT_COUNT);
+        return o != null && o.isPresent() ? o.get() : 0;
+    }
+
     private FirearmDataUtils() {}
 
 }

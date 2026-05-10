@@ -43,13 +43,15 @@ public class RFEModelProjectileRenderer extends RFEProjectileRenderer {
         VertexConsumer vCons = buffers.getBuffer(Sheets.translucentItemSheet());
         poseStack.pushPose();
         poseStack.scale(this.scale, this.scale, this.scale);
-        Vec3 vel = instance.velocity().scale(-1);
+        Vec3 vel = instance.velocity();
+        if (vel.lengthSqr() < 1e-4d)
+            vel = new Vec3(0, -1, 0);
         if (vel.horizontalDistanceSqr() > 1e-4d && Math.abs(vel.y) > 1e-2d) {
             Vec3 horizontal = new Vec3(vel.x, 0, vel.z).normalize();
             poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(vel.normalize().reverse(), horizontal));
-            poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(horizontal, new Vec3(0, 0, -1)));
+            poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(horizontal, new Vec3(0, 0, 1)));
         } else {
-            poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(vel.normalize(), new Vec3(0, 0, -1)));
+            poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(vel.normalize(), new Vec3(0, 0, 1)));
         }
         poseStack.translate(-0.5f, -0.5f, -0.5f);
         PoseStack.Pose pose = poseStack.last();

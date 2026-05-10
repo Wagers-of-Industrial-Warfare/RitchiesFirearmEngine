@@ -64,9 +64,9 @@ public class RFEBulletProjectileRenderer extends RFEProjectileRenderer {
         if (vel.horizontalDistanceSqr() > 1e-4d && Math.abs(vel.y) > 1e-2d) {
             Vec3 horizontal = new Vec3(vel.x, 0, vel.z).normalize();
             poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(vel.normalize().reverse(), horizontal));
-            poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(horizontal, new Vec3(0, 0, -1)));
+            poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(horizontal, new Vec3(0, 0, 1)));
         } else {
-            poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(vel.normalize(), new Vec3(0, 0, -1)));
+            poseStack.mulPose(RFEMatrixUtils.mat4x4fFacing(vel.normalize(), new Vec3(0, 0, 1)));
         }
 
         light = this.tracerLight ? LightTexture.FULL_BRIGHT : light;

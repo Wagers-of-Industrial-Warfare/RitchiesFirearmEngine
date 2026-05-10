@@ -66,7 +66,8 @@ public class RFEClient {
             return 0;
         });
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("aiming"), (itemStack, level, entity, seed) -> {
-           return (entity instanceof Player ? entity.isUsingItem() : FirearmDataUtils.isAiming(itemStack)) ? 1 : 0;
+           return (entity instanceof Player && entity.isUsingItem() && entity.getItemInHand(entity.getUsedItemHand()) == itemStack
+                   || FirearmDataUtils.isAiming(itemStack)) ? 1 : 0;
         });
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("has_magazine"), (itemStack, level, entity, seed) -> {
             return itemStack.getItem() instanceof RFEFirearmItem firearm && firearm.hasMagazine(itemStack) ? 1 : 0;

@@ -41,6 +41,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFE
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFEProjectileRendererPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundFirearmActionPacket;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundSetAttackKeyPacket;
@@ -215,6 +216,8 @@ public class RFEClient {
 
     public static void onClientLogout() {
         RFEProjectileManager.clearAllProjectiles();
+        RFERecoilManager.clearTrackedRecoil();
+        RFESpreadManager.clearTrackedSpread();
     }
 
     public static void renderAfterEntities(PoseStack poseStack, Matrix4f projectionMatrix, int renderTick,

@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.api.recoil;
 
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
@@ -8,11 +9,14 @@ import net.minecraft.world.level.Level;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 
 public class RFERecoilManager {
 
-    private static final Map<LivingEntity, Map<InteractionHand, TaggedRecoilInstance>> RECOIL_INSTANCES = new WeakHashMap<>();
+    private static final Map<LivingEntity, Map<InteractionHand, TaggedRecoilInstance>> RECOIL_INSTANCES = new Reference2ObjectOpenHashMap<>();
 
     public static void clearTrackedRecoil() {
         RECOIL_INSTANCES.clear();

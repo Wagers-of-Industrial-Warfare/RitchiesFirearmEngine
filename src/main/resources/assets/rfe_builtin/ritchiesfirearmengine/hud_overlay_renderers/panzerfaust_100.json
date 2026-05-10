@@ -1,0 +1,13 @@
+{
+  "style": "ritchiesfirearmengine:ammo_counter",
+  "hide_entire_ammo_count": true,
+  "firearm_icon": {
+    "texture": "rfe_builtin:textures/gui/hud/weapon_icon/panzerfaust_gross.png",
+    "width": 64,
+    "height": 16
+  },
+  "mode_translations": {
+    "default": "gui.ritchiesfirearmengine.mode.single_action",
+    "safety": "gui.ritchiesfirearmengine.mode.safety"
+  }
+}

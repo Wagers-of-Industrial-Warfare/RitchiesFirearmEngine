@@ -11,7 +11,7 @@
   "replace_secondary_ammo": false,
   "secondary_ammo": [
   ],
-  "unlimited_projectile": "rfe_builtin:panzerfaust_60",
+  "unlimited_projectile": "rfe_builtin:panzerfaust_100",
   "modes": {
   }
 }

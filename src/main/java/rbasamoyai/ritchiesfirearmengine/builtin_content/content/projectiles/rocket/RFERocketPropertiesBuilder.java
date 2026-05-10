@@ -7,6 +7,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 
 import javax.annotation.Nullable;
@@ -19,8 +20,7 @@ public class RFERocketPropertiesBuilder {
             Codec.DOUBLE.fieldOf("acceleration").forGetter(t -> t.acceleration),
             Codec.doubleRange(0d, Double.MAX_VALUE).fieldOf("terminal_velocity").forGetter(t -> t.terminalVelocity),
             Codec.BOOL.optionalFieldOf("rocket_smoke", false).forGetter(t -> t.rocketSmoke),
-            SoundEvent.CODEC.optionalFieldOf("rocket_sound")
-                    .forGetter(t -> t.rocketSound == null ? Optional.empty() : Optional.of(Holder.direct(t.rocketSound)))
+            ResourceLocation.CODEC.xmap(SoundEvent::createVariableRangeEvent, SoundEvent::getLocation).optionalFieldOf("rocket_sound").forGetter(t -> Optional.ofNullable(t.rocketSound))
     ).apply(o, RFERocketPropertiesBuilder::fromCodec));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, RFERocketPropertiesBuilder> STREAM_CODEC = StreamCodec.composite(
@@ -41,13 +41,13 @@ public class RFERocketPropertiesBuilder {
     public RFERocketPropertiesBuilder() {}
 
     private static RFERocketPropertiesBuilder fromCodec(int rocketActivationTime, double acceleration, double terminalVelocity,
-                                                        boolean rocketSmoke, Optional<Holder<SoundEvent>> rocketSound) {
+                                                        boolean rocketSmoke, Optional<SoundEvent> rocketSound) {
         RFERocketPropertiesBuilder properties = new RFERocketPropertiesBuilder();
         properties.rocketActivationTime = rocketActivationTime;
         properties.acceleration = acceleration;
         properties.terminalVelocity = terminalVelocity;
         properties.rocketSmoke = rocketSmoke;
-        properties.rocketSound = rocketSound.map(Holder::value).orElse(null);
+        properties.rocketSound = rocketSound.orElse(null);
         return properties;
     }
 

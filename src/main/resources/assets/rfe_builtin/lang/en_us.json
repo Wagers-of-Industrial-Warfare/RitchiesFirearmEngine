@@ -219,6 +219,11 @@
   "subtitles.rfe_builtin.item.generic.firearm.en_bloc.eject": "En bloc clip ejected",
   "subtitles.rfe_builtin.item.generic.firearm.en_bloc.insert": "En bloc clip inserted",
   "subtitles.rfe_builtin.item.generic.firearm.en_bloc.remove": "En bloc clip removed",
+  "subtitles.rfe_builtin.item.generic.launcher.draw": "Launcher equipped",
+  "subtitles.rfe_builtin.item.generic.launcher.hammer.cocked": "Launcher cocked",
+  "subtitles.rfe_builtin.item.generic.launcher.fired": "Launcher fired",
+  "subtitles.rfe_builtin.item.generic.launcher.rocket.reload": "Rocket inserted",
+  "subtitles.rfe_builtin.item.generic.launcher.rocket.unload": "Rocket removed",
   "subtitles.rfe_builtin.item.generic.musket.cocked": "Musket cocked",
   "subtitles.rfe_builtin.item.generic.musket.draw": "Musket equipped",
   "subtitles.rfe_builtin.item.generic.musket.fired": "Musket fired",
@@ -277,5 +282,6 @@
   "subtitles.rfe_builtin.item.generic.smg.rack": "Submachine gun racked",
   "subtitles.rfe_builtin.item.generic.smg.shot": "Submachine gun shot",
   "subtitles.rfe_builtin.projectile.generic.crack": "Bullet cracks past",
-  "subtitles.rfe_builtin.projectile.generic.whizz": "Bullet whizzes past"
+  "subtitles.rfe_builtin.projectile.generic.whizz": "Bullet whizzes past",
+  "subtitles.rfe_builtin.projectile.generic.rocket.motor": "Rocket flies past"
 }

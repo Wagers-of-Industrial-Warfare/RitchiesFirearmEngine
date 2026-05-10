@@ -22,7 +22,7 @@
   "firing": {
     "fire_mode": "single_action",
     "cooldown": 4,
-    "sound": "rfe_builtin:item.generic.launcher.shot"
+    "sound": "rfe_builtin:item.generic.launcher.fired"
   },
   "reload": {
     "phases": [
@@ -51,7 +51,8 @@
         "reload_count": 1,
         "reload_delay": 70,
         "sounds": [
-          { "time": 40, "sound": "rfe_builtin:item.generic.launcher.rocket.reload" }
+          { "time": 50, "sound": "rfe_builtin:item.generic.launcher.rocket.reload1" },
+          { "time": 60, "sound": "rfe_builtin:item.generic.launcher.rocket.reload2" }
         ]
       },
       {
@@ -79,7 +80,7 @@
         "unload_count": 1,
         "unload_delay": 50,
         "sounds": [
-          { "time": 10, "sound": "rfe_builtin:item.generic.launcher.rocket.unload" }
+          { "time": 30, "sound": "rfe_builtin:item.generic.launcher.rocket.unload" }
         ]
       },
       {

@@ -38,5 +38,6 @@
   "rocket_activation_time": 2,
   "terminal_velocity": 15,
   "acceleration": 10,
-  "rocket_smoke": true
+  "rocket_smoke": true,
+  "rocket_sound": "rfe_builtin:projectile.generic.rocket.motor"
 }

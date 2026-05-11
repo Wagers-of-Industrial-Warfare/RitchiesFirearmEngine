@@ -26,6 +26,54 @@
         "ritchiesfirearmengine:aiming": 1
       },
       "model": "rfe_builtin:item/panzerfaust_30/panzerfaust_30_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_drawing": 1 },
+      "model": "rfe_builtin:item/panzerfaust_30/panzerfaust_30_normal_undeployed"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:shot_count": 1,
+        "ritchiesfirearmengine:is_drawing": 1
+      },
+      "model": "rfe_builtin:item/panzerfaust_30/panzerfaust_30_fired_undeployed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_safety": 1 },
+      "model": "rfe_builtin:item/panzerfaust_30/panzerfaust_30_normal_undeployed"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_safety": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/panzerfaust_30/panzerfaust_30_normal_aimed_undeployed"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:shot_count": 1,
+        "ritchiesfirearmengine:is_safety": 1
+      },
+      "model": "rfe_builtin:item/panzerfaust_30/panzerfaust_30_fired_undeployed"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:shot_count": 1,
+        "ritchiesfirearmengine:is_safety": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/panzerfaust_30/panzerfaust_30_fired_aimed_undeployed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:untouched": 1 },
+      "model": "rfe_builtin:item/panzerfaust_30/panzerfaust_30_normal_undeployed"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:shot_count": 1,
+        "ritchiesfirearmengine:untouched": 1
+      },
+      "model": "rfe_builtin:item/panzerfaust_30/panzerfaust_30_fired_undeployed"
     }
   ]
 }

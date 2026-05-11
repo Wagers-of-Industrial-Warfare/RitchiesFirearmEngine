@@ -43,12 +43,13 @@ public class RFEShotgunProjectileType extends RFEBulletProjectileType {
     }
 
     @Override
-    public void shoot(RFEProjectileInstance instance, double dx, double dy, double dz, ItemStack itemStack,
-                      LivingEntity entity, RFESpreadInstance spread) {
+    public void shoot(RFEProjectileInstance instance, double dx, double dy, double dz, float pitchAdjustment,
+                      ItemStack itemStack, LivingEntity entity, RFESpreadInstance spread) {
         instance.setRemoved();
 
         Vec3 aimDir = new Vec3(dx, dy, dz);
         RFEAimAngles aimAngles = RFEMathUtils.getAnglesFromVec(aimDir, entity.getXRot(), entity.yHeadRot);
+        aimAngles = new RFEAimAngles(aimAngles.pitch() - pitchAdjustment, aimAngles.yaw());
         RFEAimAngles spreadAngles = spread.getSpread(itemStack, entity);
         float basePitch = aimAngles.pitch() + spreadAngles.pitch();
         float baseYaw = aimAngles.yaw() + spreadAngles.yaw();
@@ -65,6 +66,33 @@ public class RFEShotgunProjectileType extends RFEBulletProjectileType {
             actualInstance.setPosition(sourcePos.add(finalShootDir.scale(randomPosOffset)));
             actualInstance.setVelocity(finalShootDir.scale(this.muzzleVelocity));
             this.tick(entity.level(), actualInstance);
+            if (this.fullHitscan) {
+                actualInstance.setRemoved();
+            } else {
+                RFEProjectileManager.queueAddedProjectile(actualInstance, level);
+            }
+        }
+    }
+
+    @Override
+    public void shootWithoutEntity(RFEProjectileInstance instance, double dx, double dy, double dz, Level level) {
+        instance.setRemoved();
+
+        Vec3 aimDir = new Vec3(dx, dy, dz);
+        RFEAimAngles aimAngles = RFEMathUtils.getAnglesFromVec(aimDir, 0, 0);
+        float basePitch = aimAngles.pitch();
+        float baseYaw = aimAngles.yaw();
+        Vec3 sourcePos = instance.getPosition(1);
+        RandomSource random = level.getRandom();
+
+        for (int i = 0; i < this.count; ++i) {
+            RFEAimAngles dispersion = RFEProjectileUtils.standardSpreadAngles(this.horizontalDispersion, this.verticalDispersion, false, random);
+            Vec3 finalShootDir = RFEMathUtils.calculateAimVector(basePitch + dispersion.pitch(), baseYaw + dispersion.yaw()).normalize();
+            RFEProjectileInstance actualInstance = this.createInstance();
+            double randomPosOffset = 0.1d + 0.05d * random.nextDouble();
+            actualInstance.setPosition(sourcePos.add(finalShootDir.scale(randomPosOffset)));
+            actualInstance.setVelocity(finalShootDir.scale(this.muzzleVelocity));
+            this.tick(level, actualInstance);
             if (this.fullHitscan) {
                 actualInstance.setRemoved();
             } else {

@@ -34,6 +34,9 @@
   },
   "charging_behavior": "auto",
   "modes": {
+    "range_30m": {
+      "pitch_adjustment": 13.0
+    },
     "safety": {
       "firing": {
         "fire_mode": "safety"

@@ -29,20 +29,20 @@ public class RFEBuckAndBallProjectileType implements RFEProjectileType, RFEProje
     }
 
     @Override
-    public void shoot(RFEProjectileInstance instance, double dx, double dy, double dz, ItemStack itemStack,
-                      LivingEntity entity, RFESpreadInstance spread) {
+    public void shoot(RFEProjectileInstance instance, double dx, double dy, double dz, float pitchAdjustment,
+                      ItemStack itemStack, LivingEntity entity, RFESpreadInstance spread) {
         instance.setRemoved();
 
         RFEProjectileInstance ballInstance = this.ballProjectileType.createInstance();
         ballInstance.setPosition(instance.position());
         ballInstance.setOwner(entity);
-        this.ballProjectileType.shoot(ballInstance, dx, dy, dz, itemStack, entity, spread);
+        this.ballProjectileType.shoot(ballInstance, dx, dy, dz, pitchAdjustment, itemStack, entity, spread);
         RFEProjectileManager.queueAddedProjectile(ballInstance, entity.level());
 
         RFEProjectileInstance buckInstance = this.buckProjectileType.createInstance();
         buckInstance.setPosition(instance.position());
         buckInstance.setOwner(entity);
-        this.buckProjectileType.shoot(buckInstance, dx, dy, dz, itemStack, entity, spread);
+        this.buckProjectileType.shoot(buckInstance, dx, dy, dz, pitchAdjustment, itemStack, entity, spread);
     }
 
     @Override

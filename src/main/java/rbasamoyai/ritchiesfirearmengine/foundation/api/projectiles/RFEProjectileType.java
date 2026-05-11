@@ -40,8 +40,8 @@ public interface RFEProjectileType {
                     .<Serializer<?>>map(RFEContentBuilderRegistry::getProjectileTypeSerializer, RFEContentBuilderRegistry::getProjectileTypeSerializerId)
                     .dispatch(RFEProjectileType::getSerializer, Serializer::streamCodec);
 
-    void shoot(RFEProjectileInstance instance, double dx, double dy, double dz, ItemStack itemStack, LivingEntity entity,
-               RFESpreadInstance spreadInstance);
+    void shoot(RFEProjectileInstance instance, double dx, double dy, double dz, float pitchAdjustment, ItemStack itemStack,
+               LivingEntity entity, RFESpreadInstance spreadInstance);
 
     void shootWithoutEntity(RFEProjectileInstance instance, double dx, double dy, double dz, Level level);
 

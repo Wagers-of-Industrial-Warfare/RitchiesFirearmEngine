@@ -97,6 +97,7 @@ public class RFEFirearmModeBuilder {
     protected float heatAddedOnFiring = 0; // Datapackable
     protected int coolingDelayTime = 0; // Datapackable
     protected int maxShots = 0; // Datapackable
+    protected float pitchAdjustment = 0; // Datapackable
 
     @Nullable protected ResourceLocation magazineAttachmentSlot = null;
     @Nullable protected ResourceLocation loadedRoundAttachmentSlot = null;
@@ -179,6 +180,8 @@ public class RFEFirearmModeBuilder {
         newBuilder.coolingDelayTime = this.coolingDelayTime;
 
         newBuilder.maxShots = this.maxShots;
+
+        newBuilder.pitchAdjustment = this.pitchAdjustment;
 
         newBuilder.magazineAttachmentSlot = this.magazineAttachmentSlot;
         newBuilder.loadedRoundAttachmentSlot = this.loadedRoundAttachmentSlot;
@@ -601,10 +604,17 @@ public class RFEFirearmModeBuilder {
         return this;
     }
 
-    public RFEFirearmModeBuilder maxShots(@Nullable int maxShots) {
+    public RFEFirearmModeBuilder maxShots(int maxShots) {
         if (maxShots < 0)
             throw new IllegalStateException("Cannot specify max shots less than 0 (set to 0 to disable max shots)");
         this.maxShots = maxShots;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder pitchAdjustment(float pitchAdjustment) {
+        if (pitchAdjustment < -90 || 90 < pitchAdjustment || !Float.isFinite(pitchAdjustment))
+            throw new IllegalStateException("Pitch adjustment must be in the range of [-90, 90]");
+        this.pitchAdjustment = pitchAdjustment;
         return this;
     }
 

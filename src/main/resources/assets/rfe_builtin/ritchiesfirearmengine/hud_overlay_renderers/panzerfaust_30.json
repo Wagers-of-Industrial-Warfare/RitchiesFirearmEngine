@@ -7,7 +7,8 @@
     "height": 16
   },
   "mode_translations": {
-    "default": "gui.ritchiesfirearmengine.mode.single_action",
+    "default": "gui.rfe_builtin.mode.panzerfaust.direct_fire",
+    "range_30m": "gui.rfe_builtin.mode.panzerfaust.range_30m",
     "safety": "gui.ritchiesfirearmengine.mode.safety"
   }
 }

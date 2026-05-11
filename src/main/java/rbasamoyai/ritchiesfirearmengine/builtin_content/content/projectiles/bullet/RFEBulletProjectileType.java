@@ -89,10 +89,11 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     }
 
     @Override
-    public void shoot(RFEProjectileInstance instance, double dx, double dy, double dz, ItemStack itemStack,
-                      LivingEntity entity, RFESpreadInstance spread) {
+    public void shoot(RFEProjectileInstance instance, double dx, double dy, double dz, float pitchAdjustment,
+                      ItemStack itemStack, LivingEntity entity, RFESpreadInstance spread) {
         Vec3 aimDir = new Vec3(dx, dy, dz);
         RFEAimAngles aimAngles = RFEMathUtils.getAnglesFromVec(aimDir, entity.getXRot(), entity.yHeadRot);
+        aimAngles = new RFEAimAngles(aimAngles.pitch() - pitchAdjustment, aimAngles.yaw());
         RFEAimAngles spreadAngles = spread.getSpread(itemStack, entity);
         Vec3 finalAimDir = RFEMathUtils.calculateAimVector(aimAngles.pitch() + spreadAngles.pitch(), aimAngles.yaw() + spreadAngles.yaw());
         Vec3 spawnPos = instance.getPosition(1);

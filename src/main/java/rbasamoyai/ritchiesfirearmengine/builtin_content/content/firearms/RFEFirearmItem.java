@@ -173,6 +173,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     public void onSwitchMode(ItemStack itemStack, LivingEntity entity) {
         if (this.modeOrder.size() == 1)
             return;
+        if (this.getCurrentAction(itemStack) != null)
+            return;
         String stateRef = itemStack.getOrDefault(BuiltInRFEPlugin.RFEDataComponents.FIREARM_MODE, this.defaultMode);
         int index = this.modeOrder.indexOf(stateRef);
         if (index == -1) {

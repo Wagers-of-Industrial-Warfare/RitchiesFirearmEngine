@@ -121,6 +121,8 @@ public class RFEFirearmMode {
     // Eject magazines
     protected final boolean ejectMagazineOnLastShot;
     @Nullable protected final SoundEvent ejectMagazineOnLastShotSound;
+    // Zeroing
+    protected final float pitchAdjustment;
 
     // Reloading
     protected final Map<ReloadPhase.PhaseType, List<ReloadPhase>> reloadPhases;
@@ -194,6 +196,7 @@ public class RFEFirearmMode {
         this.windDownSound = builder.windDownSound;
         this.ejectMagazineOnLastShot = builder.ejectMagazineOnLastShot;
         this.ejectMagazineOnLastShotSound = builder.ejectMagazineOnLastShotSound;
+        this.pitchAdjustment = builder.pitchAdjustment;
 
         this.resetChargeOnUnequip = builder.resetChargeOnUnequip;
 
@@ -567,7 +570,7 @@ public class RFEFirearmMode {
             projectile.setPosition(input.pos());
 
             Vec3 aimDirection = input.aim();
-            projectile.shoot(aimDirection.x, aimDirection.y, aimDirection.z, itemStack, entity, spreadInstance);
+            projectile.shoot(aimDirection.x, aimDirection.y, aimDirection.z, this.getPitchAdjustment(itemStack), itemStack, entity, spreadInstance);
             spreadInstance.updateSpread(itemStack, entity);
             RFEProjectileManager.queueAddedProjectile(projectile, entity.level());
         }
@@ -1687,6 +1690,10 @@ public class RFEFirearmMode {
 
     public int getShotCount(ItemStack itemStack) {
         return FirearmDataUtils.getShotCount(this.getModeData(itemStack));
+    }
+
+    public float getPitchAdjustment(ItemStack itemStack) {
+        return this.pitchAdjustment; // TODO adjustable sights
     }
 
     public enum FiringType {

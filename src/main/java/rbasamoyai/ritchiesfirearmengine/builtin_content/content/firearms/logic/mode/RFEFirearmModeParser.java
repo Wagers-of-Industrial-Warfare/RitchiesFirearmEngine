@@ -226,6 +226,11 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
             builder.maxShots(maxShots);
         }
 
+        if (GsonHelper.isNumberValue(obj, "pitch_adjustment")) {
+            float pitchAdjustment = GsonHelper.getAsFloat(obj, "pitch_adjustment");
+            builder.pitchAdjustment(pitchAdjustment);
+        }
+
         if (GsonHelper.isStringValue(obj, "loaded_round_attachment_slot")) {
             String loadedRoundAttachmentSlot = GsonHelper.getAsString(obj, "loaded_round_attachment_slot");
             if (loadedRoundAttachmentSlot.isEmpty()) {

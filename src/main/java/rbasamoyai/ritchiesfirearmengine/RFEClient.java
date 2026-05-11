@@ -118,6 +118,9 @@ public class RFEClient {
             return itemStack.getItem() instanceof RFEFirearmItem firearm
                     && firearm.getCurrentMode(itemStack).getFireMode() == FireMode.SAFETY ? 1 : 0;
         });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("untouched"), (itemStack, level, entity, seed) -> {
+            return FirearmDataUtils.isEquipped(itemStack) ? 0 : 1;
+        });
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("shot_count"), (itemStack, level, entity, seed) -> {
             return itemStack.getItem() instanceof RFEFirearmItem firearm ? firearm.getShotCount(itemStack) : 0;
         });

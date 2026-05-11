@@ -98,8 +98,8 @@ public class RFEProjectileInstance {
         ++this.age;
     }
 
-    public void shoot(double dx, double dy, double dz, ItemStack itemStack, LivingEntity entity, RFESpreadInstance spreadInstance) {
-        this.projectileType.shoot(this, dx, dy, dz, itemStack, entity, spreadInstance);
+    public void shoot(double dx, double dy, double dz, float pitchAdjustment, ItemStack itemStack, LivingEntity entity, RFESpreadInstance spreadInstance) {
+        this.projectileType.shoot(this, dx, dy, dz, pitchAdjustment, itemStack, entity, spreadInstance);
     }
 
     public void ignoreEntity(Entity entity) { this.ignoredEntities.add(entity.getId()); }

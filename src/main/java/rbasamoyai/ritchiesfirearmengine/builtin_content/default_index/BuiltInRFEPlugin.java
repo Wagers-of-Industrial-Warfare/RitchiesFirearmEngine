@@ -413,6 +413,9 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         public static final DataComponentType<Integer> SHOT_COUNT = register("shot_count",
                 builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
+        public static final DataComponentType<Boolean> IS_EQUIPPED = register("is_equipped",
+                builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
         // TODO move to base RFE index
         public static final DataComponentType<UUID> RECOIL_IDENTIFIER = register("recoil_identifier",
                 builder -> builder.persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC));

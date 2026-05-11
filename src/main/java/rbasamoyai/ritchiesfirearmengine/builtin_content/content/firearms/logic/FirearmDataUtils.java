@@ -589,6 +589,27 @@ public class FirearmDataUtils {
         return o != null && o.isPresent() ? o.get() : 0;
     }
 
+    // Is equipped methods
+
+    public static void setEquipped(ItemStack itemStack, boolean isEquipped) {
+        itemStack.set(RFEDataComponents.IS_EQUIPPED, isEquipped);
+    }
+
+    public static DataComponentPatch setEquipped(DataComponentPatch data, boolean isEquipped) {
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
+        patched.set(RFEDataComponents.IS_EQUIPPED, isEquipped);
+        return patched.asPatch();
+    }
+
+    public static boolean isEquipped(ItemStack itemStack) {
+        return isEquipped(itemStack.getComponentsPatch());
+    }
+
+    public static boolean isEquipped(DataComponentPatch data) {
+        Optional<? extends Boolean> o = data.get(RFEDataComponents.IS_EQUIPPED);
+        return o != null && o.isPresent() && o.get();
+    }
+
     private FirearmDataUtils() {}
 
 }

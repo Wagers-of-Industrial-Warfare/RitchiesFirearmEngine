@@ -1422,9 +1422,10 @@ public class RFEFirearmMode {
     public int unaimTime() { return this.unaimTime; }
 
     public void onTick(ItemStack itemStack, LivingEntity entity, boolean selected) {
-        if (!selected) {
+        if (!selected || !FirearmDataUtils.isEquipped(itemStack)) {
             FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.DRAW);
             FirearmDataUtils.setActionTime(itemStack, this.drawTime);
+            FirearmDataUtils.setEquipped(itemStack, true);
             this.clearBurstFiring(itemStack);
             this.setWindingUp(itemStack, entity, false);
             this.setForceCancelAction(itemStack, entity, false);

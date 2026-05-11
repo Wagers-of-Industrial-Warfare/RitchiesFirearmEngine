@@ -1,0 +1,27 @@
+{
+  "parent": "rfe_builtin:item/m72_law/m72_law_undeployed",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:is_charged": 1 },
+      "model": "rfe_builtin:item/m72_law/m72_law_deployed"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charged": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/m72_law/m72_law_deployed_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:shot_count": 1 },
+      "model": "rfe_builtin:item/m72_law/m72_law_deployed"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:shot_count": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/m72_law/m72_law_deployed_aimed"
+    }
+  ]
+}

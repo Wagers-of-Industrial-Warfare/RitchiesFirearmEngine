@@ -1,0 +1,6 @@
+{
+  "renderer": "ritchiesfirearmengine:model",
+  "model": "rfe_builtin:item/projectiles/m72_law_rocket",
+  "tracer_light": false,
+  "scale": 0.75
+}

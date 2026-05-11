@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
+    "rfe_builtin:m72_law",
     "rfe_builtin:panzerfaust_30",
     "rfe_builtin:panzerfaust_60",
     "rfe_builtin:panzerfaust_100"

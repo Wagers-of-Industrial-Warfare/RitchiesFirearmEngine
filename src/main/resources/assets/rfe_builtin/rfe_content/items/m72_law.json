@@ -1,0 +1,43 @@
+{
+  "type": "ritchiesfirearmengine:firearm",
+  "item_length": -1,
+  "max_shots": 1,
+  "drawing": {
+    "draw_time": 30,
+    "sound": "rfe_builtin:item.generic.launcher.draw"
+  },
+  "mode_change": {
+    "mode_change_time": 1,
+    "sound": "rfe_builtin:item.generic.firearm.mode_change.switch"
+  },
+  "aiming": {
+    "aim_time": 10,
+    "aim_sound": "rfe_builtin:item.generic.launcher.aim",
+    "unaim_sound": "rfe_builtin:item.generic.launcher.unaim"
+  },
+  "ammo": {
+    "ammo_required": false,
+    "internal_capacity": 1
+  },
+  "firing": {
+    "fire_mode": "single_action",
+    "cooldown": 0,
+    "sound": "rfe_builtin:item.generic.launcher.fired"
+  },
+  "charge": {
+    "actions": [
+      {
+        "condition": { "macro": "rfe_builtin:can_charge" },
+        "time": 1
+      }
+    ]
+  },
+  "charging_behavior": "auto",
+  "modes": {
+    "safety": {
+      "firing": {
+        "fire_mode": "safety"
+      }
+    }
+  }
+}

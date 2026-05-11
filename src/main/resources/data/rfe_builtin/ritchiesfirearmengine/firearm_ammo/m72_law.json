@@ -1,0 +1,17 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+  ],
+  "replace_magazines": false,
+  "magazines": [
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "unlimited_projectile": "rfe_builtin:m72_law",
+  "modes": {
+  }
+}

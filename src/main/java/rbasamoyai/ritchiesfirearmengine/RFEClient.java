@@ -88,6 +88,10 @@ public class RFEClient {
             return itemStack.getItem() instanceof RFEFirearmItem firearm
                     && firearm.getCurrentAction(itemStack) == RFEFirearmItem.Action.FIRING ? 1 : 0;
         });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_drawing"), (itemStack, level, entity, seed) -> {
+            return itemStack.getItem() instanceof RFEFirearmItem firearm
+                    && firearm.getCurrentAction(itemStack) == RFEFirearmItem.Action.DRAW ? 1 : 0;
+        });
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_charged"), (itemStack, level, entity, seed) -> {
             return itemStack.getItem() instanceof RFEFirearmItem firearm && firearm.isCharged(itemStack) ? 1 : 0;
         });

@@ -1426,6 +1426,8 @@ public class RFEFirearmMode {
             FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.DRAW);
             FirearmDataUtils.setActionTime(itemStack, this.drawTime);
             FirearmDataUtils.setEquipped(itemStack, true);
+            FirearmDataUtils.setAiming(itemStack, false);
+            this.setAimingTime(itemStack, entity, 0);
             this.clearBurstFiring(itemStack);
             this.setWindingUp(itemStack, entity, false);
             this.setForceCancelAction(itemStack, entity, false);

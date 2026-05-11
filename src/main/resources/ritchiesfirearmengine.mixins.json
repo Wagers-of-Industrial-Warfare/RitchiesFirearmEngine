@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "ritchiesfirearmengine.refmap.json",
   "mixins": [
+    "ExplosionMixin",
     "LivingEntityMixin",
     "client.MultiPlayerGameModeMixin"
   ],

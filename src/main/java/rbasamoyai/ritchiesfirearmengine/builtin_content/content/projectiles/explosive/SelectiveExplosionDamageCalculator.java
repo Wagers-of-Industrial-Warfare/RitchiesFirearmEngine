@@ -7,12 +7,16 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class SelectiveExplosionDamageCalculator extends ExplosionDamageCalculator {
 
     private final boolean enableBlockDamage;
     private final boolean enableEntityDamage;
     private final float entityDamageScale;
     private final float entityKnockbackScale;
+    private final Set<Entity> exemptEntities = new HashSet<>();
 
     public SelectiveExplosionDamageCalculator(boolean enableBlockDamage, boolean enableEntityDamage, float entityDamageScale, float entityKnockbackScale) {
         this.enableBlockDamage = enableBlockDamage;
@@ -34,17 +38,19 @@ public class SelectiveExplosionDamageCalculator extends ExplosionDamageCalculato
 
     @Override
     public boolean shouldDamageEntity(Explosion explosion, Entity entity) {
-        return this.enableEntityDamage && super.shouldDamageEntity(explosion, entity);
+        return this.enableEntityDamage && !this.exemptEntities.contains(entity) && super.shouldDamageEntity(explosion, entity);
     }
 
     @Override
     public float getKnockbackMultiplier(Entity entity) {
-        return this.enableEntityDamage ? super.getKnockbackMultiplier(entity) * this.entityKnockbackScale : 0f;
+        return this.enableEntityDamage && !this.exemptEntities.contains(entity) ? super.getKnockbackMultiplier(entity) * this.entityKnockbackScale : 0f;
     }
 
     @Override
     public float getEntityDamageAmount(Explosion explosion, Entity entity) {
         return super.getEntityDamageAmount(explosion, entity) * this.entityDamageScale;
     }
+
+    public void addEntityExempt(Entity entity) { this.exemptEntities.add(entity); }
 
 }

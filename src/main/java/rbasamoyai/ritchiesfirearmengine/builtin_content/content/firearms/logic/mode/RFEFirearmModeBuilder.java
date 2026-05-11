@@ -75,6 +75,9 @@ public class RFEFirearmModeBuilder {
     protected boolean ejectMagazineOnLastShot = false;
     @Nullable
     protected SoundEvent ejectMagazineOnLastShotSound = null;
+    protected int maxShots = 0; // Datapackable
+    protected float pitchAdjustment = 0; // Datapackable
+    protected float backblast = 0; // Datapackable
 
     protected List<ReloadPhase> reloadPhases = new LinkedList<>();
     protected final Map<ReloadPhase.PhaseType, List<ReloadPhase>> finalReloadPhases = new EnumMap<>(ReloadPhase.PhaseType.class);
@@ -96,8 +99,6 @@ public class RFEFirearmModeBuilder {
     protected float heatRemovedOnCharge = 0; // Datapackable
     protected float heatAddedOnFiring = 0; // Datapackable
     protected int coolingDelayTime = 0; // Datapackable
-    protected int maxShots = 0; // Datapackable
-    protected float pitchAdjustment = 0; // Datapackable
 
     @Nullable protected ResourceLocation magazineAttachmentSlot = null;
     @Nullable protected ResourceLocation loadedRoundAttachmentSlot = null;

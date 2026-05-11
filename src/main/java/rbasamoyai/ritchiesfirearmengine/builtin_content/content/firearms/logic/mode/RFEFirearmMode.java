@@ -412,9 +412,9 @@ public class RFEFirearmMode {
 
         if (this.canOverheat) {
             DataComponentPatch modeData = this.getModeData(itemStack);
-            modeData = FirearmDataUtils.addHeat(modeData, firearmProperties.heatAddedOnFiring());
-            modeData = FirearmDataUtils.setCoolingDelay(modeData, firearmProperties.coolingDelayTime());
-            if (FirearmDataUtils.getHeat(modeData) > firearmProperties.heatCapacity())
+            modeData = FirearmDataUtils.addHeat(modeData, firearmProperties.heatProperties().heatAddedOnFiring());
+            modeData = FirearmDataUtils.setCoolingDelay(modeData, firearmProperties.heatProperties().coolingDelayTime());
+            if (FirearmDataUtils.getHeat(modeData) > firearmProperties.heatProperties().heatCapacity())
                 modeData = FirearmDataUtils.setOverheated(modeData, true);
             this.saveModeData(itemStack, modeData);
         }
@@ -1247,7 +1247,7 @@ public class RFEFirearmMode {
         if (this.canOverheat) {
             DataComponentPatch modeData = this.getModeData(itemStack);
             float heat = FirearmDataUtils.getHeat(modeData);
-            heat -= this.getHandlingProperties(itemStack).heatRemovedOnCharge();
+            heat -= this.getHandlingProperties(itemStack).heatProperties().heatRemovedOnCharge();
             heat = Math.max(0, heat);
             modeData = FirearmDataUtils.setHeat(modeData, heat);
             this.saveModeData(itemStack, modeData);
@@ -1511,7 +1511,7 @@ public class RFEFirearmMode {
                     this.saveModeData(itemStack, modeData);
                 } else {
                     float heat = FirearmDataUtils.getHeat(modeData);
-                    heat -= properties.heatRemovedPerTick();
+                    heat -= properties.heatProperties().heatRemovedPerTick();
                     heat = Math.max(0, heat);
                     modeData = FirearmDataUtils.setHeat(modeData, heat);
                     this.saveModeData(itemStack, modeData);
@@ -1671,7 +1671,7 @@ public class RFEFirearmMode {
     }
 
     public float getHeatCapacity(ItemStack itemStack) {
-        return this.getHandlingProperties(itemStack).heatCapacity();
+        return this.getHandlingProperties(itemStack).heatProperties().heatCapacity();
     }
 
     public void addAttachments(ItemStack itemStack, Map<ResourceLocation, ItemStack> attachments) {

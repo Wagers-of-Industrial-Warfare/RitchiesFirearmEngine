@@ -29,16 +29,20 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.*;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.RFEItemLengths;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.effects.explosions.QuietExplosion;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.effects.particles.BlackPowderSmokeOptions;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEBaseProjectilePropertiesBuilder;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEProjectileClipContext;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEProjectileDamageModel;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.explosive.SelectiveExplosionDamageCalculator;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplier;
@@ -52,6 +56,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEMathUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEProjectileUtils;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -70,7 +75,13 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     @Nullable protected final ResourceLocation hitMultiplierId;
     @Nullable protected final ResourceLocation penetrationId;
     protected final float smoke;
+    protected final float backblast;
+    protected final float backblastDamageMultiplier;
+    protected final float backblastKnockbackMultiplier;
     @Nullable protected final SoundEvent passSound;
+
+    public static final ResourceKey<DamageType> BACKBLAST_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE,
+            ResourceLocation.fromNamespaceAndPath("rfe_builtin", "backblast"));
 
     public RFEBulletProjectileType(RFEBaseProjectilePropertiesBuilder baseProperties) {
         this.fullHitscan = baseProperties.fullHitscan;
@@ -85,6 +96,9 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         this.hitMultiplierId = baseProperties.hitMultiplierId;
         this.penetrationId = baseProperties.penetrationId;
         this.smoke = baseProperties.smoke;
+        this.backblast = baseProperties.backblast;
+        this.backblastDamageMultiplier = baseProperties.backblastDamageMultiplier;
+        this.backblastKnockbackMultiplier = baseProperties.backblastKnockbackMultiplier;
         this.passSound = baseProperties.passSound;
     }
 
@@ -98,33 +112,21 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         Vec3 finalAimDir = RFEMathUtils.calculateAimVector(aimAngles.pitch() + spreadAngles.pitch(), aimAngles.yaw() + spreadAngles.yaw());
         Vec3 spawnPos = instance.getPosition(1);
         instance.setVelocity(finalAimDir.normalize().scale(this.muzzleVelocity));
-        this.tick(entity.level(), instance);
+        Level level = entity.level();
+        this.tick(level, instance);
         if (this.fullHitscan)
             instance.setRemoved();
 
-        if (this.smoke > 0 && entity.level() instanceof ServerLevel slevel) {
-            RandomSource random = entity.getRandom();
-            float itemLength = RFEItemLengths.getItemLength(itemStack, entity);
+        float itemLength = RFEItemLengths.getItemLength(itemStack, entity);
+        if (this.smoke > 0 && level instanceof ServerLevel slevel) {
             RFEAimAngles smokeAimAngles = aimAngles;
             if (itemLength < 0)
                 smokeAimAngles = new RFEAimAngles(-smokeAimAngles.pitch(), smokeAimAngles.yaw() + 180f);
             Vec3 smokePos = spawnPos.add(aimDir.scale(itemLength));
-            double speed = Math.sqrt(this.smoke);
-            double spawnDispersion = Math.min(this.smoke * 0.15, 1);
-            ParticleOptions option = new BlackPowderSmokeOptions(this.smoke);
-            for (int i = 0; i < 10; ++i) {
-                double sx = smokePos.x + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
-                double sy = smokePos.y + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
-                double sz = smokePos.z + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
-                Vec3 smokeVelocity = RFEMathUtils.calculateAimVector(smokeAimAngles.pitch() + (random.nextFloat() - random.nextFloat()) * 30f,
-                        smokeAimAngles.yaw() + (random.nextFloat() - random.nextFloat()) * 30f);
-                double pdx = smokeVelocity.x * speed * (0.9 * 0.1 * random.nextDouble());
-                double pdy = smokeVelocity.y * speed * (0.9 * 0.1 * random.nextDouble());
-                double pdz = smokeVelocity.z * speed * (0.9 * 0.1 * random.nextDouble());
-                for (ServerPlayer splayer : slevel.players())
-                    slevel.sendParticles(splayer, option, true, sx, sy, sz, 0, pdx, pdy, pdz, 1);
-            }
+            this.spawnSmoke(slevel, smokePos, smokeAimAngles);
         }
+
+        this.doBackblast(level, spawnPos, aimDir, itemLength, entity);
     }
 
     @Override
@@ -137,24 +139,57 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         if (this.fullHitscan)
             instance.setRemoved();
 
-        if (this.smoke > 0 && level instanceof ServerLevel slevel) {
-            RandomSource random = level.getRandom();
-            double speed = Math.sqrt(this.smoke);
-            double spawnDispersion = Math.min(this.smoke * 0.15, 1);
-            ParticleOptions option = new BlackPowderSmokeOptions(this.smoke);
-            for (int i = 0; i < 10; ++i) {
-                double sx = spawnPos.x + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
-                double sy = spawnPos.y + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
-                double sz = spawnPos.z + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
-                Vec3 smokeVelocity = RFEMathUtils.calculateAimVector(aimAngles.pitch() + (random.nextFloat() - random.nextFloat()) * 30f,
-                        aimAngles.yaw() + (random.nextFloat() - random.nextFloat()) * 30f);
-                double pdx = smokeVelocity.x * speed * (0.9 * 0.1 * random.nextDouble());
-                double pdy = smokeVelocity.y * speed * (0.9 * 0.1 * random.nextDouble());
-                double pdz = smokeVelocity.z * speed * (0.9 * 0.1 * random.nextDouble());
-                for (ServerPlayer splayer : slevel.players())
-                    slevel.sendParticles(splayer, option, true, sx, sy, sz, 0, pdx, pdy, pdz, 1);
-            }
+        if (this.smoke > 0 && level instanceof ServerLevel slevel)
+            this.spawnSmoke(slevel, spawnPos, aimAngles);
+
+        this.doBackblast(level, spawnPos, aimDir, 0, null);
+    }
+
+    protected void spawnSmoke(ServerLevel level, Vec3 smokePos, RFEAimAngles smokeAimAngles) {
+        RandomSource random = level.getRandom();
+        double speed = Math.sqrt(this.smoke);
+        double spawnDispersion = Math.min(this.smoke * 0.15, 1);
+        ParticleOptions option = new BlackPowderSmokeOptions(this.smoke);
+        for (int i = 0; i < 10; ++i) {
+            double sx = smokePos.x + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
+            double sy = smokePos.y + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
+            double sz = smokePos.z + (random.nextDouble() - random.nextDouble()) * spawnDispersion;
+            Vec3 smokeVelocity = RFEMathUtils.calculateAimVector(smokeAimAngles.pitch() + (random.nextFloat() - random.nextFloat()) * 30f,
+                    smokeAimAngles.yaw() + (random.nextFloat() - random.nextFloat()) * 30f);
+            double pdx = smokeVelocity.x * speed * (0.9 * 0.1 * random.nextDouble());
+            double pdy = smokeVelocity.y * speed * (0.9 * 0.1 * random.nextDouble());
+            double pdz = smokeVelocity.z * speed * (0.9 * 0.1 * random.nextDouble());
+            for (ServerPlayer splayer : level.players())
+                level.sendParticles(splayer, option, true, sx, sy, sz, 0, pdx, pdy, pdz, 1);
         }
+    }
+
+    protected void doBackblast(Level level, Vec3 spawnPos, Vec3 aimDir, float itemLength, @Nullable Entity owner) {
+        float backblastScale = Math.abs(this.backblast);
+        if (backblastScale < 1e-1d)
+            return;
+        Vec3 backblastVector = aimDir.scale(itemLength - (backblastScale + 0.5f) * Mth.sign(this.backblast) * 1.5d);
+        Vec3 endPos = spawnPos.add(backblastVector);
+        BlockHitResult blastHitResult = level.clip(new ClipContext(spawnPos, endPos, ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE, CollisionContext.empty()));
+        if (blastHitResult.getType() != HitResult.Type.MISS)
+            endPos = blastHitResult.getLocation();
+        Registry<DamageType> damageReg = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
+        DamageSource backblastDamageSource;
+        if (owner instanceof LivingEntity livingOwner) {
+            backblastDamageSource = damageReg.getHolder(BACKBLAST_DAMAGE)
+                    .map(type -> new DamageSource(type, null, livingOwner))
+                    .orElse(level.damageSources().mobAttack(livingOwner));
+        } else {
+            backblastDamageSource = level.damageSources().generic();
+        }
+        SelectiveExplosionDamageCalculator damageCalculator = SelectiveExplosionDamageCalculator.entityDamage(this.backblastDamageMultiplier, this.backblastKnockbackMultiplier);
+        if (owner != null)
+            damageCalculator.addEntityExempt(owner);
+        Explosion entityExplosion = new QuietExplosion(level, null, backblastDamageSource, damageCalculator,
+                endPos.x, endPos.y, endPos.z, backblastScale, false, Explosion.BlockInteraction.KEEP, ParticleTypes.EXPLOSION,
+                ParticleTypes.EXPLOSION_EMITTER);
+        RFEUtils.explode(level, entityExplosion, level.isClientSide);
     }
 
     @Override
@@ -320,7 +355,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
 
     protected void onHitEntity(RFEProjectileInstance instance, Level level, EntityHitResult result) {
         Entity entity = result.getEntity();
-        float speed = (float) instance.velocity().length();
+        //float speed = (float) instance.velocity().length();
         double additionalDisplacement = result.getLocation().subtract(instance.position()).length();
 
         float damage = (float) this.damageModel.getDamage(instance.distanceTravelled() + additionalDisplacement);

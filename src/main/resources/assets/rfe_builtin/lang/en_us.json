@@ -4,6 +4,8 @@
   "death.attack.rfe_builtin.armor_penetrator.item": "%s was hit by an armor penetrator from %s using %s",
   "death.attack.rfe_builtin.blown_up": "%s was blown up by %s",
   "death.attack.rfe_builtin.blown_up.item": "%s was blown up by %s using %s",
+  "death.attack.rfe_builtin.blown_up_backblast": "%s was blown up by %s's backblast",
+  "death.attack.rfe_builtin.blown_up_backblast.item": "%s was blown up by %s's backblast using %s",
   "death.attack.rfe_builtin.shot": "%s was shot by %s",
   "death.attack.rfe_builtin.shot.item": "%s was shot by %s using %s",
   "death.attack.rfe_builtin.torn_to_shreds": "%s was torn to shreds with shrapnel from %s",

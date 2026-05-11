@@ -25,6 +25,9 @@ public class RFEBaseProjectilePropertiesBuilder {
             ResourceLocation.CODEC.optionalFieldOf("hit_multiplier").forGetter(b -> Optional.ofNullable(b.hitMultiplierId)),
             ResourceLocation.CODEC.optionalFieldOf("penetration").forGetter(b -> Optional.ofNullable(b.penetrationId)),
             Codec.floatRange(0f, 10f).optionalFieldOf("smoke", 0f).forGetter(b -> b.smoke),
+            Codec.floatRange(-10f, 10f).optionalFieldOf("backblast", 0f).forGetter(b -> b.backblast),
+            Codec.floatRange(0f, Float.MAX_VALUE).optionalFieldOf("backblast_damage_multiplier", 1f).forGetter(b -> b.backblastDamageMultiplier),
+            Codec.floatRange(0f, Float.MAX_VALUE).optionalFieldOf("backblast_knockback_multiplier", 1f).forGetter(b -> b.backblastKnockbackMultiplier),
             ResourceLocation.CODEC.xmap(SoundEvent::createVariableRangeEvent, SoundEvent::getLocation).optionalFieldOf("pass_sound").forGetter(b -> Optional.ofNullable(b.passSound))
     ).apply(o, RFEBaseProjectilePropertiesBuilder::common));
 
@@ -61,6 +64,8 @@ public class RFEBaseProjectilePropertiesBuilder {
                     builder.hitMultiplierId = buf.readBoolean() ? buf.readResourceLocation() : null;
                     builder.penetrationId = buf.readBoolean() ? buf.readResourceLocation() : null;
                     builder.smoke = buf.readFloat();
+                    builder.backblast = buf.readFloat();
+                    builder.backblastDamageMultiplier = buf.readFloat();
                     builder.passSound = buf.readBoolean() ? SoundEvent.createVariableRangeEvent(buf.readResourceLocation()) : null;
                     return builder;
                 }
@@ -83,6 +88,8 @@ public class RFEBaseProjectilePropertiesBuilder {
                     if (builder.penetrationId != null)
                         buf.writeResourceLocation(builder.penetrationId);
                     buf.writeFloat(builder.smoke)
+                            .writeFloat(builder.backblast)
+                            .writeFloat(builder.backblastDamageMultiplier)
                             .writeBoolean(builder.passSound != null);
                     if (builder.passSound != null)
                         buf.writeResourceLocation(builder.passSound.getLocation());
@@ -101,29 +108,12 @@ public class RFEBaseProjectilePropertiesBuilder {
     @Nullable public ResourceLocation hitMultiplierId = null;
     @Nullable public ResourceLocation penetrationId = null;
     public float smoke;
+    public float backblast;
+    public float backblastDamageMultiplier;
+    public float backblastKnockbackMultiplier;
     @Nullable public SoundEvent passSound = null;
 
     public RFEBaseProjectilePropertiesBuilder() {}
-
-    private RFEBaseProjectilePropertiesBuilder(boolean fullHitscan, double muzzleVelocity, double drag,
-                                               boolean quadraticDrag, double gravity, int maxAge, float knockback,
-                                               RFEProjectileDamageModel damageModel, ResourceKey<DamageType> damageTypeKey,
-                                               Optional<ResourceLocation> hitMultiplierId, Optional<ResourceLocation> penetrationId,
-                                               float smoke, Optional<SoundEvent> passSound) {
-        this.fullHitscan = fullHitscan;
-        this.muzzleVelocity = muzzleVelocity;
-        this.drag = drag;
-        this.quadraticDrag = quadraticDrag;
-        this.gravity = gravity;
-        this.maxAge = maxAge;
-        this.knockback = knockback;
-        this.damageModel = damageModel;
-        this.damageTypeKey = damageTypeKey;
-        this.hitMultiplierId = hitMultiplierId.orElse(null);
-        this.penetrationId = penetrationId.orElse(null);
-        this.smoke = smoke;
-        this.passSound = passSound.orElse(null);
-    }
 
     private static RFEBaseProjectilePropertiesBuilder noHitscan(double muzzleVelocity, double drag, boolean quadraticDrag,
                                                                 double gravity, int maxAge, RFEBaseProjectilePropertiesBuilder builder) {
@@ -150,7 +140,8 @@ public class RFEBaseProjectilePropertiesBuilder {
                                                              ResourceKey<DamageType> damageTypeKey,
                                                              Optional<ResourceLocation> hitMultiplierId,
                                                              Optional<ResourceLocation> penetrationId,
-                                                             float smoke, Optional<SoundEvent> passSound) {
+                                                             float smoke, float backblast, float backblastDamageMultiplier,
+                                                             float backblastKnockbackMultiplier, Optional<SoundEvent> passSound) {
         RFEBaseProjectilePropertiesBuilder builder = new RFEBaseProjectilePropertiesBuilder();
         builder.knockback = knockback;
         builder.damageModel = damageModel;
@@ -158,6 +149,9 @@ public class RFEBaseProjectilePropertiesBuilder {
         builder.hitMultiplierId = hitMultiplierId.orElse(null);
         builder.penetrationId = penetrationId.orElse(null);
         builder.smoke = smoke;
+        builder.backblast = backblast;
+        builder.backblastDamageMultiplier = backblastDamageMultiplier;
+        builder.backblastKnockbackMultiplier = backblastKnockbackMultiplier;
         builder.passSound = passSound.orElse(null);
         return builder;
     }

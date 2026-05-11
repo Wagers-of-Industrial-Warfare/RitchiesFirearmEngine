@@ -16,6 +16,8 @@
   "hit_multiplier": "rfe_builtin:generic_headshot",
   "penetration": "rfe_builtin:default_rocket",
   "smoke": 1.75,
+  "backblast": 3,
+  "backblast_damage_multiplier": 3,
   "pass_sound": "rfe_builtin:projectile.generic.whizz",
   "block_explosion_power": 0,
   "entity_explosion_power": 3,

@@ -18,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.effects.explosions.QuietExplosion;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEBaseProjectilePropertiesBuilder;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bullet.RFEBulletProjectileType;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
@@ -92,9 +93,11 @@ public class RFEExplosiveProjectileType extends RFEBulletProjectileType implemen
                 ParticleTypes.EXPLOSION_EMITTER, SoundEvents.GENERIC_EXPLODE);
         RFEUtils.explode(level, blockExplosion, level.isClientSide);
 
-        level.explode(null, damageSource, SelectiveExplosionDamageCalculator.entityDamage(this.entityDamageScale, this.entityKnockbackScale),
-                position.x, position.y, position.z, this.entityExplosionPower, false, Level.ExplosionInteraction.NONE,
-                ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER, SoundEvents.GENERIC_EXPLODE);
+        Explosion entityExplosion = new QuietExplosion(level, null, damageSource,
+                SelectiveExplosionDamageCalculator.entityDamage(this.entityDamageScale, this.entityKnockbackScale),
+                position.x, position.y, position.z, this.entityExplosionPower, false, Explosion.BlockInteraction.KEEP,
+                ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER);
+        RFEUtils.explode(level, entityExplosion, level.isClientSide);
         instance.setRemoved();
 
         if (this.penetratorProjectileType != null) {

@@ -368,7 +368,7 @@ public class RFEFirearmMode {
                 || FirearmDataUtils.getActionTime(itemStack) > 0 || this.isWindingUp(itemStack, entity))
             return false;
         RFEFirearmModeHandlingProperties handlingProperties = this.getHandlingProperties(itemStack);
-        if (handlingProperties.maxShots() > 0 && FirearmDataUtils.getShotCount(itemStack) >= handlingProperties.maxShots())
+        if (handlingProperties.maxShots() > 0 && FirearmDataUtils.getShotCount(modeData) >= handlingProperties.maxShots())
             return false;
         if (this.isJammed(itemStack))
             return false;
@@ -571,7 +571,8 @@ public class RFEFirearmMode {
             spreadInstance.updateSpread(itemStack, entity);
             RFEProjectileManager.queueAddedProjectile(projectile, entity.level());
         }
-        FirearmDataUtils.setShotCount(itemStack, FirearmDataUtils.getShotCount(itemStack) + firingInputs.size());
+        DataComponentPatch modeData = this.getModeData(itemStack);
+        this.saveModeData(itemStack, FirearmDataUtils.setShotCount(modeData, FirearmDataUtils.getShotCount(modeData) + firingInputs.size()));
 
         this.fireFirearm(itemStack, entity, FiringType.NON_PLAYER_AND_EFFECTS);
     }
@@ -1682,6 +1683,10 @@ public class RFEFirearmMode {
             if (o != null && o.isPresent())
                 attachments.put(this.magazineAttachmentSlot, o.get().copyOne());
         }
+    }
+
+    public int getShotCount(ItemStack itemStack) {
+        return FirearmDataUtils.getShotCount(this.getModeData(itemStack));
     }
 
     public enum FiringType {

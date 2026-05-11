@@ -429,7 +429,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     }
 
     public int getShotCount(ItemStack itemStack) {
-        return FirearmDataUtils.getShotCount(itemStack);
+        return this.getCurrentMode(itemStack).getShotCount(itemStack);
     }
 
     public enum Action implements StringRepresentable {

@@ -274,7 +274,7 @@ public class RFEClient {
 
     public static void renderHUDOverlay(GuiGraphics graphics, float partialTick) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null)
+        if (mc.player == null || mc.options.hideGui)
             return;
         ItemStack mainhand = mc.player.getMainHandItem();
         ItemStack offhand = mc.player.getOffhandItem();

@@ -8,7 +8,7 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.effects.explosions.RFECustomExplosion;
+import rbasamoyai.ritchiesfirearmengine.foundation.effects.explosions.RFECustomExplosion;
 
 @Mixin(Explosion.class)
 public class ExplosionMixin {

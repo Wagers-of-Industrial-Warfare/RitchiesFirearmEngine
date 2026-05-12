@@ -11,6 +11,7 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import rbasamoyai.ritchiesfirearmengine.foundation.effects.explosions.RFECustomExplosion;
 
 import java.util.*;
 import java.util.function.Function;
@@ -97,13 +98,16 @@ public class RFEUtils {
                 explosion.clearToBlow();
 
             Vec3 explosionPos = explosion.center();
-            // TODO just copy CBC custom explosion handling
             for (ServerPlayer serverplayer : slevel.players()) {
-                if (serverplayer.distanceToSqr(explosionPos.x, explosionPos.y, explosionPos.z) < 4096.0) {
-                    serverplayer.connection.send(new ClientboundExplodePacket(explosionPos.x, explosionPos.y, explosionPos.z,
-                                    explosion.radius(), explosion.getToBlow(), explosion.getHitPlayers().get(serverplayer),
-                                    explosion.getBlockInteraction(), explosion.getSmallExplosionParticles(),
-                                    explosion.getLargeExplosionParticles(), explosion.getExplosionSound()));
+                if (explosion instanceof RFECustomExplosion customExplosion) {
+                    customExplosion.sendToServerPlayer(serverplayer);
+                } else {
+                    if (serverplayer.distanceToSqr(explosionPos.x, explosionPos.y, explosionPos.z) < 4096.0) {
+                        serverplayer.connection.send(new ClientboundExplodePacket(explosionPos.x, explosionPos.y, explosionPos.z,
+                                explosion.radius(), explosion.getToBlow(), explosion.getHitPlayers().get(serverplayer),
+                                explosion.getBlockInteraction(), explosion.getSmallExplosionParticles(),
+                                explosion.getLargeExplosionParticles(), explosion.getExplosionSound()));
+                    }
                 }
             }
         }

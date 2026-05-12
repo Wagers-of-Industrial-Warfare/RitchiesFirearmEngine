@@ -37,7 +37,6 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.RFEItemLengths;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.effects.explosions.QuietExplosion;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.effects.particles.BlackPowderSmokeOptions;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEBaseProjectilePropertiesBuilder;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEProjectileClipContext;
@@ -54,6 +53,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.penetration.R
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.penetration.RFEProjectilePenetrationProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
+import rbasamoyai.ritchiesfirearmengine.foundation.effects.explosions.QuietExplosion;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEMathUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEProjectileUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;

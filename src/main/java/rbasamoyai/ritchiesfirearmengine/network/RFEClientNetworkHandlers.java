@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Explosion;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.IFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
@@ -76,6 +77,16 @@ public class RFEClientNetworkHandlers {
         ItemStack itemStack = mc.player.getItemInHand(packet.hand());
         if (itemStack.getItem() instanceof IFirearmItem firearm)
             firearm.handleServerAutomaticFireOnClient(itemStack, mc.player, packet.hand(), packet.recoil(), packet.recoilUUID());
+    }
+
+    public static void handleExplosionPacket(RFEExplosionPacket<?> packet) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null)
+            return;
+        Explosion explosion = packet.getExplosion(mc.level);
+        explosion.finalizeExplosion(true);
+        if (mc.player != null)
+            mc.player.setDeltaMovement(mc.player.getDeltaMovement().add(packet.getKnockback()));
     }
 
 }

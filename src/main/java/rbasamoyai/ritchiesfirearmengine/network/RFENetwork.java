@@ -23,6 +23,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectile
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.penetration.RFEProjectilePenetrationHandler.ClientboundSyncProjectilePenetrationPacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProviderPackHandler.ClientboundSyncRecoilProvidersPacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProviderPackHandler.ClientboundSyncSpreadProvidersPacket;
+import rbasamoyai.ritchiesfirearmengine.foundation.effects.explosions.QuietExplosion;
 
 public class RFENetwork {
 
@@ -55,6 +56,7 @@ public class RFENetwork {
         addMessage(id++, ClientboundSyncHitMultipliersPacket.class, ClientboundSyncHitMultipliersPacket.STREAM_CODEC);
         addMessage(id++, ClientboundRunFiringLogicPacket.class, ClientboundRunFiringLogicPacket.STREAM_CODEC);
         addMessage(id++, ClientboundSyncProjectilePenetrationPacket.class, ClientboundSyncProjectilePenetrationPacket.STREAM_CODEC);
+        addMessage(id++, QuietExplosion.ClientboundExplosionPacket.class, QuietExplosion.ClientboundExplosionPacket.STREAM_CODEC);
     }
 
     private static <MSG extends RFEPacket> void addMessage(int id, Class<MSG> clazz, StreamCodec<RegistryFriendlyByteBuf, MSG> streamCodec) {

@@ -2,7 +2,8 @@
   "replace": false,
   "values": [
     "rfe_builtin:armor_penetrator",
+    "rfe_builtin:backblast",
     "rfe_builtin:bullet",
-    "rfe_builtin:explosive"
+    "rfe_builtin:explosion"
   ]
 }

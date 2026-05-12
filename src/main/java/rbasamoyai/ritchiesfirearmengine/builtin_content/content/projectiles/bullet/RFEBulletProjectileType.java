@@ -78,6 +78,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     protected final float backblast;
     protected final float backblastDamageMultiplier;
     protected final float backblastKnockbackMultiplier;
+    protected final double movementRecoil;
     @Nullable protected final SoundEvent passSound;
 
     public static final ResourceKey<DamageType> BACKBLAST_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE,
@@ -99,6 +100,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         this.backblast = baseProperties.backblast;
         this.backblastDamageMultiplier = baseProperties.backblastDamageMultiplier;
         this.backblastKnockbackMultiplier = baseProperties.backblastKnockbackMultiplier;
+        this.movementRecoil = baseProperties.movementRecoil;
         this.passSound = baseProperties.passSound;
     }
 
@@ -127,6 +129,11 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         }
 
         this.doBackblast(level, spawnPos, aimDir, itemLength, entity);
+
+        if (Math.abs(this.movementRecoil) > 1e-4d) {
+            entity.setDeltaMovement(entity.getDeltaMovement().subtract(aimDir.normalize().scale(this.movementRecoil)));
+            entity.hurtMarked = true; // This might be a bit hacky --ritchie
+        }
     }
 
     @Override
@@ -506,6 +513,10 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         builder.hitMultiplierId = type.hitMultiplierId;
         builder.penetrationId = type.penetrationId;
         builder.smoke = type.smoke;
+        builder.backblast = type.backblast;
+        builder.backblastDamageMultiplier = type.backblastDamageMultiplier;
+        builder.backblastKnockbackMultiplier = type.backblastKnockbackMultiplier;
+        builder.movementRecoil = type.movementRecoil;
         builder.passSound = type.passSound;
         return builder;
     }

@@ -28,6 +28,7 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPluginManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
+import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationDataComponents;
 import rbasamoyai.ritchiesfirearmengine.foundation.pack_loading.RFEPackLoader;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
@@ -78,6 +79,7 @@ public class RitchiesFirearmEngine {
             RFEPluginManager.loadParticleTypes(cons);
         } else if (key == Registries.DATA_COMPONENT_TYPE) {
             BiConsumer<ResourceLocation, DataComponentType<?>> cons = (loc, type) -> event.register(Registries.DATA_COMPONENT_TYPE, loc, () -> type);
+            FoundationDataComponents.register(cons);
             RFEPluginManager.loadDataComponentTypes(cons);
         }
     }

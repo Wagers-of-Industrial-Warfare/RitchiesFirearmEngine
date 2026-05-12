@@ -6,7 +6,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
+import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationDataComponents;
 
 import javax.annotation.Nullable;
 import java.util.EnumMap;
@@ -49,7 +49,7 @@ public class RFERecoilManager {
             return null;
         Map<InteractionHand, TaggedRecoilInstance> instances = RECOIL_INSTANCES.get(entity);
 
-        if (!itemStack.has(RFEDataComponents.RECOIL_IDENTIFIER))
+        if (!itemStack.has(FoundationDataComponents.RECOIL_IDENTIFIER))
             return null;
         UUID uuid = getOrCreateRecoilId(entity, itemStack);
 
@@ -93,10 +93,10 @@ public class RFERecoilManager {
             return;
         Map<InteractionHand, TaggedRecoilInstance> instances = RECOIL_INSTANCES.get(entity);
 
-        if (!itemStack.has(RFEDataComponents.RECOIL_IDENTIFIER))
+        if (!itemStack.has(FoundationDataComponents.RECOIL_IDENTIFIER))
             return;
-        UUID uuid = itemStack.get(RFEDataComponents.RECOIL_IDENTIFIER);
-        itemStack.remove(RFEDataComponents.RECOIL_IDENTIFIER);
+        UUID uuid = itemStack.get(FoundationDataComponents.RECOIL_IDENTIFIER);
+        itemStack.remove(FoundationDataComponents.RECOIL_IDENTIFIER);
         for (Iterator<TaggedRecoilInstance> iter = instances.values().iterator(); iter.hasNext(); ) {
             TaggedRecoilInstance instance = iter.next();
             if (instance.uuid.equals(uuid))
@@ -111,21 +111,21 @@ public class RFERecoilManager {
     }
 
     private static UUID getOrCreateRecoilId(LivingEntity entity, ItemStack itemStack) {
-        if (!itemStack.has(RFEDataComponents.RECOIL_IDENTIFIER))
-            itemStack.set(RFEDataComponents.RECOIL_IDENTIFIER, Mth.createInsecureUUID(entity.getRandom()));
-        return itemStack.get(RFEDataComponents.RECOIL_IDENTIFIER);
+        if (!itemStack.has(FoundationDataComponents.RECOIL_IDENTIFIER))
+            itemStack.set(FoundationDataComponents.RECOIL_IDENTIFIER, Mth.createInsecureUUID(entity.getRandom()));
+        return itemStack.get(FoundationDataComponents.RECOIL_IDENTIFIER);
     }
 
     @Nullable
     public static UUID getRecoilId(ItemStack itemStack) {
-        return itemStack.get(RFEDataComponents.RECOIL_IDENTIFIER);
+        return itemStack.get(FoundationDataComponents.RECOIL_IDENTIFIER);
     }
 
     public static void setRecoilId(ItemStack itemStack, @Nullable UUID uuid) {
         if (uuid == null) {
-            itemStack.remove(RFEDataComponents.RECOIL_IDENTIFIER);
+            itemStack.remove(FoundationDataComponents.RECOIL_IDENTIFIER);
         } else {
-            itemStack.set(RFEDataComponents.RECOIL_IDENTIFIER, uuid);
+            itemStack.set(FoundationDataComponents.RECOIL_IDENTIFIER, uuid);
         }
     }
 

@@ -6,7 +6,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
+import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationDataComponents;
 
 import javax.annotation.Nullable;
 import java.util.EnumMap;
@@ -49,7 +49,7 @@ public class RFESpreadManager {
             return null;
         Map<InteractionHand, TaggedSpreadInstance> instances = SPREAD_INSTANCES.get(entity);
 
-        if (!itemStack.has(RFEDataComponents.SPREAD_IDENTIFIER))
+        if (!itemStack.has(FoundationDataComponents.SPREAD_IDENTIFIER))
             return null;
         UUID uuid = getOrCreateSpreadId(entity, itemStack);
 
@@ -93,10 +93,10 @@ public class RFESpreadManager {
             return;
         Map<InteractionHand, TaggedSpreadInstance> instances = SPREAD_INSTANCES.get(entity);
 
-        if (!itemStack.has(RFEDataComponents.SPREAD_IDENTIFIER))
+        if (!itemStack.has(FoundationDataComponents.SPREAD_IDENTIFIER))
             return;
-        UUID uuid = itemStack.get(RFEDataComponents.SPREAD_IDENTIFIER);
-        itemStack.remove(RFEDataComponents.SPREAD_IDENTIFIER);
+        UUID uuid = itemStack.get(FoundationDataComponents.SPREAD_IDENTIFIER);
+        itemStack.remove(FoundationDataComponents.SPREAD_IDENTIFIER);
         for (Iterator<TaggedSpreadInstance> iter = instances.values().iterator(); iter.hasNext(); ) {
             TaggedSpreadInstance instance = iter.next();
             if (instance.uuid.equals(uuid))
@@ -111,21 +111,21 @@ public class RFESpreadManager {
     }
 
     private static UUID getOrCreateSpreadId(LivingEntity entity, ItemStack itemStack) {
-        if (!itemStack.has(RFEDataComponents.SPREAD_IDENTIFIER))
-            itemStack.set(RFEDataComponents.SPREAD_IDENTIFIER, Mth.createInsecureUUID(entity.getRandom()));
-        return itemStack.get(RFEDataComponents.SPREAD_IDENTIFIER);
+        if (!itemStack.has(FoundationDataComponents.SPREAD_IDENTIFIER))
+            itemStack.set(FoundationDataComponents.SPREAD_IDENTIFIER, Mth.createInsecureUUID(entity.getRandom()));
+        return itemStack.get(FoundationDataComponents.SPREAD_IDENTIFIER);
     }
 
     @Nullable
     public static UUID getSpreadId(ItemStack itemStack) {
-        return itemStack.get(RFEDataComponents.SPREAD_IDENTIFIER);
+        return itemStack.get(FoundationDataComponents.SPREAD_IDENTIFIER);
     }
 
     public static void setSpreadId(ItemStack itemStack, @Nullable UUID uuid) {
         if (uuid == null) {
-            itemStack.remove(RFEDataComponents.SPREAD_IDENTIFIER);
+            itemStack.remove(FoundationDataComponents.SPREAD_IDENTIFIER);
         } else {
-            itemStack.set(RFEDataComponents.SPREAD_IDENTIFIER, uuid);
+            itemStack.set(FoundationDataComponents.SPREAD_IDENTIFIER, uuid);
         }
     }
 

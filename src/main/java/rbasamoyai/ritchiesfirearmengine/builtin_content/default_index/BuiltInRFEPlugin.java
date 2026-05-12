@@ -3,7 +3,6 @@ package rbasamoyai.ritchiesfirearmengine.builtin_content.default_index;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.particles.ParticleType;
@@ -60,7 +59,6 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProviderP
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.UnaryOperator;
 
@@ -415,14 +413,6 @@ public class BuiltInRFEPlugin implements RFEPlugin {
 
         public static final DataComponentType<Boolean> IS_EQUIPPED = register("is_equipped",
                 builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
-
-        // TODO move to base RFE index
-        public static final DataComponentType<UUID> RECOIL_IDENTIFIER = register("recoil_identifier",
-                builder -> builder.persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC));
-
-        // TODO move to base RFE index
-        public static final DataComponentType<UUID> SPREAD_IDENTIFIER = register("spread_identifier",
-                builder -> builder.persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC));
 
         private static <V> DataComponentType<V> register(String id, UnaryOperator<DataComponentType.Builder<V>> builderOp) {
             ResourceLocation loc = RitchiesFirearmEngine.resource(id);

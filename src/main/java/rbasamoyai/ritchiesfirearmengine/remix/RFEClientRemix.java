@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.ClientHooks;
@@ -72,6 +73,11 @@ public class RFEClientRemix {
 
     public static void handleItemCameraTransforms(PoseStack poseStack, BakedModel model, ItemDisplayContext context, boolean leftHand) {
         ClientHooks.handleCameraTransforms(poseStack, model, context, leftHand);
+    }
+
+    public static void renderValidAmmoHighlight(GuiGraphics graphics, Slot slot) {
+        graphics.fillGradient(slot.x, slot.y, slot.x + 16, slot.y + 16, 100, 0x7F00FF00, 0x7F00FF00);
+        //AbstractContainerScreen.renderSlotHighlight(graphics, slot.x, slot.y, 0, 0x7F00FF00);
     }
 
     private RFEClientRemix() {}

@@ -10,6 +10,7 @@
     "client.MultiPlayerGameModeMixin"
   ],
   "client": [
+    "client.AbstractContainerScreenMixin",
     "client.BlockModelMixin",
     "client.GuiGraphicsMixin",
     "client.GuiMixin",

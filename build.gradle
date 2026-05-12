@@ -129,6 +129,7 @@ dependencies {
     runtimeOnly("curse.maven:configured-457570:${configured_cf_file}")
     runtimeOnly("curse.maven:freecam-557076:${freecam_cf_file}")
     implementation("curse.maven:shoulder_surfing-243190:${shoulder_surfing_cf_file}")
+    runtimeOnly("curse.maven:squake-1305018:${squake_cf_file}")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

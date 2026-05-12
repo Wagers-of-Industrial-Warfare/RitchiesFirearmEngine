@@ -66,6 +66,7 @@ public class RFEBaseProjectilePropertiesBuilder {
                     builder.smoke = buf.readFloat();
                     builder.backblast = buf.readFloat();
                     builder.backblastDamageMultiplier = buf.readFloat();
+                    builder.backblastKnockbackMultiplier = buf.readFloat();
                     builder.passSound = buf.readBoolean() ? SoundEvent.createVariableRangeEvent(buf.readResourceLocation()) : null;
                     return builder;
                 }
@@ -90,6 +91,7 @@ public class RFEBaseProjectilePropertiesBuilder {
                     buf.writeFloat(builder.smoke)
                             .writeFloat(builder.backblast)
                             .writeFloat(builder.backblastDamageMultiplier)
+                            .writeFloat(builder.backblastKnockbackMultiplier)
                             .writeBoolean(builder.passSound != null);
                     if (builder.passSound != null)
                         buf.writeResourceLocation(builder.passSound.getLocation());

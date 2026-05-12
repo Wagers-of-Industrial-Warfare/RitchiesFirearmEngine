@@ -1,11 +1,16 @@
 package rbasamoyai.ritchiesfirearmengine.utils;
 
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.network.protocol.game.ClientboundExplodePacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.event.EventHooks;
 
 import java.util.*;
 import java.util.function.Function;
@@ -83,10 +88,25 @@ public class RFEUtils {
     }
 
     public static void explode(Level level, Explosion explosion, boolean spawnParticles) {
-        if (net.neoforged.neoforge.event.EventHooks.onExplosionStart(level, explosion))
+        if (EventHooks.onExplosionStart(level, explosion))
             return;
         explosion.explode();
         explosion.finalizeExplosion(spawnParticles);
+        if (level instanceof ServerLevel slevel) {
+            if (!explosion.interactsWithBlocks())
+                explosion.clearToBlow();
+
+            Vec3 explosionPos = explosion.center();
+            // TODO just copy CBC custom explosion handling
+            for (ServerPlayer serverplayer : slevel.players()) {
+                if (serverplayer.distanceToSqr(explosionPos.x, explosionPos.y, explosionPos.z) < 4096.0) {
+                    serverplayer.connection.send(new ClientboundExplodePacket(explosionPos.x, explosionPos.y, explosionPos.z,
+                                    explosion.radius(), explosion.getToBlow(), explosion.getHitPlayers().get(serverplayer),
+                                    explosion.getBlockInteraction(), explosion.getSmallExplosionParticles(),
+                                    explosion.getLargeExplosionParticles(), explosion.getExplosionSound()));
+                }
+            }
+        }
     }
 
 }

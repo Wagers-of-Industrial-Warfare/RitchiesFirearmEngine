@@ -850,6 +850,11 @@ public class RFEFirearmMode {
                 Predicate<ItemStack> magPred = RFEUtils.orAllPredicates(ammoProperties.magazines());
                 Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
                 ItemStack foundMagazine = RFEItemUtils.findFullestMagazine(entity, magPred, ammoPred, true);
+                if (foundMagazine.isEmpty() && RFEFirearmItem.canEntityInfiniteReload(entity)) {
+                    ItemStack infiniteMagazine = ammoProperties.unlimitedPrimaryReloadItem();
+                    if (magPred.test(infiniteMagazine))
+                        foundMagazine = infiniteMagazine.copy();
+                }
                 if (!foundMagazine.isEmpty())
                     this.setMagazine(itemStack, entity, foundMagazine);
             }
@@ -922,6 +927,11 @@ public class RFEFirearmMode {
                     FirearmDataUtils.addAmmo(foundAmmo, addition, false, false);
                     return s.isEmpty() ? ItemStack.EMPTY : s;
                 }, () -> foundAmmo.size() >= addable || !foundAmmo.isEmpty() && foundAmmo.get(foundAmmo.size() - 1).is(RFEItemTags.INFINITE_AMMO.tag));
+                if (foundAmmo.isEmpty() && RFEFirearmItem.canEntityInfiniteReload(entity)) {
+                    ItemStack infiniteRounds = ammoProperties.unlimitedPrimaryReloadItem();
+                    if (ammoPred.test(infiniteRounds))
+                        foundAmmo.add(infiniteRounds.copyWithCount(addable));
+                }
                 if (!foundAmmo.isEmpty()) {
                     for (ItemStack sourceStack : foundAmmo)
                         FirearmDataUtils.addAmmo(ammoList, sourceStack, addedLast, this.trackEmptySlots, 0);
@@ -931,6 +941,11 @@ public class RFEFirearmMode {
             Predicate<ItemStack> speedloaderPred = RFEUtils.orAllPredicates(ammoProperties.speedloaders());
             int reloadCount1 = capacity - this.getLoadedAmmoCount(itemStack, entity, false);
             ItemStack bestSpeedloaderStack = RFEItemUtils.findBestSpeedloader(entity, speedloaderPred, ammoPred, reloadCount1, true);
+            if (bestSpeedloaderStack.isEmpty() && RFEFirearmItem.canEntityInfiniteReload(entity)) {
+                ItemStack infiniteSpeedloader = ammoProperties.unlimitedPrimaryReloadItem();
+                if (speedloaderPred.test(infiniteSpeedloader))
+                    bestSpeedloaderStack = infiniteSpeedloader.copy();
+            }
             if (bestSpeedloaderStack.getItem() instanceof MagazineItem magazineItem) {
                 List<ItemStack> strippedAmmo = magazineItem.getStoredAmmo(bestSpeedloaderStack);
                 int consumed = FirearmDataUtils.addMultipleAmmo(ammoList, strippedAmmo, addedLast, false, this.trackEmptySlots, capacity);
@@ -1646,9 +1661,15 @@ public class RFEFirearmMode {
         if (this.internalCapacity > 0)
             return false;
         RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
-        ItemStack magazine = RFEItemUtils.findFullestMagazine(entity, RFEUtils.orAllPredicates(ammoProperties.magazines()),
-                RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates()), false);
-        return !magazine.isEmpty();
+        Predicate<ItemStack> magazinePred = RFEUtils.orAllPredicates(ammoProperties.magazines());
+        Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
+        ItemStack magazine = RFEItemUtils.findFullestMagazine(entity, magazinePred, ammoPred, false);
+        if (!magazine.isEmpty())
+            return true;
+        if (!RFEFirearmItem.canEntityInfiniteReload(entity))
+            return false;
+        // Taken to be compatible if passes magazine predicate, checks done in RFEFirearmAmmoHandler
+        return magazinePred.test(ammoProperties.unlimitedPrimaryReloadItem());
     }
 
     public int bestSpeedloaderAmmoCount(ItemStack itemStack, LivingEntity entity) {
@@ -1657,7 +1678,16 @@ public class RFEFirearmMode {
         Predicate<ItemStack> speedloaderPred = RFEUtils.orAllPredicates(ammoProperties.speedloaders());
         int reloadCount1 = this.countFreeAmmoSpaces(itemStack);
         ItemStack bestSpeedloaderStack = RFEItemUtils.findBestSpeedloader(entity, speedloaderPred, ammoPred, reloadCount1, false);
-        return bestSpeedloaderStack.getItem() instanceof MagazineItem magazine ? magazine.countAmmo(bestSpeedloaderStack) : 0;
+        if (bestSpeedloaderStack.getItem() instanceof MagazineItem speedloaderItem) {
+            int count = speedloaderItem.countAmmo(bestSpeedloaderStack);
+            if (count > 0)
+                return count;
+        }
+        if (!RFEFirearmItem.canEntityInfiniteReload(entity))
+            return 0;
+        ItemStack infiniteStack = ammoProperties.unlimitedPrimaryReloadItem();
+        return infiniteStack.getItem() instanceof MagazineItem speedloaderItem && speedloaderPred.test(infiniteStack)
+                ? speedloaderItem.countAmmo(infiniteStack) : 0;
     }
 
     public boolean requiresAmmo() { return this.ammoRequired; }

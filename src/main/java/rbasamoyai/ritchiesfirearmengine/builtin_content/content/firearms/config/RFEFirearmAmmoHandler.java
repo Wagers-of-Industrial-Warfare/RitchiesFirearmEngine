@@ -29,6 +29,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.AmmoPredicate;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmModeAmmoProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEFirearmProperties;
@@ -37,10 +38,12 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectile
 import rbasamoyai.ritchiesfirearmengine.foundation.data_packing.RFEJsonResourceReloadListener;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.RFEPacket;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.Executor;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class RFEFirearmAmmoHandler {
@@ -49,7 +52,7 @@ public class RFEFirearmAmmoHandler {
     private static final Map<Item, UnresolvedItemAmmoProperties> UNRESOLVED_PROPERTIES = new Reference2ObjectOpenHashMap<>();
 
     private static final RFEFirearmModeAmmoProperties EMPTY_MODE = new RFEFirearmModeAmmoProperties(ImmutableMap.of(),
-            ImmutableList.of(), ImmutableList.of(), ImmutableList.of(), null);
+            ImmutableList.of(), ImmutableList.of(), ImmutableList.of(), null, ItemStack.EMPTY);
     private static final RFEFirearmProperties<RFEFirearmModeAmmoProperties> EMPTY = new RFEFirearmProperties<>(EMPTY_MODE, ImmutableMap.of());
 
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -117,6 +120,13 @@ public class RFEFirearmAmmoHandler {
             oldProperties.unlimitedProjectile = newProperties.unlimitedProjectile;
         }
 
+        if (newProperties.noUnlimitedPrimaryReloadItem) {
+            oldProperties.unlimitedPrimaryReloadItem = ItemStack.EMPTY;
+        } else if (!newProperties.unlimitedPrimaryReloadItem.isEmpty()) {
+            oldProperties.unlimitedPrimaryReloadItem = newProperties.unlimitedPrimaryReloadItem;
+        }
+        // TODO unlimited secondary ammo
+
         if (newProperties.replaceMagazines)
             oldProperties.magazines.clear();
         oldProperties.magazines.addAll(newProperties.magazines);
@@ -181,6 +191,7 @@ public class RFEFirearmAmmoHandler {
             unresolved.secondaryAmmo.addAll(resolved.secondaryAmmo());
             if (resolved.unlimitedProjectile() != null)
                 unresolved.unlimitedProjectile = RFEProjectileTypeHandler.getProjectileTypeId(resolved.unlimitedProjectile());
+            unresolved.unlimitedPrimaryReloadItem = resolved.unlimitedPrimaryReloadItem();
             return unresolved;
         }
 
@@ -238,7 +249,9 @@ public class RFEFirearmAmmoHandler {
                 Codec.BOOL.optionalFieldOf("replace_secondary_ammo", false).forGetter(p -> p.replaceSecondaryAmmo),
                 Codec.list(AmmoPredicate.CODEC).optionalFieldOf("magazines", new ArrayList<>()).forGetter(p -> p.secondaryAmmo),
                 Codec.BOOL.optionalFieldOf("no_unlimited_projectile", false).forGetter(p -> p.noUnlimitedProjectile),
-                ResourceLocation.CODEC.optionalFieldOf("unlimited_projectile").forGetter(p -> Optional.ofNullable(p.unlimitedProjectile))
+                ResourceLocation.CODEC.optionalFieldOf("unlimited_projectile").forGetter(p -> Optional.ofNullable(p.unlimitedProjectile)),
+                Codec.BOOL.optionalFieldOf("no_unlimited_primary_reload_item", false).forGetter(p -> p.noUnlimitedPrimaryReloadItem),
+                ItemStack.OPTIONAL_CODEC.optionalFieldOf("unlimited_primary_reload_item", ItemStack.EMPTY).forGetter(p -> p.unlimitedPrimaryReloadItem)
         ).apply(o, UnresolvedModeAmmoProperties::fromCodec));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, UnresolvedModeAmmoProperties> SYNC_STREAM_CODEC = StreamCodec.composite(
@@ -247,6 +260,7 @@ public class RFEFirearmAmmoHandler {
                 AmmoPredicate.STREAM_CODEC.apply(ByteBufCodecs.list()), p -> p.speedloaders,
                 AmmoPredicate.STREAM_CODEC.apply(ByteBufCodecs.list()), p -> p.secondaryAmmo,
                 ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC), p -> Optional.ofNullable(p.unlimitedProjectile),
+                ItemStack.OPTIONAL_STREAM_CODEC, p -> p.unlimitedPrimaryReloadItem,
                 UnresolvedModeAmmoProperties::fromStreamCodec);
 
         public boolean replacePrimaryAmmo = false;
@@ -259,12 +273,15 @@ public class RFEFirearmAmmoHandler {
         public List<AmmoPredicate> secondaryAmmo = new ArrayList<>();
         public boolean noUnlimitedProjectile = false;
         public ResourceLocation unlimitedProjectile = null;
+        public boolean noUnlimitedPrimaryReloadItem = false;
+        public ItemStack unlimitedPrimaryReloadItem = ItemStack.EMPTY;
 
         private static UnresolvedModeAmmoProperties fromCodec(boolean replacePrimaryAmmo, Map<AmmoPredicate, ResourceLocation> primaryAmmo,
                                                               boolean replaceMagazines, List<AmmoPredicate> magazines,
                                                               boolean replaceSpeedloaders, List<AmmoPredicate> speedloaders,
                                                               boolean replaceSecondaryAmmo, List<AmmoPredicate> secondaryAmmo,
-                                                              boolean noUnlimitedProjectile, Optional<ResourceLocation> unlimitedProjectile) {
+                                                              boolean noUnlimitedProjectile, Optional<ResourceLocation> unlimitedProjectile,
+                                                              boolean noUnlimitedReloadItem, ItemStack unlimitedPrimaryReloadItem) {
             UnresolvedModeAmmoProperties properties = new UnresolvedModeAmmoProperties();
             properties.replacePrimaryAmmo = replacePrimaryAmmo;
             properties.primaryAmmo.putAll(primaryAmmo);
@@ -276,6 +293,8 @@ public class RFEFirearmAmmoHandler {
             properties.secondaryAmmo.addAll(secondaryAmmo);
             properties.noUnlimitedProjectile = noUnlimitedProjectile;
             properties.unlimitedProjectile = unlimitedProjectile.orElse(null);
+            properties.noUnlimitedPrimaryReloadItem = noUnlimitedReloadItem;
+            properties.unlimitedPrimaryReloadItem = unlimitedPrimaryReloadItem;
             return properties;
         }
 
@@ -283,13 +302,15 @@ public class RFEFirearmAmmoHandler {
                                                                     List<AmmoPredicate> magazines,
                                                                     List<AmmoPredicate> speedloaders,
                                                                     List<AmmoPredicate> secondaryAmmo,
-                                                                    Optional<ResourceLocation> unlimitedProjectile) {
+                                                                    Optional<ResourceLocation> unlimitedProjectile,
+                                                                    ItemStack unlimitedPrimaryReloadItem) {
             UnresolvedModeAmmoProperties properties = new UnresolvedModeAmmoProperties();
             properties.primaryAmmo.putAll(primaryAmmo);
             properties.magazines.addAll(magazines);
             properties.speedloaders.addAll(speedloaders);
             properties.secondaryAmmo.addAll(secondaryAmmo);
             properties.unlimitedProjectile = unlimitedProjectile.orElse(null);
+            properties.unlimitedPrimaryReloadItem = unlimitedPrimaryReloadItem;
             return properties;
         }
 
@@ -300,6 +321,7 @@ public class RFEFirearmAmmoHandler {
             newProperties.speedloaders = new ArrayList<>(this.speedloaders);
             newProperties.secondaryAmmo = new ArrayList<>(this.secondaryAmmo);
             newProperties.unlimitedProjectile = this.unlimitedProjectile;
+            newProperties.unlimitedPrimaryReloadItem = this.unlimitedPrimaryReloadItem;
             return newProperties;
         }
 
@@ -319,7 +341,15 @@ public class RFEFirearmAmmoHandler {
             RFEProjectileType unlimitedProjectile = null;
             if (this.unlimitedProjectile != null)
                 unlimitedProjectile = loadProjectileTypeOrWarnIgnore(this.unlimitedProjectile, item);
-            return new RFEFirearmModeAmmoProperties(primaryAmmo.build(), magazines.build(), speedloaders.build(), secondaryAmmo.build(), unlimitedProjectile);
+            ImmutableMap<AmmoPredicate, RFEProjectileType> primaryAmmoBuilt = primaryAmmo.build();
+            ImmutableList<AmmoPredicate> magazinesBuilt = magazines.build();
+            ImmutableList<AmmoPredicate> speedloadersBuilt = speedloaders.build();
+            ItemStack finalUnlimitedReloadItem = validateUnlimitedPrimaryReloadItem(this.unlimitedPrimaryReloadItem,
+                    RFEUtils.orAllPredicates(magazinesBuilt), RFEUtils.orAllPredicates(speedloadersBuilt),
+                    RFEUtils.orAllPredicates(primaryAmmoBuilt.keySet()), item)
+                    ? this.unlimitedPrimaryReloadItem : ItemStack.EMPTY;
+            return new RFEFirearmModeAmmoProperties(primaryAmmoBuilt, magazinesBuilt, speedloadersBuilt, secondaryAmmo.build(),
+                    unlimitedProjectile, finalUnlimitedReloadItem);
         }
 
         @Nullable
@@ -331,6 +361,35 @@ public class RFEFirearmAmmoHandler {
                 return null;
             } else {
                 return type;
+            }
+        }
+
+        private static boolean validateUnlimitedPrimaryReloadItem(ItemStack unlimitedReloadItem, Predicate<ItemStack> magazinePredicate,
+                                                                  Predicate<ItemStack> speedloaderPredicate, Predicate<ItemStack> ammoPredicate, Item item) {
+            if (unlimitedReloadItem.isEmpty())
+                return false;
+            if (ammoPredicate.test(unlimitedReloadItem))
+                return true;
+            if (magazinePredicate.test(unlimitedReloadItem) || speedloaderPredicate.test(unlimitedReloadItem)) {
+                if (!(unlimitedReloadItem.getItem() instanceof MagazineItem magazineItem)) {
+                    LOGGER.warn("Unlimited primary reload item {} for firearm item {} is specified as a magazine/speedloader but is not actually a magazine/speedloader item (ritchiesfirearmengine:magazine, ritchiesfirearmengine:speedloader), setting unlimited reload item to empty", unlimitedReloadItem, item);
+                    return false;
+                }
+                List<ItemStack> storedAmmo = magazineItem.getStoredAmmo(unlimitedReloadItem);
+                if (storedAmmo.isEmpty()) {
+                    LOGGER.warn("Unlimited primary reload item {} for firearm item {} is an empty magazine/speedloader item, setting unlimited reload item to empty", unlimitedReloadItem, item);
+                    return false;
+                }
+                for (ItemStack ammoStack : storedAmmo) {
+                    if (!ammoPredicate.test(ammoStack)) {
+                        LOGGER.warn("Unlimited primary reload item {} for firearm item {} contains invalid ammo stack {}, setting unlimited reload item to empty", unlimitedReloadItem, item, ammoStack);
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                LOGGER.warn("Unlimited primary reload item {} for firearm item {} is not consistent with loaded firearm item ammo properties (neither valid ammo nor valid magazine/speedloader with valid ammo), setting unlimited reload item to empty", unlimitedReloadItem, item);
+                return false;
             }
         }
     }

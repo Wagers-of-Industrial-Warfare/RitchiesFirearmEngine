@@ -13,7 +13,7 @@ import java.util.List;
 
 public record RFEFirearmModeAmmoProperties(ImmutableMap<AmmoPredicate, RFEProjectileType> primaryAmmo, ImmutableList<AmmoPredicate> magazines,
                                            ImmutableList<AmmoPredicate> speedloaders, ImmutableList<AmmoPredicate> secondaryAmmo,
-                                           @Nullable RFEProjectileType unlimitedProjectile) {
+                                           @Nullable RFEProjectileType unlimitedProjectile, ItemStack unlimitedPrimaryReloadItem) {
 
     public ImmutableCollection<AmmoPredicate> primaryAmmoPredicates() { return this.primaryAmmo.keySet(); }
 

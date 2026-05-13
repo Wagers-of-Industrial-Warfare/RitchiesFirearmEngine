@@ -68,6 +68,9 @@
   "replace_secondary_ammo": false,
   "secondary_ammo": [
   ],
+  "unlimited_primary_reload_item": {
+    "id": "rfe_builtin:buckshot_shell"
+  },
   "modes": {
     "rifle": {
       "replace_primary_ammo": false,
@@ -112,7 +115,10 @@
           "ammo": "rfe_builtin:infinite_magnum_hp_rifle_cartridge",
           "fires": "rfe_builtin:93x74mmr_hp"
         }
-      ]
+      ],
+      "unlimited_primary_reload_item": {
+        "id": "rfe_builtin:magnum_rifle_cartridge"
+      }
     }
   }
 }

@@ -52,6 +52,10 @@
   "replace_secondary_ammo": false,
   "secondary_ammo": [
   ],
+  "unlimited_primary_reload_item": {
+    "id": "rfe_builtin:pistol_magazine_15rds",
+    "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:handgun_cartridge","count":15},"slot":0}]}
+  },
   "modes": {
   }
 }

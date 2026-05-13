@@ -243,7 +243,9 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
                 return Float.POSITIVE_INFINITY;
             count += ammo.getCount();
         }
-        return count;
+        if (count > 0)
+            return count;
+        return canEntityInfiniteReload(entity) && !ammoProperties.unlimitedPrimaryReloadItem().isEmpty() ? Float.POSITIVE_INFINITY : 0;
     }
 
     public int ammoCount(ItemStack itemStack, LivingEntity entity) {
@@ -441,6 +443,10 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
 
     public int getShotCount(ItemStack itemStack) {
         return this.getCurrentMode(itemStack).getShotCount(itemStack);
+    }
+
+    public static boolean canEntityInfiniteReload(LivingEntity entity) {
+        return !(entity instanceof Player player) || player.isCreative();
     }
 
     public enum Action implements StringRepresentable {

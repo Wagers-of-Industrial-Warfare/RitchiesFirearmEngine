@@ -19,6 +19,9 @@
   "replace_secondary_ammo": false,
   "secondary_ammo": [
   ],
+  "unlimited_primary_reload_item": {
+    "id": "rfe_builtin:black_powder_rifle_cartridge"
+  },
   "modes": {
   }
 }

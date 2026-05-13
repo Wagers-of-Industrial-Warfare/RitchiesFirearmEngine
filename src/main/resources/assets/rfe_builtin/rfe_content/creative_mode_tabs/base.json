@@ -3,6 +3,7 @@
   "icon": "rfe_builtin:ammo_packet",
   "contents": [
     "rfe_builtin:ammo_packet",
+    "ritchiesfirearmengine:firearm_catalog",
     "rfe_builtin:rifle_cartridge",
     "rfe_builtin:tracer_rifle_cartridge",
     "rfe_builtin:ap_rifle_cartridge",

@@ -6,8 +6,7 @@
   "refmap": "ritchiesfirearmengine.refmap.json",
   "mixins": [
     "ExplosionMixin",
-    "LivingEntityMixin",
-    "client.MultiPlayerGameModeMixin"
+    "LivingEntityMixin"
   ],
   "client": [
     "client.AbstractContainerScreenMixin",
@@ -18,7 +17,8 @@
     "client.ItemInHandRendererMixin",
     "client.ItemRendererMixin",
     "client.MinecraftMixin",
-    "client.ModelManagerMixin"
+    "client.ModelManagerMixin",
+    "client.MultiPlayerGameModeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

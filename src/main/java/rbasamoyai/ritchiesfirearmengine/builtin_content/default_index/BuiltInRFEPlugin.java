@@ -48,6 +48,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bull
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.explosive.RFEExplosiveProjectileType;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.rocket.RFEExplosiveRocketProjectileType;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.shotgun.RFEShotgunProjectileType;
+import rbasamoyai.ritchiesfirearmengine.foundation.RFETags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplier;
@@ -178,6 +179,10 @@ public class BuiltInRFEPlugin implements RFEPlugin {
 
             @Override
             public boolean addToInventory(LivingEntity entity, ItemStack itemStack) {
+                if (itemStack.is(RFETags.RFEItemTags.DISPOSABLE_BY_NPCS_ON_RELOAD.tag)) {
+                    itemStack.setCount(0);
+                    return false;
+                }
                 if (entity instanceof Pillager pillager) {
                     ItemStack result = pillager.getInventory().addItem(itemStack);
                     if (result.isEmpty()) {

@@ -22,10 +22,12 @@ public class RangedFirearmAttackGoal extends Goal {
     private int attackDelay;
     private int shotsFirable;
     private int updatePathDelay;
+    private int reaimDelay;
 
     // TODO dual wielding
     private RFEFirearmItem.Action firearmAction = null;
 
+    // TODO more parameters for accuracy/control
     public RangedFirearmAttackGoal(Mob mob, double baseSpeedModifier, float attackRadius) {
         this.mob = mob;
         this.baseSpeedModifier = baseSpeedModifier;
@@ -45,6 +47,12 @@ public class RangedFirearmAttackGoal extends Goal {
         // TODO dual wielding
         //return this.mob.isHolding(s -> s.getItem() instanceof IFirearmItem);
         return this.mob.getMainHandItem().getItem() instanceof IFirearmItem;
+    }
+
+    @Override
+    public void start() {
+        super.start();
+        this.attackDelay = 60 + this.mob.getRandom().nextInt(21);
     }
 
     @Override
@@ -97,8 +105,12 @@ public class RangedFirearmAttackGoal extends Goal {
 
         // TODO config this and also just make this better
         //float lookSpeed = this.firearmAction == RFEFirearmItem.Action.FIRING ? 1.0F : 10.0F;
-        float lookSpeed = 30.0f;
-        this.mob.getLookControl().setLookAt(livingentity, lookSpeed, lookSpeed);
+        if (this.reaimDelay > 0) {
+            --this.reaimDelay;
+        } else {
+            float lookSpeed = 30.0f;
+            this.mob.getLookControl().setLookAt(livingentity, lookSpeed, lookSpeed);
+        }
         // TODO dual wielding
         ItemStack mainhandStack = this.mob.getMainHandItem();
         if (!(mainhandStack.getItem() instanceof RFEFirearmItem firearmItem))
@@ -113,12 +125,14 @@ public class RangedFirearmAttackGoal extends Goal {
             };
         }
         this.firearmAction = currentAction;
-        if (this.shotsFirable <= 0 && this.attackDelay <= 0) {
+        if (hasLineOfSight && this.shotsFirable <= 0 && this.attackDelay <= 0) {
+            firearmItem.onReleaseAttackKey(mainhandStack, this.mob);
             this.attackDelay = 20 + this.mob.getRandom().nextInt(21);
         }
         switch (this.firearmAction) {
             case RELOAD, UNLOAD, DRAW, COOLDOWN -> {
                 this.mob.stopUsingItem();
+                this.reaimDelay = 0;
             }
             case FIRING -> {
                 if (!hasLineOfSight) {
@@ -131,7 +145,7 @@ public class RangedFirearmAttackGoal extends Goal {
                     --this.attackDelay;
                     if (this.attackDelay == 0)
                         this.shotsFirable = this.getShotsFirable();
-                } else if (hasLineOfSight) {
+                } else if (hasLineOfSight && this.shotsFirable > 0) {
                     this.mob.startUsingItem(InteractionHand.MAIN_HAND);
                     firearmItem.onEntityTryAttackOption(mainhandStack, this.mob);
                 } else {
@@ -162,6 +176,7 @@ public class RangedFirearmAttackGoal extends Goal {
     public void decrementShot() {
         if (this.shotsFirable > 0)
             --this.shotsFirable;
+        this.reaimDelay = 10 + this.mob.getRandom().nextInt(11);
     }
 
 }

@@ -257,7 +257,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     public float countEntityAmmo(ItemStack itemStack, LivingEntity entity) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
         RFEFirearmModeAmmoProperties ammoProperties = mode.getAmmoProperties(itemStack);
-        List<ItemStack> entityAmmo = RFEItemUtils.getItemsFromEntity(entity, RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates()), 0, false);
+        Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
+        List<ItemStack> entityAmmo = RFEItemUtils.getItemsFromEntity(entity, ammoPred, 0, false);
         int count = 0;
         for (ItemStack ammo : entityAmmo) {
             if (ammo.is(RFEItemTags.INFINITE_AMMO.tag))
@@ -266,7 +267,10 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         }
         if (count > 0)
             return count;
-        return canEntityInfiniteReload(entity) && !ammoProperties.unlimitedPrimaryReloadItem().isEmpty() ? Float.POSITIVE_INFINITY : 0;
+        if (!canEntityInfiniteReload(entity))
+            return 0;
+        ItemStack infiniteAmmo = ammoProperties.unlimitedPrimaryReloadItem();
+        return ammoPred.test(infiniteAmmo) ? Float.POSITIVE_INFINITY : 0;
     }
 
     public int ammoCount(ItemStack itemStack, LivingEntity entity) {

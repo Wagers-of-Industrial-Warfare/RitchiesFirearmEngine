@@ -12,7 +12,8 @@ import java.util.Locale;
 public class RFETags {
 
     public enum RFEItemTags {
-        INFINITE_AMMO;
+        INFINITE_AMMO,
+        DISPOSABLE_BY_NPCS_ON_RELOAD;
 
         public final TagKey<Item> tag = TagKey.create(Registries.ITEM, RitchiesFirearmEngine.resource(this.name().toLowerCase(Locale.ROOT)));
     }

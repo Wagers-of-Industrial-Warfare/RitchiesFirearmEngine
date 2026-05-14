@@ -46,6 +46,7 @@ public class RFEClientRemix {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
 
+        // TODO offhand item
         ItemStack mainhandItem = mc.player.getMainHandItem();
         if (mainhandItem.getItem() instanceof HoldAttackKeyInteraction hold && !hold.isHoldingAttackKey(mainhandItem, mc.player)) {
             RFENetwork.sendToServer(new ServerboundSetAttackKeyPacket(true));

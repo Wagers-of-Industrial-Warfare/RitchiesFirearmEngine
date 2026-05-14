@@ -98,6 +98,12 @@ public class RFEPluginManager {
             plugin.registerPluginDataComponentTypes(registry);
     }
 
+    public static void onCommonSetup() {
+        LOGGER.info("Running RFE plugin common setup");
+        for (RFEPlugin plugin : PLUGINS.values())
+            plugin.onCommonSetup();
+    }
+
     private RFEPluginManager() {}
 
 }

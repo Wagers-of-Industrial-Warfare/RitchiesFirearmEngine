@@ -148,6 +148,27 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         return true;
     }
 
+    public void onEntityTryAttackOption(ItemStack stack, LivingEntity entity) {
+        FirearmDataUtils.setHoldingAttackKey(stack, true);
+        RFEFirearmMode firearmMode = this.getCurrentMode(stack);
+        if (firearmMode.canFireProjectile(stack, entity)) {
+            if (!firearmMode.isBurstFiring(stack, entity)) {
+                firearmMode.fireFirearm(stack, entity, RFEFirearmMode.FiringType.CLICK);
+            }
+            if (this.getCurrentAction(stack) == Action.FIRING)
+                return;
+        }
+        if (firearmMode.canChargeInternal(stack, entity)) {
+            firearmMode.onCharge(stack, entity);
+            if (this.getCurrentAction(stack) == Action.CHARGING)
+                return;
+        }
+        if (firearmMode.tryRunningReloadAction(stack, entity, ReloadPhase.PhaseType.PREPARE, true, ReloadPhaseAccessFilter.IncludeAll.INSTANCE)) {
+            if (this.getCurrentAction(stack) == Action.RELOAD)
+                return;
+        }
+    }
+
     @Override
     public void handleClientFireInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs,
                                               boolean jam, @Nullable UUID recoilUUID, InteractionHand hand) {
@@ -330,14 +351,20 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         ItemStack itemStack = player.getItemInHand(usedHand);
-        RFEFirearmMode mode = this.getCurrentMode(itemStack);
         boolean startUsing = false;
-        if (mode.canAim(itemStack, player)) {
-            mode.startAiming(itemStack, player);
+        if (this.tryAiming(itemStack, player))
             startUsing = true;
-        }
         // TODO other interactions
         return startUsing ? ItemUtils.startUsingInstantly(level, player, usedHand) : super.use(level, player, usedHand);
+    }
+
+    public boolean tryAiming(ItemStack itemStack, LivingEntity entity) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        if (mode.canAim(itemStack, entity)) {
+            mode.startAiming(itemStack, entity);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -446,7 +473,9 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     }
 
     public static boolean canEntityInfiniteReload(LivingEntity entity) {
-        return !(entity instanceof Player player) || player.isCreative();
+        if (entity instanceof Player player)
+            return player.isCreative();
+        return true; // TODO config
     }
 
     public enum Action implements StringRepresentable {

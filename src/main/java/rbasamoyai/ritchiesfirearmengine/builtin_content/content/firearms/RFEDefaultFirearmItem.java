@@ -41,6 +41,8 @@ public class RFEDefaultFirearmItem extends RFEFirearmItem {
         });
     }
 
+
+
     public static class Builder implements RFEItemBuilder {
         @Override
         public Item apply(JsonObject obj) {

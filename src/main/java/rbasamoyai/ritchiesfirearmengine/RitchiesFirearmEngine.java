@@ -14,6 +14,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
@@ -47,6 +48,7 @@ public class RitchiesFirearmEngine {
 
         modBus.addListener(this::onRegisterObjects);
         modBus.addListener(this::onAddPackFinders);
+        modBus.addListener(this::onCommonSetup);
 
         FoundationItems.ITEMS.register(modBus);
 
@@ -65,6 +67,10 @@ public class RitchiesFirearmEngine {
         RFEPackLoader.prepareResources();
 
         RFENetwork.init();
+    }
+
+    private void onCommonSetup(final FMLCommonSetupEvent event) {
+        RFEPluginManager.onCommonSetup();
     }
 
     private void onRegisterObjects(final RegisterEvent event) {

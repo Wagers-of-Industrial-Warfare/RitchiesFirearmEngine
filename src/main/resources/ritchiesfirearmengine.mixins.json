@@ -6,7 +6,8 @@
   "refmap": "ritchiesfirearmengine.refmap.json",
   "mixins": [
     "ExplosionMixin",
-    "LivingEntityMixin"
+    "LivingEntityMixin",
+    "ai.PillagerMixin"
   ],
   "client": [
     "client.AbstractContainerScreenMixin",

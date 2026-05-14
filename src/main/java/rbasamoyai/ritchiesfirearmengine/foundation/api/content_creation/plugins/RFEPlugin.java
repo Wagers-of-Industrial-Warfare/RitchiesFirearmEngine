@@ -25,6 +25,8 @@ public interface RFEPlugin {
 
     default void registerPluginDataComponentTypes(BiConsumer<ResourceLocation, DataComponentType<?>> registry) {}
 
+    default void onCommonSetup() {}
+
     record Info(String modId, String classPath) {
     }
 

@@ -11,7 +11,11 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Pillager;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.*;
@@ -56,10 +60,15 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProvider;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProviderPackHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProvider;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProviderPackHandler;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 /**
@@ -123,6 +132,77 @@ public class BuiltInRFEPlugin implements RFEPlugin {
     @Override
     public void registerPluginDataComponentTypes(BiConsumer<ResourceLocation, DataComponentType<?>> registry) {
         RFEDataComponents.register(registry);
+    }
+
+    @Override
+    public void onCommonSetup() {
+        RFEItemUtils.registerGeneralItemHandler(new RFEItemUtils.EntityItemHandler() {
+            @Override
+            public boolean consumeFromInventory(LivingEntity entity, Predicate<ItemStack> predicate, UnaryOperator<ItemStack> op, Supplier<Boolean> breakOnSuccess) {
+                ItemStack offhandStack = entity.getOffhandItem();
+                if (predicate.test(offhandStack)) {
+                    ItemStack result = op.apply(offhandStack);
+                    entity.setItemInHand(InteractionHand.OFF_HAND, result);
+                    return breakOnSuccess.get();
+                }
+                return false;
+            }
+
+            @Override
+            public boolean addToInventory(LivingEntity entity, ItemStack itemStack) {
+                return false;
+            }
+        });
+
+        RFEItemUtils.registerItemHandlerForType(EntityType.PLAYER, new RFEItemUtils.EntityItemHandler() {
+            @Override
+            public boolean consumeFromInventory(LivingEntity entity, Predicate<ItemStack> predicate, UnaryOperator<ItemStack> op, Supplier<Boolean> breakOnSuccess) {
+                return entity instanceof Player player && iterateInventory(player.getInventory().items, predicate, op, breakOnSuccess);
+            }
+
+            @Override
+            public boolean addToInventory(LivingEntity entity, ItemStack itemStack) {
+                if (entity instanceof Player player) {
+                    player.getInventory().placeItemBackInInventory(itemStack);
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        RFEItemUtils.registerItemHandlerForType(EntityType.PILLAGER, new RFEItemUtils.EntityItemHandler() {
+            @Override
+            public boolean consumeFromInventory(LivingEntity entity, Predicate<ItemStack> predicate, UnaryOperator<ItemStack> op, Supplier<Boolean> breakOnSuccess) {
+                return entity instanceof Pillager pillager && iterateInventory(pillager.getInventory().getItems(), predicate, op, breakOnSuccess);
+            }
+
+            @Override
+            public boolean addToInventory(LivingEntity entity, ItemStack itemStack) {
+                if (entity instanceof Pillager pillager) {
+                    ItemStack result = pillager.getInventory().addItem(itemStack);
+                    if (result.isEmpty()) {
+                        return true;
+                    } else {
+                        itemStack.setCount(result.getCount());
+                        return false;
+                    }
+                }
+                return false;
+            }
+        });
+    }
+
+    private static boolean iterateInventory(List<ItemStack> inventory, Predicate<ItemStack> predicate, UnaryOperator<ItemStack> op, Supplier<Boolean> breakOnSuccess) {
+        for (ListIterator<ItemStack> lister = inventory.listIterator(); lister.hasNext(); ) {
+            ItemStack invStack = lister.next();
+            if (!predicate.test(invStack))
+                continue;
+            ItemStack result = op.apply(invStack);
+            lister.set(result);
+            if (breakOnSuccess.get())
+                return true;
+        }
+        return false;
     }
 
     /**

@@ -21,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.HoldAttackKeyInteraction;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ai.ICanFireRFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
@@ -387,7 +388,7 @@ public class RFEFirearmMode {
         InteractionHand hand = entity.getMainHandItem() == itemStack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
         boolean client = entity.level().isClientSide;
 
-        if (entity instanceof Player && firing != FiringType.NON_PLAYER_AND_EFFECTS) {
+        if (firing != FiringType.EFFECTS) {
             if (this.windUpTime > 0) {
                 if (!this.isWindingUp(itemStack, entity) && firing == FiringType.CLICK) {
                     this.setWindingUp(itemStack, entity, true);
@@ -400,10 +401,11 @@ public class RFEFirearmMode {
                 }
             }
 
-            if (client && firing == FiringType.CLICK || !client && firing == FiringType.AUTOMATIC)
+            boolean canFireClick = client && entity instanceof Player || !client && !(entity instanceof Player);
+            if (canFireClick && firing == FiringType.CLICK || !client && firing == FiringType.AUTOMATIC)
                 this.handlePlayerAmmoAndShootingOnClient(itemStack, entity);
             return;
-        } // TODO other entities
+        }
 
         if (!client)
             this.tryStartBurstFire(itemStack, entity);
@@ -421,6 +423,8 @@ public class RFEFirearmMode {
 
         this.setCharged(itemStack, entity, false);
         FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.FIRING);
+        if (entity instanceof ICanFireRFEFirearmItem aiShooter)
+            aiShooter.ritchiesfirearmengine$onShotFired(itemStack);
         if (this.firingCooldown > 0) {
             DataComponentPatch modeData = this.getModeData(itemStack);
             float extraActionTime = Math.max(FirearmDataUtils.getExtraFiringTime(modeData), 0);
@@ -516,9 +520,14 @@ public class RFEFirearmMode {
 
         UUID recoilUUID = RFERecoilManager.getRecoilId(itemStack);
         if (entity.level().isClientSide) {
-            RFENetwork.sendToServer(new ServerboundRunFiringLogicPacket(firingInputs, jam, hand, recoilUUID));
-        } else if (entity instanceof ServerPlayer splayer) {
-            RFENetwork.sendToPlayer(new ClientboundRunFiringLogicPacket(hand, impulse, recoilUUID), splayer);
+            if (entity instanceof Player)
+                RFENetwork.sendToServer(new ServerboundRunFiringLogicPacket(firingInputs, jam, hand, recoilUUID));
+        } else {
+            if (entity instanceof ServerPlayer splayer) {
+                RFENetwork.sendToPlayer(new ClientboundRunFiringLogicPacket(hand, impulse, recoilUUID), splayer);
+            } else if (!(entity instanceof Player)) {
+                this.handleServerRecoil(itemStack, entity, hand, impulse, recoilUUID);
+            }
             this.handleFiringInputOnServer(itemStack, entity, firingInputs, jam, recoilUUID, hand);
         }
     }
@@ -577,7 +586,7 @@ public class RFEFirearmMode {
         DataComponentPatch modeData = this.getModeData(itemStack);
         this.saveModeData(itemStack, FirearmDataUtils.setShotCount(modeData, FirearmDataUtils.getShotCount(modeData) + firingInputs.size()));
 
-        this.fireFirearm(itemStack, entity, FiringType.NON_PLAYER_AND_EFFECTS);
+        this.fireFirearm(itemStack, entity, FiringType.EFFECTS);
     }
 
     public void playFiringEffects(ItemStack itemStack, LivingEntity entity) {
@@ -1729,7 +1738,7 @@ public class RFEFirearmMode {
     public enum FiringType {
         CLICK,
         AUTOMATIC,
-        NON_PLAYER_AND_EFFECTS
+        EFFECTS
     }
     
 }

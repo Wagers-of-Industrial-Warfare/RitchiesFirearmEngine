@@ -25,7 +25,7 @@ public abstract class PillagerMixin extends AbstractIllager implements ICanFireR
     private void ritchiesfirearmengine$registerGoals(Operation<Void> original) {
         original.call();
         this.goalSelector.addGoal(0, new TickFirearmInHandsGoal(this));
-        this.goalSelector.addGoal(3, this.ritchiesfirearmengine$firearmattackgoal = new RangedFirearmAttackGoal(this, 1.0d, 8f, 2.5f));
+        this.goalSelector.addGoal(3, this.ritchiesfirearmengine$firearmattackgoal = new RangedFirearmAttackGoal(this, 1.0d, 8f, 32f, 2.5f));
     }
 
     @WrapMethod(method = "getArmPose")

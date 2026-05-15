@@ -19,6 +19,7 @@ public class RangedFirearmAttackGoal extends Goal {
     private final Mob mob;
     private final double baseSpeedModifier;
     private final float closeInDistance;
+    private final float firingCutoffRange;
     private final float inaccuracyDegrees;
     private int seeTime;
     private int attackDelay;
@@ -29,9 +30,10 @@ public class RangedFirearmAttackGoal extends Goal {
     private RFEFirearmItem.Action firearmAction = null;
 
     // TODO more parameters for accuracy/control
-    public RangedFirearmAttackGoal(Mob mob, double baseSpeedModifier, float closeInDistance, float inaccuracyDegrees) {
+    public RangedFirearmAttackGoal(Mob mob, double baseSpeedModifier, float closeInDistance, float firingCutoffRange, float inaccuracyDegrees) {
         this.mob = mob;
         this.baseSpeedModifier = baseSpeedModifier;
+        this.firingCutoffRange = firingCutoffRange;
         this.closeInDistance = closeInDistance * closeInDistance;
         this.inaccuracyDegrees = inaccuracyDegrees;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
@@ -94,7 +96,8 @@ public class RangedFirearmAttackGoal extends Goal {
         }
 
         double sqrDist = this.mob.distanceToSqr(livingentity);
-        boolean outOfRangeOrCantReach = (sqrDist > (double) this.closeInDistance || this.seeTime < 5) && this.attackDelay == 0;
+        boolean outOfFiringRange = sqrDist > this.firingCutoffRange * this.firingCutoffRange;
+        boolean outOfRangeOrCantReach = (sqrDist > (double) this.closeInDistance || this.seeTime < 5 || outOfFiringRange) && this.attackDelay == 0;
         if (outOfRangeOrCantReach) {
             this.updatePathDelay--;
             if (this.updatePathDelay <= 0) {
@@ -129,7 +132,11 @@ public class RangedFirearmAttackGoal extends Goal {
             };
         }
         this.firearmAction = currentAction;
-        if (hasLineOfSight && this.shotsFirable <= 0 && this.attackDelay <= 0) {
+        if (outOfFiringRange) {
+            firearmItem.onReleaseAttackKey(mainhandStack, this.mob);
+            this.shotsFirable = 0;
+        }
+        if (hasLineOfSight && !outOfFiringRange && this.shotsFirable <= 0 && this.attackDelay <= 0) {
             firearmItem.onReleaseAttackKey(mainhandStack, this.mob);
             this.attackDelay = 20 + this.mob.getRandom().nextInt(21); // TODO modify
         }
@@ -141,7 +148,7 @@ public class RangedFirearmAttackGoal extends Goal {
                 }
             }
             case FIRING -> {
-                if (!hasLineOfSight) {
+                if (!hasLineOfSight || outOfFiringRange) {
                     if (this.mob.isUsingItem()) {
                         this.mob.stopUsingItem();
                         firearmItem.stopAiming(mainhandStack, this.mob);
@@ -154,7 +161,7 @@ public class RangedFirearmAttackGoal extends Goal {
                     --this.attackDelay;
                     if (this.attackDelay == 0)
                         this.shotsFirable = this.getShotsFirable();
-                } else if (hasLineOfSight && this.shotsFirable > 0) {
+                } else if (hasLineOfSight && !outOfFiringRange && this.shotsFirable > 0) {
                     if (!this.mob.isUsingItem())
                         this.mob.startUsingItem(InteractionHand.MAIN_HAND);
                     firearmItem.tryAiming(mainhandStack, this.mob);

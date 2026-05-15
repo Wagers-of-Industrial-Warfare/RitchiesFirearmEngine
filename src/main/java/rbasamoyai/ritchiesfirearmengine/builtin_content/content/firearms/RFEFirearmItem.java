@@ -487,6 +487,10 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         return true; // TODO config
     }
 
+    public int getAIShootingRange() {
+        return 16; // TODO config and possibly per entity. This is mostly for BehaviorUtils/BehaviorUtilsMixin
+    }
+
     public enum Action implements StringRepresentable {
         RELOAD(false),
         UNLOAD(false),

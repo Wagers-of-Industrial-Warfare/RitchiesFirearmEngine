@@ -25,6 +25,7 @@ public class RFETags {
     }
 
     public enum RFEEntityTypeTags {
+        CAN_SHOOT_FIREARMS,
         HUMANOID,
         VULNERABLE_TO_BIRDSHOT;
 

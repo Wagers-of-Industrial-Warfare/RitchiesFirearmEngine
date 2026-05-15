@@ -7,7 +7,11 @@
   "mixins": [
     "ExplosionMixin",
     "LivingEntityMixin",
+    "ai.BehaviorUtilsMixin",
     "ai.LookControlMixin",
+    "ai.MeleeAttackMixin",
+    "ai.PiglinAiMixin",
+    "ai.PiglinMixin",
     "ai.PillagerMixin"
   ],
   "client": [

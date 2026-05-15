@@ -116,7 +116,8 @@ public class RangedFirearmAttackGoal extends Goal {
         RandomSource random = this.mob.getRandom();
         float dPitch = random.nextFloat() * 2f - 1f;
         float dYaw = random.nextFloat() * 2f - 1f;
-        this.mob.turn(this.inaccuracyDegrees * dYaw, this.inaccuracyDegrees * dPitch);
+        this.mob.turn(this.inaccuracyDegrees * dYaw / 0.15f, this.inaccuracyDegrees * dPitch / 0.15f);
+
         // TODO dual wielding
         ItemStack mainhandStack = this.mob.getMainHandItem();
         if (!(mainhandStack.getItem() instanceof RFEFirearmItem firearmItem))

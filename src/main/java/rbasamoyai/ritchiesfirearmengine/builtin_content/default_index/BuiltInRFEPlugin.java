@@ -15,6 +15,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Pillager;
+import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
@@ -185,6 +186,31 @@ public class BuiltInRFEPlugin implements RFEPlugin {
                 }
                 if (entity instanceof Pillager pillager) {
                     ItemStack result = pillager.getInventory().addItem(itemStack);
+                    if (result.isEmpty()) {
+                        return true;
+                    } else {
+                        itemStack.setCount(result.getCount());
+                        return false;
+                    }
+                }
+                return false;
+            }
+        });
+
+        RFEItemUtils.registerItemHandlerForType(EntityType.PIGLIN, new RFEItemUtils.EntityItemHandler() {
+            @Override
+            public boolean consumeFromInventory(LivingEntity entity, Predicate<ItemStack> predicate, UnaryOperator<ItemStack> op, Supplier<Boolean> breakOnSuccess) {
+                return entity instanceof Pillager pillager && iterateInventory(pillager.getInventory().getItems(), predicate, op, breakOnSuccess);
+            }
+
+            @Override
+            public boolean addToInventory(LivingEntity entity, ItemStack itemStack) {
+                if (itemStack.is(RFETags.RFEItemTags.DISPOSABLE_BY_NPCS_ON_RELOAD.tag)) {
+                    itemStack.setCount(0);
+                    return false;
+                }
+                if (entity instanceof Piglin piglin) {
+                    ItemStack result = piglin.getInventory().addItem(itemStack);
                     if (result.isEmpty()) {
                         return true;
                     } else {

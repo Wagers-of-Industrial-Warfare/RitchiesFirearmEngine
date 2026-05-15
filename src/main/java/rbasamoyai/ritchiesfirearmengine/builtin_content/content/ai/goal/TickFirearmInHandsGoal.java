@@ -1,4 +1,4 @@
-package rbasamoyai.ritchiesfirearmengine.builtin_content.content.ai;
+package rbasamoyai.ritchiesfirearmengine.builtin_content.content.ai.goal;
 
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;

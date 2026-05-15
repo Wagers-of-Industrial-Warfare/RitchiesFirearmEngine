@@ -10,8 +10,8 @@ import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ai.ICanFireRFEFirearmItem;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ai.RangedFirearmAttackGoal;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ai.TickFirearmInHandsGoal;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ai.goal.RangedFirearmAttackGoal;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ai.goal.TickFirearmInHandsGoal;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEDefaultFirearmItem;
 
 @Mixin(Pillager.class)

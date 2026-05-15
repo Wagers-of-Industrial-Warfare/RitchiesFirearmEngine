@@ -1,4 +1,4 @@
-package rbasamoyai.ritchiesfirearmengine.builtin_content.content.ai;
+package rbasamoyai.ritchiesfirearmengine.builtin_content.content.ai.goal;
 
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.TimeUtil;

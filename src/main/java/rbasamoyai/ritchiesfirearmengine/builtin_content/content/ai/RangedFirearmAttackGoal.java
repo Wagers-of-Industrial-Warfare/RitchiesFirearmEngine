@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.ai;
 
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.InteractionHand;
@@ -17,21 +18,22 @@ public class RangedFirearmAttackGoal extends Goal {
 
     private final Mob mob;
     private final double baseSpeedModifier;
-    private final float attackRadiusSqr;
+    private final float closeInDistance;
+    private final float inaccuracyDegrees;
     private int seeTime;
     private int attackDelay;
     private int shotsFirable;
     private int updatePathDelay;
-    private int reaimDelay;
 
     // TODO dual wielding
     private RFEFirearmItem.Action firearmAction = null;
 
     // TODO more parameters for accuracy/control
-    public RangedFirearmAttackGoal(Mob mob, double baseSpeedModifier, float attackRadius) {
+    public RangedFirearmAttackGoal(Mob mob, double baseSpeedModifier, float closeInDistance, float inaccuracyDegrees) {
         this.mob = mob;
         this.baseSpeedModifier = baseSpeedModifier;
-        this.attackRadiusSqr = attackRadius * attackRadius;
+        this.closeInDistance = closeInDistance * closeInDistance;
+        this.inaccuracyDegrees = inaccuracyDegrees;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
         // TODO? dual wielding when we get there
     }
@@ -67,6 +69,7 @@ public class RangedFirearmAttackGoal extends Goal {
         if (mainhandItem.getItem() instanceof RFEFirearmItem firearmItem) {
             if (firearmItem.getCurrentAction(mainhandItem) == RFEFirearmItem.Action.FIRING)
                 firearmItem.onReleaseAttackKey(mainhandItem, this.mob);
+            firearmItem.stopAiming(mainhandItem, this.mob);
         }
         // TODO firearm actions? can let them finish
     }
@@ -91,7 +94,7 @@ public class RangedFirearmAttackGoal extends Goal {
         }
 
         double sqrDist = this.mob.distanceToSqr(livingentity);
-        boolean outOfRangeOrCantReach = (sqrDist > (double) this.attackRadiusSqr || this.seeTime < 5) && this.attackDelay == 0;
+        boolean outOfRangeOrCantReach = (sqrDist > (double) this.closeInDistance || this.seeTime < 5) && this.attackDelay == 0;
         if (outOfRangeOrCantReach) {
             this.updatePathDelay--;
             if (this.updatePathDelay <= 0) {
@@ -104,19 +107,20 @@ public class RangedFirearmAttackGoal extends Goal {
         }
 
         // TODO config this and also just make this better
-        //float lookSpeed = this.firearmAction == RFEFirearmItem.Action.FIRING ? 1.0F : 10.0F;
-        if (this.reaimDelay > 0) {
-            --this.reaimDelay;
-        } else {
-            float lookSpeed = 30.0f;
-            this.mob.getLookControl().setLookAt(livingentity, lookSpeed, lookSpeed);
-        }
+        boolean isFiring = this.firearmAction == RFEFirearmItem.Action.FIRING || hasLineOfSight && this.shotsFirable > 0;
+        float lookSpeed = isFiring ? 10.0F : 30.0F;
+        this.mob.getLookControl().setLookAt(livingentity, lookSpeed, lookSpeed);
+        RandomSource random = this.mob.getRandom();
+        float dPitch = random.nextFloat() * 2f - 1f;
+        float dYaw = random.nextFloat() * 2f - 1f;
+        this.mob.turn(this.inaccuracyDegrees * dYaw, this.inaccuracyDegrees * dPitch);
         // TODO dual wielding
         ItemStack mainhandStack = this.mob.getMainHandItem();
         if (!(mainhandStack.getItem() instanceof RFEFirearmItem firearmItem))
             return;
         RFEFirearmItem.Action currentAction = firearmItem.getCurrentAction(mainhandStack);
         if (isBusyAction(this.firearmAction) && !isBusyAction(currentAction)) {
+            // TODO modify these parameters into ranges
             this.attackDelay = switch (this.firearmAction) {
                 case RELOAD, UNLOAD, COOLDOWN -> 30 + this.mob.getRandom().nextInt(21);
                 case DRAW -> 40 + this.mob.getRandom().nextInt(21);
@@ -127,16 +131,21 @@ public class RangedFirearmAttackGoal extends Goal {
         this.firearmAction = currentAction;
         if (hasLineOfSight && this.shotsFirable <= 0 && this.attackDelay <= 0) {
             firearmItem.onReleaseAttackKey(mainhandStack, this.mob);
-            this.attackDelay = 20 + this.mob.getRandom().nextInt(21);
+            this.attackDelay = 20 + this.mob.getRandom().nextInt(21); // TODO modify
         }
         switch (this.firearmAction) {
             case RELOAD, UNLOAD, DRAW, COOLDOWN -> {
-                this.mob.stopUsingItem();
-                this.reaimDelay = 0;
+                if (this.mob.isUsingItem()) {
+                    this.mob.stopUsingItem();
+                    firearmItem.stopAiming(mainhandStack, this.mob);
+                }
             }
             case FIRING -> {
                 if (!hasLineOfSight) {
-                    this.mob.stopUsingItem();
+                    if (this.mob.isUsingItem()) {
+                        this.mob.stopUsingItem();
+                        firearmItem.stopAiming(mainhandStack, this.mob);
+                    }
                     firearmItem.onReleaseAttackKey(mainhandStack, this.mob);
                 }
             }
@@ -146,10 +155,15 @@ public class RangedFirearmAttackGoal extends Goal {
                     if (this.attackDelay == 0)
                         this.shotsFirable = this.getShotsFirable();
                 } else if (hasLineOfSight && this.shotsFirable > 0) {
-                    this.mob.startUsingItem(InteractionHand.MAIN_HAND);
+                    if (!this.mob.isUsingItem())
+                        this.mob.startUsingItem(InteractionHand.MAIN_HAND);
+                    firearmItem.tryAiming(mainhandStack, this.mob);
                     firearmItem.onEntityTryAttackOption(mainhandStack, this.mob);
                 } else {
-                    this.mob.stopUsingItem();
+                    if (this.mob.isUsingItem()) {
+                        this.mob.stopUsingItem();
+                        firearmItem.stopAiming(mainhandStack, this.mob);
+                    }
                     this.shotsFirable = 0;
                 }
             }
@@ -157,18 +171,18 @@ public class RangedFirearmAttackGoal extends Goal {
         }
     }
 
-    private int getShotsFirable() {
-        return 2 + this.mob.getRandom().nextInt(3);
+    protected int getShotsFirable() {
+        return 2 + this.mob.getRandom().nextInt(3); // TODO add modifier
     }
 
-    private boolean canRun() {
+    protected boolean canRun() {
         boolean canShootAndRun = false;
         return this.firearmAction == null
                 || this.firearmAction == RFEFirearmItem.Action.COOLDOWN
                 || canShootAndRun && this.firearmAction == RFEFirearmItem.Action.FIRING;
     }
 
-    private static boolean isBusyAction(RFEFirearmItem.Action action) {
+    protected static boolean isBusyAction(RFEFirearmItem.Action action) {
         return action == RFEFirearmItem.Action.RELOAD || action == RFEFirearmItem.Action.UNLOAD || action == RFEFirearmItem.Action.CHARGING
                 || action == RFEFirearmItem.Action.SWITCH_MODE || action == RFEFirearmItem.Action.DRAW || action == RFEFirearmItem.Action.COOLDOWN;
     }
@@ -176,7 +190,6 @@ public class RangedFirearmAttackGoal extends Goal {
     public void decrementShot() {
         if (this.shotsFirable > 0)
             --this.shotsFirable;
-        this.reaimDelay = 10 + this.mob.getRandom().nextInt(11);
     }
 
 }

@@ -158,7 +158,12 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             if (this.getCurrentAction(stack) == Action.FIRING)
                 return;
         }
-        if (firearmMode.canChargeInternal(stack, entity)) {
+        if (firearmMode.requiresAmmo() && !firearmMode.hasAmmo(stack)) {
+            firearmMode.tryRunningReloadAction(stack, entity, ReloadPhase.PhaseType.PREPARE, true, ReloadPhaseAccessFilter.IncludeAll.INSTANCE);
+            if (this.getCurrentAction(stack) == Action.RELOAD)
+                return;
+        }
+        if (firearmMode.canChargeInternal(stack, entity) && !firearmMode.isCharged(stack)) {
             firearmMode.onCharge(stack, entity);
             if (this.getCurrentAction(stack) == Action.CHARGING)
                 return;

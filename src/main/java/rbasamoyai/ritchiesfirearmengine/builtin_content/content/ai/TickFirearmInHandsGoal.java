@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.ai;
 
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.item.ItemStack;
@@ -7,6 +8,9 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFire
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhase;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhaseAccessFilter;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilInstance;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
 
 public class TickFirearmInHandsGoal extends Goal {
 
@@ -58,6 +62,18 @@ public class TickFirearmInHandsGoal extends Goal {
             }
             this.firearmAction = currentAction;
         }
+        float dAimPitch = 0;
+        float dAimYaw = 0;
+        RFERecoilInstance mainhandRecoilInstance = RFERecoilManager.getRecoilInstance(this.mob, mainhandItem);
+        if (mainhandRecoilInstance != null) {
+            RFEAimAngles aimRecoil = mainhandRecoilInstance.getAimRecoil(1);
+            dAimPitch += aimRecoil.pitch();
+            dAimYaw += aimRecoil.yaw();
+        }
+        float recoilScale = 1f;
+        this.mob.setXRot(this.mob.getXRot() - recoilScale * dAimPitch);
+        this.mob.setXRot(Mth.clamp(this.mob.getXRot(), -90.0F, 90.0F));
+        this.mob.setYHeadRot(this.mob.getYHeadRot() + recoilScale * dAimYaw);
     }
 
 }

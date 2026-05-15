@@ -20,7 +20,7 @@ public record RFEFirearmProperties<T>(T defaultProperties, ImmutableMap<String, 
         return RecordCodecBuilder.create(o -> o.group(
                 codec.forGetter(RFEFirearmProperties::defaultProperties),
                 ExtraCodecs.strictUnboundedMap(Codec.STRING, codec.codec())
-                        .xmap(map -> ImmutableMap.<String, T>builder().putAll(map).build(), LinkedHashMap::new)
+                        .xmap(ImmutableMap::copyOf, LinkedHashMap::new)
                         .optionalFieldOf("modes", ImmutableMap.of()).forGetter(RFEFirearmProperties::propertiesByMode)
         ).apply(o, RFEFirearmProperties::new));
     }

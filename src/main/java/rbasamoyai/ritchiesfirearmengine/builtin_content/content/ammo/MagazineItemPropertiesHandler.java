@@ -137,8 +137,7 @@ public class MagazineItemPropertiesHandler {
             public final List<AmmoPredicate> speedloaderPredicates = new ArrayList<>();
 
             public MagazineItemProperties build() {
-                return new MagazineItemProperties(ImmutableList.<AmmoPredicate>builder().addAll(this.ammoPredicates).build(),
-                        ImmutableList.<AmmoPredicate>builder().addAll(this.speedloaderPredicates).build());
+                return new MagazineItemProperties(ImmutableList.copyOf(this.ammoPredicates), ImmutableList.copyOf(this.speedloaderPredicates));
             }
 
             public static Builder fromExistingProperties(MagazineItemProperties properties) {

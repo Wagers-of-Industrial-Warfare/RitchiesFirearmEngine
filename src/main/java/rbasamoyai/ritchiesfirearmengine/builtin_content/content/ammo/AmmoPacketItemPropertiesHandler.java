@@ -128,7 +128,7 @@ public class AmmoPacketItemPropertiesHandler {
             public final Map<AmmoPredicate, Integer> ammoCapacities = new LinkedHashMap<>();
 
             public AmmoPacketItemProperties build() {
-                return new AmmoPacketItemProperties(ImmutableMap.<AmmoPredicate, Integer>builder().putAll(this.ammoCapacities).build());
+                return new AmmoPacketItemProperties(ImmutableMap.copyOf(this.ammoCapacities));
             }
 
             public static Builder fromExistingProperties(AmmoPacketItemProperties properties) {

@@ -25,7 +25,7 @@ public record RFEFirearmModeHandlingProperties(float movementSpeedModifier, Char
             RFEFirearmHeatProperties.CODEC.forGetter(RFEFirearmModeHandlingProperties::heatProperties),
             Codec.intRange(0, Integer.MAX_VALUE).optionalFieldOf("max_shots", 0).forGetter(RFEFirearmModeHandlingProperties::maxShots),
             Codec.floatRange(-90f, 90f).optionalFieldOf("pitch_adjustment", 0f).forGetter(RFEFirearmModeHandlingProperties::pitchAdjustment),
-            RFEMisfire.LIST_CODEC.xmap(li -> ImmutableList.<RFEMisfire>builder().addAll(li).build(), Lists::newArrayList)
+            RFEMisfire.LIST_CODEC.xmap(ImmutableList::copyOf, Lists::newArrayList)
                     .optionalFieldOf("misfire_chances", ImmutableList.of()).forGetter(RFEFirearmModeHandlingProperties::misfires)
     ).apply(o, RFEFirearmModeHandlingProperties::new));
 
@@ -42,7 +42,7 @@ public record RFEFirearmModeHandlingProperties(float movementSpeedModifier, Char
         return new RFEFirearmModeHandlingProperties(builder.movementSpeedModifier, builder.chargingBehavior,
                 new RFEFirearmHeatProperties(builder.heatCapacity, builder.heatRemovedPerTick, builder.heatRemovedOnCharge,
                         builder.heatAddedOnFiring, builder.coolingDelayTime),
-                builder.maxShots, builder.pitchAdjustment, ImmutableList.<RFEMisfire>builder().addAll(builder.misfires).build());
+                builder.maxShots, builder.pitchAdjustment, ImmutableList.copyOf(builder.misfires));
     }
 
     public record RFEFirearmHeatProperties(float heatCapacity, float heatRemovedPerTick, float heatRemovedOnCharge,

@@ -44,7 +44,7 @@ public class RFEFirearmHandlingPropertiesHandler {
 
     private static final Codec<ImmutableMap<String, RFEFirearmModeHandlingProperties>> CODEC = RecordCodecBuilder.create(o -> o.group(
             ExtraCodecs.strictUnboundedMap(Codec.STRING, RFEFirearmModeHandlingProperties.CODEC)
-                    .xmap(map -> ImmutableMap.<String, RFEFirearmModeHandlingProperties>builder().putAll(map).build(), LinkedHashMap::new)
+                    .xmap(ImmutableMap::copyOf, LinkedHashMap::new)
                     .fieldOf("modes").forGetter(Function.identity())
     ).apply(o, Function.identity()));
 

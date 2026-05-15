@@ -248,7 +248,7 @@ public class RFEFirearmMode {
     public void saveModeData(ItemStack itemStack, DataComponentPatch data) {
         Map<String, DataComponentPatch> map = new HashMap<>(itemStack.getOrDefault(RFEDataComponents.FIREARM_MODE_DATA, ImmutableMap.of()));
         map.put(this.modeDataId, data);
-        itemStack.set(RFEDataComponents.FIREARM_MODE_DATA, ImmutableMap.<String, DataComponentPatch>builder().putAll(map).build());
+        itemStack.set(RFEDataComponents.FIREARM_MODE_DATA, ImmutableMap.copyOf(map));
     }
 
     public int getNominalCapacity(ItemStack itemStack, LivingEntity entity) {

@@ -1738,17 +1738,18 @@
     "sounds": [
       {
         "name": "rfe_builtin:item/generic/smg/shot",
-        "volume": 1.0
+        "volume": 1.0,
+        "pitch": 1.1
       },
       {
         "name": "rfe_builtin:item/generic/smg/shot",
         "volume": 1.0,
-        "pitch": 0.98
+        "pitch": 1.08
       },
       {
         "name": "rfe_builtin:item/generic/smg/shot",
         "volume": 1.0,
-        "pitch": 0.97
+        "pitch": 1.07
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.smg.shot"

@@ -97,6 +97,10 @@
       "components": {"ritchiesfirearmengine:firearm_mode_data":{"MainMode":{"ritchiesfirearmengine:detached_magazine":[{"item":{"id":"rfe_builtin:pistol_magazine_15rds"},"slot":0}]}}}
     },
     {
+      "id": "rfe_builtin:tt_33",
+      "components": {"ritchiesfirearmengine:firearm_mode_data":{"MainMode":{"ritchiesfirearmengine:detached_magazine":[{"item":{"id":"rfe_builtin:pistol_magazine_8rds"},"slot":0}]}}}
+    },
+    {
       "id": "rfe_builtin:deagle_50_ae",
       "components": {"ritchiesfirearmengine:firearm_mode_data":{"MainMode":{"ritchiesfirearmengine:detached_magazine":[{"item":{"id":"rfe_builtin:pistol_magazine_7rds"},"slot":0}]}}}
     },

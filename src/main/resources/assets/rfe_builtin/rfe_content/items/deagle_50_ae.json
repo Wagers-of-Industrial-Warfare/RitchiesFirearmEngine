@@ -20,7 +20,7 @@
   "firing": {
     "fire_mode": "semi_auto",
     "rpm": 220,
-    "sound": "rfe_builtin:item.generic.pistol.shot1"
+    "sound": "rfe_builtin:item.generic.pistol.shot.powerful"
   },
   "reload": {
     "phases": [

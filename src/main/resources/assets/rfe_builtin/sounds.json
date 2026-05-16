@@ -573,7 +573,8 @@
     "sounds": [
       {
         "name": "rfe_builtin:item/generic/pistol/shot",
-        "volume": 1.0
+        "volume": 1.0,
+        "pitch": 1.0
       },
       {
         "name": "rfe_builtin:item/generic/pistol/shot",
@@ -591,6 +592,86 @@
   "item.generic.pistol.shot1": {
     "sounds": [
       {
+        "name": "rfe_builtin:item/generic/pistol/shot1",
+        "volume": 1.0,
+        "pitch": 1.0
+      },
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot1",
+        "volume": 1.0,
+        "pitch": 1.02
+      },
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot1",
+        "volume": 1.0,
+        "pitch": 1.04
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.shot"
+  },
+  "item.generic.pistol.shot2": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot2",
+        "volume": 1.0,
+        "pitch": 1.05
+      },
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot2",
+        "volume": 1.0,
+        "pitch": 1.06
+      },
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot2",
+        "volume": 1.0,
+        "pitch": 1.08
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.shot"
+  },
+  "item.generic.pistol.shot3": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot3",
+        "volume": 1.0,
+        "pitch": 1.0
+      },
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot3",
+        "volume": 1.0,
+        "pitch": 1.02
+      },
+      {
+        "name": "rfe_builtin:item/generic/pistol/shot3",
+        "volume": 1.0,
+        "pitch": 1.04
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.shot"
+  },
+  "item.generic.pistol.shot4": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/revolver/shot",
+        "volume": 1.0,
+        "pitch": 1.0
+      },
+      {
+        "name": "rfe_builtin:item/generic/revolver/shot",
+        "volume": 1.0,
+        "pitch": 0.98
+      },
+      {
+        "name": "rfe_builtin:item/generic/revolver/shot",
+        "volume": 1.0,
+        "pitch": 0.97
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.shot"
+  },
+  "item.generic.pistol.shot.powerful": {
+    "sounds": [
+      {
         "name": "rfe_builtin:item/generic/pistol/shot_powerful",
         "volume": 1.0,
         "pitch": 0.95
@@ -604,25 +685,6 @@
         "name": "rfe_builtin:item/generic/pistol/shot_powerful",
         "volume": 1.0,
         "pitch": 0.92
-      }
-    ],
-    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.shot"
-  },
-  "item.generic.pistol.shot2": {
-    "sounds": [
-      {
-        "name": "rfe_builtin:item/generic/revolver/shot",
-        "volume": 1.0
-      },
-      {
-        "name": "rfe_builtin:item/generic/revolver/shot",
-        "volume": 1.0,
-        "pitch": 0.98
-      },
-      {
-        "name": "rfe_builtin:item/generic/revolver/shot",
-        "volume": 1.0,
-        "pitch": 0.97
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.pistol.shot"

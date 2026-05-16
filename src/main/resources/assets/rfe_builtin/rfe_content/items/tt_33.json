@@ -19,8 +19,8 @@
   },
   "firing": {
     "fire_mode": "semi_auto",
-    "rpm": 300,
-    "sound": "rfe_builtin:item.generic.pistol.shot3"
+    "rpm": 400,
+    "sound": "rfe_builtin:item.generic.pistol.shot2"
   },
   "reload": {
     "phases": [
@@ -52,7 +52,7 @@
             { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 }
           ]
         },
-        "time": 12,
+        "time": 15,
         "unload_type": "magazines",
         "unload_time": 10,
         "sounds": [
@@ -71,7 +71,7 @@
             { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 }
           ]
         },
-        "time": 10,
+        "time": 12,
         "reload_type": "magazines",
         "sounds": [
           { "time": 5, "sound": "rfe_builtin:item.generic.pistol.magazine.reload" }
@@ -83,10 +83,10 @@
       {
         "phase": "finish",
         "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 },
-        "time": 10,
+        "time": 12,
         "charge_firearm": true,
         "sounds": [
-          { "time": 5, "sound": "rfe_builtin:item.generic.pistol.rack.end" }
+          { "time": 6, "sound": "rfe_builtin:item.generic.pistol.rack.end" }
         ]
       },
       {
@@ -110,7 +110,7 @@
       {
         "phase": "unload",
         "condition": { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
-        "time": 11,
+        "time": 16,
         "unload_type": "rounds",
         "unload_count": 1,
         "sound": "rfe_builtin:item.generic.pistol.rack"
@@ -118,7 +118,7 @@
       {
         "phase": "unload",
         "condition": { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-        "time": 10,
+        "time": 15,
         "unload_type": "magazines",
         "sound": "rfe_builtin:item.generic.pistol.magazine.unload"
       },

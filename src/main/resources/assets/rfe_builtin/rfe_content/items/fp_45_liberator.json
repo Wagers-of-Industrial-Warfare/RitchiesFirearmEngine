@@ -20,7 +20,7 @@
   "firing": {
     "fire_mode": "single_action",
     "cooldown": 2,
-    "sound": "rfe_builtin:item.generic.pistol.shot2"
+    "sound": "rfe_builtin:item.generic.pistol.shot4"
   },
   "reload": {
     "phases": [

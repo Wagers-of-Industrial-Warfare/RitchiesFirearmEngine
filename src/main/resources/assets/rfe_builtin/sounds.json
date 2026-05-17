@@ -479,6 +479,56 @@
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.pistol.draw"
   },
+  "item.generic.pistol.fired.click": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/musket/click",
+        "volume": 0.75,
+        "pitch": 0.9
+      },
+      {
+        "name": "rfe_builtin:item/generic/musket/click",
+        "volume": 0.75,
+        "pitch": 0.88
+      },
+      {
+        "name": "rfe_builtin:item/generic/musket/click",
+        "volume": 0.75,
+        "pitch": 0.86
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.shot"
+  },
+  "item.generic.pistol.gunpowder.pour": {
+    "sounds": [
+      {
+        "name": "minecraft:dig/sand4",
+        "volume": 0.75,
+        "pitch": 1.2
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.musket.gunpowder.pour"
+  },
+  "item.generic.pistol.hammer.cocked": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 1.3
+      },
+      {
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 1.28
+      },
+      {
+        "name": "rfe_builtin:item/generic/firearm/hammer_cocked",
+        "volume": 0.25,
+        "pitch": 1.27
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.cocked"
+  },
   "item.generic.pistol.magazine.reload": {
     "sounds": [
       {
@@ -568,6 +618,56 @@
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.pistol.rack"
+  },
+  "item.generic.pistol.ramrod.draw": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/musket/ramrod",
+        "volume": 0.25,
+        "pitch": 1.1
+      },
+      {
+        "name": "rfe_builtin:item/generic/musket/ramrod",
+        "volume": 0.25,
+        "pitch": 1.08
+      },
+      {
+        "name": "rfe_builtin:item/generic/musket/ramrod",
+        "volume": 0.75,
+        "pitch": 1.07
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.ramrod.draw"
+  },
+  "item.generic.pistol.ramrod.insert": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/musket/ramrod",
+        "volume": 0.25,
+        "pitch": 1.0
+      },
+      {
+        "name": "rfe_builtin:item/generic/musket/ramrod",
+        "volume": 0.25,
+        "pitch": 0.98
+      },
+      {
+        "name": "rfe_builtin:item/generic/musket/ramrod",
+        "volume": 0.75,
+        "pitch": 0.97
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.ramrod.insert"
+  },
+  "item.generic.pistol.ramrod.ram": {
+    "sounds": [
+      {
+        "name": "minecraft:dig/stone1",
+        "volume": 0.25,
+        "pitch": 1.35
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.ramrod.ram"
   },
   "item.generic.pistol.shot": {
     "sounds": [
@@ -665,6 +765,26 @@
         "name": "rfe_builtin:item/generic/revolver/shot",
         "volume": 1.0,
         "pitch": 0.97
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.pistol.shot"
+  },
+  "item.generic.pistol.shot.black_powder": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/musket/fired",
+        "volume": 1.0,
+        "pitch": 1.5
+      },
+      {
+        "name": "rfe_builtin:item/generic/musket/fired",
+        "volume": 1.0,
+        "pitch": 1.48
+      },
+      {
+        "name": "rfe_builtin:item/generic/musket/fired",
+        "volume": 1.0,
+        "pitch": 1.47
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.pistol.shot"

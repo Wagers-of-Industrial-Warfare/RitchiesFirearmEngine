@@ -2,11 +2,11 @@
   "replace_primary_ammo": false,
   "primary_ammo": [
     {
-      "ammo": "rfe_builtin:black_powder_handgun_cartridge",
+      "ammo": "rfe_builtin:paper_handgun_cartridge",
       "fires": "rfe_builtin:65_pistol_ball"
     },
     {
-      "ammo": "rfe_builtin:infinite_black_powder_handgun_cartridge",
+      "ammo": "rfe_builtin:infinite_paper_handgun_cartridge",
       "fires": "rfe_builtin:65_pistol_ball"
     }
   ],
@@ -20,7 +20,7 @@
   "secondary_ammo": [
   ],
   "unlimited_primary_reload_item": {
-    "id": "rfe_builtin:black_powder_handgun_cartridge"
+    "id": "rfe_builtin:paper_handgun_cartridge"
   },
   "modes": {
   }

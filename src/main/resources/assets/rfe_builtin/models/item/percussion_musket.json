@@ -1,0 +1,83 @@
+{
+  "parent": "rfe_builtin:item/percussion_musket/percussion_musket_fired",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:aiming": 1 },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 1 },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_uncharged"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:round_count": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_uncharged_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_jammed": 1 },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_jammed": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_charged": 1 },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_normal"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charged": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_charging": 1 },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_normal"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charging": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_firing": 1 },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_firing": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_uncharged": 1 },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_uncharged"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_uncharged": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_uncharged_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_reload"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_reload"
+    }
+  ]
+}

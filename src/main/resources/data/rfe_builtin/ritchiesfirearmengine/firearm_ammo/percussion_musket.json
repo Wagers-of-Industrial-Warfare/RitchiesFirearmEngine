@@ -1,0 +1,39 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:musket_cartridge",
+      "fires": "rfe_builtin:75_musket_ball"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_musket_cartridge",
+      "fires": "rfe_builtin:75_musket_ball"
+    },
+    {
+      "ammo": "rfe_builtin:buck_and_ball_musket_cartridge",
+      "fires": "rfe_builtin:75_1_musket_buck_and_ball"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_buck_and_ball_musket_cartridge",
+      "fires": "rfe_builtin:75_1_musket_buck_and_ball"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+    "#rfe_builtin:percussion_caps"
+  ],
+  "unlimited_primary_reload_item": {
+    "id": "rfe_builtin:musket_cartridge"
+  },
+  "unlimited_secondary_reload_item": {
+    "id": "rfe_builtin:percussion_cap"
+  },
+  "modes": {
+  }
+}

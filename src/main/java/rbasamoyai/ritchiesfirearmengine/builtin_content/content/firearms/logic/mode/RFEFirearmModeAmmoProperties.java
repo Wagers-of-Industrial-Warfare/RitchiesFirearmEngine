@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.AmmoPredicate;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 
 import javax.annotation.Nullable;
@@ -50,7 +51,7 @@ public record RFEFirearmModeAmmoProperties(ImmutableMap<AmmoPredicate, RFEProjec
             }
         }
         for (AmmoPredicate secondaryPred : this.secondaryAmmo) {
-            if (secondaryPred.test(item))
+            if (!FirearmDataUtils.isUsedPrimer(item) && secondaryPred.test(item))
                 return true;
         }
         return false;

@@ -2,5 +2,11 @@
   "parent": "minecraft:item/generated",
   "textures": {
     "layer0": "rfe_builtin:item/percussion_cap"
-  }
+  },
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:is_used_primer": 1 },
+      "model": "rfe_builtin:item/percussion_cap_used"
+    }
+  ]
 }

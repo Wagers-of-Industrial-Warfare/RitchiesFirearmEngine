@@ -77,21 +77,31 @@ public class AmmoPacketItemPropertiesHandler {
     }
 
     private static void applyLoadedData(AmmoPacketItemProperties.Builder builder, AmmoPacketItemProperties.Layer layer) {
-        if (layer.replaceAmmoCapacities)
-            builder.ammoCapacities.clear();
-        builder.ammoCapacities.putAll(layer.ammoCapacities);
+        if (layer.replacePrimaryAmmoCapacities)
+            builder.primaryAmmoCapacities.clear();
+        builder.primaryAmmoCapacities.putAll(layer.primaryAmmoCapacities);
+        
+        if (layer.replaceSecondaryAmmoCapacities)
+            builder.secondaryAmmoCapacities.clear();
+        builder.secondaryAmmoCapacities.putAll(layer.secondaryAmmoCapacities);
     }
 
     @ApiStatus.Internal
-    public static void registerDefaults(Item item, ImmutableMap<AmmoPredicate, Integer> ammoCapacities) {
+    public static void registerDefaults(Item item, ImmutableMap<AmmoPredicate, Integer> primaryAmmoCapacities,
+                                        ImmutableMap<AmmoPredicate, Integer> secondaryAmmoCapacities) {
         if (DEFAULT_PROPERTIES.containsKey(item))
             throw new IllegalStateException("Already registered default ammo packet properties for item");
-        DEFAULT_PROPERTIES.put(item, new AmmoPacketItemProperties(ammoCapacities));
+        DEFAULT_PROPERTIES.put(item, new AmmoPacketItemProperties(primaryAmmoCapacities, secondaryAmmoCapacities));
     }
 
     @Nullable
-    public static ImmutableMap<AmmoPredicate, Integer> getAmmoCapacities(Item item) {
-        return PROPERTIES.containsKey(item) ? PROPERTIES.get(item).ammoCapacities : null;
+    public static ImmutableMap<AmmoPredicate, Integer> getPrimaryAmmoCapacities(Item item) {
+        return PROPERTIES.containsKey(item) ? PROPERTIES.get(item).primaryAmmoCapacities : null;
+    }
+
+    @Nullable
+    public static ImmutableMap<AmmoPredicate, Integer> getSecondaryAmmoCapacities(Item item) {
+        return PROPERTIES.containsKey(item) ? PROPERTIES.get(item).secondaryAmmoCapacities : null;
     }
 
     public static void syncToPlayer(ServerPlayer player) {
@@ -117,32 +127,40 @@ public class AmmoPacketItemPropertiesHandler {
     }
 
     // TODO secondary ammo capacities
-    private record AmmoPacketItemProperties(ImmutableMap<AmmoPredicate, Integer> ammoCapacities) {
+    private record AmmoPacketItemProperties(ImmutableMap<AmmoPredicate, Integer> primaryAmmoCapacities,
+                                            ImmutableMap<AmmoPredicate, Integer> secondaryAmmoCapacities) {
         private static final StreamCodec<RegistryFriendlyByteBuf, AmmoPacketItemProperties> STREAM_CODEC = StreamCodec.composite(
-                RFEByteBufCodecUtils.immutableMap(AmmoPredicate.STREAM_CODEC, ByteBufCodecs.VAR_INT), AmmoPacketItemProperties::ammoCapacities,
+                RFEByteBufCodecUtils.immutableMap(AmmoPredicate.STREAM_CODEC, ByteBufCodecs.VAR_INT), AmmoPacketItemProperties::primaryAmmoCapacities,
+                RFEByteBufCodecUtils.immutableMap(AmmoPredicate.STREAM_CODEC, ByteBufCodecs.VAR_INT), AmmoPacketItemProperties::secondaryAmmoCapacities,
                 AmmoPacketItemProperties::new);
 
         public static Builder builder() { return new Builder(); }
 
         private static class Builder {
-            public final Map<AmmoPredicate, Integer> ammoCapacities = new LinkedHashMap<>();
+            public final Map<AmmoPredicate, Integer> primaryAmmoCapacities = new LinkedHashMap<>();
+            public final Map<AmmoPredicate, Integer> secondaryAmmoCapacities = new LinkedHashMap<>();
 
             public AmmoPacketItemProperties build() {
-                return new AmmoPacketItemProperties(ImmutableMap.copyOf(this.ammoCapacities));
+                return new AmmoPacketItemProperties(ImmutableMap.copyOf(this.primaryAmmoCapacities), ImmutableMap.copyOf(this.secondaryAmmoCapacities));
             }
 
             public static Builder fromExistingProperties(AmmoPacketItemProperties properties) {
                 Builder builder = new Builder();
-                builder.ammoCapacities.putAll(properties.ammoCapacities);
+                builder.primaryAmmoCapacities.putAll(properties.primaryAmmoCapacities);
+                builder.secondaryAmmoCapacities.putAll(properties.secondaryAmmoCapacities);
                 return builder;
             }
         }
 
-        private record Layer(boolean replaceAmmoCapacities, Map<AmmoPredicate, Integer> ammoCapacities) {
+        private record Layer(boolean replacePrimaryAmmoCapacities, Map<AmmoPredicate, Integer> primaryAmmoCapacities,
+                             boolean replaceSecondaryAmmoCapacities, Map<AmmoPredicate, Integer> secondaryAmmoCapacities) {
             private static final Codec<Layer> CODEC = RecordCodecBuilder.create(o -> o.group(
-                    Codec.BOOL.optionalFieldOf("replace_ammo", false).forGetter(Layer::replaceAmmoCapacities),
+                    Codec.BOOL.optionalFieldOf("replace_primary_ammo", false).forGetter(Layer::replacePrimaryAmmoCapacities),
                     ExtraCodecs.strictUnboundedMap(AmmoPredicate.CODEC.fieldOf("ammo").codec(), Codec.intRange(0, Integer.MAX_VALUE).fieldOf("capacity").codec())
-                            .optionalFieldOf("ammo", new LinkedHashMap<>()).forGetter(Layer::ammoCapacities)
+                            .optionalFieldOf("primary_ammo", new LinkedHashMap<>()).forGetter(Layer::primaryAmmoCapacities),
+                    Codec.BOOL.optionalFieldOf("replace_secondary_ammo", false).forGetter(Layer::replaceSecondaryAmmoCapacities),
+                    ExtraCodecs.strictUnboundedMap(AmmoPredicate.CODEC.fieldOf("ammo").codec(), Codec.intRange(0, Integer.MAX_VALUE).fieldOf("capacity").codec())
+                            .optionalFieldOf("secondary_ammo", new LinkedHashMap<>()).forGetter(Layer::secondaryAmmoCapacities)
             ).apply(o, Layer::new));
         }
     }

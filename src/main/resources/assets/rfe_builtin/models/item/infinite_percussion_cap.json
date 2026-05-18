@@ -3,5 +3,11 @@
   "textures": {
     "layer0": "rfe_builtin:item/percussion_cap",
     "ritchiesfirearmengine:slot_overlay0": "rfe_builtin:item/capacity_counters/infinite"
-  }
+  },
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:is_used_primer": 1 },
+      "model": "rfe_builtin:item/infinite_percussion_cap_used"
+    }
+  ]
 }

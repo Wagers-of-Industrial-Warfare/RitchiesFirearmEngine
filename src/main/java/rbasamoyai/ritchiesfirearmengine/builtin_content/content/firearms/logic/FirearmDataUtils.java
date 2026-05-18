@@ -609,6 +609,27 @@ public class FirearmDataUtils {
         Optional<? extends Boolean> o = data.get(RFEDataComponents.IS_EQUIPPED);
         return o != null && o.isPresent() && o.get();
     }
+    
+    // Is used primer methods
+
+    public static void setUsedPrimer(ItemStack itemStack, boolean isUsedPrimer) {
+        itemStack.set(RFEDataComponents.IS_USED_PRIMER, isUsedPrimer);
+    }
+
+    public static DataComponentPatch setUsedPrimer(DataComponentPatch data, boolean isUsedPrimer) {
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
+        patched.set(RFEDataComponents.IS_USED_PRIMER, isUsedPrimer);
+        return patched.asPatch();
+    }
+
+    public static boolean isUsedPrimer(ItemStack itemStack) {
+        return isUsedPrimer(itemStack.getComponentsPatch());
+    }
+
+    public static boolean isUsedPrimer(DataComponentPatch data) {
+        Optional<? extends Boolean> o = data.get(RFEDataComponents.IS_USED_PRIMER);
+        return o != null && o.isPresent() && o.get();
+    }
 
     private FirearmDataUtils() {}
 

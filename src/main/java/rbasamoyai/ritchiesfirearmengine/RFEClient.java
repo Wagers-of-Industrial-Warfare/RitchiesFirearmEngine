@@ -124,6 +124,9 @@ public class RFEClient {
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("shot_count"), (itemStack, level, entity, seed) -> {
             return itemStack.getItem() instanceof RFEFirearmItem firearm ? firearm.getShotCount(itemStack) : 0;
         });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_used_primer"), (itemStack, level, entity, seed) -> {
+            return FirearmDataUtils.isUsedPrimer(itemStack) ? 1 : 0;
+        });
     }
 
     public static void onRegisterParticleProviders(ParticleRegistry registry) {

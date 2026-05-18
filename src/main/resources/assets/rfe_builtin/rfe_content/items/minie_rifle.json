@@ -1,0 +1,211 @@
+{
+  "type": "ritchiesfirearmengine:firearm",
+  "reset_charge_on_unequip": true,
+  "item_length": 2.5,
+  "movement_speed_modifier": -0.35,
+  "loaded_secondary_attachment_slot": "rfe_builtin:loaded_percussion_cap",
+  "drawing": {
+    "draw_time": 25,
+    "sound": "rfe_builtin:item.generic.rifle.draw"
+  },
+  "mode_change": {
+    "mode_change_time": 1,
+    "sound": "rfe_builtin:item.generic.rifle.hammer.cocked"
+  },
+  "aiming": {
+    "aim_time": 7,
+    "aim_sound": "rfe_builtin:item.generic.rifle.aim",
+    "unaim_sound": "rfe_builtin:item.generic.rifle.unaim"
+  },
+  "ammo": {
+    "ammo_required": true,
+    "internal_capacity": 1,
+    "requires_secondary_ammo": true,
+    "secondary_ammo_remains_after_firing": true
+  },
+  "firing": {
+    "fire_mode": "single_action",
+    "cooldown": 16,
+    "charging_behavior": "manual",
+    "sound": "rfe_builtin:item.generic.rifle.black_powder.shot",
+    "can_dry_fire": true
+  },
+  "reload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1" },
+            { "macro": "rfe_builtin:can_load_1_secondary" },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 },
+            { "compare": "ritchiesfirearmengine:entity_secondary_ammo_count", "operator": "greater_than", "value": 0 }
+          ]
+        },
+        "time": 15,
+        "sound": "rfe_builtin:item.generic.rifle.hammer.cocked",
+        "accessible_phases": {
+          "reload": { "include": [0] },
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "prepare",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1" },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 },
+            { "compare": "ritchiesfirearmengine:free_secondary_ammo_space", "operator": "equals", "value": 0 }
+          ]
+        },
+        "time": 15,
+        "sound": "rfe_builtin:item.generic.rifle.hammer.cocked",
+        "accessible_phases": {
+          "reload": { "include": [0] },
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "prepare",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1_secondary" },
+            { "compare": "ritchiesfirearmengine:entity_secondary_ammo_count", "operator": "greater_than", "value": 0 }
+          ]
+        },
+        "time": 15,
+        "sound": "rfe_builtin:item.generic.rifle.hammer.cocked",
+        "accessible_phases": {
+          "unload": "all",
+          "reload": { "include": [1] },
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:used_secondary_ammo_count", "operator": "greater_than", "value": 0 },
+            { "compare": "ritchiesfirearmengine:entity_secondary_ammo_count", "operator": "greater_than", "value": 0 }
+          ]
+        },
+        "time": 8,
+        "unload_type": "secondaries",
+        "unload_count": 1,
+        "unload_delay": 8,
+        "sounds": [
+          { "time": 2, "sound": "rfe_builtin:item.generic.firearm.percussion_cap.remove" }
+        ]
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1" },
+            { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
+          ]
+        },
+        "time": 210,
+        "reload_type": "rounds",
+        "reload_count": 1,
+        "reload_delay": 210,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.rifle.gunpowder.pour" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.rifle.ramrod.draw" },
+          { "time": 52, "sound": "rfe_builtin:item.generic.rifle.ramrod.draw" },
+          { "time": 70, "sound": "rfe_builtin:item.generic.rifle.ramrod.insert" },
+          { "time": 90, "sound": "rfe_builtin:item.generic.rifle.ramrod.insert" },
+          { "time": 120, "sound": "rfe_builtin:item.generic.rifle.ramrod.ram" },
+          { "time": 125, "sound": "rfe_builtin:item.generic.rifle.ramrod.ram" },
+          { "time": 130, "sound": "rfe_builtin:item.generic.rifle.ramrod.ram" },
+          { "time": 150, "sound": "rfe_builtin:item.generic.rifle.ramrod.draw" },
+          { "time": 165, "sound": "rfe_builtin:item.generic.rifle.ramrod.draw" },
+          { "time": 180, "sound": "rfe_builtin:item.generic.rifle.ramrod.insert" },
+          { "time": 195, "sound": "rfe_builtin:item.generic.rifle.ramrod.insert" }
+        ]
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_load_1_secondary" },
+            { "compare": "ritchiesfirearmengine:used_secondary_ammo_count", "operator": "equals", "value": 0 },
+            { "compare": "ritchiesfirearmengine:entity_secondary_ammo_count", "operator": "greater_than", "value": 0 }
+          ]
+        },
+        "time": 30,
+        "reload_type": "secondaries",
+        "reload_count": 1,
+        "reload_delay": 30,
+        "sounds": [
+          { "time": 15, "sound": "rfe_builtin:item.generic.firearm.percussion_cap.place" }
+        ],
+        "accessible_phases": {
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "finish",
+        "time": 15,
+        "sound": "rfe_builtin:item.generic.rifle.hammer.cocked"
+      }
+    ]
+  },
+  "unload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": {
+          "or": [
+            { "compare": "ritchiesfirearmengine:used_secondary_ammo_count", "operator": "greater_than", "value": 0 },
+            { "compare": "ritchiesfirearmengine:free_secondary_ammo_space", "operator": "equals", "value": 0 }
+          ]
+        },
+        "time": 15,
+        "sound": "rfe_builtin:item.generic.rifle.hammer.cocked"
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "or": [
+            { "compare": "ritchiesfirearmengine:used_secondary_ammo_count", "operator": "greater_than", "value": 0 },
+            { "compare": "ritchiesfirearmengine:free_secondary_ammo_space", "operator": "equals", "value": 0 }
+          ]
+        },
+        "time": 8,
+        "unload_type": "secondaries",
+        "unload_count": 1,
+        "unload_delay": 8,
+        "sounds": [
+          { "time": 2, "sound": "rfe_builtin:item.generic.firearm.percussion_cap.remove" }
+        ]
+      },
+      {
+        "phase": "finish",
+        "time": 15,
+        "sound": "rfe_builtin:item.generic.rifle.hammer.cocked"
+      }
+    ]
+  },
+  "charge": {
+    "actions": [
+      {
+        "condition": {
+          "or": [
+            { "compare": "ritchiesfirearmengine:is_charged", "operator": "equals", "value": 0 },
+            { "compare": "ritchiesfirearmengine:is_jammed", "operator": "equals", "value": 1 }
+          ]
+        },
+        "time": 15,
+        "sound": "rfe_builtin:item.generic.rifle.hammer.cocked"
+      }
+    ]
+  },
+  "modes": {
+    "safety": {
+      "firing": {
+        "fire_mode": "safety"
+      }
+    }
+  }
+}

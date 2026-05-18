@@ -25,6 +25,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEDefa
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.condition.FirearmConditionMacroHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhase;
@@ -87,7 +88,6 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("speedloader"), new MagazineItem.Builder()); // Alias of magazine
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("ammo_packet"), new AmmoPacketItem.Builder());
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("firearm"), new RFEDefaultFirearmItem.Builder());
-        // TODO revolver builder
 
         ProjectileTypes.register();
         SpreadProviders.register();
@@ -106,6 +106,9 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("entity_has_magazine"), BuiltInRFEPlugin::entityHasMagazine);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("best_speedloader_ammo_count"), BuiltInRFEPlugin::bestSpeedloaderAmmoCount);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("firearm_ammo_count"), BuiltInRFEPlugin::firearmAmmoCount);
+        RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("entity_secondary_ammo_count"), BuiltInRFEPlugin::entitySecondaryAmmoCount);
+        RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("free_secondary_ammo_space"), BuiltInRFEPlugin::freeSecondaryAmmoSpace);
+        RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("used_secondary_ammo_count"), BuiltInRFEPlugin::usedSecondaryAmmoCount);
     }
 
     @Override
@@ -180,7 +183,8 @@ public class BuiltInRFEPlugin implements RFEPlugin {
 
             @Override
             public boolean addToInventory(LivingEntity entity, ItemStack itemStack) {
-                if (itemStack.is(RFETags.RFEItemTags.DISPOSABLE_BY_NPCS_ON_RELOAD.tag)) {
+                if (itemStack.is(RFETags.RFEItemTags.DISPOSABLE_BY_NPCS_ON_RELOAD.tag)
+                        || FirearmDataUtils.isUsedPrimer(itemStack)) {
                     itemStack.setCount(0);
                     return false;
                 }
@@ -205,7 +209,8 @@ public class BuiltInRFEPlugin implements RFEPlugin {
 
             @Override
             public boolean addToInventory(LivingEntity entity, ItemStack itemStack) {
-                if (itemStack.is(RFETags.RFEItemTags.DISPOSABLE_BY_NPCS_ON_RELOAD.tag)) {
+                if (itemStack.is(RFETags.RFEItemTags.DISPOSABLE_BY_NPCS_ON_RELOAD.tag)
+                        || FirearmDataUtils.isUsedPrimer(itemStack)) {
                     itemStack.setCount(0);
                     return false;
                 }
@@ -340,6 +345,33 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         return 0;
     }
 
+    /**
+     * Unused secondary ammo count
+     */
+    private static float entitySecondaryAmmoCount(ItemStack itemStack, LivingEntity entity) {
+        if (itemStack.getItem() instanceof RFEFirearmItem firearm)
+            return firearm.countEntitySecondaryAmmo(itemStack, entity);
+        return 0;
+    }
+
+    /**
+     * Free secondary space based on amount on entity
+     */
+    private static float freeSecondaryAmmoSpace(ItemStack itemStack, LivingEntity entity) {
+        if (itemStack.getItem() instanceof RFEFirearmItem firearm)
+            return firearm.freeSecondaryAmmoSpace(itemStack);
+        return 0;
+    }
+
+    /**
+     * Used secondary ammo count
+     */
+    private static float usedSecondaryAmmoCount(ItemStack itemStack, LivingEntity entity) {
+        if (itemStack.getItem() instanceof RFEFirearmItem firearm)
+            return firearm.usedSecondaryAmmoCount(itemStack);
+        return 0;
+    }
+
     public static class ProjectileTypes {
         private static final Map<ResourceLocation, RFEProjectileType.Serializer<?>> SERIALIZERS = new LinkedHashMap<>();
         public static final RFEBulletProjectileType.Serializer BULLET = register("bullet", new RFEBulletProjectileType.Serializer());
@@ -444,6 +476,9 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         public static final DataComponentType<RFEItemContainerContents> ROUNDS = register("rounds",
                 builder -> builder.persistent(RFEItemContainerContents.CODEC).networkSynchronized(RFEItemContainerContents.STREAM_CODEC));
 
+        public static final DataComponentType<RFEItemContainerContents> PRIMERS = register("primers",
+                builder -> builder.persistent(RFEItemContainerContents.CODEC).networkSynchronized(RFEItemContainerContents.STREAM_CODEC));
+
         public static final DataComponentType<String> FIREARM_MODE = register("firearm_mode",
                 builder -> builder.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
 
@@ -498,6 +533,9 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         public static final DataComponentType<RFEItemContainerContents> LOADED_ROUND = register("loaded_round",
                 builder -> builder.persistent(RFEItemContainerContents.CODEC).networkSynchronized(RFEItemContainerContents.STREAM_CODEC));
 
+        public static final DataComponentType<RFEItemContainerContents> INTERNAL_PRIMERS = register("internal_primers",
+                builder -> builder.persistent(RFEItemContainerContents.CODEC).networkSynchronized(RFEItemContainerContents.STREAM_CODEC));
+
         public static final DataComponentType<ReloadPhase.PhaseType> RELOAD_PHASE = register("reload_phase",
                 builder -> builder.persistent(ReloadPhase.PhaseType.CODEC).networkSynchronized(ReloadPhase.PhaseType.STREAM_CODEC));
 
@@ -523,6 +561,9 @@ public class BuiltInRFEPlugin implements RFEPlugin {
                 builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
         public static final DataComponentType<Boolean> IS_EQUIPPED = register("is_equipped",
+                builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
+        public static final DataComponentType<Boolean> IS_USED_PRIMER = register("is_used_primer",
                 builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
 
         private static <V> DataComponentType<V> register(String id, UnaryOperator<DataComponentType.Builder<V>> builderOp) {

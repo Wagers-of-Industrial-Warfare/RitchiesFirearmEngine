@@ -7,7 +7,7 @@
   "reload_cooldown": 60,
   "use_sound": "rfe_builtin:item.generic.ammo_packet.unwrap",
   "spawn_particles_on_use": true,
-  "ammo": [
+  "primary_ammo": [
     { "ammo": "#rfe_builtin:rifle_cartridges", "capacity": 10 },
     { "ammo": "#rfe_builtin:intermediate_cartridges", "capacity": 15 },
     { "ammo": "#rfe_builtin:pistol_cartridges", "capacity": 20 },
@@ -24,5 +24,8 @@
     { "ammo": "rfe_builtin:infinite_buck_and_ball_musket_cartridge", "capacity": 10 },
     { "ammo": "rfe_builtin:paper_handgun_cartridge", "capacity": 20 },
     { "ammo": "rfe_builtin:infinite_paper_handgun_cartridge", "capacity": 20 }
+  ],
+  "secondary_ammo": [
+    { "ammo": "#rfe_builtin:percussion_caps", "capacity": 10 }
   ]
 }

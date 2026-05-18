@@ -35,24 +35,32 @@ public class AmmoPacketItem extends Item {
     private final int reloadCooldown;
     @Nullable private final SoundEvent useSound;
     private final boolean spawnParticlesOnUse;
-    private final ImmutableMap<AmmoPredicate, Integer> defaultAmmoCapacities; // Datapackable
+    private final ImmutableMap<AmmoPredicate, Integer> defaultPrimaryAmmoCapacities; // Datapackable
+    private final ImmutableMap<AmmoPredicate, Integer> defaultSecondaryAmmoCapacities; // Datapackable
 
     public AmmoPacketItem(Properties properties, boolean glint, int useDuration, int reloadCooldown,
                           @Nullable SoundEvent useSound, boolean spawnParticlesOnUse,
-                          ImmutableMap<AmmoPredicate, Integer> defaultAmmoCapacities) {
+                          ImmutableMap<AmmoPredicate, Integer> defaultPrimaryAmmoCapacities,
+                          ImmutableMap<AmmoPredicate, Integer> defaultSecondaryAmmoCapacities) {
         super(properties);
         this.glint = glint;
         this.useDuration = useDuration;
         this.reloadCooldown = reloadCooldown;
         this.useSound = useSound;
         this.spawnParticlesOnUse = spawnParticlesOnUse;
-        this.defaultAmmoCapacities = defaultAmmoCapacities;
-        AmmoPacketItemPropertiesHandler.registerDefaults(this, defaultAmmoCapacities);
+        this.defaultPrimaryAmmoCapacities = defaultPrimaryAmmoCapacities;
+        this.defaultSecondaryAmmoCapacities = defaultSecondaryAmmoCapacities;
+        AmmoPacketItemPropertiesHandler.registerDefaults(this, defaultPrimaryAmmoCapacities, defaultSecondaryAmmoCapacities);
     }
 
-    public ImmutableMap<AmmoPredicate, Integer> getAmmoCapacities() {
-        ImmutableMap<AmmoPredicate, Integer> ammoCapacities = AmmoPacketItemPropertiesHandler.getAmmoCapacities(this);
-        return ammoCapacities == null ? this.defaultAmmoCapacities : ammoCapacities;
+    public ImmutableMap<AmmoPredicate, Integer> getPrimaryAmmoCapacities() {
+        ImmutableMap<AmmoPredicate, Integer> ammoCapacities = AmmoPacketItemPropertiesHandler.getPrimaryAmmoCapacities(this);
+        return ammoCapacities == null ? this.defaultPrimaryAmmoCapacities : ammoCapacities;
+    }
+
+    public ImmutableMap<AmmoPredicate, Integer> getSecondaryAmmoCapacities() {
+        ImmutableMap<AmmoPredicate, Integer> ammoCapacities = AmmoPacketItemPropertiesHandler.getSecondaryAmmoCapacities(this);
+        return ammoCapacities == null ? this.defaultSecondaryAmmoCapacities : ammoCapacities;
     }
 
     @Override public boolean isFoil(ItemStack itemStack) { return this.glint || super.isFoil(itemStack); }
@@ -67,7 +75,7 @@ public class AmmoPacketItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
-        if (this.getStoredAmmo(itemStack).isEmpty())
+        if (this.getStoredPrimaryAmmo(itemStack).isEmpty())
             return super.use(level, player, hand);
         player.startUsingItem(hand);
         return InteractionResultHolder.consume(itemStack);
@@ -75,7 +83,7 @@ public class AmmoPacketItem extends Item {
 
     @Override
     public ItemStack finishUsingItem(ItemStack itemStack, Level level, LivingEntity entity) {
-        List<ItemStack> ammo = this.getStoredAmmo(itemStack);
+        List<ItemStack> ammo = this.getStoredPrimaryAmmo(itemStack);
         for (ItemStack ammoStack : ammo)
             RFEItemUtils.addItemToEntity(ammoStack, entity);
         if (itemStack.getCount() > 1) {
@@ -87,28 +95,45 @@ public class AmmoPacketItem extends Item {
         }
     }
 
-    public List<ItemStack> getStoredAmmo(ItemStack itemStack) {
+    public List<ItemStack> getStoredPrimaryAmmo(ItemStack itemStack) {
         return FirearmDataUtils.getRounds(itemStack, BuiltInRFEPlugin.RFEDataComponents.ROUNDS);
     }
 
-    public void writeStoredAmmo(ItemStack itemStack, List<ItemStack> ammo) {
+    public void writeStoredPrimaryAmmo(ItemStack itemStack, List<ItemStack> ammo) {
         FirearmDataUtils.saveRounds(itemStack, BuiltInRFEPlugin.RFEDataComponents.ROUNDS, ammo);
     }
 
-    public int countAmmo(ItemStack itemStack) {
-        return RFEItemUtils.countItems(this.getStoredAmmo(itemStack));
+    public int countPrimaryAmmo(ItemStack itemStack) {
+        return RFEItemUtils.countItems(this.getStoredPrimaryAmmo(itemStack));
+    }
+
+    public List<ItemStack> getStoredSecondaryAmmo(ItemStack itemStack) {
+        return FirearmDataUtils.getRounds(itemStack, BuiltInRFEPlugin.RFEDataComponents.PRIMERS);
+    }
+
+    public void writeStoredSecondaryAmmo(ItemStack itemStack, List<ItemStack> ammo) {
+        FirearmDataUtils.saveRounds(itemStack, BuiltInRFEPlugin.RFEDataComponents.PRIMERS, ammo);
+    }
+
+    public int countSecondaryAmmo(ItemStack itemStack) {
+        return RFEItemUtils.countItems(this.getStoredSecondaryAmmo(itemStack));
     }
 
     public void tryReloadingOutsideOfMenu(ItemStack itemStack, LivingEntity entity) {
         if (this.isOnCooldown(entity))
             return;
         boolean split = itemStack.getCount() > 1;
-        List<ItemStack> ammo = this.getStoredAmmo(itemStack);
+        List<ItemStack> primaryAmmo = this.getStoredPrimaryAmmo(itemStack);
+        List<ItemStack> secondaryAmmo = this.getStoredSecondaryAmmo(itemStack);
+        ImmutableMap<AmmoPredicate, Integer> primaryCapacities = this.getPrimaryAmmoCapacities();
+        ImmutableMap<AmmoPredicate, Integer> secondaryCapacities = this.getSecondaryAmmoCapacities();
         RFEItemUtils.consumeItemsFromEntity(entity, s -> {
-            return s != itemStack && this.tryReloadForItem(ammo, s);
+            return s != itemStack && !FirearmDataUtils.isUsedPrimer(s)
+                    && (this.tryReloadForItem(primaryAmmo, s, primaryCapacities) || this.tryReloadForItem(secondaryAmmo, s, secondaryCapacities));
         }, s -> {
             ItemStack writeTo = split ? itemStack.split(1) : itemStack;
-            this.writeStoredAmmo(writeTo, ammo);
+            this.writeStoredPrimaryAmmo(writeTo, primaryAmmo);
+            this.writeStoredSecondaryAmmo(writeTo, secondaryAmmo);
             this.applyCooldown(writeTo, entity);
             if (split) {
                 if (s.isEmpty())
@@ -119,9 +144,8 @@ public class AmmoPacketItem extends Item {
         });
     }
 
-    protected boolean tryReloadForItem(List<ItemStack> ammo, ItemStack availableStack) {
+    protected boolean tryReloadForItem(List<ItemStack> ammo, ItemStack availableStack, ImmutableMap<AmmoPredicate, Integer> ammoCapacities) {
         boolean infinite = availableStack.is(RFEItemTags.INFINITE_AMMO.tag);
-        ImmutableMap<AmmoPredicate, Integer> ammoCapacities = this.getAmmoCapacities();
         if (ammo.isEmpty()) {
             for (Map.Entry<AmmoPredicate, Integer> entry : ammoCapacities.entrySet()) {
                 if (!entry.getKey().test(availableStack))
@@ -173,7 +197,8 @@ public class AmmoPacketItem extends Item {
     @Override
     public void appendHoverText(ItemStack itemStack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(itemStack, context, tooltip, flag);
-        List<ItemStack> storedAmmo = this.getStoredAmmo(itemStack);
+        List<ItemStack> storedAmmo = this.getStoredPrimaryAmmo(itemStack);
+        storedAmmo.addAll(this.getStoredSecondaryAmmo(itemStack));
         Map<Item, Integer> storedIndex = new Object2IntLinkedOpenHashMap<>();
         for (ItemStack ammoStack : storedAmmo)
             storedIndex.merge(ammoStack.getItem(), ammoStack.getCount(), Integer::sum);
@@ -206,11 +231,11 @@ public class AmmoPacketItem extends Item {
             }
             boolean spawnParticlesOnUse = GsonHelper.getAsBoolean(obj, "spawn_particles_on_use", false);
 
-            JsonArray primaryAmmoCapArr = GsonHelper.getAsJsonArray(obj, "ammo");
+            JsonArray primaryAmmoCapArr = GsonHelper.getAsJsonArray(obj, "primary_ammo");
             ImmutableMap.Builder<AmmoPredicate, Integer> primaryAmmoCapacities = ImmutableMap.builder();
             for (JsonElement el : primaryAmmoCapArr) {
                 if (!el.isJsonObject())
-                    throw new JsonParseException("Ammo packet capacity must be a json object");
+                    throw new JsonParseException("Primary ammo packet capacity must be a json object");
                 JsonObject capObj = el.getAsJsonObject();
                 AmmoPredicate pred = AmmoPredicate.fromString(GsonHelper.getAsString(capObj, "ammo"));
                 int capacity = GsonHelper.getAsInt(capObj, "capacity");
@@ -219,8 +244,21 @@ public class AmmoPacketItem extends Item {
                 primaryAmmoCapacities.put(pred, capacity);
             }
 
+            JsonArray secondaryAmmoCapArr = GsonHelper.getAsJsonArray(obj, "secondary_ammo");
+            ImmutableMap.Builder<AmmoPredicate, Integer> secondaryAmmoCapacities = ImmutableMap.builder();
+            for (JsonElement el : secondaryAmmoCapArr) {
+                if (!el.isJsonObject())
+                    throw new JsonParseException("Secondary ammo packet capacity must be a json object");
+                JsonObject capObj = el.getAsJsonObject();
+                AmmoPredicate pred = AmmoPredicate.fromString(GsonHelper.getAsString(capObj, "ammo"));
+                int capacity = GsonHelper.getAsInt(capObj, "capacity");
+                if (capacity < 1)
+                    throw new IllegalStateException("'capacity' must be at least 1");
+                secondaryAmmoCapacities.put(pred, capacity);
+            }
+
             return new AmmoPacketItem(new Properties().stacksTo(stacksTo).rarity(rarity), glint, useDuration, reloadCooldown,
-                    useSound, spawnParticlesOnUse, primaryAmmoCapacities.build());
+                    useSound, spawnParticlesOnUse, primaryAmmoCapacities.build(), secondaryAmmoCapacities.build());
         }
     }
 

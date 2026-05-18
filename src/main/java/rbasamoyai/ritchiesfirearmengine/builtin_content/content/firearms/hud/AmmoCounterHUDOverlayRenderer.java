@@ -13,6 +13,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudItemInfoProviders;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRenderer;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.elements.RFEHudIcon;
@@ -33,12 +34,13 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
     private final boolean enlargeFirearmAmmoCount;
     private final boolean showInventoryCount;
     private final boolean countLooseRounds;
+    private final boolean showSecondaryAmmoCount;
     @Nullable private final RFEHudIcon firearmIcon;
     private final Map<String, String> modeTranslations;
 
-    public AmmoCounterHUDOverlayRenderer(boolean hideEntireAmmoCount, boolean hideOverheating, boolean hideFirearmAmmoCount, boolean enlargeFirearmAmmoCount,
-                                         boolean showInventoryCount, boolean countLooseRounds, @Nullable RFEHudIcon firearmIcon,
-                                         Map<String, String> modeTranslations) {
+    public AmmoCounterHUDOverlayRenderer(boolean hideEntireAmmoCount, boolean hideOverheating, boolean hideFirearmAmmoCount,
+                                         boolean enlargeFirearmAmmoCount, boolean showInventoryCount, boolean countLooseRounds,
+                                         boolean showSecondaryAmmoCount, @Nullable RFEHudIcon firearmIcon, Map<String, String> modeTranslations) {
         this.minecraft = Minecraft.getInstance();
         this.font = this.minecraft.font;
 
@@ -48,13 +50,19 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
         this.enlargeFirearmAmmoCount = enlargeFirearmAmmoCount;
         this.showInventoryCount = showInventoryCount;
         this.countLooseRounds = countLooseRounds;
+        this.showSecondaryAmmoCount = showSecondaryAmmoCount;
         this.firearmIcon = firearmIcon;
         this.modeTranslations = modeTranslations;
     }
 
     @Override
     public void renderHUD(GuiGraphics graphics, float partialTicks, ItemStack item, Player player, boolean offhand) {
-        // TODO offhand
+        RFEHudItemInfoProviders.RFEHudInfoProvider hudInfo = RFEHudItemInfoProviders.getHudProvider(item);
+        if (hudInfo == null)
+            return;
+        List<ItemStack> inventory = RFEItemUtils.getEntityInventory(player);
+
+        // TODO offhand/left-hand
         int width = graphics.guiWidth();
         int height = graphics.guiHeight();
         PoseStack poseStack = graphics.pose();
@@ -63,7 +71,7 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
         int originY = height - 80;
 
         if (!this.hideEntireAmmoCount) {
-            List<ItemStack> ammoList = RFEHudItemInfoProviders.getAmmoStacksFromItem(item);
+            List<ItemStack> ammoList = hudInfo.getPrimaryAmmo(item);
             if (ammoList != null) { // if firearm item does not have infinite ammo
                 String countText = this.hideFirearmAmmoCount ? "_" : Integer.toString(RFEItemUtils.countItems(ammoList));
                 int textWidth = this.font.width(countText);
@@ -79,7 +87,7 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
                     graphics.drawString(this.font, countText, originX - textWidth, originY, 0xFFFFFF, true);
                 }
                 if (this.showInventoryCount) {
-                    int ammoCount = RFEHudItemInfoProviders.getAmmoInventoryCount(item, player, this.countLooseRounds);
+                    int ammoCount = hudInfo.countPrimaryAmmoInInventory(item, inventory, this.countLooseRounds).orElse(0);
                     String inventoryCountText = "/ " + (ammoCount < 0 ? "∞" : Math.min(ammoCount, 9999));
                     graphics.drawString(this.font, inventoryCountText, originX, originY, 0xFFFFFF, true);
                 }
@@ -94,15 +102,29 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
                     graphics.drawString(this.font, "∞", originX - textWidth / 2, originY, 0xFFFFFF, true);
                 }
             }
+            if (this.showSecondaryAmmoCount) {
+                List<ItemStack> secondaryAmmoList = hudInfo.getSecondaryAmmo(item);
+                if (secondaryAmmoList != null) {
+                    String countText = this.hideFirearmAmmoCount ? "_" : Integer.toString(RFEItemUtils.countItemsConditional(secondaryAmmoList, s -> !FirearmDataUtils.isUsedPrimer(s)));
+                    //countText = "9999";
+                    int offset = this.font.width("      ") - this.font.width(countText);
+                    if (this.showInventoryCount) {
+                        int inventoryAmmoCount = hudInfo.countSecondaryAmmoInInventory(item, inventory, this.countLooseRounds).orElse(0);
+                        String inventoryCountPortion = " / " + (inventoryAmmoCount < 0 ? "∞" : Math.min(inventoryAmmoCount, 9999));
+                        countText += inventoryCountPortion;
+                    }
+                    graphics.drawString(this.font, countText, originX + offset, originY + this.font.lineHeight, 11184810, true);
+                }
+            }
         }
         if (this.firearmIcon != null) {
             this.firearmIcon.blit(graphics, originX - this.firearmIcon.blitWidth() / 2, originY - this.firearmIcon.blitHeight() - 4);
         }
         if (!this.hideOverheating) {
-            float heat = RFEHudItemInfoProviders.getHeatFromItem(item).orElse(0f);
-            float heatCapacity = RFEHudItemInfoProviders.getHeatCapacityFromItem(item).orElse(0f);
+            float heat = hudInfo.getHeatAmount(item);
+            float heatCapacity = hudInfo.getHeatCapacity(item);
             boolean overheated = heat >= heatCapacity;
-            float percentage = heat / heatCapacity;
+            float percentage = heatCapacity >= 1e-4d ? 1 : heat / heatCapacity;
             int rgb = Mth.hsvToRgb((1f - percentage) / 7.5f, 0.75f * Mth.clamp(percentage * 10, 0f, 1f), 1.0f);
             int r = rgb >> 16 & 255;
             int g = rgb >> 8 & 255;
@@ -130,7 +152,6 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
                 graphics.drawString(this.font, modeText, originX - textWidth / 2, originY + this.font.lineHeight * 3 + 2, rgb, true);
             }
         }
-        // TODO secondary ammo
         String modeName = this.getModeName(item);
         if (this.modeTranslations.containsKey(modeName)) {
             String modeKey = this.modeTranslations.get(modeName);
@@ -153,6 +174,7 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
             boolean enlargeFirearmAmmoCount = GsonHelper.getAsBoolean(obj, "enlarge_firearm_ammo", true);
             boolean showInventoryCount = GsonHelper.getAsBoolean(obj, "show_inventory_ammo", true);
             boolean countLooseRounds = GsonHelper.getAsBoolean(obj, "count_loose_rounds", true);
+            boolean showSecondaryAmmoCount = GsonHelper.getAsBoolean(obj, "show_secondary_ammo_count", false);
 
             RFEHudIcon firearmIcon = null;
             if (GsonHelper.isObjectNode(obj, "firearm_icon"))
@@ -168,7 +190,7 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
             }
 
             return new AmmoCounterHUDOverlayRenderer(hideEntireAmmoCount, hideOverheating, hideFirearmAmmoCount, enlargeFirearmAmmoCount,
-                    showInventoryCount, countLooseRounds, firearmIcon, modeNames);
+                    showInventoryCount, countLooseRounds, showSecondaryAmmoCount, firearmIcon, modeNames);
         }
     }
 

@@ -1,0 +1,31 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:musket_rifle_cartridge",
+      "fires": "rfe_builtin:550_minie_ball"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_musket_rifle_cartridge",
+      "fires": "rfe_builtin:550_minie_ball"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+    "#rfe_builtin:percussion_caps"
+  ],
+  "unlimited_primary_reload_item": {
+    "id": "rfe_builtin:musket_rifle_cartridge"
+  },
+  "unlimited_secondary_reload_item": {
+    "id": "rfe_builtin:percussion_cap"
+  },
+  "modes": {
+  }
+}

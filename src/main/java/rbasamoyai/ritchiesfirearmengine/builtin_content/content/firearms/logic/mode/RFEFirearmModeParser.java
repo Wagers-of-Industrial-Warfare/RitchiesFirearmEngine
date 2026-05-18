@@ -82,6 +82,10 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                 boolean trackEmptySlots = GsonHelper.getAsBoolean(ammo, "track_empty_slots", false);
                 builder.requiresSecondaryAmmo(requiresSecondaryAmmo)
                         .trackEmptySlots(trackEmptySlots);
+                if (requiresSecondaryAmmo) {
+                    boolean secondaryAmmoRemainsAfterFiring = GsonHelper.getAsBoolean(ammo, "secondary_ammo_remains_after_firing", true);
+                    builder.secondaryAmmoRemainsAfterFiring(secondaryAmmoRemainsAfterFiring);
+                }
             }
         }
 
@@ -245,6 +249,14 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                 builder.magazineAttachmentSlot(null);
             } else {
                 builder.magazineAttachmentSlot(ResourceLocation.parse(magazineAttachmentSlot));
+            }
+        }
+        if (GsonHelper.isStringValue(obj, "loaded_secondary_attachment_slot")) {
+            String loadedSecondaryAttachmentSlot = GsonHelper.getAsString(obj, "loaded_secondary_attachment_slot");
+            if (loadedSecondaryAttachmentSlot.isEmpty()) {
+                builder.loadedSecondaryAttachmentSlot(null);
+            } else {
+                builder.loadedSecondaryAttachmentSlot(ResourceLocation.parse(loadedSecondaryAttachmentSlot));
             }
         }
 

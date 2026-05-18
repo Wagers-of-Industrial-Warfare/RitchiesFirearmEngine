@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "rfe_builtin:infinite_percussion_cap",
+    "rfe_builtin:percussion_cap"
+  ]
+}

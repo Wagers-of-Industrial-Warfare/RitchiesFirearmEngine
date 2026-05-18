@@ -117,6 +117,15 @@ public class RFEItemUtils {
         return count;
     }
 
+    public static int countItemsConditional(List<ItemStack> items, Predicate<ItemStack> pred) {
+        int count = 0;
+        for (ItemStack itemStack : items) {
+            if (pred.test(itemStack))
+                count += itemStack.getCount();
+        }
+        return count;
+    }
+
     public static int countItemsIncludingSlots(List<ItemStack> items) {
         int count = 0;
         for (ItemStack itemStack : items)

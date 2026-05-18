@@ -161,6 +161,7 @@
   "item.rfe_builtin.mac_10": "MAC-10",
   "item.rfe_builtin.mas_49_56": "MAS-49/56",
   "item.rfe_builtin.mat_49": "MAT-49",
+  "item.rfe_builtin.minie_rifle": "Minié Rifle",
   "item.rfe_builtin.mp_18": "Maschinenpistole 18",
   "item.rfe_builtin.mp_18_experimental": "Maschinenpistole 18 (experimental)",
   "item.rfe_builtin.mp_28": "Maschinenpistole 28",
@@ -278,9 +279,13 @@
   "subtitles.rfe_builtin.item.generic.rifle.bullet_unload": "Rifle unloaded",
   "subtitles.rfe_builtin.item.generic.rifle.cocked": "Rifle cocked",
   "subtitles.rfe_builtin.item.generic.rifle.draw": "Rifle equipped",
+  "subtitles.rfe_builtin.item.generic.rifle.gunpowder.pour": "Gunpowder poured",
   "subtitles.rfe_builtin.item.generic.rifle.magazine.reload": "Rifle magazine reloaded",
   "subtitles.rfe_builtin.item.generic.rifle.magazine.unload": "Rifle magazine unloaded",
   "subtitles.rfe_builtin.item.generic.rifle.rack": "Rifle racked",
+  "subtitles.rfe_builtin.item.generic.rifle.ramrod.draw": "Rifle ramrod drawn",
+  "subtitles.rfe_builtin.item.generic.rifle.ramrod.insert": "Rifle ramrod inserted",
+  "subtitles.rfe_builtin.item.generic.rifle.ramrod.ram": "Rifle ramrod rammed",
   "subtitles.rfe_builtin.item.generic.rifle.shot": "Rifle shot",
   "subtitles.rfe_builtin.item.generic.rifle.stripper_clip": "Rifle stripper clip loaded",
   "subtitles.rfe_builtin.item.generic.shotgun.break_action.close": "Break-action shotgun closed",
@@ -301,5 +306,6 @@
   "subtitles.rfe_builtin.item.generic.smg.shot": "Submachine gun shot",
   "subtitles.rfe_builtin.projectile.generic.crack": "Bullet cracks past",
   "subtitles.rfe_builtin.projectile.generic.whizz": "Bullet whizzes past",
-  "subtitles.rfe_builtin.projectile.generic.rocket.motor": "Rocket flies past"
+  "subtitles.rfe_builtin.projectile.generic.rocket.motor": "Rocket flies past",
+  "rfe_builtin.tooltip.used": "(Used)"
 }

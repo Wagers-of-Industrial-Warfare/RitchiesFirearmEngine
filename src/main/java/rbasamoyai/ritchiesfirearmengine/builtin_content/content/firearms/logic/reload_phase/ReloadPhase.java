@@ -360,7 +360,6 @@ public class ReloadPhase {
             return this;
         }
 
-        // TODO secondaries
         public ReloadPhase build() {
             if (this.phaseType == null)
                 throw new IllegalStateException("Must specify " + this.mode + " phase type");

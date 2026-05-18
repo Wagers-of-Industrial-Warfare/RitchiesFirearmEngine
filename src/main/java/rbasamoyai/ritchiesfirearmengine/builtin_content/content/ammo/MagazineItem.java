@@ -24,6 +24,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,8 +54,31 @@ public class MagazineItem extends Item {
     }
 
     protected void registerHUDProviders() {
-        RFEHudItemInfoProviders.registerAmmoProvider(this, this::getAmmoItemsForHUD);
-        RFEHudItemInfoProviders.registerAmmoInventoryCountProvider(this, this::getInventoryAmmoCountForHUD);
+        RFEHudItemInfoProviders.registerHudInfoProvider(this, new RFEHudItemInfoProviders.RFEHudInfoProvider() {
+            @Nullable
+            @Override
+            public List<ItemStack> getPrimaryAmmo(ItemStack itemStack) {
+                return MagazineItem.this.getAmmoItemsForHUD(itemStack);
+            }
+
+            @Nullable
+            @Override
+            public List<ItemStack> getSecondaryAmmo(ItemStack itemStack) {
+                return List.of();
+            }
+
+            @Override
+            public Optional<Integer> countPrimaryAmmoInInventory(ItemStack itemStack, List<ItemStack> inventory, boolean countLooseRounds) {
+                return MagazineItem.this.getInventoryAmmoCountForHUD(itemStack, inventory, countLooseRounds);
+            }
+
+            @Override
+            public Optional<Integer> countSecondaryAmmoInInventory(ItemStack itemStack, List<ItemStack> inventory, boolean countLooseRounds) {
+                return Optional.of(0);
+            }
+
+            // TODO magazine secondaries
+        });
     }
 
     @Override public boolean isFoil(ItemStack stack) { return this.glint || super.isFoil(stack); }

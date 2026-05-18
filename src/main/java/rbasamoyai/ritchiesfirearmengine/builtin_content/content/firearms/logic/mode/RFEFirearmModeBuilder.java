@@ -45,6 +45,7 @@ public class RFEFirearmModeBuilder {
     protected boolean explicitNominalCapacity = false;
     protected boolean plusOneCapacity = false;
     protected boolean requiresSecondaryAmmo = false;
+    public boolean secondaryAmmoRemainsAfterFiring = false;
     protected boolean trackEmptySlots = false;
 
     protected FireMode fireMode = null;
@@ -102,6 +103,7 @@ public class RFEFirearmModeBuilder {
 
     @Nullable protected ResourceLocation magazineAttachmentSlot = null;
     @Nullable protected ResourceLocation loadedRoundAttachmentSlot = null;
+    @Nullable protected ResourceLocation loadedSecondaryAttachmentSlot = null;
 
     public RFEFirearmModeBuilder(String modeId) {
         this.modeId = modeId;
@@ -137,6 +139,7 @@ public class RFEFirearmModeBuilder {
         newBuilder.explicitNominalCapacity = this.explicitNominalCapacity;
         newBuilder.plusOneCapacity = this.plusOneCapacity;
         newBuilder.requiresSecondaryAmmo = this.requiresSecondaryAmmo;
+        newBuilder.secondaryAmmoRemainsAfterFiring = this.secondaryAmmoRemainsAfterFiring;
         newBuilder.trackEmptySlots = this.trackEmptySlots;
 
         newBuilder.fireMode = this.fireMode;
@@ -186,6 +189,7 @@ public class RFEFirearmModeBuilder {
 
         newBuilder.magazineAttachmentSlot = this.magazineAttachmentSlot;
         newBuilder.loadedRoundAttachmentSlot = this.loadedRoundAttachmentSlot;
+        newBuilder.loadedSecondaryAttachmentSlot = this.loadedSecondaryAttachmentSlot;
 
         return newBuilder;
     }
@@ -309,6 +313,11 @@ public class RFEFirearmModeBuilder {
 
     public RFEFirearmModeBuilder requiresSecondaryAmmo(boolean requiresSecondaryAmmo) {
         this.requiresSecondaryAmmo = requiresSecondaryAmmo;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder secondaryAmmoRemainsAfterFiring(boolean secondaryAmmoRemainsAfterFiring) {
+        this.secondaryAmmoRemainsAfterFiring = secondaryAmmoRemainsAfterFiring;
         return this;
     }
 
@@ -602,6 +611,11 @@ public class RFEFirearmModeBuilder {
     
     public RFEFirearmModeBuilder magazineAttachmentSlot(@Nullable ResourceLocation magazineAttachmentSlot) {
         this.magazineAttachmentSlot = magazineAttachmentSlot;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder loadedSecondaryAttachmentSlot(@Nullable ResourceLocation loadedSecondaryAttachmentSlot) {
+        this.loadedSecondaryAttachmentSlot = loadedSecondaryAttachmentSlot;
         return this;
     }
 

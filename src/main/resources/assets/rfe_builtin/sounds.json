@@ -400,6 +400,24 @@
       }
     ]
   },
+  "item.generic.firearm.percussion_cap.place": {
+    "sounds": [
+      {
+        "name": "minecraft:item/armor/equip_leather1",
+        "volume": 0.25,
+        "pitch": 2.0
+      }
+    ]
+  },
+  "item.generic.firearm.percussion_cap.remove": {
+    "sounds": [
+      {
+        "name": "minecraft:item/armor/equip_leather1",
+        "volume": 0.25,
+        "pitch": 1.85
+      }
+    ]
+  },
   "item.generic.pistol.aim": {
     "sounds": [
       {
@@ -1270,6 +1288,16 @@
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.rifle.draw"
   },
+  "item.generic.rifle.gunpowder.pour": {
+    "sounds": [
+      {
+        "name": "minecraft:dig/sand4",
+        "volume": 0.75,
+        "pitch": 0.9
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.gunpowder.pour"
+  },
   "item.generic.rifle.hammer.cocked": {
     "sounds": [
       {
@@ -1379,6 +1407,56 @@
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.rifle.rack"
+  },
+  "item.generic.rifle.ramrod.draw": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/musket/ramrod",
+        "volume": 0.25,
+        "pitch": 0.9
+      },
+      {
+        "name": "rfe_builtin:item/generic/musket/ramrod",
+        "volume": 0.25,
+        "pitch": 0.88
+      },
+      {
+        "name": "rfe_builtin:item/generic/musket/ramrod",
+        "volume": 0.75,
+        "pitch": 0.87
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.ramrod.draw"
+  },
+  "item.generic.rifle.ramrod.insert": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/musket/ramrod",
+        "volume": 0.25,
+        "pitch": 0.8
+      },
+      {
+        "name": "rfe_builtin:item/generic/musket/ramrod",
+        "volume": 0.25,
+        "pitch": 0.78
+      },
+      {
+        "name": "rfe_builtin:item/generic/musket/ramrod",
+        "volume": 0.75,
+        "pitch": 0.77
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.ramrod.insert"
+  },
+  "item.generic.rifle.ramrod.ram": {
+    "sounds": [
+      {
+        "name": "minecraft:dig/stone1",
+        "volume": 0.25,
+        "pitch": 1.3
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.ramrod.ram"
   },
   "item.generic.rifle.shot": {
     "sounds": [

@@ -73,10 +73,39 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     }
 
     protected void registerHUDProviders() {
-        RFEHudItemInfoProviders.registerAmmoProvider(this, this::getAmmoItemsForHUD);
-        RFEHudItemInfoProviders.registerAmmoInventoryCountProvider(this, this::getInventoryAmmoCountForHUD);
-        RFEHudItemInfoProviders.registerHeatProvider(this, this::getHeatAmountForHUD);
-        RFEHudItemInfoProviders.registerHeatCapacityProvider(this, this::getHeatCapacityForHUD);
+        RFEHudItemInfoProviders.registerHudInfoProvider(this, new RFEHudItemInfoProviders.RFEHudInfoProvider() {
+            @Nullable
+            @Override
+            public List<ItemStack> getPrimaryAmmo(ItemStack itemStack) {
+                return RFEFirearmItem.this.getAmmoItemsForHUD(itemStack);
+            }
+
+            @Nullable
+            @Override
+            public List<ItemStack> getSecondaryAmmo(ItemStack itemStack) {
+                return RFEFirearmItem.this.getSecondaryAmmoItemsForHUD(itemStack);
+            }
+
+            @Override
+            public Optional<Integer> countPrimaryAmmoInInventory(ItemStack itemStack, List<ItemStack> inventory, boolean countLooseRounds) {
+                return RFEFirearmItem.this.getInventoryAmmoCountForHUD(itemStack, inventory, countLooseRounds);
+            }
+
+            @Override
+            public Optional<Integer> countSecondaryAmmoInInventory(ItemStack itemStack, List<ItemStack> inventory, boolean countLooseRounds) {
+                return RFEFirearmItem.this.getInventorySecondaryAmmoCountForHUD(itemStack, inventory, countLooseRounds);
+            }
+
+            @Override
+            public float getHeatAmount(ItemStack itemStack) {
+                return RFEFirearmItem.this.getHeatAmountForHUD(itemStack);
+            }
+
+            @Override
+            public float getHeatCapacity(ItemStack itemStack) {
+                return RFEFirearmItem.this.getHeatCapacityForHUD(itemStack);
+            }
+        });
     }
 
     @Override
@@ -328,6 +357,37 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         return mode.bestSpeedloaderAmmoCount(itemStack, entity);
     }
 
+    public float countEntitySecondaryAmmo(ItemStack itemStack, LivingEntity entity) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        RFEFirearmModeAmmoProperties ammoProperties = mode.getAmmoProperties(itemStack);
+        Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(ammoProperties.secondaryAmmo());
+        List<ItemStack> entityAmmo = RFEItemUtils.getItemsFromEntity(entity, ammoPred, 0, false);
+        int count = 0;
+        for (ItemStack ammo : entityAmmo) {
+            if (FirearmDataUtils.isUsedPrimer(ammo))
+                continue;
+            if (ammo.is(RFEItemTags.INFINITE_AMMO.tag))
+                return Float.POSITIVE_INFINITY;
+            count += ammo.getCount();
+        }
+        if (count > 0)
+            return count;
+        if (!canEntityInfiniteReload(entity))
+            return 0;
+        ItemStack infiniteAmmo = ammoProperties.unlimitedSecondaryReloadItem();
+        return ammoPred.test(infiniteAmmo) ? Float.POSITIVE_INFINITY : 0;
+    }
+
+    public int freeSecondaryAmmoSpace(ItemStack itemStack) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.countFreeSecondaryAmmoSpaces(itemStack);
+    }
+
+    public int usedSecondaryAmmoCount(ItemStack itemStack) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.countUsedSecondaryAmmo(itemStack);
+    }
+
     public boolean laysFlatOnGround(ItemStack stack) {
         return true;
     }
@@ -422,6 +482,11 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         return mode.requiresAmmo() ? mode.getLoadedAmmo(itemStack) : null;
     }
 
+    public List<ItemStack> getSecondaryAmmoItemsForHUD(ItemStack itemStack) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.requiresAmmo() ? mode.getLoadedSecondaryAmmo(itemStack) : null;
+    }
+
     public float getItemLength(ItemStack itemStack, @Nullable LivingEntity entity) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
         return mode.getItemLength(itemStack, entity);
@@ -430,7 +495,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     public Optional<Integer> getInventoryAmmoCountForHUD(ItemStack itemStack, List<ItemStack> inventory, boolean countLooseRounds) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
         RFEFirearmModeAmmoProperties ammoProperties = mode.getAmmoProperties(itemStack);
-        Predicate<ItemStack> primaryAmmoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmo().keySet());
+        Predicate<ItemStack> primaryAmmoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
         Predicate<ItemStack> magazineAndSpeedloaderPred = RFEUtils.orAllPredicates(ammoProperties.magazines())
                 .or(RFEUtils.orAllPredicates(ammoProperties.speedloaders()));
         int count = 0;
@@ -461,12 +526,30 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         return Optional.of(count);
     }
 
-    public Optional<Float> getHeatAmountForHUD(ItemStack itemStack) {
-        return Optional.of(this.getCurrentMode(itemStack).getHeatAmount(itemStack));
+    public Optional<Integer> getInventorySecondaryAmmoCountForHUD(ItemStack itemStack, List<ItemStack> inventory, boolean countLooseRounds) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        RFEFirearmModeAmmoProperties ammoProperties = mode.getAmmoProperties(itemStack);
+        Predicate<ItemStack> secondaryPred = RFEUtils.orAllPredicates(ammoProperties.secondaryAmmo());
+        int count = 0;
+        for (ItemStack invStack : inventory) {
+            if (FirearmDataUtils.isUsedPrimer(invStack))
+                continue;
+            if (countLooseRounds && secondaryPred.test(invStack)) {
+                if (invStack.is(RFEItemTags.INFINITE_AMMO.tag))
+                    return Optional.of(-1);
+                count += invStack.getCount();
+            }
+        }
+        return Optional.of(count);
+        // TODO magazine secondaries?
     }
 
-    public Optional<Float> getHeatCapacityForHUD(ItemStack itemStack) {
-        return Optional.of(this.getCurrentMode(itemStack).getHeatCapacity(itemStack));
+    public float getHeatAmountForHUD(ItemStack itemStack) {
+        return this.getCurrentMode(itemStack).getHeatAmount(itemStack);
+    }
+
+    public float getHeatCapacityForHUD(ItemStack itemStack) {
+        return this.getCurrentMode(itemStack).getHeatCapacity(itemStack);
     }
 
     @Override

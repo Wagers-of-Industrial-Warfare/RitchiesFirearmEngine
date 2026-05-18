@@ -1,0 +1,10 @@
+{
+  "slot_rendering": {
+    "rfe_builtin:loaded_percussion_cap": {
+      "model": "rfe_builtin:item/item_attachments/percussion_cap",
+      "translation": [0.575, -0.275, 6.65],
+      "rotation": [45, 0, 0],
+      "scale": [0.52, 0.52, 0.52]
+    }
+  }
+}

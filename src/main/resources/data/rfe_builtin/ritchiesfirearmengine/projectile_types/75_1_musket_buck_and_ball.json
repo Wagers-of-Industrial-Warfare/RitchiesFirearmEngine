@@ -10,10 +10,14 @@
     "damage_model": [
       {
         "distance": 15,
-        "damage": 3.25
+        "damage": 5.25
       },
       {
         "distance": 60,
+        "damage": 3.25
+      },
+      {
+        "distance": 65,
         "damage": 1.25
       }
     ],
@@ -33,12 +37,16 @@
     "knockback": 0.5,
     "damage_model": [
       {
-        "distance": 50,
-        "damage": 20.5
+        "distance": 100,
+        "damage": 25
       },
       {
-        "distance": 80,
-        "damage": 17
+        "distance": 300,
+        "damage": 20
+      },
+      {
+        "distance": 350,
+        "damage": 18
       }
     ],
     "damage_type": "rfe_builtin:bullet",

@@ -8,11 +8,15 @@
   "knockback": 0.5,
   "damage_model": [
     {
-      "distance": 60,
-      "damage": 22.5
+      "distance": 100,
+      "damage": 25
     },
     {
-      "distance": 100,
+      "distance": 300,
+      "damage": 20
+    },
+    {
+      "distance": 350,
       "damage": 18
     }
   ],
@@ -20,5 +24,5 @@
   "hit_multiplier": "rfe_builtin:generic_headshot_strong",
   "penetration": "rfe_builtin:default",
   "smoke": 2.25,
-  "pass_sound": "rfe_builtin:projectile.generic.whizz"
+  "pass_sound": "rfe_builtin:projectile.generic.crack"
 }

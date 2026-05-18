@@ -54,7 +54,7 @@
   "secondary_ammo": [
   ],
   "unlimited_primary_reload_item": {
-    "id": "rfe_builtin:infinite_revolver_speedloader_6rds",
+    "id": "rfe_builtin:revolver_speedloader_6rds",
     "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:handgun_cartridge","count":6},"slot":0}]}
   },
   "modes": {

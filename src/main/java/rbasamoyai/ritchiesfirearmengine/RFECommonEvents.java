@@ -4,6 +4,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.AmmoPacketItemPropertiesHandler;
@@ -98,6 +100,21 @@ public class RFECommonEvents {
     public static boolean onLeftClickBlock(Player player) {
         // TODO attachments
         return player.getMainHandItem().getItem() instanceof RFEFirearmItem || player.getOffhandItem().getItem() instanceof RFEFirearmItem;
+    }
+
+    public static void onPlayerSwitchGamemode(Player player, GameType oldGamemode, GameType newGamemode) {
+        if (newGamemode == GameType.SPECTATOR) {
+            ItemStack mainhandItem = player.getMainHandItem();
+            if (mainhandItem.getItem() instanceof RFEFirearmItem firearmItem) {
+                firearmItem.onReleaseAttackKey(mainhandItem, player);
+                firearmItem.stopAiming(mainhandItem, player);
+            }
+            ItemStack offhandItem = player.getOffhandItem();
+            if (offhandItem.getItem() instanceof RFEFirearmItem firearmItem) {
+                firearmItem.onReleaseAttackKey(offhandItem, player);
+                firearmItem.stopAiming(offhandItem, player);
+            }
+        }
     }
 
 }

@@ -141,7 +141,7 @@ public class RFEClient {
 
     public static void onMouseInput(int button, int action, int modifiers) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null) return;
+        if (mc.player == null || mc.player.isSpectator()) return;
 
         boolean attacking = mc.options.keyAttack.isDown();
         ItemStack mainhandItem = mc.player.getMainHandItem();
@@ -156,7 +156,7 @@ public class RFEClient {
     public static void onKeyInput(int key, int scancode, int action, int mods) {
         Minecraft mc = Minecraft.getInstance();
 
-        if (mc.player != null && mc.screen == null) {
+        if (mc.player != null && !mc.player.isSpectator() && mc.screen == null) {
             ItemStack useStack = mc.player.getMainHandItem();
             if (useStack.getItem() instanceof RFEFirearmItem || useStack.getItem() instanceof MagazineItem
                 || useStack.getItem() instanceof AmmoPacketItem) {

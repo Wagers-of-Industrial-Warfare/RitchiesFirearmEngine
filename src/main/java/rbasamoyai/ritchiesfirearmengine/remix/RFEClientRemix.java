@@ -44,7 +44,7 @@ public class RFEClientRemix {
 
     public static void handleAttackKeybinds() {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null) return;
+        if (mc.player == null || mc.player.isSpectator()) return;
 
         // TODO offhand item
         ItemStack mainhandItem = mc.player.getMainHandItem();
@@ -56,7 +56,7 @@ public class RFEClientRemix {
 
     public static void interruptAttack() {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null) return;
+        if (mc.player == null || mc.player.isSpectator()) return;
 
         ItemStack mainhandItem = mc.player.getMainHandItem();
         if (mainhandItem.getItem() instanceof HoldAttackKeyInteraction hold && hold.isHoldingAttackKey(mainhandItem, mc.player)) {

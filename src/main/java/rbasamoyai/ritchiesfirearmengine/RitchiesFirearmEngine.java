@@ -61,6 +61,7 @@ public class RitchiesFirearmEngine {
         forgeBus.addListener(this::onPlayerLoggedIn);
         forgeBus.addListener(this::onLevelTick);
         forgeBus.addListener(this::onLeftClickBlock);
+        forgeBus.addListener(this::onPlayerSwitchGamemode);
 
         RFEConfig.registerConfigs(modBus, container);
 
@@ -138,6 +139,10 @@ public class RitchiesFirearmEngine {
     private void onLeftClickBlock(final PlayerInteractEvent.LeftClickBlock event) {
         if (RFECommonEvents.onLeftClickBlock(event.getEntity()))
             event.setCanceled(true);
+    }
+
+    private void onPlayerSwitchGamemode(final PlayerEvent.PlayerChangeGameModeEvent event) {
+        RFECommonEvents.onPlayerSwitchGamemode(event.getEntity(), event.getCurrentGameMode(), event.getNewGameMode());
     }
 
     public static ResourceLocation resource(String path) { return RFEUtils.location(MOD_ID, path); }

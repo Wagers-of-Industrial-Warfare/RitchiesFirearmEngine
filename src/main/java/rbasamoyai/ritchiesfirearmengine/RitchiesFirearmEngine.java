@@ -21,6 +21,7 @@ import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
@@ -62,6 +63,7 @@ public class RitchiesFirearmEngine {
         forgeBus.addListener(this::onLevelTick);
         forgeBus.addListener(this::onLeftClickBlock);
         forgeBus.addListener(this::onPlayerSwitchGamemode);
+        forgeBus.addListener(this::onLivingDeath);
 
         RFEConfig.registerConfigs(modBus, container);
 
@@ -143,6 +145,10 @@ public class RitchiesFirearmEngine {
 
     private void onPlayerSwitchGamemode(final PlayerEvent.PlayerChangeGameModeEvent event) {
         RFECommonEvents.onPlayerSwitchGamemode(event.getEntity(), event.getCurrentGameMode(), event.getNewGameMode());
+    }
+
+    private void onLivingDeath(final LivingDeathEvent event) {
+        RFECommonEvents.onLivingDeath(event.getEntity(), event.getSource());
     }
 
     public static ResourceLocation resource(String path) { return RFEUtils.location(MOD_ID, path); }

@@ -483,7 +483,7 @@ public class RFEFirearmMode {
 
             boolean canFireClick = client && entity instanceof Player || !client && !(entity instanceof Player);
             if (canFireClick && firing == FiringType.CLICK || !client && firing == FiringType.AUTOMATIC)
-                this.handlePlayerAmmoAndShootingOnClient(itemStack, entity);
+                this.handlePlayerAmmoAndShootingOnClient(itemStack, entity, firing);
             return;
         }
 
@@ -530,7 +530,7 @@ public class RFEFirearmMode {
             entity.level().playSound(null, entity.blockPosition(), this.windUpSound, SoundSource.NEUTRAL, 1, 1);
     }
 
-    protected void handlePlayerAmmoAndShootingOnClient(ItemStack itemStack, LivingEntity entity) {
+    protected void handlePlayerAmmoAndShootingOnClient(ItemStack itemStack, LivingEntity entity, FiringType firing) {
         if (!FirearmDataUtils.isHoldingAttackKey(itemStack) && this.fireMode == FireMode.FULL_AUTO)
             return;
         RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);

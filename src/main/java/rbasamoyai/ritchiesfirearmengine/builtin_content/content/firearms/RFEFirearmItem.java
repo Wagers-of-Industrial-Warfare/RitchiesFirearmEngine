@@ -206,6 +206,13 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     @Override
     public void handleClientFireInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs,
                                               boolean jam, @Nullable UUID recoilUUID, InteractionHand hand) {
+        long currentTime = entity.level().getGameTime();
+        long lastFiredTime = itemStack.getOrDefault(BuiltInRFEPlugin.RFEDataComponents.LAST_SHOT_TIME, -1L);
+        if (currentTime != lastFiredTime) {
+            itemStack.set(BuiltInRFEPlugin.RFEDataComponents.LAST_SHOT_TIME, currentTime);
+        } else {
+            return; // Do not accept more than 1 clientbound shot from an entity/player each tick
+        }
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
         mode.handleFiringInputOnServer(itemStack, entity, firingInputs, jam, recoilUUID, hand);
     }

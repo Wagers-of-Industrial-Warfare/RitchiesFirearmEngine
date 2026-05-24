@@ -566,6 +566,9 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         public static final DataComponentType<Boolean> IS_USED_PRIMER = register("is_used_primer",
                 builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
 
+        public static final DataComponentType<Long> LAST_SHOT_TIME = register("last_shot_time",
+                builder -> builder.persistent(Codec.LONG).networkSynchronized(ByteBufCodecs.VAR_LONG));
+
         private static <V> DataComponentType<V> register(String id, UnaryOperator<DataComponentType.Builder<V>> builderOp) {
             ResourceLocation loc = RitchiesFirearmEngine.resource(id);
             if (TYPES.containsKey(loc))

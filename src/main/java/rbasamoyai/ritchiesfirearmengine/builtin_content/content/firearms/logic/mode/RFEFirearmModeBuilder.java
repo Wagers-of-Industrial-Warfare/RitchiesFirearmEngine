@@ -42,11 +42,15 @@ public class RFEFirearmModeBuilder {
     protected boolean ammoRequired = true;
     protected int internalCapacity = 0;
     protected int nominalCapacity = 0;
-    protected boolean explicitNominalCapacity = false;
     protected boolean plusOneCapacity = false;
-    protected boolean requiresSecondaryAmmo = false;
-    public boolean secondaryAmmoRemainsAfterFiring = false;
     protected boolean trackEmptySlots = false;
+
+    protected boolean requiresSecondaryAmmo = false;
+    protected boolean secondaryAmmoRemainsAfterFiring = false;
+    protected int internalSecondaryCapacity = 0;
+    protected int nominalSecondaryCapacity = 0;
+    protected boolean plusOneSecondaryCapacity = false;
+    protected boolean trackEmptySecondarySlots = false;
 
     protected FireMode fireMode = null;
     protected ChargingBehavior chargingBehavior = ChargingBehavior.HOLD; // Datapackable
@@ -136,11 +140,15 @@ public class RFEFirearmModeBuilder {
         newBuilder.ammoRequired = this.ammoRequired;
         newBuilder.internalCapacity = this.internalCapacity;
         newBuilder.nominalCapacity = this.nominalCapacity;
-        newBuilder.explicitNominalCapacity = this.explicitNominalCapacity;
         newBuilder.plusOneCapacity = this.plusOneCapacity;
+        newBuilder.trackEmptySlots = this.trackEmptySlots;
+
         newBuilder.requiresSecondaryAmmo = this.requiresSecondaryAmmo;
         newBuilder.secondaryAmmoRemainsAfterFiring = this.secondaryAmmoRemainsAfterFiring;
-        newBuilder.trackEmptySlots = this.trackEmptySlots;
+        newBuilder.internalSecondaryCapacity = this.internalSecondaryCapacity;
+        newBuilder.nominalSecondaryCapacity = this.nominalSecondaryCapacity;
+        newBuilder.plusOneSecondaryCapacity = this.plusOneSecondaryCapacity;
+        newBuilder.trackEmptySecondarySlots = this.trackEmptySecondarySlots;
 
         newBuilder.fireMode = this.fireMode;
         newBuilder.chargingBehavior = this.chargingBehavior;
@@ -311,6 +319,20 @@ public class RFEFirearmModeBuilder {
         return this;
     }
 
+    public RFEFirearmModeBuilder trackEmptySlots(boolean trackEmptySlots) {
+        this.trackEmptySlots = trackEmptySlots;
+        return this;
+    }
+
+    private void resetInternalSecondaryCapacityOptions() {
+        this.internalSecondaryCapacity = 0;
+        this.nominalSecondaryCapacity = 0;
+    }
+
+    private void resetSecondaryMagazineOptions() {
+        this.plusOneSecondaryCapacity = false;
+    }
+
     public RFEFirearmModeBuilder requiresSecondaryAmmo(boolean requiresSecondaryAmmo) {
         this.requiresSecondaryAmmo = requiresSecondaryAmmo;
         return this;
@@ -321,8 +343,35 @@ public class RFEFirearmModeBuilder {
         return this;
     }
 
-    public RFEFirearmModeBuilder trackEmptySlots(boolean trackEmptySlots) {
-        this.trackEmptySlots = trackEmptySlots;
+    public RFEFirearmModeBuilder internalSecondaryCapacity(int internalSecondaryCapacity) {
+        if (internalSecondaryCapacity < 1)
+            throw new IllegalStateException("Cannot specify internal secondary capacity less than 1");
+        this.internalSecondaryCapacity = internalSecondaryCapacity;
+        this.nominalSecondaryCapacity = this.internalSecondaryCapacity;
+        this.resetSecondaryMagazineOptions();
+        return this;
+    }
+
+    public RFEFirearmModeBuilder nominalSecondaryCapacity(int nominalSecondaryCapacity) {
+        if (this.internalSecondaryCapacity < 1)
+            throw new IllegalStateException("Cannot specify nominal secondary capacity without specifying internal secondary capacity first");
+        if (nominalSecondaryCapacity < 1)
+            throw new IllegalStateException("Cannot specify nominal secondary capacity less than 1");
+        this.nominalSecondaryCapacity = nominalSecondaryCapacity;
+        this.resetSecondaryMagazineOptions();
+        return this;
+    }
+
+    public RFEFirearmModeBuilder plusOneSecondaryCapacity(boolean plusOneSecondaryCapacity) {
+        if (this.internalSecondaryCapacity > 0)
+            throw new IllegalStateException("Can only specify +1 secondary capacity for magazine firearms");
+        this.plusOneSecondaryCapacity = plusOneSecondaryCapacity;
+        this.resetInternalSecondaryCapacityOptions();
+        return this;
+    }
+
+    public RFEFirearmModeBuilder trackEmptySecondarySlots(boolean trackEmptySecondarySlots) {
+        this.trackEmptySecondarySlots = trackEmptySecondarySlots;
         return this;
     }
 

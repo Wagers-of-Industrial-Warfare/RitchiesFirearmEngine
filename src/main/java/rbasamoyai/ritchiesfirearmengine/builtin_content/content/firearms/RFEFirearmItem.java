@@ -187,7 +187,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             if (this.getCurrentAction(stack) == Action.FIRING)
                 return;
         }
-        if (firearmMode.requiresAmmo() && !firearmMode.hasAmmo(stack)) {
+        if (firearmMode.requiresAmmo() && !firearmMode.hasAmmo(stack) || firearmMode.requiresSecondaryAmmo() && !firearmMode.hasSecondaryAmmo(stack)) {
             firearmMode.tryRunningReloadAction(stack, entity, ReloadPhase.PhaseType.PREPARE, true, ReloadPhaseAccessFilter.IncludeAll.INSTANCE);
             if (this.getCurrentAction(stack) == Action.RELOAD)
                 return;
@@ -491,7 +491,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
 
     public List<ItemStack> getSecondaryAmmoItemsForHUD(ItemStack itemStack) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
-        return mode.requiresAmmo() ? mode.getLoadedSecondaryAmmo(itemStack) : null;
+        return mode.requiresSecondaryAmmo() ? mode.getLoadedSecondaryAmmo(itemStack) : null;
     }
 
     public float getItemLength(ItemStack itemStack, @Nullable LivingEntity entity) {

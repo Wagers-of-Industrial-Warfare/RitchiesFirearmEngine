@@ -78,14 +78,29 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                     boolean plusOneCapacity = GsonHelper.getAsBoolean(ammo, "plus_1_capacity", true);
                     builder.plusOneCapacity(plusOneCapacity);
                 }
-                boolean requiresSecondaryAmmo = GsonHelper.getAsBoolean(ammo, "requires_secondary_ammo", false);
                 boolean trackEmptySlots = GsonHelper.getAsBoolean(ammo, "track_empty_slots", false);
-                builder.requiresSecondaryAmmo(requiresSecondaryAmmo)
-                        .trackEmptySlots(trackEmptySlots);
-                if (requiresSecondaryAmmo) {
-                    boolean secondaryAmmoRemainsAfterFiring = GsonHelper.getAsBoolean(ammo, "secondary_ammo_remains_after_firing", true);
-                    builder.secondaryAmmoRemainsAfterFiring(secondaryAmmoRemainsAfterFiring);
+                builder.trackEmptySlots(trackEmptySlots);
+            }
+        }
+
+        if (GsonHelper.isObjectNode(obj, "secondary_ammo")) {
+            JsonObject secondaryAmmo = obj.getAsJsonObject("secondary_ammo");
+            boolean requiresSecondaryAmmo = GsonHelper.getAsBoolean(secondaryAmmo, "secondary_ammo_required", false);
+            builder.requiresSecondaryAmmo(requiresSecondaryAmmo);
+            if (requiresSecondaryAmmo) {
+                boolean secondaryAmmoRemainsAfterFiring = GsonHelper.getAsBoolean(secondaryAmmo, "secondary_ammo_remains_after_firing", true);
+                builder.secondaryAmmoRemainsAfterFiring(secondaryAmmoRemainsAfterFiring);
+                int internalSecondaryCapacity = GsonHelper.getAsInt(secondaryAmmo, "internal_secondary_capacity", 0);
+                if (internalSecondaryCapacity > 0) {
+                    builder.internalSecondaryCapacity(internalSecondaryCapacity);
+                    int nominalSecondaryCapacity = GsonHelper.getAsInt(secondaryAmmo, "nominal_secondary_capacity", internalSecondaryCapacity);
+                    builder.nominalSecondaryCapacity(nominalSecondaryCapacity);
+                } else {
+                    boolean plusOneSecondaryCapacity = GsonHelper.getAsBoolean(secondaryAmmo, "plus_1_secondary_capacity", true);
+                    builder.plusOneSecondaryCapacity(plusOneSecondaryCapacity);
                 }
+                boolean trackEmptySecondarySlots = GsonHelper.getAsBoolean(secondaryAmmo, "track_empty_secondary_slots", false);
+                builder.trackEmptySecondarySlots(trackEmptySecondarySlots);
             }
         }
 

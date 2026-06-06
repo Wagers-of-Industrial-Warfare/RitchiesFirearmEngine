@@ -19,8 +19,11 @@
   },
   "ammo": {
     "ammo_required": true,
-    "internal_capacity": 1,
-    "requires_secondary_ammo": true,
+    "internal_capacity": 1
+  },
+  "secondary_ammo": {
+    "secondary_ammo_required": true,
+    "internal_secondary_capacity": 1,
     "secondary_ammo_remains_after_firing": true
   },
   "firing": {

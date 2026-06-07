@@ -11,6 +11,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -568,6 +569,9 @@ public class BuiltInRFEPlugin implements RFEPlugin {
 
         public static final DataComponentType<Long> LAST_SHOT_TIME = register("last_shot_time",
                 builder -> builder.persistent(Codec.LONG).networkSynchronized(ByteBufCodecs.VAR_LONG));
+
+        public static final DataComponentType<Integer> FILLED_MAX_STACK_SIZE = register("filled_max_stack_size",
+                builder -> builder.persistent(ExtraCodecs.intRange(1, 99)).networkSynchronized(ByteBufCodecs.VAR_INT));
 
         private static <V> DataComponentType<V> register(String id, UnaryOperator<DataComponentType.Builder<V>> builderOp) {
             ResourceLocation loc = RitchiesFirearmEngine.resource(id);

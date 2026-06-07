@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "rfe_builtin:infinite_paper_handgun_cartridge",
+    "rfe_builtin:paper_handgun_cartridge"
+  ]
+}

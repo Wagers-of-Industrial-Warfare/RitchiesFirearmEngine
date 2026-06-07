@@ -1,0 +1,7 @@
+{
+	"parent": "rfe_builtin:item/revolver_cylinder_base",
+	"textures": {
+		"cylinder": "rfe_builtin:item/percussion_revolver_cylinder_5rds",
+        "ammo_count": "rfe_builtin:item/capacity_counters/5rds"
+	}
+}

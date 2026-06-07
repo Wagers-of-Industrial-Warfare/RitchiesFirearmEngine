@@ -38,8 +38,8 @@ import java.util.concurrent.Executor;
 
 public class MagazineItemPropertiesHandler {
 
-    private static final Map<Item, MagazineItemProperties> DEFAULT_PROPERTIES = new Reference2ObjectOpenHashMap<>();
-    private static final Map<Item, MagazineItemProperties> PROPERTIES = new Reference2ObjectOpenHashMap<>();
+    private static final Reference2ObjectOpenHashMap<Item, MagazineItemProperties> DEFAULT_PROPERTIES = new Reference2ObjectOpenHashMap<>();
+    private static final Reference2ObjectOpenHashMap<Item, MagazineItemProperties> PROPERTIES = new Reference2ObjectOpenHashMap<>();
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -53,9 +53,10 @@ public class MagazineItemPropertiesHandler {
         protected void apply(Multimap<ResourceLocation, JsonElement> data, ResourceManager resourceManager, ProfilerFiller profiler) {
             PROPERTIES.clear();
 
-            Map<Item, MagazineItemProperties.Builder> builders = new Reference2ObjectOpenHashMap<>();
-            for (Map.Entry<Item, MagazineItemProperties> existing : DEFAULT_PROPERTIES.entrySet())
-                builders.put(existing.getKey(), MagazineItemProperties.Builder.fromExistingProperties(existing.getValue()));
+            Reference2ObjectOpenHashMap<Item, MagazineItemProperties.Builder> builders = new Reference2ObjectOpenHashMap<>();
+            DEFAULT_PROPERTIES.reference2ObjectEntrySet().fastForEach(e -> {
+                builders.put(e.getKey(), MagazineItemProperties.Builder.fromExistingProperties(e.getValue()));
+            });
 
             for (Map.Entry<ResourceLocation, JsonElement> entry : data.entries()) {
                 ResourceLocation id = entry.getKey();
@@ -71,8 +72,9 @@ public class MagazineItemPropertiesHandler {
                 }
             }
 
-            for (Map.Entry<Item, MagazineItemProperties.Builder> builder : builders.entrySet())
-                PROPERTIES.put(builder.getKey(), builder.getValue().build());
+            builders.reference2ObjectEntrySet().fastForEach(e -> {
+                PROPERTIES.put(e.getKey(), e.getValue().build());
+            });
         }
     }
 
@@ -83,13 +85,18 @@ public class MagazineItemPropertiesHandler {
         if (layer.replaceValidSpeedloaders)
             builder.speedloaderPredicates.clear();
         builder.speedloaderPredicates.addAll(layer.speedloaderPredicates);
+        if (layer.replaceValidSecondaries)
+            builder.secondaryPredicates.clear();
+        builder.secondaryPredicates.addAll(layer.secondaryPredicates);
     }
 
     @ApiStatus.Internal
-    public static void registerDefaults(Item item, ImmutableList<AmmoPredicate> ammoPredicates, ImmutableList<AmmoPredicate> speedloaderPredicates) {
+    public static void registerDefaults(Item item, ImmutableList<AmmoPredicate> ammoPredicates,
+                                        ImmutableList<AmmoPredicate> speedloaderPredicates,
+                                        ImmutableList<AmmoPredicate> secondaryPredicates) {
         if (DEFAULT_PROPERTIES.containsKey(item))
             throw new IllegalStateException("Already registered default magazine properties for item");
-        DEFAULT_PROPERTIES.put(item, new MagazineItemProperties(ammoPredicates, speedloaderPredicates));
+        DEFAULT_PROPERTIES.put(item, new MagazineItemProperties(ammoPredicates, speedloaderPredicates, secondaryPredicates));
     }
 
     @Nullable
@@ -100,6 +107,11 @@ public class MagazineItemPropertiesHandler {
     @Nullable
     public static ImmutableList<AmmoPredicate> getValidSpeedloaderPredicates(Item item) {
         return PROPERTIES.containsKey(item) ? PROPERTIES.get(item).speedloaderPredicates : null;
+    }
+
+    @Nullable
+    public static ImmutableList<AmmoPredicate> getValidSecondaryPredicates(Item item) {
+        return PROPERTIES.containsKey(item) ? PROPERTIES.get(item).secondaryPredicates : null;
     }
 
     public static void syncToPlayer(ServerPlayer player) {
@@ -124,10 +136,13 @@ public class MagazineItemPropertiesHandler {
         }
     }
 
-    private record MagazineItemProperties(ImmutableList<AmmoPredicate> ammoPredicates, ImmutableList<AmmoPredicate> speedloaderPredicates) {
+    private record MagazineItemProperties(ImmutableList<AmmoPredicate> ammoPredicates,
+                                          ImmutableList<AmmoPredicate> speedloaderPredicates,
+                                          ImmutableList<AmmoPredicate> secondaryPredicates) {
         private static final StreamCodec<RegistryFriendlyByteBuf, MagazineItemProperties> STREAM_CODEC = StreamCodec.composite(
                 AmmoPredicate.STREAM_CODEC.apply(RFEByteBufCodecUtils.immutableList()), MagazineItemProperties::ammoPredicates,
                 AmmoPredicate.STREAM_CODEC.apply(RFEByteBufCodecUtils.immutableList()), MagazineItemProperties::speedloaderPredicates,
+                AmmoPredicate.STREAM_CODEC.apply(RFEByteBufCodecUtils.immutableList()), MagazineItemProperties::secondaryPredicates,
                 MagazineItemProperties::new);
 
         public static Builder builder() { return new Builder(); }
@@ -135,26 +150,32 @@ public class MagazineItemPropertiesHandler {
         private static class Builder {
             public final List<AmmoPredicate> ammoPredicates = new ArrayList<>();
             public final List<AmmoPredicate> speedloaderPredicates = new ArrayList<>();
+            public final List<AmmoPredicate> secondaryPredicates = new ArrayList<>();
 
             public MagazineItemProperties build() {
-                return new MagazineItemProperties(ImmutableList.copyOf(this.ammoPredicates), ImmutableList.copyOf(this.speedloaderPredicates));
+                return new MagazineItemProperties(ImmutableList.copyOf(this.ammoPredicates),
+                        ImmutableList.copyOf(this.speedloaderPredicates), ImmutableList.copyOf(this.secondaryPredicates));
             }
 
             public static Builder fromExistingProperties(MagazineItemProperties properties) {
                 Builder builder = new Builder();
                 builder.ammoPredicates.addAll(properties.ammoPredicates);
                 builder.speedloaderPredicates.addAll(properties.speedloaderPredicates);
+                builder.secondaryPredicates.addAll(properties.secondaryPredicates);
                 return builder;
             }
         }
 
         private record Layer(boolean replaceValidAmmo, List<AmmoPredicate> ammoPredicates,
-                             boolean replaceValidSpeedloaders, List<AmmoPredicate> speedloaderPredicates) {
+                             boolean replaceValidSpeedloaders, List<AmmoPredicate> speedloaderPredicates,
+                             boolean replaceValidSecondaries, List<AmmoPredicate> secondaryPredicates) {
             private static final Codec<Layer> CODEC = RecordCodecBuilder.create(o -> o.group(
                     Codec.BOOL.optionalFieldOf("replace_valid_ammo", false).forGetter(Layer::replaceValidAmmo),
                     Codec.list(AmmoPredicate.CODEC).optionalFieldOf("valid_ammo", new ArrayList<>()).forGetter(Layer::ammoPredicates),
                     Codec.BOOL.optionalFieldOf("replace_valid_speedloaders", false).forGetter(Layer::replaceValidSpeedloaders),
-                    Codec.list(AmmoPredicate.CODEC).optionalFieldOf("valid_speedloaders", new ArrayList<>()).forGetter(Layer::speedloaderPredicates)
+                    Codec.list(AmmoPredicate.CODEC).optionalFieldOf("valid_speedloaders", new ArrayList<>()).forGetter(Layer::speedloaderPredicates),
+                    Codec.BOOL.optionalFieldOf("replace_valid_secondaries", false).forGetter(Layer::replaceValidSecondaries),
+                    Codec.list(AmmoPredicate.CODEC).optionalFieldOf("valid_secondaries", new ArrayList<>()).forGetter(Layer::secondaryPredicates)
             ).apply(o, Layer::new));
         }
     }

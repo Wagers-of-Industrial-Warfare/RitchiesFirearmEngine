@@ -1,0 +1,16 @@
+{
+  "type": "ritchiesfirearmengine:magazine",
+  "stacks_to": 64,
+  "rarity": "common",
+  "glint": false,
+  "capacity": 8,
+  "secondary_capacity": 8,
+  "track_empty_slots": true,
+  "reload_cooldown": 10,
+  "valid_ammo": [
+    "#rfe_builtin:percussion_revolver_cartridges"
+  ],
+  "valid_secondaries": [
+    "#rfe_builtin:percussion_caps"
+  ]
+}

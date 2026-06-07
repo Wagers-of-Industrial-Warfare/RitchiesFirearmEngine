@@ -122,6 +122,10 @@
     "rfe_builtin:revolver_cylinder_6rds",
     "rfe_builtin:revolver_cylinder_7rds",
     "rfe_builtin:revolver_cylinder_8rds",
+    "rfe_builtin:percussion_revolver_cylinder_5rds",
+    "rfe_builtin:percussion_revolver_cylinder_6rds",
+    "rfe_builtin:percussion_revolver_cylinder_7rds",
+    "rfe_builtin:percussion_revolver_cylinder_8rds",
     "rfe_builtin:infinite_rifle_stripper_clip_5rds",
     "rfe_builtin:infinite_rifle_en_bloc_clip_5rds",
     "rfe_builtin:infinite_rifle_magazine_5rds",
@@ -151,6 +155,10 @@
     "rfe_builtin:infinite_revolver_cylinder_5rds",
     "rfe_builtin:infinite_revolver_cylinder_6rds",
     "rfe_builtin:infinite_revolver_cylinder_7rds",
-    "rfe_builtin:infinite_revolver_cylinder_8rds"
+    "rfe_builtin:infinite_revolver_cylinder_8rds",
+    "rfe_builtin:infinite_percussion_revolver_cylinder_5rds",
+    "rfe_builtin:infinite_percussion_revolver_cylinder_6rds",
+    "rfe_builtin:infinite_percussion_revolver_cylinder_7rds",
+    "rfe_builtin:infinite_percussion_revolver_cylinder_8rds"
   ]
 }

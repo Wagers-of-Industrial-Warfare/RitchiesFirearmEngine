@@ -641,6 +641,15 @@
     { "id": "rfe_builtin:infinite_revolver_cylinder_5rds", "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:black_powder_handgun_cartridge","count":5},"slot":0}]} },
     { "id": "rfe_builtin:infinite_revolver_cylinder_6rds", "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:black_powder_handgun_cartridge","count":6},"slot":0}]} },
     { "id": "rfe_builtin:infinite_revolver_cylinder_7rds", "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:black_powder_handgun_cartridge","count":7},"slot":0}]} },
-    { "id": "rfe_builtin:infinite_revolver_cylinder_8rds", "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:black_powder_handgun_cartridge","count":8},"slot":0}]} }
+    { "id": "rfe_builtin:infinite_revolver_cylinder_8rds", "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:black_powder_handgun_cartridge","count":8},"slot":0}]} },
+    "rfe_builtin:paper_handgun_cartridge",
+    { "id": "rfe_builtin:percussion_revolver_cylinder_5rds", "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:paper_handgun_cartridge","count":5},"slot":0}],"ritchiesfirearmengine:primers":[{"item":{"id":"rfe_builtin:percussion_cap","count":5},"slot":0}]} },
+    { "id": "rfe_builtin:percussion_revolver_cylinder_6rds", "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:paper_handgun_cartridge","count":6},"slot":0}],"ritchiesfirearmengine:primers":[{"item":{"id":"rfe_builtin:percussion_cap","count":6},"slot":0}]} },
+    { "id": "rfe_builtin:percussion_revolver_cylinder_7rds", "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:paper_handgun_cartridge","count":7},"slot":0}],"ritchiesfirearmengine:primers":[{"item":{"id":"rfe_builtin:percussion_cap","count":7},"slot":0}]} },
+    { "id": "rfe_builtin:percussion_revolver_cylinder_8rds", "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:paper_handgun_cartridge","count":8},"slot":0}],"ritchiesfirearmengine:primers":[{"item":{"id":"rfe_builtin:percussion_cap","count":8},"slot":0}]} },
+    { "id": "rfe_builtin:infinite_percussion_revolver_cylinder_5rds", "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:paper_handgun_cartridge","count":5},"slot":0}],"ritchiesfirearmengine:primers":[{"item":{"id":"rfe_builtin:percussion_cap","count":5},"slot":0}]} },
+    { "id": "rfe_builtin:infinite_percussion_revolver_cylinder_6rds", "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:paper_handgun_cartridge","count":6},"slot":0}],"ritchiesfirearmengine:primers":[{"item":{"id":"rfe_builtin:percussion_cap","count":6},"slot":0}]} },
+    { "id": "rfe_builtin:infinite_percussion_revolver_cylinder_7rds", "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:paper_handgun_cartridge","count":7},"slot":0}],"ritchiesfirearmengine:primers":[{"item":{"id":"rfe_builtin:percussion_cap","count":7},"slot":0}]} },
+    { "id": "rfe_builtin:infinite_percussion_revolver_cylinder_8rds", "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:paper_handgun_cartridge","count":8},"slot":0}],"ritchiesfirearmengine:primers":[{"item":{"id":"rfe_builtin:percussion_cap","count":8},"slot":0}]} }
   ]
 }

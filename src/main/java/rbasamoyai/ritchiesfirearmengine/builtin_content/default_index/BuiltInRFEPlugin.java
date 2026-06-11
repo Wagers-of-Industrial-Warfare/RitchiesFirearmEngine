@@ -537,6 +537,9 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         public static final DataComponentType<RFEItemContainerContents> INTERNAL_PRIMERS = register("internal_primers",
                 builder -> builder.persistent(RFEItemContainerContents.CODEC).networkSynchronized(RFEItemContainerContents.STREAM_CODEC));
 
+        public static final DataComponentType<RFEItemContainerContents> LOADED_PRIMER = register("loaded_primer",
+                builder -> builder.persistent(RFEItemContainerContents.CODEC).networkSynchronized(RFEItemContainerContents.STREAM_CODEC));
+
         public static final DataComponentType<ReloadPhase.PhaseType> RELOAD_PHASE = register("reload_phase",
                 builder -> builder.persistent(ReloadPhase.PhaseType.CODEC).networkSynchronized(ReloadPhase.PhaseType.STREAM_CODEC));
 

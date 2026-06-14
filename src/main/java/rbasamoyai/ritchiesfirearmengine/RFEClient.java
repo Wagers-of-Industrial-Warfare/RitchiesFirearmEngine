@@ -42,6 +42,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFE
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
+import rbasamoyai.ritchiesfirearmengine.foundation.compat.iris.IrisCompat;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundFirearmActionPacket;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundSetAttackKeyPacket;
@@ -308,6 +309,12 @@ public class RFEClient {
                 registry.accept(ModelResourceLocation.standalone(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), path)));
             }
         }
+    }
+
+    public static boolean isShadersEnabled() {
+        if (RFEModsNeoForge.IRIS.runIfInstalled(() -> IrisCompat::isShadersEnabled).orElse(false))
+            return true;
+        return false;
     }
 
 }

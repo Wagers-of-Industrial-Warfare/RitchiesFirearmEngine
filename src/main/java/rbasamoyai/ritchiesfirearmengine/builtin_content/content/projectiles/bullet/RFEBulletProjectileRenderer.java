@@ -13,6 +13,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import rbasamoyai.ritchiesfirearmengine.RFEClient;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFEProjectileRenderer;
@@ -21,7 +22,9 @@ import rbasamoyai.ritchiesfirearmengine.utils.RFEMatrixUtils;
 public class RFEBulletProjectileRenderer extends RFEProjectileRenderer {
 
     private static final ResourceLocation COLOR_LOCATION = RitchiesFirearmEngine.resource("textures/entity/color.png");
+    private static final ResourceLocation COLOR_EMISSIVE_LOCATION = RitchiesFirearmEngine.resource("textures/entity/color_s.png");
     private static final RenderType COLOR = RenderType.entityTranslucentCull(COLOR_LOCATION);
+    private static final RenderType COLOR_EMISSIVE = RenderType.eyes(COLOR_EMISSIVE_LOCATION);
     
     protected final int rHead;
     protected final int gHead;
@@ -74,6 +77,10 @@ public class RFEBulletProjectileRenderer extends RFEProjectileRenderer {
 
         VertexConsumer vcons = buffers.getBuffer(COLOR);
         renderBox(vcons, lastPose, this.rHead, this.gHead, this.bHead, this.rTail, this.gTail, this.bTail, length, this.thickness, light);
+        if (this.tracerLight && RFEClient.isShadersEnabled()) {
+            vcons = buffers.getBuffer(COLOR_EMISSIVE);
+            renderBox(vcons, lastPose, this.rHead, this.gHead, this.bHead, this.rTail, this.gTail, this.bTail, length, this.thickness * 1.25f, light);
+        }
 
         poseStack.popPose();
     }

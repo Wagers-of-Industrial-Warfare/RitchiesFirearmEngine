@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public enum RFEModsNeoForge {
+    IRIS,
     SHOULDERSURFING;
 
     private final String id = this.name().toLowerCase(Locale.ROOT);

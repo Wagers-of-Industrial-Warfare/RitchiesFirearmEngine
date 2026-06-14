@@ -2,6 +2,7 @@ package rbasamoyai.ritchiesfirearmengine.foundation.pack_loading;
 
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.FileUtil;
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentData;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.creative_mode_tab.RFECreativeModeTabBuilder;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.creative_mode_tab.RFECreativeModeTabMetadata;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPluginManager;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEModUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
@@ -332,6 +334,21 @@ public class RFEPackLoader {
 
     public static void loadCreativeModeTabs(BiConsumer<ResourceLocation, CreativeModeTab> cons) {
         LOGGER.info("Registering RFE content pack creative mode tabs");
+
+        List<RFECreativeModeTabMetadata> tabMetadatas = new ArrayList<>();
+        for (Map.Entry<String, RFEContentPack> packEntry : LOADED_CONTENT_PACKS.entrySet())
+            tabMetadatas.add(packEntry.getValue().contentData().creativeModeTabMetadata());
+        tabMetadatas.sort(Comparator.comparingInt(RFECreativeModeTabMetadata::priority));
+
+        List<ResourceLocation> allTabIds = new ArrayList<>();
+        for (RFECreativeModeTabMetadata tabMetadata : tabMetadatas)
+            allTabIds.addAll(tabMetadata.order());
+
+        // Build this so that we don't have to call indexOf and end up with O(n^2)
+        Object2IntOpenHashMap<ResourceLocation> indices = new Object2IntOpenHashMap<>();
+        for (int i = 0; i < allTabIds.size(); ++i)
+            indices.put(allTabIds.get(i), i);
+
         int totalObjectCount = 0;
         int successfulObjectCount = 0;
         for (Map.Entry<String, RFEContentPack> packEntry : LOADED_CONTENT_PACKS.entrySet()) {
@@ -342,13 +359,13 @@ public class RFEPackLoader {
                 ResourceLocation entryKey = RFEUtils.location(namespace, tabEntry.getKey());
                 try {
                     JsonObject tabDefinition = tabEntry.getValue();
-                    CreativeModeTab creativeModeTab = RFECreativeModeTabBuilder.buildTab(entryKey, tabDefinition);
+                    CreativeModeTab creativeModeTab = RFECreativeModeTabBuilder.buildTab(entryKey, tabDefinition, allTabIds, indices.getInt(entryKey));
                     cons.accept(entryKey, creativeModeTab);
                     ++successfulObjectCount;
                 } catch (Exception e) {
                     LOGGER.error("Exception encountered while registering RFE content pack item {} from pack {}, skipping item: {}",
                             entryKey, packEntry.getKey(), e);
-                    throw e;
+                    throw e; // I don't know why we are doing this.
                 }
             }
         }

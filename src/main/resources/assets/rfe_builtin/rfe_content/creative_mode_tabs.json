@@ -1,0 +1,4 @@
+{
+  "order": [ "base", "filled_magazines", "weapons" ],
+  "priority": -10
+}

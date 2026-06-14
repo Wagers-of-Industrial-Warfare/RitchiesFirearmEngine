@@ -11,14 +11,25 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
+
+import java.util.List;
 
 public class RFECreativeModeTabBuilder {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static CreativeModeTab buildTab(ResourceLocation tabId, JsonObject obj) {
+    @ApiStatus.Internal
+    public static CreativeModeTab buildTab(ResourceLocation tabId, JsonObject obj, List<ResourceLocation> rfeTabs, int index) {
+        CreativeModeTab.Builder builder = buildTabInternal(tabId, obj);
+        if (index > 0)
+            builder.withTabsBefore(rfeTabs.get(index - 1));
+        return builder.build();
+    }
+
+    private static CreativeModeTab.Builder buildTabInternal(ResourceLocation tabId, JsonObject obj) {
         final JsonObject copy = obj.deepCopy(); // For lazily evaluated objects
         CreativeModeTab.Builder builder = builder();
 
@@ -55,7 +66,7 @@ public class RFECreativeModeTabBuilder {
             }
         });
 
-        return builder.build();
+        return builder;
     }
 
     private static ItemStack readItem(JsonElement element) throws IllegalStateException {

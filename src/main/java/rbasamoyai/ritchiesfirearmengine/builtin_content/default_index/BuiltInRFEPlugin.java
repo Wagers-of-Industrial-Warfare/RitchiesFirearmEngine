@@ -110,6 +110,11 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("entity_secondary_ammo_count"), BuiltInRFEPlugin::entitySecondaryAmmoCount);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("free_secondary_ammo_space"), BuiltInRFEPlugin::freeSecondaryAmmoSpace);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("used_secondary_ammo_count"), BuiltInRFEPlugin::usedSecondaryAmmoCount);
+        RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("secondary_ammo_count"), BuiltInRFEPlugin::secondaryAmmoCount);
+        RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("has_chambered_secondary"), BuiltInRFEPlugin::hasChamberedSecondary);
+        RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("has_chambered_used_secondary"), BuiltInRFEPlugin::hasChamberedUsedSecondary);
+        RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("primable_ammo_count"), BuiltInRFEPlugin::primableAmmoCount);
+        RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("primed_ammo_count"), BuiltInRFEPlugin::primedAmmoCount);
     }
 
     @Override
@@ -370,6 +375,51 @@ public class BuiltInRFEPlugin implements RFEPlugin {
     private static float usedSecondaryAmmoCount(ItemStack itemStack, LivingEntity entity) {
         if (itemStack.getItem() instanceof RFEFirearmItem firearm)
             return firearm.usedSecondaryAmmoCount(itemStack);
+        return 0;
+    }
+
+    /**
+     * Secondary ammo count, not counting used ammo
+     */
+    private static float secondaryAmmoCount(ItemStack itemStack, LivingEntity entity) {
+        if (itemStack.getItem() instanceof RFEFirearmItem firearm)
+            return firearm.secondaryAmmoCount(itemStack);
+        return 0;
+    }
+
+    /**
+     * Whether the firearm has a loaded and unused secondary round
+     */
+    private static float hasChamberedSecondary(ItemStack itemStack, LivingEntity entity) {
+        if (itemStack.getItem() instanceof RFEFirearmItem firearm)
+            return firearm.hasChamberedSecondary(itemStack) ? 1 : 0;
+        return 0;
+    }
+
+    /**
+     * Whether the firearm has a loaded and used secondary round
+     */
+    private static float hasChamberedUsedSecondary(ItemStack itemStack, LivingEntity entity) {
+        if (itemStack.getItem() instanceof RFEFirearmItem firearm)
+            return firearm.hasChamberedUsedSecondary(itemStack) ? 1 : 0;
+        return 0;
+    }
+
+    /**
+     * How many ammo items are missing a complementing primer
+     */
+    private static float primableAmmoCount(ItemStack itemStack, LivingEntity entity) {
+        if (itemStack.getItem() instanceof RFEFirearmItem firearm)
+            return firearm.primableAmmoCount(itemStack, entity);
+        return 0;
+    }
+
+    /**
+     * How many ammo items have a complementing primer
+     */
+    private static float primedAmmoCount(ItemStack itemStack, LivingEntity entity) {
+        if (itemStack.getItem() instanceof RFEFirearmItem firearm)
+            return firearm.primedAmmoCount(itemStack, entity);
         return 0;
     }
 

@@ -990,8 +990,14 @@ public class RFEFirearmMode {
         DataComponentPatch modeData = this.getModeData(itemStack);
         List<ItemStack> ammoList;
         List<ItemStack> secondaryList;
-        if (this.internalCapacity > 0) {
+        int primaryCapacity;
+        int secondaryCapacity;
+        if (!this.requiresAmmo()) {
+            ammoList = new ArrayList<>();
+            primaryCapacity = 0;
+        } else if (this.internalCapacity > 0) {
             ammoList = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS);
+            primaryCapacity = this.internalCapacity;
         } else {
             Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
             if (o == null || o.isEmpty())
@@ -1000,9 +1006,14 @@ public class RFEFirearmMode {
             if (!(magazine.getItem() instanceof MagazineItem magazineItem))
                 return;
             ammoList = magazineItem.getStoredAmmo(magazine);
+            primaryCapacity = magazineItem.getMagazineCapacity(magazine);
         }
-        if (this.internalSecondaryCapacity > 0) {
+        if (!this.requiresSecondaryAmmo()) {
+            secondaryList = new ArrayList<>();
+            secondaryCapacity = 0;
+        } else if (this.internalSecondaryCapacity > 0) {
             secondaryList = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_PRIMERS);
+            secondaryCapacity = this.internalSecondaryCapacity;
         } else {
             Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
             if (o == null || o.isEmpty())
@@ -1011,88 +1022,107 @@ public class RFEFirearmMode {
             if (!(magazine.getItem() instanceof MagazineItem magazineItem))
                 return;
             secondaryList = magazineItem.getStoredSecondaryAmmo(magazine);
+            secondaryCapacity = magazineItem.getSecondaryMagazineCapacity(magazine);
         }
+        if (this.trackEmptySlots) {
+            int diff = Math.max(0, primaryCapacity - RFEItemUtils.countItemsIncludingSlots(ammoList));
+            for (int i = 0; i < diff; ++i)
+                ammoList.add(ItemStack.EMPTY);
+        }
+        if (this.trackEmptySecondarySlots) {
+            int diff = Math.max(0, secondaryCapacity - RFEItemUtils.countItemsIncludingSlots(secondaryList));
+            for (int i = 0; i < diff; ++i)
+                secondaryList.add(ItemStack.EMPTY);
+        }
+
         if (ammoList.isEmpty() && secondaryList.isEmpty())
             return;
 
-        int count = indexCount;
-        while (count > 0) {
-            int stripIndex = reverse ? ammoList.size() - 1 : 0;
-            ItemStack strip = ammoList.get(stripIndex);
-            int deductible = Math.min(count, strip.isEmpty() ? 1 : strip.getCount());
-            ItemStack split = strip.isEmpty() ? ItemStack.EMPTY : strip.split(deductible);
-            if (strip.isEmpty())
-                ammoList.remove(stripIndex);
-            int addIndex = reverse ? 0 : ammoList.size();
-            if (split.isEmpty()) {
-                ammoList.add(addIndex, split);
-            } else if (ammoList.isEmpty()) {
-                ammoList.add(split);
-            } else {
-                ItemStack next = ammoList.get(reverse ? 0 : ammoList.size() - 1);
-                if (ItemStack.isSameItemSameComponents(next, split)) {
-                    int maxAddable = Math.min(next.getMaxStackSize() - split.getCount(), split.getCount());
-                    next.grow(maxAddable);
-                    split.shrink(maxAddable);
-                }
-                if (!split.isEmpty())
+        if (!ammoList.isEmpty()) {
+            int count = indexCount;
+            while (count > 0) {
+                int stripIndex = reverse ? ammoList.size() - 1 : 0;
+                ItemStack strip = ammoList.get(stripIndex);
+                int deductible = Math.min(count, strip.isEmpty() ? 1 : strip.getCount());
+                ItemStack split = strip.isEmpty() ? ItemStack.EMPTY : strip.split(deductible);
+                if (strip.isEmpty())
+                    ammoList.remove(stripIndex);
+                int addIndex = reverse ? 0 : ammoList.size();
+                if (split.isEmpty()) {
                     ammoList.add(addIndex, split);
-            }
-            count -= deductible;
-        }
-        int secondaryCount = indexCount;
-        while (secondaryCount > 0) {
-            int stripIndex = reverse ? secondaryList.size() - 1 : 0;
-            ItemStack strip = secondaryList.get(stripIndex);
-            int deductible = Math.min(secondaryCount, strip.isEmpty() ? 1 : strip.getCount());
-            ItemStack split = strip.isEmpty() ? ItemStack.EMPTY : strip.split(deductible);
-            if (strip.isEmpty())
-                secondaryList.remove(stripIndex);
-            int addIndex = reverse ? 0 : secondaryList.size();
-            if (split.isEmpty()) {
-                secondaryList.add(addIndex, split);
-            } else if (secondaryList.isEmpty()) {
-                secondaryList.add(split);
-            } else {
-                ItemStack next = secondaryList.get(reverse ? 0 : secondaryList.size() - 1);
-                if (ItemStack.isSameItemSameComponents(next, split)) {
-                    int maxAddable = Math.min(next.getMaxStackSize() - split.getCount(), split.getCount());
-                    next.grow(maxAddable);
-                    split.shrink(maxAddable);
+                } else if (ammoList.isEmpty()) {
+                    ammoList.add(split);
+                } else {
+                    ItemStack next = ammoList.get(reverse ? 0 : ammoList.size() - 1);
+                    if (ItemStack.isSameItemSameComponents(next, split)) {
+                        int maxAddable = Math.min(next.getMaxStackSize() - split.getCount(), split.getCount());
+                        next.grow(maxAddable);
+                        split.shrink(maxAddable);
+                    }
+                    if (!split.isEmpty())
+                        ammoList.add(addIndex, split);
                 }
-                if (!split.isEmpty())
-                    secondaryList.add(addIndex, split);
+                count -= deductible;
             }
-            secondaryCount -= deductible;
         }
-
-        if (this.internalCapacity > 0) {
-            this.saveModeData(itemStack, FirearmDataUtils.saveRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS, ammoList));
-        } else {
-            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
-            if (o == null || o.isEmpty())
-                return;
-            ItemStack magazine = o.get().copyOne();
-            if (magazine.getItem() instanceof MagazineItem magazineItem) {
-                magazineItem.writeStoredAmmo(magazine, ammoList);
-                PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, modeData);
-                patched.set(RFEDataComponents.DETACHED_MAGAZINE, RFEItemContainerContents.fromItems(List.of(magazine)));
-                this.saveModeData(itemStack, patched.asPatch());
+        if (!secondaryList.isEmpty()) {
+            int secondaryCount = indexCount;
+            while (secondaryCount > 0) {
+                int stripIndex = reverse ? secondaryList.size() - 1 : 0;
+                ItemStack strip = secondaryList.get(stripIndex);
+                int deductible = Math.min(secondaryCount, strip.isEmpty() ? 1 : strip.getCount());
+                ItemStack split = strip.isEmpty() ? ItemStack.EMPTY : strip.split(deductible);
+                if (strip.isEmpty())
+                    secondaryList.remove(stripIndex);
+                int addIndex = reverse ? 0 : secondaryList.size();
+                if (split.isEmpty()) {
+                    secondaryList.add(addIndex, split);
+                } else if (secondaryList.isEmpty()) {
+                    secondaryList.add(split);
+                } else {
+                    ItemStack next = secondaryList.get(reverse ? 0 : secondaryList.size() - 1);
+                    if (ItemStack.isSameItemSameComponents(next, split)) {
+                        int maxAddable = Math.min(next.getMaxStackSize() - split.getCount(), split.getCount());
+                        next.grow(maxAddable);
+                        split.shrink(maxAddable);
+                    }
+                    if (!split.isEmpty())
+                        secondaryList.add(addIndex, split);
+                }
+                secondaryCount -= deductible;
+            }
+        }
+        if (this.requiresAmmo()) {
+            if (this.internalCapacity > 0) {
+                this.saveModeData(itemStack, FirearmDataUtils.saveRounds(modeData, RFEDataComponents.INTERNAL_ROUNDS, ammoList));
+            } else {
+                Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+                if (o == null || o.isEmpty())
+                    return;
+                ItemStack magazine = o.get().copyOne();
+                if (magazine.getItem() instanceof MagazineItem magazineItem) {
+                    magazineItem.writeStoredAmmo(magazine, ammoList);
+                    PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, modeData);
+                    patched.set(RFEDataComponents.DETACHED_MAGAZINE, RFEItemContainerContents.fromItems(List.of(magazine)));
+                    this.saveModeData(itemStack, patched.asPatch());
+                }
             }
         }
         modeData = this.getModeData(itemStack);
-        if (this.internalSecondaryCapacity > 0) {
-            this.saveModeData(itemStack, FirearmDataUtils.saveRounds(modeData, RFEDataComponents.INTERNAL_PRIMERS, secondaryList));
-        } else {
-            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
-            if (o == null || o.isEmpty())
-                return;
-            ItemStack magazine = o.get().copyOne();
-            if (magazine.getItem() instanceof MagazineItem magazineItem) {
-                magazineItem.writeStoredSecondaryAmmo(magazine, secondaryList);
-                PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, modeData);
-                patched.set(RFEDataComponents.DETACHED_MAGAZINE, RFEItemContainerContents.fromItems(List.of(magazine)));
-                this.saveModeData(itemStack, patched.asPatch());
+        if (this.requiresSecondaryAmmo()) {
+            if (this.internalSecondaryCapacity > 0) {
+                this.saveModeData(itemStack, FirearmDataUtils.saveRounds(modeData, RFEDataComponents.INTERNAL_PRIMERS, secondaryList));
+            } else {
+                Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+                if (o == null || o.isEmpty())
+                    return;
+                ItemStack magazine = o.get().copyOne();
+                if (magazine.getItem() instanceof MagazineItem magazineItem) {
+                    magazineItem.writeStoredSecondaryAmmo(magazine, secondaryList);
+                    PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, modeData);
+                    patched.set(RFEDataComponents.DETACHED_MAGAZINE, RFEItemContainerContents.fromItems(List.of(magazine)));
+                    this.saveModeData(itemStack, patched.asPatch());
+                }
             }
         }
     }
@@ -1136,7 +1166,7 @@ public class RFEFirearmMode {
                 if (!(magazine.getItem() instanceof MagazineItem magazineItem))
                     return;
                 secondaryList = magazineItem.getStoredSecondaryAmmo(magazine);
-                addable = Mth.clamp(magazineItem.getSecondaryMagazineCapacity(magazine) - RFEItemUtils.countItemsConditional(secondaryList, s -> !FirearmDataUtils.isUsedPrimer(s)), 0, reloadCount);
+                addable = Mth.clamp(magazineItem.getSecondaryMagazineCapacity(magazine) - RFEItemUtils.countItemsConditional(secondaryList, Predicate.not(FirearmDataUtils::isUsedPrimer)), 0, reloadCount);
             }
             RFEItemUtils.consumeItemsFromEntity(entity, secondaryPred.and(s -> s != itemStack && !FirearmDataUtils.isUsedPrimer(s)), s -> {
                 int takeAmount = Math.min(addable - RFEItemUtils.countItems(foundSecondaries), s.getMaxStackSize());
@@ -1414,9 +1444,8 @@ public class RFEFirearmMode {
             } else {
                 if (this.plusOneSecondaryCapacity) {
                     ItemStack loadedPrimer = this.getLoadedPrimer(itemStack);
-                    if (!loadedPrimer.isEmpty()) {
+                    if (!loadedPrimer.isEmpty())
                         RFEItemUtils.addItemToEntity(loadedPrimer, entity);
-                    }
                 }
                 DataComponentPatch modeData = this.getModeData(itemStack);
                 Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
@@ -1587,19 +1616,6 @@ public class RFEFirearmMode {
         this.setJammed(itemStack, entity, false);
         if (entity.level().isClientSide)
             return;
-        RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
-        if (ammoProperties.unlimitedProjectile() != null)
-            return;
-        if (this.plusOneCapacity && this.getLoadedRound(itemStack).isEmpty()) {
-            List<ItemStack> nextAmmoList = this.getNextRoundsInItem(itemStack, entity, 1, true);
-            ItemStack nextAmmoStack = FirearmDataUtils.stripAmmo(nextAmmoList, this.ammoConsumedLast, false, this.trackEmptySlots);
-            this.setLoadedRound(itemStack, nextAmmoStack);
-            if (nextAmmoStack.isEmpty())
-                this.setCharged(itemStack, entity, false);
-        }
-        List<ItemStack> nextRound = this.getNextRoundsInItem(itemStack, entity, 1, false);
-        if (!this.plusOneCapacity && nextRound.isEmpty())
-            this.setCharged(itemStack, entity, false);
         if (this.canOverheat) {
             DataComponentPatch modeData = this.getModeData(itemStack);
             float heat = FirearmDataUtils.getHeat(modeData);
@@ -1608,18 +1624,67 @@ public class RFEFirearmMode {
             modeData = FirearmDataUtils.setHeat(modeData, heat);
             this.saveModeData(itemStack, modeData);
         }
-        ItemStack chamberedRound = this.getChamberedRound(itemStack);
-        if (!chamberedRound.isEmpty()) {
-            boolean valid = false;
-            for (AmmoPredicate pred : ammoProperties.primaryAmmo().keySet()) {
-                if (pred.test(chamberedRound)) {
-                    valid = true;
-                    break;
+
+        boolean shouldJam = false;
+        RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
+        if (this.requiresAmmo() && ammoProperties.unlimitedProjectile() == null) {
+            if (this.plusOneCapacity) {
+                ItemStack loadedRound = this.getLoadedRound(itemStack);
+                if (loadedRound.isEmpty()) {
+                    List<ItemStack> nextAmmoList = this.getNextRoundsInItem(itemStack, entity, 1, true);
+                    ItemStack nextAmmoStack = FirearmDataUtils.stripAmmo(nextAmmoList, this.ammoConsumedLast, false, this.trackEmptySlots);
+                    this.setLoadedRound(itemStack, nextAmmoStack);
+                    if (nextAmmoStack.isEmpty())
+                        this.setCharged(itemStack, entity, false);
+                }
+            } else {
+                List<ItemStack> nextRound = this.getNextRoundsInItem(itemStack, entity, 1, false);
+                if (nextRound.isEmpty())
+                    this.setCharged(itemStack, entity, false);
+            }
+            ItemStack chamberedRound = this.getChamberedRound(itemStack);
+            if (!chamberedRound.isEmpty()) {
+                shouldJam = true;
+                for (AmmoPredicate pred : ammoProperties.primaryAmmo().keySet()) {
+                    if (pred.test(chamberedRound)) {
+                        shouldJam = false;
+                        break;
+                    }
                 }
             }
-            if (!valid) {
-                this.setCharged(itemStack, entity, false);
-                this.setJammed(itemStack, entity, true);
+        }
+        if (this.requiresSecondaryAmmo() && ammoProperties.unlimitedSecondaryReloadItem() == null) {
+            if (this.plusOneSecondaryCapacity) {
+                ItemStack loadedPrimer = this.getLoadedPrimer(itemStack);
+                if (loadedPrimer.isEmpty() || FirearmDataUtils.isUsedPrimer(loadedPrimer)) {
+                    List<ItemStack> nextAmmoList = this.getNextSecondariesInItem(itemStack, entity, 1, true, true);
+                    ItemStack nextPrimerStack = FirearmDataUtils.stripAmmo(nextAmmoList, this.ammoConsumedLast, false, this.trackEmptySlots);
+                    this.setLoadedPrimer(itemStack, nextPrimerStack);
+                    if (nextPrimerStack.isEmpty() || FirearmDataUtils.isUsedPrimer(nextPrimerStack))
+                        this.setCharged(itemStack, entity, false);
+                }
+            } else {
+                List<ItemStack> nextPrimer = this.getNextRoundsInItem(itemStack, entity, 1, false);
+                if (nextPrimer.isEmpty() || FirearmDataUtils.isUsedPrimer(nextPrimer.getFirst()))
+                    this.setCharged(itemStack, entity, false);
+            }
+            ItemStack chamberedPrimer = this.getChamberedRound(itemStack);
+            if (!chamberedPrimer.isEmpty()) {
+                shouldJam = true;
+                if (!FirearmDataUtils.isUsedPrimer(chamberedPrimer)) {
+                    for (AmmoPredicate pred : ammoProperties.secondaryAmmo()) {
+                        if (pred.test(chamberedPrimer)) {
+                            shouldJam = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if (shouldJam) {
+            this.setCharged(itemStack, entity, false);
+            this.setJammed(itemStack, entity, true);
+            if (this.requiresAmmo() && ammoProperties.unlimitedProjectile() == null) {
                 if (this.plusOneCapacity) {
                     ItemStack loadedRound = this.getLoadedRound(itemStack);
                     if (!loadedRound.isEmpty()) {
@@ -1642,6 +1707,38 @@ public class RFEFirearmMode {
                             List<ItemStack> ammoList = magazineItem.getStoredAmmo(magazine);
                             ItemStack ejected = FirearmDataUtils.stripAmmo(ammoList, this.ammoConsumedLast, false, this.trackEmptySlots);
                             magazineItem.writeStoredAmmo(magazine, ammoList);
+                            PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, modeData);
+                            patched.set(RFEDataComponents.DETACHED_MAGAZINE, RFEItemContainerContents.fromItems(List.of(magazine)));
+                            this.saveModeData(itemStack, patched.asPatch());
+                            if (!ejected.isEmpty())
+                                RFEItemUtils.addItemToEntity(ejected, entity);
+                        }
+                    }
+                }
+            }
+            if (this.requiresSecondaryAmmo() && ammoProperties.unlimitedSecondaryReloadItem() == null) {
+                if (this.plusOneSecondaryCapacity) {
+                    ItemStack loadedPrimer = this.getLoadedPrimer(itemStack);
+                    if (!loadedPrimer.isEmpty()) {
+                        this.setLoadedPrimer(itemStack, ItemStack.EMPTY);
+                        RFEItemUtils.addItemToEntity(loadedPrimer, entity);
+                    }
+                } else if (this.internalSecondaryCapacity > 0) {
+                    DataComponentPatch modeData = this.getModeData(itemStack);
+                    List<ItemStack> ammoList = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_PRIMERS);
+                    ItemStack ejected = FirearmDataUtils.stripAmmo(ammoList, this.ammoConsumedLast, false, this.trackEmptySecondarySlots);
+                    this.saveModeData(itemStack, FirearmDataUtils.saveRounds(modeData, RFEDataComponents.INTERNAL_PRIMERS, ammoList));
+                    if (!ejected.isEmpty())
+                        RFEItemUtils.addItemToEntity(ejected, entity);
+                } else {
+                    DataComponentPatch modeData = this.getModeData(itemStack);
+                    Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+                    if (o != null && o.isPresent()) {
+                        ItemStack magazine = o.get().copyOne();
+                        if (magazine.getItem() instanceof MagazineItem magazineItem) {
+                            List<ItemStack> ammoList = magazineItem.getStoredSecondaryAmmo(magazine);
+                            ItemStack ejected = FirearmDataUtils.stripAmmo(ammoList, this.ammoConsumedLast, false, this.trackEmptySecondarySlots);
+                            magazineItem.writeStoredSecondaryAmmo(magazine, ammoList);
                             PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, modeData);
                             patched.set(RFEDataComponents.DETACHED_MAGAZINE, RFEItemContainerContents.fromItems(List.of(magazine)));
                             this.saveModeData(itemStack, patched.asPatch());
@@ -1952,7 +2049,7 @@ public class RFEFirearmMode {
         DataComponentPatch modeData = this.getModeData(itemStack);
         if (this.internalSecondaryCapacity > 0) {
             List<ItemStack> secondaryList = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_PRIMERS);
-            return RFEItemUtils.countItemsConditional(secondaryList, s -> !FirearmDataUtils.isUsedPrimer(s)) > 0;
+            return RFEItemUtils.countItemsConditional(secondaryList, Predicate.not(FirearmDataUtils::isUsedPrimer)) > 0;
         } else {
             if (this.plusOneSecondaryCapacity) {
                 ItemStack loadedPrimer = this.getLoadedPrimer(itemStack);
@@ -1966,7 +2063,7 @@ public class RFEFirearmMode {
             if (!(magazine.getItem() instanceof MagazineItem magazineItem))
                 return false;
             List<ItemStack> secondaryList = magazineItem.getStoredSecondaryAmmo(magazine);
-            return RFEItemUtils.countItemsConditional(secondaryList, s -> !FirearmDataUtils.isUsedPrimer(s)) > 0;
+            return RFEItemUtils.countItemsConditional(secondaryList, Predicate.not(FirearmDataUtils::isUsedPrimer)) > 0;
         }
     }
 
@@ -1996,7 +2093,7 @@ public class RFEFirearmMode {
     }
 
     public boolean hasChamberedRound(ItemStack itemStack) {
-        if (!this.ammoRequired)
+        if (!this.requiresAmmo())
             return true;
         ItemStack chamberedRound = this.getChamberedRound(itemStack);
         RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
@@ -2071,7 +2168,7 @@ public class RFEFirearmMode {
                 return 0;
             int capacity = magazineItem.getSecondaryMagazineCapacity(magazine);
             List<ItemStack> secondaryList = magazineItem.getStoredSecondaryAmmo(magazine);
-            int count = RFEItemUtils.countItemsConditional(secondaryList, s -> !FirearmDataUtils.isUsedPrimer(s));
+            int count = RFEItemUtils.countItemsConditional(secondaryList, Predicate.not(FirearmDataUtils::isUsedPrimer));
             return capacity - count;
         }
     }
@@ -2082,6 +2179,12 @@ public class RFEFirearmMode {
             List<ItemStack> secondaryList = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_PRIMERS);
             return RFEItemUtils.countItemsConditional(secondaryList, FirearmDataUtils::isUsedPrimer);
         } else {
+            int extraCount = 0;
+            if (this.plusOneSecondaryCapacity) {
+                ItemStack loadedPrimer = this.getLoadedPrimer(itemStack);
+                if (!loadedPrimer.isEmpty() && FirearmDataUtils.isUsedPrimer(loadedPrimer))
+                    ++extraCount;
+            }
             Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
             if (o == null || o.isEmpty())
                 return 0;
@@ -2089,7 +2192,144 @@ public class RFEFirearmMode {
             if (!(magazine.getItem() instanceof MagazineItem magazineItem))
                 return 0;
             List<ItemStack> secondaryList = magazineItem.getStoredSecondaryAmmo(magazine);
-            return RFEItemUtils.countItemsConditional(secondaryList, FirearmDataUtils::isUsedPrimer);
+            return RFEItemUtils.countItemsConditional(secondaryList, FirearmDataUtils::isUsedPrimer) + extraCount;
+        }
+    }
+
+    public int countSecondaryAmmo(ItemStack itemStack) {
+        DataComponentPatch modeData = this.getModeData(itemStack);
+        if (this.internalSecondaryCapacity > 0) {
+            List<ItemStack> secondaryList = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_PRIMERS);
+            return RFEItemUtils.countItemsConditional(secondaryList, Predicate.not(FirearmDataUtils::isUsedPrimer));
+        } else {
+            int extraCount = 0;
+            if (this.plusOneSecondaryCapacity) {
+                ItemStack loadedPrimer = this.getLoadedPrimer(itemStack);
+                if (!loadedPrimer.isEmpty() && !FirearmDataUtils.isUsedPrimer(loadedPrimer))
+                    ++extraCount;
+            }
+            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+            if (o == null || o.isEmpty())
+                return 0;
+            ItemStack magazine = o.get().copyOne();
+            if (!(magazine.getItem() instanceof MagazineItem magazineItem))
+                return 0;
+            List<ItemStack> secondaryList = magazineItem.getStoredSecondaryAmmo(magazine);
+            return RFEItemUtils.countItemsConditional(secondaryList, Predicate.not(FirearmDataUtils::isUsedPrimer)) + extraCount;
+        }
+    }
+
+    protected ItemStack getChamberedSecondary(ItemStack itemStack) {
+        DataComponentPatch modeData = this.getModeData(itemStack);
+        ItemStack chamberedRound;
+        if (this.internalSecondaryCapacity > 0) {
+            List<ItemStack> ammoList = FirearmDataUtils.getRounds(modeData, RFEDataComponents.INTERNAL_PRIMERS);
+            if (ammoList.isEmpty())
+                return ItemStack.EMPTY;
+            chamberedRound = ammoList.get(this.ammoConsumedLast ? ammoList.size() - 1 : 0);
+        } else if (this.plusOneSecondaryCapacity) {
+            return this.getLoadedPrimer(itemStack);
+        } else {
+            Optional<? extends RFEItemContainerContents> o = modeData.get(RFEDataComponents.DETACHED_MAGAZINE);
+            if (o == null || o.isEmpty())
+                return ItemStack.EMPTY;
+            ItemStack magazine = o.get().copyOne();
+            if (!(magazine.getItem() instanceof MagazineItem magazineItem))
+                return ItemStack.EMPTY;
+            List<ItemStack> ammoList = magazineItem.getStoredSecondaryAmmo(magazine);
+            if (ammoList.isEmpty())
+                return ItemStack.EMPTY;
+            chamberedRound = ammoList.get(this.ammoConsumedLast ? ammoList.size() - 1 : 0);
+        }
+        return chamberedRound;
+    }
+
+    public boolean hasChamberedSecondary(ItemStack itemStack) {
+        if (!this.requiresSecondaryAmmo())
+            return false;
+        ItemStack chamberedSecondary = this.getChamberedSecondary(itemStack);
+        if (chamberedSecondary.isEmpty() || FirearmDataUtils.isUsedPrimer(chamberedSecondary))
+            return false;
+        RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
+        for (AmmoPredicate pred : ammoProperties.secondaryAmmo()) {
+            if (pred.test(chamberedSecondary))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean hasChamberedUsedSecondary(ItemStack itemStack) {
+        if (!this.requiresSecondaryAmmo())
+            return false;
+        ItemStack chamberedSecondary = this.getChamberedSecondary(itemStack);
+        if (chamberedSecondary.isEmpty() || !FirearmDataUtils.isUsedPrimer(chamberedSecondary))
+            return false;
+        RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
+        for (AmmoPredicate pred : ammoProperties.secondaryAmmo()) {
+            if (pred.test(chamberedSecondary))
+                return true;
+        }
+        return false;
+    }
+
+    public int primableAmmoCount(ItemStack itemStack, LivingEntity entity) {
+        if (!this.requiresSecondaryAmmo())
+            return 0;
+        int ammoCount = this.getLoadedAmmoCount(itemStack, entity, true);
+        int secondaryCount = this.countSecondaryAmmo(itemStack);
+        return Math.max(0, ammoCount - secondaryCount);
+    }
+
+    public int primedAmmoCount(ItemStack itemStack, LivingEntity entity) {
+        if (!this.requiresSecondaryAmmo())
+            return 0;
+        if (!this.requiresAmmo())
+            return this.countSecondaryAmmo(itemStack);
+        if (!this.trackEmptySlots && !this.trackEmptySecondarySlots) {
+            // If empty slots are not tracked for both, just get loose count
+            int ammoCount = this.getLoadedAmmoCount(itemStack, entity, true);
+            int secondaryCount = this.countSecondaryAmmo(itemStack);
+            return Math.max(ammoCount, secondaryCount);
+        }
+        List<ItemStack> primaryAmmo = this.getLoadedAmmo(itemStack);
+        List<ItemStack> secondaryAmmo = this.getLoadedSecondaryAmmo(itemStack);
+
+        int sz = Math.min(RFEItemUtils.countItemsIncludingSlots(primaryAmmo), RFEItemUtils.countItems(secondaryAmmo));
+        int paired = 0;
+        for (int i = 0; i < sz; ++i) {
+            ItemStack primary = FirearmDataUtils.stripAmmo(primaryAmmo, this.ammoConsumedLast, false, false);
+            ItemStack secondary = FirearmDataUtils.stripAmmo(secondaryAmmo, this.ammoConsumedLast, false, false);
+            if (!primary.isEmpty() && !secondary.isEmpty() && !FirearmDataUtils.isUsedPrimer(secondary))
+                ++paired;
+        }
+        return paired;
+    }
+
+    public int getActualAmmoCapacity(ItemStack itemStack, LivingEntity entity) {
+        if (this.internalCapacity > 0) {
+            return this.internalCapacity;
+        } else {
+            Optional<? extends RFEItemContainerContents> o = this.getModeData(itemStack).get(RFEDataComponents.DETACHED_MAGAZINE);
+            if (o == null || o.isEmpty())
+                return 0;
+            ItemStack magazine = o.get().copyOne();
+            if (!(magazine.getItem() instanceof MagazineItem magazineItem))
+                return 0;
+            return magazineItem.getMagazineCapacity(magazine);
+        }
+    }
+
+    public int getActualSecondaryAmmoCapacity(ItemStack itemStack, LivingEntity entity) {
+        if (this.internalSecondaryCapacity > 0) {
+            return this.internalSecondaryCapacity;
+        } else {
+            Optional<? extends RFEItemContainerContents> o = this.getModeData(itemStack).get(RFEDataComponents.DETACHED_MAGAZINE);
+            if (o == null || o.isEmpty())
+                return 0;
+            ItemStack magazine = o.get().copyOne();
+            if (!(magazine.getItem() instanceof MagazineItem magazineItem))
+                return 0;
+            return magazineItem.getSecondaryMagazineCapacity(magazine);
         }
     }
 

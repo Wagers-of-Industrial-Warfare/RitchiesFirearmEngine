@@ -1,0 +1,11 @@
+{
+  "and": [
+    {
+      "or": [
+        { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 0 },
+        { "compare": "ritchiesfirearmengine:has_chambered_secondary", "operator": "equals", "value": 0 }
+      ]
+    },
+    { "compare": "ritchiesfirearmengine:primed_ammo_count", "operator": "greater_than", "value": 0 }
+  ]
+}

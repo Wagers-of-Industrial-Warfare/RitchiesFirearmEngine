@@ -188,7 +188,7 @@ public class MagazineItem extends Item {
         int primaryCapacity = this.getMagazineCapacity(itemStack);
         int secondaryCapacity = this.getSecondaryMagazineCapacity(itemStack);
         if (RFEItemUtils.countItems(primaryAmmo) >= primaryCapacity
-                && RFEItemUtils.countItemsConditional(secondaryAmmo, s -> !FirearmDataUtils.isUsedPrimer(s)) >= secondaryCapacity)
+                && RFEItemUtils.countItemsConditional(secondaryAmmo, Predicate.not(FirearmDataUtils::isUsedPrimer)) >= secondaryCapacity)
             return;
         boolean split = itemStack.getCount() > 1;
         RFEItemUtils.consumeItemsFromEntity(entity, s -> {

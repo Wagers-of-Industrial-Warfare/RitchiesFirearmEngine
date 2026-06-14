@@ -1,0 +1,7 @@
+{
+  "and": [
+    { "compare": "ritchiesfirearmengine:has_chambered_secondary", "operator": "equals", "value": 0 },
+    { "compare": "ritchiesfirearmengine:has_chambered_used_secondary", "operator": "equals", "value": 0 },
+    { "compare": "ritchiesfirearmengine:used_secondary_ammo_count", "operator": "greater_than", "value": 0 }
+  ]
+}

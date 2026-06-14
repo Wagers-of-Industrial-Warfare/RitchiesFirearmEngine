@@ -1,0 +1,19 @@
+{
+  "style": "ritchiesfirearmengine:ammo_counter",
+  "hide_entire_ammo_count": false,
+  "hide_firearm_ammo": false,
+  "enlarge_firearm_ammo": true,
+  "show_inventory_ammo": true,
+  "count_loose_rounds": true,
+  "show_secondary_ammo_count": true,
+  "firearm_icon": {
+    "texture": "rfe_builtin:textures/gui/hud/weapon_icon/naval_revolver_1851.png",
+    "width": 40,
+    "height": 16
+  },
+  "mode_translations": {
+    "default": "gui.ritchiesfirearmengine.mode.single_action",
+    "fan_fire": "gui.rfe_builtin.mode.fan_fire",
+    "safety": "gui.ritchiesfirearmengine.mode.safety"
+  }
+}

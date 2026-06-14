@@ -1035,6 +1035,26 @@
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.revolver.cocked"
   },
+  "item.generic.revolver.lever": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 1.55
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 1.53
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 1.51
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.revolver.lever"
+  },
   "item.generic.revolver.shot": {
     "sounds": [
       {

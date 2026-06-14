@@ -395,6 +395,31 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         return mode.countUsedSecondaryAmmo(itemStack);
     }
 
+    public int secondaryAmmoCount(ItemStack itemStack) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.countSecondaryAmmo(itemStack);
+    }
+
+    public boolean hasChamberedSecondary(ItemStack itemStack) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.hasChamberedSecondary(itemStack);
+    }
+
+    public boolean hasChamberedUsedSecondary(ItemStack itemStack) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.hasChamberedUsedSecondary(itemStack);
+    }
+
+    public int primableAmmoCount(ItemStack itemStack, LivingEntity entity) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.primableAmmoCount(itemStack, entity);
+    }
+
+    public int primedAmmoCount(ItemStack itemStack, LivingEntity entity) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        return mode.primedAmmoCount(itemStack, entity);
+    }
+
     public boolean laysFlatOnGround(ItemStack stack) {
         return true;
     }

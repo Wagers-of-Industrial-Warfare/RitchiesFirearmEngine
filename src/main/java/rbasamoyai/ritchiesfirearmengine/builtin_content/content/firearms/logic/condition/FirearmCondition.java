@@ -190,7 +190,7 @@ public abstract sealed class FirearmCondition implements Predicate<Map<ResourceL
             ResourceLocation macroLoc = RFEUtils.location(GsonHelper.getAsString(obj, "macro"));
             return FirearmConditionMacroHandler.getMacro(macroLoc);
         }
-        throw new JsonParseException("Invalid firearm condition type, must be one of 'compare', 'and', 'or'" + (macroEnabled ? ", 'macro" : ""));
+        throw new JsonParseException("Invalid firearm condition type, must be one of 'compare', 'and', 'or', 'not'" + (macroEnabled ? ", 'macro'" : ""));
     }
 
     public static Map<ResourceLocation, Float> evaluateCompareValueSources(Map<ResourceLocation, CompareValueSource> toEvaluate,

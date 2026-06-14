@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
 
@@ -105,7 +106,8 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
             if (this.showSecondaryAmmoCount) {
                 List<ItemStack> secondaryAmmoList = hudInfo.getSecondaryAmmo(item);
                 if (secondaryAmmoList != null) {
-                    String countText = this.hideFirearmAmmoCount ? "_" : Integer.toString(RFEItemUtils.countItemsConditional(secondaryAmmoList, s -> !FirearmDataUtils.isUsedPrimer(s)));
+                    String countText = this.hideFirearmAmmoCount ? "_"
+                            : Integer.toString(RFEItemUtils.countItemsConditional(secondaryAmmoList, Predicate.not(FirearmDataUtils::isUsedPrimer)));
                     //countText = "9999";
                     int offset = this.font.width("      ") - this.font.width(countText);
                     if (this.showInventoryCount) {

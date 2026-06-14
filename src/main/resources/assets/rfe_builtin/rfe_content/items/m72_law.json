@@ -21,7 +21,7 @@
   },
   "firing": {
     "fire_mode": "single_action",
-    "cooldown": 0,
+    "cooldown": 1,
     "sound": "rfe_builtin:item.generic.launcher.fired"
   },
   "charge": {

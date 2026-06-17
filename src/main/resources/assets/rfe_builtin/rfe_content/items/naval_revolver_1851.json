@@ -267,8 +267,7 @@
         "phase": "finish",
         "time": 14,
         "sounds": [
-          { "time": 0, "sound": "rfe_builtin:item.generic.revolver.gate.close" },
-          { "time": 14, "sound": "rfe_builtin:item.generic.revolver.hammer.cocked" }
+          { "time": 0, "sound": "rfe_builtin:item.generic.revolver.hammer.cocked" }
         ]
       }
     ]

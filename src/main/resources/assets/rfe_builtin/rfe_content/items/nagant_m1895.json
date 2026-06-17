@@ -37,6 +37,30 @@
         "phase": "prepare",
         "condition": {
           "and": [
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
+            {
+              "or": [
+                { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 0 },
+                { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than", "value": 0 }
+              ]
+            }
+          ]
+        },
+        "time": 1,
+        "sounds": [
+          { "time": 0, "sound": "rfe_builtin:item.generic.revolver.gate.open" },
+          { "time": 14, "sound": "rfe_builtin:item.generic.revolver.hammer.cocked" }
+        ],
+        "accessible_phases": {
+          "unload": "all",
+          "reload": { "include": [1] },
+          "finish": { "include": [1] }
+        }
+      },
+      {
+        "phase": "prepare",
+        "condition": {
+          "and": [
             { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
             { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "equals", "value": 1 },
             { "compare": "ritchiesfirearmengine:has_chambered_round", "operator": "equals", "value": 1 },
@@ -50,7 +74,7 @@
         ],
         "accessible_phases": {
           "index": { "include": [3] },
-          "reload": { "include": [1] },
+          "reload": { "include": [0] },
           "finish": "all"
         }
       },
@@ -72,35 +96,6 @@
           "index": { "exclude": [3] },
           "reload": "all",
           "finish": "all"
-        }
-      },
-      {
-        "phase": "prepare",
-        "condition": {
-          "and": [
-            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
-            {
-              "or": [
-                { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 0 },
-                {
-                  "and": [
-                    { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-                    { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than", "value": 0 }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        "time": 1,
-        "sounds": [
-          { "time": 0, "sound": "rfe_builtin:item.generic.revolver.gate.open" },
-          { "time": 14, "sound": "rfe_builtin:item.generic.revolver.hammer.cocked" }
-        ],
-        "accessible_phases": {
-          "unload": "all",
-          "reload": { "include": [1] },
-          "finish": { "include": [1] }
         }
       },
       {
@@ -174,7 +169,7 @@
         ],
         "accessible_phases": {
           "index": { "include": [0, 1] },
-          "reload": { "include": [1] },
+          "reload": { "include": [0] },
           "finish": "all"
         }
       },

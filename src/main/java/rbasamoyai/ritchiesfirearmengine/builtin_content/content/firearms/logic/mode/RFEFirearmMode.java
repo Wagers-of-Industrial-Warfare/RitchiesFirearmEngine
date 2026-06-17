@@ -1198,6 +1198,9 @@ public class RFEFirearmMode {
                 if (!(magazine.getItem() instanceof MagazineItem magazineItem))
                     return;
                 magazineItem.writeStoredSecondaryAmmo(magazine, secondaryList);
+                PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, this.getModeData(itemStack));
+                patched.set(RFEDataComponents.DETACHED_MAGAZINE, RFEItemContainerContents.fromItems(List.of(magazine)));
+                this.saveModeData(itemStack, patched.asPatch());
             }
             return;
         }

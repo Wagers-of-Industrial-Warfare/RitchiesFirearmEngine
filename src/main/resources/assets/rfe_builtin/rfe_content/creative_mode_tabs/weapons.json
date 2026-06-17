@@ -112,6 +112,10 @@
       "components": {"ritchiesfirearmengine:firearm_mode_data":{"MainMode":{"ritchiesfirearmengine:detached_magazine":[{"item":{"id":"rfe_builtin:revolver_cylinder_7rds"},"slot":0}]}}}
     },
     "rfe_builtin:naval_revolver_1851",
+    {
+      "id": "rfe_builtin:new_model_army_1858",
+      "components": {"ritchiesfirearmengine:firearm_mode_data":{"MainMode":{"ritchiesfirearmengine:detached_magazine":[{"item":{"id":"rfe_builtin:percussion_revolver_cylinder_6rds"},"slot":0}]}}}
+    },
     "rfe_builtin:revolver_44_mag",
     "rfe_builtin:brown_bess",
     "rfe_builtin:flintlock_pistol",

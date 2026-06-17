@@ -119,6 +119,24 @@
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.firearm.en_bloc.remove"
   },
+  "item.generic.firearm.item.equip": {
+    "sounds": [
+      {
+        "name": "minecraft:item/armor/equip_leather1",
+        "volume": 0.25,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "item.generic.firearm.item.stash": {
+    "sounds": [
+      {
+        "name": "minecraft:item/armor/equip_leather1",
+        "volume": 0.25,
+        "pitch": 0.8
+      }
+    ]
+  },
   "item.generic.firearm.mode_change.switch": {
     "sounds": [
       {
@@ -148,6 +166,24 @@
       }
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.launcher.draw"
+  },
+  "item.generic.firearm.percussion_cap.place": {
+    "sounds": [
+      {
+        "name": "minecraft:item/armor/equip_leather1",
+        "volume": 0.25,
+        "pitch": 2.0
+      }
+    ]
+  },
+  "item.generic.firearm.percussion_cap.remove": {
+    "sounds": [
+      {
+        "name": "minecraft:item/armor/equip_leather1",
+        "volume": 0.25,
+        "pitch": 1.85
+      }
+    ]
   },
   "item.generic.launcher.aim": {
     "sounds": [
@@ -397,24 +433,6 @@
         "name": "rfe_builtin:item/generic/firearm/aim",
         "volume": 0.25,
         "pitch": 0.5
-      }
-    ]
-  },
-  "item.generic.firearm.percussion_cap.place": {
-    "sounds": [
-      {
-        "name": "minecraft:item/armor/equip_leather1",
-        "volume": 0.25,
-        "pitch": 2.0
-      }
-    ]
-  },
-  "item.generic.firearm.percussion_cap.remove": {
-    "sounds": [
-      {
-        "name": "minecraft:item/armor/equip_leather1",
-        "volume": 0.25,
-        "pitch": 1.85
       }
     ]
   },

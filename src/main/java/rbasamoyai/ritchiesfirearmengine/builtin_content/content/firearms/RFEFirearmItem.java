@@ -528,6 +528,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
         RFEFirearmModeAmmoProperties ammoProperties = mode.getAmmoProperties(itemStack);
         Predicate<ItemStack> primaryAmmoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
+        Predicate<ItemStack> secondaryPred = RFEUtils.orAllPredicates(ammoProperties.secondaryAmmo());
         Predicate<ItemStack> magazineAndSpeedloaderPred = RFEUtils.orAllPredicates(ammoProperties.magazines())
                 .or(RFEUtils.orAllPredicates(ammoProperties.speedloaders()));
         int count = 0;
@@ -542,13 +543,24 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
                 if (magAmmo.isEmpty())
                     continue;
                 boolean valid = true;
-                for (ItemStack magStack : magAmmo) {
-                    if (!primaryAmmoPred.test(magStack)) {
-                        magCount = 0;
-                        valid = false;
-                        break;
+                if (mode.requiresSecondaryAmmo() && magazineItem.getSecondaryMagazineCapacity(invStack) > 0) {
+                    List<ItemStack> secondaryAmmo = magazineItem.getStoredSecondaryAmmo(invStack);
+                    for (ItemStack secondaryStack : secondaryAmmo) {
+                        if (!secondaryPred.test(secondaryStack)) {
+                            valid = false;
+                            break;
+                        }
                     }
-                    magCount += magStack.getCount();
+                }
+                if (valid) {
+                    for (ItemStack magStack : magAmmo) {
+                        if (!primaryAmmoPred.test(magStack)) {
+                            magCount = 0;
+                            valid = false;
+                            break;
+                        }
+                        magCount += magStack.getCount();
+                    }
                 }
                 if (valid && invStack.is(RFEItemTags.INFINITE_AMMO.tag))
                     return Optional.of(-1);
@@ -562,6 +574,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
         RFEFirearmModeAmmoProperties ammoProperties = mode.getAmmoProperties(itemStack);
         Predicate<ItemStack> secondaryPred = RFEUtils.orAllPredicates(ammoProperties.secondaryAmmo());
+        Predicate<ItemStack> primaryAmmoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
+        Predicate<ItemStack> magazinePred = RFEUtils.orAllPredicates(ammoProperties.magazines());
         int count = 0;
         for (ItemStack invStack : inventory) {
             if (FirearmDataUtils.isUsedPrimer(invStack))
@@ -570,10 +584,37 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
                 if (invStack.is(RFEItemTags.INFINITE_AMMO.tag))
                     return Optional.of(-1);
                 count += invStack.getCount();
+            } else if (magazinePred.test(invStack) && invStack.getItem() instanceof MagazineItem magazineItem) {
+                List<ItemStack> magAmmo = magazineItem.getStoredSecondaryAmmo(invStack);
+                int magCount = 0;
+                if (magAmmo.isEmpty())
+                    continue;
+                boolean valid = true;
+                if (mode.requiresAmmo() && magazineItem.getMagazineCapacity(invStack) > 0) {
+                    List<ItemStack> primaryAmmo = magazineItem.getStoredAmmo(invStack);
+                    for (ItemStack primaryStack : primaryAmmo) {
+                        if (!primaryAmmoPred.test(primaryStack)) {
+                            valid = false;
+                            break;
+                        }
+                    }
+                }
+                if (valid) {
+                    for (ItemStack magStack : magAmmo) {
+                        if (!secondaryPred.test(magStack)) {
+                            magCount = 0;
+                            valid = false;
+                            break;
+                        }
+                        magCount += magStack.getCount();
+                    }
+                }
+                if (valid && invStack.is(RFEItemTags.INFINITE_AMMO.tag))
+                    return Optional.of(-1);
+                count += magCount;
             }
         }
         return Optional.of(count);
-        // TODO magazine secondaries?
     }
 
     public float getHeatAmountForHUD(ItemStack itemStack) {

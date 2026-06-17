@@ -1,0 +1,33 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:paper_handgun_cartridge",
+      "fires": "rfe_builtin:44_army_pistol_ball"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_paper_handgun_cartridge",
+      "fires": "rfe_builtin:44_army_pistol_ball"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+    "rfe_builtin:percussion_revolver_cylinder_6rds",
+    "rfe_builtin:infinite_percussion_revolver_cylinder_6rds"
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+    "#rfe_builtin:percussion_caps"
+  ],
+  "unlimited_primary_reload_item": {
+    "id": "rfe_builtin:paper_handgun_cartridge"
+  },
+  "unlimited_secondary_reload_item": {
+    "id": "rfe_builtin:percussion_cap"
+  },
+  "modes": {
+  }
+}

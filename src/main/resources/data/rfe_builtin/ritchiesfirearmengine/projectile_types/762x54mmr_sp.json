@@ -1,0 +1,31 @@
+{
+  "type": "ritchiesfirearmengine:bullet",
+  "muzzle_velocity": 44,
+  "drag": 0.0025,
+  "quadratic_drag": true,
+  "gravity": 0.03,
+  "max_age": 400,
+  "knockback": 0.5,
+  "damage_model": [
+    {
+      "distance": 40,
+      "damage": 18
+    },
+    {
+      "distance": 60,
+      "damage": 22
+    },
+    {
+      "distance": 100,
+      "damage": 22
+    },
+    {
+      "distance": 140,
+      "damage": 18
+    }
+  ],
+  "damage_type": "rfe_builtin:bullet",
+  "hit_multiplier": "rfe_builtin:generic_headshot_strong",
+  "penetration": "rfe_builtin:default",
+  "pass_sound": "rfe_builtin:projectile.generic.crack"
+}

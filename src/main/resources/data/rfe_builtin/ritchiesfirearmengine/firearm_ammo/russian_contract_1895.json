@@ -1,0 +1,62 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:rifle_cartridge",
+      "fires": "rfe_builtin:762x54mmr"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_rifle_cartridge",
+      "fires": "rfe_builtin:762x54mmr"
+    },
+    {
+      "ammo": "rfe_builtin:tracer_rifle_cartridge",
+      "fires": "rfe_builtin:762x54mmr_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_tracer_rifle_cartridge",
+      "fires": "rfe_builtin:762x54mmr_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:ap_rifle_cartridge",
+      "fires": "rfe_builtin:762x54mmr_ap"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_ap_rifle_cartridge",
+      "fires": "rfe_builtin:762x54mmr_ap"
+    },
+    {
+      "ammo": "rfe_builtin:sp_rifle_cartridge",
+      "fires": "rfe_builtin:762x54mmr_sp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_sp_rifle_cartridge",
+      "fires": "rfe_builtin:762x54mmr_sp"
+    },
+    {
+      "ammo": "rfe_builtin:hp_rifle_cartridge",
+      "fires": "rfe_builtin:762x54mmr_hp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_hp_rifle_cartridge",
+      "fires": "rfe_builtin:762x54mmr_hp"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+    "rfe_builtin:rifle_stripper_clip_5rds",
+    "rfe_builtin:infinite_rifle_stripper_clip_5rds"
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "unlimited_primary_reload_item": {
+    "id": "rfe_builtin:rifle_stripper_clip_5rds",
+    "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:rifle_cartridge","count":5},"slot":0}]}
+  },
+  "modes": {
+  }
+}

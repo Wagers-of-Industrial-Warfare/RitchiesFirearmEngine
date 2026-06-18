@@ -9,6 +9,7 @@
     },
     "rfe_builtin:kar98k",
     "rfe_builtin:gewehr_88",
+    "rfe_builtin:russian_contract_1895",
     {
       "id": "rfe_builtin:mas_49_56",
       "components": {"ritchiesfirearmengine:firearm_mode_data":{"MainMode":{"ritchiesfirearmengine:detached_magazine":[{"item":{"id":"rfe_builtin:rifle_magazine_10rds"},"slot":0}]}}}

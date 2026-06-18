@@ -1,0 +1,50 @@
+{
+  "parent": "rfe_builtin:item/russian_contract_1895/russian_contract_1895_fired",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:aiming": 1 },
+      "model": "rfe_builtin:item/russian_contract_1895/russian_contract_1895_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_charged": 1 },
+      "model": "rfe_builtin:item/russian_contract_1895/russian_contract_1895_normal"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charged": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/russian_contract_1895/russian_contract_1895_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_safety": 1 },
+      "model": "rfe_builtin:item/russian_contract_1895/russian_contract_1895_safety"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_safety": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/russian_contract_1895/russian_contract_1895_safety_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_charging": 1 },
+      "model": "rfe_builtin:item/russian_contract_1895/russian_contract_1895_charge"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_charging": 1,
+        "ritchiesfirearmengine:aiming": 1
+      },
+      "model": "rfe_builtin:item/russian_contract_1895/russian_contract_1895_charge_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
+      "model": "rfe_builtin:item/russian_contract_1895/russian_contract_1895_reload"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
+      "model": "rfe_builtin:item/russian_contract_1895/russian_contract_1895_reload"
+    }
+  ]
+}

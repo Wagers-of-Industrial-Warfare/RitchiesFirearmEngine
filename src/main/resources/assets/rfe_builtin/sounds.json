@@ -1356,6 +1356,66 @@
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.rifle.cocked"
   },
+  "item.generic.rifle.lever.cycle": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 0.89
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 0.87
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 0.85
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.lever.cycle"
+  },
+  "item.generic.rifle.lever.cycle.end": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 0.89
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 0.87
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 0.85
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.lever.cycle"
+  },
+  "item.generic.rifle.lever.cycle.start": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 0.89
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 0.87
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 0.85
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.lever.cycle"
+  },
   "item.generic.rifle.magazine.reload": {
     "sounds": [
       {

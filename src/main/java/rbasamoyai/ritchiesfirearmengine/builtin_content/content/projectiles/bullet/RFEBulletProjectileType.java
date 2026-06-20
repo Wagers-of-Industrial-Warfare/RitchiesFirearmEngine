@@ -358,6 +358,10 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     protected boolean canIgnoreEntity(RFEProjectileInstance instance, Entity target) { return instance.canIgnoreEntity(target); }
 
     protected void onHit(RFEProjectileInstance instance, Level level, HitResult hitResult, Map<BlockPos, BlockState> penetratedBlocks) {
+        if (instance.isFalseProjectile()) {
+            instance.setRemoved();
+            return;
+        }
         HitResult.Type type = hitResult.getType();
         if (type == HitResult.Type.ENTITY) {
             this.onHitEntity(instance, level, (EntityHitResult) hitResult);

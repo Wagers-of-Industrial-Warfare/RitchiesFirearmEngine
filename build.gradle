@@ -17,6 +17,8 @@ version = "${mod_version}${release ? "" : "-dev"}+mc.${minecraft_version}${night
 group = mod_group
 
 repositories {
+    maven { url = 'https://maven.blamejared.com' }
+
     exclusiveContent {
         forRepository { maven { url "https://maven.parchmentmc.org" } }
         filter { includeGroup "org.parchmentmc.data" }
@@ -127,7 +129,7 @@ configurations {
 }
 
 dependencies {
-    // modRuntimeOnly("mezz.jei:jei-1.20.1:${prop("jei_version")}")
+    implementation("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
     runtimeOnly("curse.maven:moonlight-499980:${moonlight_cf_file}")
     runtimeOnly("curse.maven:dummymod-225738:${dummy_mod_cf_file}")
     runtimeOnly("curse.maven:configured-457570:${configured_cf_file}")

@@ -21,7 +21,7 @@ public class NoOpProjectileRenderer extends RFEProjectileRenderer {
 
     @Override
     public boolean shouldRender(RFEProjectileInstance instance, Level level, Frustum camera,
-                                double camX, double camY, double camZ) {
+                                double camX, double camY, double camZ, float partialTick) {
         return false;
     }
 

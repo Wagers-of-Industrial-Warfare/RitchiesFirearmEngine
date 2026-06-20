@@ -31,7 +31,7 @@ public abstract class RFEProjectileRenderer {
 
     public abstract void renderProjectile(RFEProjectileInstance instance, Level level, float partialTick, PoseStack poseStack, MultiBufferSource buffers, int light);
 
-    public boolean shouldRender(RFEProjectileInstance instance, Level level, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(RFEProjectileInstance instance, Level level, Frustum camera, double camX, double camY, double camZ, float partialTick) {
         AABB aabb = instance.getAABB(level).inflate(0.5D);
         if (aabb.hasNaN() || aabb.getSize() == 0.0D) {
             Vec3 pos = instance.position();

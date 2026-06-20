@@ -47,6 +47,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplierHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.penetration.RFEProjectilePenetrationHandler;
@@ -116,10 +117,15 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         instance.setVelocity(finalAimDir.normalize().scale(this.muzzleVelocity));
         Level level = entity.level();
         this.tick(level, instance);
+
+        float itemLength = RFEItemLengths.getItemLength(itemStack, entity);
+
+        if (this.shouldAddFalseProjectile(instance, entity.level()))
+            this.addFalseProjectile(instance, spawnPos.add(finalAimDir.normalize().scale(itemLength)), instance.position(), entity.level());
+
         if (this.fullHitscan)
             instance.setRemoved();
 
-        float itemLength = RFEItemLengths.getItemLength(itemStack, entity);
         if (this.smoke > 0 && level instanceof ServerLevel slevel) {
             RFEAimAngles smokeAimAngles = aimAngles;
             if (itemLength < 0)
@@ -143,6 +149,10 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         Vec3 spawnPos = instance.getPosition(1);
         instance.setVelocity(aimDir.normalize().scale(this.muzzleVelocity));
         this.tick(level, instance);
+
+        if (this.shouldAddFalseProjectile(instance, level))
+            this.addFalseProjectile(instance, spawnPos, instance.position(), level);
+
         if (this.fullHitscan)
             instance.setRemoved();
 
@@ -363,7 +373,9 @@ public class RFEBulletProjectileType implements RFEProjectileType {
     protected void onHitEntity(RFEProjectileInstance instance, Level level, EntityHitResult result) {
         Entity entity = result.getEntity();
         //float speed = (float) instance.velocity().length();
-        double additionalDisplacement = result.getLocation().subtract(instance.position()).length();
+        Vec3 startPos = instance.position();
+        Vec3 endPos = result.getLocation();
+        double additionalDisplacement = endPos.subtract(startPos).length();
 
         float damage = (float) this.damageModel.getDamage(instance.distanceTravelled() + additionalDisplacement);
         for (RFEHitMultiplier mul : RFEHitMultiplierHandler.getHitMultipliers(this.getHitMultiplierId()))
@@ -421,11 +433,15 @@ public class RFEBulletProjectileType implements RFEProjectileType {
                     instance.setRemoved();
             } else {
                 instance.setRemoved();
+                if (this.shouldAddFalseProjectile(instance, level))
+                    this.addFalseProjectile(instance, startPos, endPos, level);
             }
         } else {
             // TODO entity ricochet if warranted
             instance.setRemoved();
         }
+        if (instance.isRemoved() && this.shouldAddFalseProjectile(instance, level))
+            this.addFalseProjectile(instance, startPos, endPos, level);
     }
 
     protected ResourceLocation getHitMultiplierId() {
@@ -463,12 +479,14 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         BlockState blockstate = level.getBlockState(hitPos);
 
         //this.lastState = blockstate;
-        //blockstate.onProjectileHit(level, blockstate, pResult, this); TODO fake projectile
+        //blockstate.onProjectileHit(level, blockstate, pResult, this); TODO fake entity projectile for onProjectileHit
         Vec3 projPos = instance.position();
         Vec3 terminalVel = pResult.getLocation().subtract(projPos.x, projPos.y, projPos.z);
         instance.setVelocity(terminalVel);
         instance.setRemoved();
         instance.setForceSync(true);
+        if (this.shouldAddFalseProjectile(instance, level))
+            this.addFalseProjectile(instance, projPos, pResult.getLocation(), level);
 
         if (RFEConfig.SERVER.enableBlockBreaking.get()) {
             RFEProjectilePenetrationProperties penetrationProperties = this.getPenetrationProperties();
@@ -487,11 +505,27 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, blockstate), hitLoc.x, hitLoc.y, hitLoc.z, 8, 0, 0, 0, 0);
     }
 
-    protected void onExpiry(RFEProjectileInstance instance, Level level) {}
+    protected void onExpiry(RFEProjectileInstance instance, Level level) {
+        if (this.shouldAddFalseProjectile(instance, level))
+            this.addFalseProjectile(instance, instance.oldPosition(), instance.position(), level);
+    }
 
     public RFEProjectilePenetrationProperties getPenetrationProperties() {
         ResourceLocation id = this.penetrationId != null ? this.penetrationId : RFEProjectileTypeHandler.getProjectileTypeId(this);
         return RFEProjectilePenetrationHandler.getPenetrationProperties(id);
+    }
+
+    protected boolean shouldAddFalseProjectile(RFEProjectileInstance instance, Level level) {
+        return !instance.isFalseProjectile();
+    }
+
+    protected void addFalseProjectile(RFEProjectileInstance instance, Vec3 startPos, Vec3 endPos, Level level) {
+        Vec3 syncVelocity = endPos.subtract(startPos);
+        RFEProjectileInstance syncClone = instance.cloneToNewProjectile();
+        syncClone.setPosition(startPos);
+        syncClone.setVelocity(syncVelocity);
+        syncClone.setFalseProjectile(true);
+        RFEProjectileManager.queueAddedProjectile(syncClone, level);
     }
 
     @Override

@@ -257,7 +257,7 @@ public class RFEClient {
             double posY = pos.y - camY;
             double posZ = pos.z - camZ;
             try {
-                if (!renderer.shouldRender(instance, level, frustum, camX, camY, camZ))
+                if (!renderer.shouldRender(instance, level, frustum, camX, camY, camZ, partialTick))
                     continue;
                 int light = renderer.getPackedLightCoords(instance, partialTick, level);
 

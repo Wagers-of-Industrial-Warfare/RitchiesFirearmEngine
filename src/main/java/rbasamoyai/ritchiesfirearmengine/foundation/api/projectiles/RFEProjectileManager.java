@@ -44,8 +44,9 @@ public class RFEProjectileManager {
         Collection<RFEProjectileInstance> projectiles = PROJECTILES_BY_LEVEL.get(level).values();
         for (Iterator<RFEProjectileInstance> iter = projectiles.iterator(); iter.hasNext(); ) {
             RFEProjectileInstance projectile = iter.next();
+            boolean isFalseProjectile = projectile.isFalseProjectile();
             projectile.tick(level);
-            if (projectile.isRemoved()) {
+            if (!isFalseProjectile && projectile.isRemoved() || isFalseProjectile && projectile.age() > 1) {
                 iter.remove();
                 if (level instanceof ServerLevel slevel)
                     RFENetwork.sendToAllInDimension(new ClientboundRemoveRFEProjectilePacket(projectile.uuid(), level.dimension()), slevel);
@@ -121,14 +122,15 @@ public class RFEProjectileManager {
             return new ClientboundSpawnRFEProjectilePacket(instance, instance.getOwner() == null ? null : instance.getOwner().getId(), level.dimension());
         }
 
-        private static final StreamCodec<RegistryFriendlyByteBuf, RFEProjectileInstance> INSTANCE_SPAWN_STREAM_CODEC = StreamCodec.composite(
+        private static final StreamCodec<RegistryFriendlyByteBuf, RFEProjectileInstance> INSTANCE_SPAWN_STREAM_CODEC = RFEByteBufCodecUtils.composite7(
                 RFEProjectileTypeHandler.LOADED_TYPE_STREAM_CODEC, RFEProjectileInstance::projectileType,
                 UUIDUtil.STREAM_CODEC, RFEProjectileInstance::uuid,
                 RFEByteBufCodecUtils.VEC3_STREAM_CODEC, RFEProjectileInstance::position,
                 RFEByteBufCodecUtils.VEC3_STREAM_CODEC, RFEProjectileInstance::velocity,
                 ByteBufCodecs.BOOL, RFEProjectileInstance::leftOwner,
                 ByteBufCodecs.DOUBLE, RFEProjectileInstance::distanceTravelled,
-                (type, uuid, pos, vel, leftOwner, distanceTravelled) -> {
+                ByteBufCodecs.BOOL, RFEProjectileInstance::isFalseProjectile,
+                (type, uuid, pos, vel, leftOwner, distanceTravelled, isFalseProjectile) -> {
                     RFEProjectileInstance instance = new RFEProjectileInstance(type);
                     instance.setPosition(pos);
                     instance.setOldPosition(pos);
@@ -136,6 +138,7 @@ public class RFEProjectileManager {
                     instance.setUUID(uuid);
                     instance.setLeftOwner(leftOwner);
                     instance.setDistanceTravelled(distanceTravelled);
+                    instance.setFalseProjectile(isFalseProjectile);
                     return instance;
                 });
 

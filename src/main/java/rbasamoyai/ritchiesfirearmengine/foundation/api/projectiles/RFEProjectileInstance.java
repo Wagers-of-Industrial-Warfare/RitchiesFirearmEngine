@@ -30,10 +30,9 @@ public class RFEProjectileInstance {
     private double distanceTravelled = 0;
     private boolean forceSync = false;
     private final IntOpenHashSet ignoredEntities = new IntOpenHashSet();
+    private boolean isFalseProjectile;
 
-    public RFEProjectileInstance(RFEProjectileType projectileType) {
-        this.projectileType = projectileType;
-    }
+    public RFEProjectileInstance(RFEProjectileType projectileType) { this.projectileType = projectileType; }
 
     public RFEProjectileType projectileType() { return this.projectileType; }
 
@@ -104,5 +103,21 @@ public class RFEProjectileInstance {
 
     public void ignoreEntity(Entity entity) { this.ignoredEntities.add(entity.getId()); }
     public boolean canIgnoreEntity(Entity entity) { return this.ignoredEntities.contains(entity.getId()); }
+
+    public boolean isFalseProjectile() { return this.isFalseProjectile; }
+    public void setFalseProjectile(boolean isFalseProjectile) { this.isFalseProjectile = isFalseProjectile; }
+
+    public RFEProjectileInstance cloneToNewProjectile() {
+        RFEProjectileInstance clone = new RFEProjectileInstance(this.projectileType);
+        clone.position = this.position;
+        clone.oldPosition = this.oldPosition;
+        clone.velocity = this.velocity;
+        clone.owner = this.owner;
+        clone.leftOwner = this.leftOwner;
+        clone.health = this.health;
+        clone.ignoredEntities.addAll(this.ignoredEntities);
+        clone.isFalseProjectile = this.isFalseProjectile;
+        return clone;
+    }
 
 }

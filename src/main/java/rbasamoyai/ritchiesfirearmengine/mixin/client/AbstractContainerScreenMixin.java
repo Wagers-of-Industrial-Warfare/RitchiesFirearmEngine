@@ -13,9 +13,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmModeAmmoProperties;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEFirearmProperties;
 import rbasamoyai.ritchiesfirearmengine.remix.RFEClientRemix;
 
 import javax.annotation.Nullable;
@@ -33,22 +30,7 @@ public abstract class AbstractContainerScreenMixin {
         if (this.hoveredSlot != null) {
             ItemStack itemStack = this.hoveredSlot.getItem();
             if (itemStack.getItem() instanceof RFEFirearmItem firearmItem) {
-                Predicate<ItemStack> pred = s -> false;
-                if (!Screen.hasControlDown() && Screen.hasShiftDown()) { // Only display current mode consumable ammo
-                    RFEFirearmModeAmmoProperties modeProperties = firearmItem.getCurrentMode(itemStack).getAmmoProperties(itemStack);
-                    pred = modeProperties::isValidItem;
-                } else if (Screen.hasControlDown() && Screen.hasShiftDown()) { // Show all consumable ammo
-                    RFEFirearmProperties<RFEFirearmModeAmmoProperties> ammo = RFEFirearmAmmoHandler.getAmmoProperties(itemStack);
-                    pred = s -> {
-                        if (ammo.defaultProperties().isValidItem(s))
-                            return true;
-                        for (RFEFirearmModeAmmoProperties modeProperties : ammo.propertiesByMode().values()) {
-                            if (modeProperties.isValidItem(s))
-                                return true;
-                        }
-                        return false;
-                    };
-                }
+                Predicate<ItemStack> pred = RFEFirearmItem.getGuiValidAmmoPredicate(itemStack, firearmItem, Screen.hasShiftDown(), Screen.hasControlDown());
                 for (int k = 0; k < this.menu.slots.size(); k++) {
                     Slot slot = this.menu.slots.get(k);
                     if (pred.test(slot.getItem()))

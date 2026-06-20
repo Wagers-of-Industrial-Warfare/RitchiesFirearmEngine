@@ -1,10 +1,10 @@
 {
-  "required": true,
-  "minVersion": "0.8",
-  "package": "rbasamoyai.ritchiesfirearmengine.mixin",
-  "compatibilityLevel": "JAVA_17",
-  "refmap": "ritchiesfirearmengine.refmap.json",
-  "mixins": [
+  "required":true,
+  "minVersion":"0.8",
+  "package":"rbasamoyai.ritchiesfirearmengine.mixin",
+  "compatibilityLevel":"JAVA_17",
+  "refmap":"ritchiesfirearmengine.refmap.json",
+  "mixins":[
     "ExplosionMixin",
     "LivingEntityMixin",
     "ai.BehaviorUtilsMixin",
@@ -14,7 +14,8 @@
     "ai.PiglinMixin",
     "ai.PillagerMixin"
   ],
-  "client": [
+  "client":[
+    "client.AbstractContainerScreenAccessor",
     "client.AbstractContainerScreenMixin",
     "client.BlockModelMixin",
     "client.GuiGraphicsMixin",
@@ -24,9 +25,10 @@
     "client.ItemRendererMixin",
     "client.MinecraftMixin",
     "client.ModelManagerMixin",
-    "client.MultiPlayerGameModeMixin"
+    "client.MultiPlayerGameModeMixin",
+    "client.compat.jei.ItemStackRendererMixin"
   ],
-  "injectors": {
-    "defaultRequire": 1
+  "injectors":{
+    "defaultRequire":1
   }
 }

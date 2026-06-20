@@ -29,6 +29,7 @@ import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.RFETooltip;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.RFEFiringInput;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmMode;
@@ -38,6 +39,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.r
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhaseAccessFilter;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEFirearmProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudItemInfoProviders;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.IHasRFEItemAttachments;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilClientImpulse;
@@ -106,6 +108,25 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
                 return RFEFirearmItem.this.getHeatCapacityForHUD(itemStack);
             }
         });
+    }
+
+    public static Predicate<ItemStack> getGuiValidAmmoPredicate(ItemStack itemStack, RFEFirearmItem firearmItem, boolean shiftDown, boolean ctrlDown) {
+        if (!ctrlDown && shiftDown) { // Only display current mode consumable ammo
+            RFEFirearmModeAmmoProperties modeProperties = firearmItem.getCurrentMode(itemStack).getAmmoProperties(itemStack);
+            return modeProperties::isValidItem;
+        } else if (ctrlDown && shiftDown) { // Show all consumable ammo
+            RFEFirearmProperties<RFEFirearmModeAmmoProperties> ammo = RFEFirearmAmmoHandler.getAmmoProperties(itemStack);
+            return s -> {
+                if (ammo.defaultProperties().isValidItem(s))
+                    return true;
+                for (RFEFirearmModeAmmoProperties modeProperties : ammo.propertiesByMode().values()) {
+                    if (modeProperties.isValidItem(s))
+                        return true;
+                }
+                return false;
+            };
+        }
+        return s -> false;
     }
 
     @Override

@@ -77,7 +77,11 @@ public class RFEClientRemix {
     }
 
     public static void renderValidAmmoHighlight(GuiGraphics graphics, Slot slot) {
-        graphics.fillGradient(slot.x, slot.y, slot.x + 16, slot.y + 16, 100, 0x7F00FF00, 0x7F00FF00);
+        renderValidAmmoHighlight(graphics, slot.x, slot.y);
+    }
+
+    public static void renderValidAmmoHighlight(GuiGraphics graphics, int x, int y) {
+        graphics.fillGradient(x, y, x + 16, y + 16, 100, 0x7F00FF00, 0x7F00FF00);
         //AbstractContainerScreen.renderSlotHighlight(graphics, slot.x, slot.y, 0, 0x7F00FF00);
     }
 

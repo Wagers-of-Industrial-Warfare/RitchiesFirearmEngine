@@ -21,8 +21,8 @@
   "key.ritchiesfirearmengine.reload_firearm": "Reload Firearm",
   "key.ritchiesfirearmengine.unload_firearm": "Unload Firearm",
   "key.ritchiesfirearmengine.switch_mode": "Switch Firearm Mode",
-  "ritchiesfirearmengine.tooltip.item.hold_key.mode_ammo": "Hold [%s] to see mode compatible ammo",
-  "ritchiesfirearmengine.tooltip.item.hold_key.all_ammo": "Hold [%s] to see all compatible ammo",
-  "ritchiesfirearmengine.tooltip.key_shift": "Shift",
-  "ritchiesfirearmengine.tooltip.key_ctrl_shift": "Ctrl + Shift"
+  "ritchiesfirearmengine.tooltip.item.hold_key.ammo": "Hold [%s] to see compatible ammo",
+  "ritchiesfirearmengine.tooltip.item.hold_key.ammo.compatible": "Compatible with current mode",
+  "ritchiesfirearmengine.tooltip.item.hold_key.ammo.incompatible": "Compatible in another mode",
+  "ritchiesfirearmengine.tooltip.key_shift": "Shift"
 }

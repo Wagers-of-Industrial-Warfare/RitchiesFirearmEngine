@@ -76,13 +76,16 @@ public class RFEClientRemix {
         ClientHooks.handleCameraTransforms(poseStack, model, context, leftHand);
     }
 
-    public static void renderValidAmmoHighlight(GuiGraphics graphics, Slot slot) {
-        renderValidAmmoHighlight(graphics, slot.x, slot.y);
+    public static void renderValidAmmoHighlight(GuiGraphics graphics, Slot slot, int color) {
+        renderValidAmmoHighlight(graphics, slot.x, slot.y, color);
     }
 
-    public static void renderValidAmmoHighlight(GuiGraphics graphics, int x, int y) {
-        graphics.fillGradient(x, y, x + 16, y + 16, 100, 0x7F00FF00, 0x7F00FF00);
-        //AbstractContainerScreen.renderSlotHighlight(graphics, slot.x, slot.y, 0, 0x7F00FF00);
+    public static void renderValidAmmoHighlight(GuiGraphics graphics, int x, int y, int color) {
+        if (RFEConfig.CLIENT.compatibleAmmoHighlightGradient.getAsBoolean()) {
+            graphics.fillGradient(x, y, x + 16, y + 16, 100, 0, color);
+        } else {
+            graphics.fillGradient(x, y, x + 16, y + 16, 100, color, color);
+        }
     }
 
     private RFEClientRemix() {}

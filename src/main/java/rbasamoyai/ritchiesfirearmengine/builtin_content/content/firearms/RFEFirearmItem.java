@@ -110,25 +110,6 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         });
     }
 
-    public static Predicate<ItemStack> getGuiValidAmmoPredicate(ItemStack itemStack, RFEFirearmItem firearmItem, boolean shiftDown, boolean ctrlDown) {
-        if (!ctrlDown && shiftDown) { // Only display current mode consumable ammo
-            RFEFirearmModeAmmoProperties modeProperties = firearmItem.getCurrentMode(itemStack).getAmmoProperties(itemStack);
-            return modeProperties::isValidItem;
-        } else if (ctrlDown && shiftDown) { // Show all consumable ammo
-            RFEFirearmProperties<RFEFirearmModeAmmoProperties> ammo = RFEFirearmAmmoHandler.getAmmoProperties(itemStack);
-            return s -> {
-                if (ammo.defaultProperties().isValidItem(s))
-                    return true;
-                for (RFEFirearmModeAmmoProperties modeProperties : ammo.propertiesByMode().values()) {
-                    if (modeProperties.isValidItem(s))
-                        return true;
-                }
-                return false;
-            };
-        }
-        return s -> false;
-    }
-
     @Override
     public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
         List<ItemAttributeModifiers.Entry> modifiers = new ArrayList<>(2);
@@ -696,6 +677,33 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         @Nullable public static Action byId(String id) { return BY_ID.get(id); }
 
         public boolean canAim() { return this.canAim; }
+    }
+
+    public static GuiAmmoPredicate getGuiValidAmmoPredicate(ItemStack itemStack, RFEFirearmItem firearmItem) {
+        RFEFirearmMode currentMode = firearmItem.getCurrentMode(itemStack);
+        RFEFirearmModeAmmoProperties currentAmmo = currentMode.getAmmoProperties(itemStack);
+        RFEFirearmProperties<RFEFirearmModeAmmoProperties> allAmmo = RFEFirearmAmmoHandler.getAmmoProperties(itemStack);
+        return s -> {
+            if (currentAmmo.isValidItem(s))
+                return GuiAmmoPredicate.Result.VALID_CURRENT_MODE;
+            if (allAmmo.defaultProperties().isValidItem(s))
+                return GuiAmmoPredicate.Result.VALID;
+            for (RFEFirearmModeAmmoProperties modeProperties : allAmmo.propertiesByMode().values()) {
+                if (modeProperties.isValidItem(s))
+                    return GuiAmmoPredicate.Result.VALID;
+            }
+            return GuiAmmoPredicate.Result.INVALID;
+        };
+    }
+
+    public interface GuiAmmoPredicate {
+        Result test(ItemStack itemStack);
+
+        enum Result {
+            VALID_CURRENT_MODE,
+            VALID,
+            INVALID
+        }
     }
 
 }

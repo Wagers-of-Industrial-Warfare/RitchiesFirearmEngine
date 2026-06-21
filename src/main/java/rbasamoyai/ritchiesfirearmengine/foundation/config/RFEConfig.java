@@ -6,7 +6,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
-import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
+import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class RFEConfig {
@@ -49,8 +49,11 @@ public class RFEConfig {
     }
 
     public static class Client {
-        public final ConfigValue<Integer> maxMagazineItemTypesDisplayed;
+        public final IntValue maxMagazineItemTypesDisplayed;
         public final BooleanValue renderCrosshairOnShoulderSurfingAim;
+        public final IntValue compatibleAmmoHighlightColor;
+        public final IntValue incompatibleAmmoHighlightColor;
+        public final BooleanValue compatibleAmmoHighlightGradient;
 
         Client(ModConfigSpec.Builder builder) {
             builder.comment("Ritchie's Firearm Engine client configuration settings")
@@ -59,18 +62,29 @@ public class RFEConfig {
             this.maxMagazineItemTypesDisplayed = builder
                     .comment("The maximum amount of item types displayed in item tooltips. Default 5, must be at least 1.")
                     .translation("ritchiesfirearmengine.configgui.maxMagazineItemTypesDisplayed")
-                    .define("maxMagazineItemTypesDisplayed", 5, this::validateMaxMagazineItemTypesDisplayed);
+                    .defineInRange("maxMagazineItemTypesDisplayed", 5, 1, Integer.MAX_VALUE);
 
             this.renderCrosshairOnShoulderSurfingAim = builder
                     .comment("Whether the firearm crosshair should render on aiming when Shoulder Surfing is installed and in the over-the-shoudler view. Default true.")
                     .translation("ritchiesfirearmengine.configgui.renderCrosshairOnShoulderSurfingAim")
                     .define("renderCrosshairOnShoulderSurfingAim", true);
 
-            builder.pop();
-        }
+            this.compatibleAmmoHighlightColor = builder
+                    .comment("The color that is shown when highlighting currently compatible firearm ammo.")
+                    .translation("ritchiesfirearmengine.configgui.compatibleAmmoHighlightColor")
+                    .defineInRange("compatibleAmmoHighlightColor", 0x7F_00FF00, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
-        private boolean validateMaxMagazineItemTypesDisplayed(Object o) {
-            return o instanceof Integer i && i >= 1;
+            this.incompatibleAmmoHighlightColor = builder
+                    .comment("The color that is shown when highlighting currently incompatible firearm ammo.")
+                    .translation("ritchiesfirearmengine.configgui.incompatibleAmmoHighlightColor")
+                    .defineInRange("incompatibleAmmoHighlightColor", 0x7F_FFDF00, Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+            this.compatibleAmmoHighlightGradient = builder
+                    .comment("Set to true to render the compatible ammo highlight as a gradient, false as a solid color.")
+                    .translation("ritchiesfirearmengine.configgui.compatibleAmmoHighlightGradient")
+                    .define("compatibleAmmoHighlightGradient", true);
+
+            builder.pop();
         }
     }
 

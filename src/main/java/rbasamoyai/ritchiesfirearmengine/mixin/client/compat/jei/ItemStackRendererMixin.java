@@ -12,11 +12,11 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
+import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 import rbasamoyai.ritchiesfirearmengine.mixin.client.AbstractContainerScreenAccessor;
 import rbasamoyai.ritchiesfirearmengine.remix.RFEClientRemix;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 @Mixin(ItemStackRenderer.class)
 public class ItemStackRendererMixin {
@@ -24,6 +24,8 @@ public class ItemStackRendererMixin {
     @WrapMethod(method = "renderBatch")
     private void ritchiesfirearmengine$renderBatch(GuiGraphics guiGraphics, List<BatchRenderElement<ItemStack>> batchRenderElements, Operation<Void> original) {
         original.call(guiGraphics, batchRenderElements);
+        if (!Screen.hasShiftDown())
+            return;
         Minecraft mc = Minecraft.getInstance();
         if (!(mc.screen instanceof AbstractContainerScreen<?> ctScreen))
             return;
@@ -32,10 +34,13 @@ public class ItemStackRendererMixin {
             return;
         ItemStack itemStack = hoveredSlot.getItem();
         if (itemStack.getItem() instanceof RFEFirearmItem firearmItem) {
-            Predicate<ItemStack> pred = RFEFirearmItem.getGuiValidAmmoPredicate(itemStack, firearmItem, Screen.hasShiftDown(), Screen.hasControlDown());
+            RFEFirearmItem.GuiAmmoPredicate pred = RFEFirearmItem.getGuiValidAmmoPredicate(itemStack, firearmItem);
             for (BatchRenderElement<ItemStack> el : batchRenderElements) {
-                if (pred.test(el.ingredient()))
-                    RFEClientRemix.renderValidAmmoHighlight(guiGraphics, el.x(), el.y());
+                RFEFirearmItem.GuiAmmoPredicate.Result res = pred.test(el.ingredient());
+                if (res != RFEFirearmItem.GuiAmmoPredicate.Result.INVALID)
+                    RFEClientRemix.renderValidAmmoHighlight(guiGraphics, el.x(), el.y(), res == RFEFirearmItem.GuiAmmoPredicate.Result.VALID_CURRENT_MODE
+                            ? RFEConfig.CLIENT.compatibleAmmoHighlightColor.getAsInt()
+                            : RFEConfig.CLIENT.incompatibleAmmoHighlightColor.getAsInt());
             }
         }
     }

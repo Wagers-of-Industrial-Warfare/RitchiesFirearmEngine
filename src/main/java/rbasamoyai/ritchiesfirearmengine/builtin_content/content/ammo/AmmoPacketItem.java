@@ -75,7 +75,7 @@ public class AmmoPacketItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
-        if (this.getStoredPrimaryAmmo(itemStack).isEmpty())
+        if (this.getStoredPrimaryAmmo(itemStack).isEmpty() && this.getStoredSecondaryAmmo(itemStack).isEmpty())
             return super.use(level, player, hand);
         player.startUsingItem(hand);
         return InteractionResultHolder.consume(itemStack);
@@ -85,6 +85,9 @@ public class AmmoPacketItem extends Item {
     public ItemStack finishUsingItem(ItemStack itemStack, Level level, LivingEntity entity) {
         List<ItemStack> ammo = this.getStoredPrimaryAmmo(itemStack);
         for (ItemStack ammoStack : ammo)
+            RFEItemUtils.addItemToEntity(ammoStack, entity);
+        List<ItemStack> secondaryAmmo = this.getStoredSecondaryAmmo(itemStack);
+        for (ItemStack ammoStack : secondaryAmmo)
             RFEItemUtils.addItemToEntity(ammoStack, entity);
         if (itemStack.getCount() > 1) {
             RFEItemUtils.addItemToEntity(new ItemStack(this), entity);

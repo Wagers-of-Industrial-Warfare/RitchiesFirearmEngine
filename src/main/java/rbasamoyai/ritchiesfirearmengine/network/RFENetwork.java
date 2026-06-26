@@ -57,6 +57,7 @@ public class RFENetwork {
         addMessage(id++, ClientboundRunFiringLogicPacket.class, ClientboundRunFiringLogicPacket.STREAM_CODEC);
         addMessage(id++, ClientboundSyncProjectilePenetrationPacket.class, ClientboundSyncProjectilePenetrationPacket.STREAM_CODEC);
         addMessage(id++, QuietExplosion.ClientboundExplosionPacket.class, QuietExplosion.ClientboundExplosionPacket.STREAM_CODEC);
+        addMessage(id++, ServerboundMeleeInputPacket.class, ServerboundMeleeInputPacket.STREAM_CODEC);
     }
 
     private static <MSG extends RFEPacket> void addMessage(int id, Class<MSG> clazz, StreamCodec<RegistryFriendlyByteBuf, MSG> streamCodec) {

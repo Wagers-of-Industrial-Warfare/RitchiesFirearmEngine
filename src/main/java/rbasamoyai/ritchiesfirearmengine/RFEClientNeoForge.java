@@ -32,6 +32,7 @@ public class RFEClientNeoForge {
         forgeBus.addListener(RFEClientNeoForge::onRenderLevel);
         forgeBus.addListener(RFEClientNeoForge::onRenderGuiOverlay);
         forgeBus.addListener(RFEClientNeoForge::onSetupCamera);
+        forgeBus.addListener(RFEClientNeoForge::onClientTick);
     }
 
     private static void onClientSetup(final FMLClientSetupEvent event) {
@@ -129,6 +130,10 @@ public class RFEClientNeoForge {
 
     private static void onModelRegistry(final ModelEvent.RegisterAdditional event) {
         RFEClient.registerModels(event::register);
+    }
+
+    private static void onClientTick(final ClientTickEvent.Pre event) {
+        RFEClient.onClientTickPre();
     }
 
 }

@@ -631,6 +631,16 @@ public class FirearmDataUtils {
         return o != null && o.isPresent() && o.get();
     }
 
+    // Melee state methods
+
+    public static void setMeleeState(ItemStack itemStack, boolean isMeleeing) {
+        itemStack.set(RFEDataComponents.MELEEING, isMeleeing);
+    }
+
+    public static boolean isInMeleeState(ItemStack itemStack) {
+        return itemStack.getOrDefault(RFEDataComponents.MELEEING, false);
+    }
+
     private FirearmDataUtils() {}
 
 }

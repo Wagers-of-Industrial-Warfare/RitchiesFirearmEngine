@@ -15,9 +15,9 @@ public abstract class MultiPlayerGameModeMixin {
     @WrapMethod(method = "attack")
     private void ritchiesfirearmengine$attack(Player player, Entity target, Operation<Void> original) {
         ItemStack mainhand = player.getMainHandItem();
-        if (mainhand.getItem() instanceof IFirearmItem)
+        if (mainhand.getItem() instanceof IFirearmItem firearmItem && !firearmItem.isMeleeing(mainhand, player))
             return;
-        // TODO offhand and melee
+        // TODO offhand
         original.call(player, target);
     }
 

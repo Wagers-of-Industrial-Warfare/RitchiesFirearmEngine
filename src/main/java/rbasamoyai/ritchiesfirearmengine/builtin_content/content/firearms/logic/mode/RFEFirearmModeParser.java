@@ -240,6 +240,30 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
             }
         }
 
+        if (GsonHelper.isObjectNode(obj, "melee")) {
+            JsonObject meleeObj = GsonHelper.getAsJsonObject(obj, "melee");
+            boolean canMelee = GsonHelper.getAsBoolean(meleeObj, "can_melee");
+            builder.canMelee(canMelee);
+            if (canMelee) {
+                boolean forcedMelee = GsonHelper.getAsBoolean(meleeObj, "forced_melee", builder.forcedMelee);
+                double baseAttackSpeed = GsonHelper.getAsDouble(meleeObj, "melee_attack_speed", builder.baseMeleeAttackSpeed);
+                double baseAttackDamage = GsonHelper.getAsDouble(meleeObj, "melee_attack_damage", builder.baseMeleeAttackDamage);
+                int enterMeleeWindowTime = GsonHelper.getAsInt(meleeObj, "enter_melee_window_time", builder.enterMeleeWindowTime);
+                int exitMeleeTime = GsonHelper.getAsInt(meleeObj, "exit_melee_time", builder.exitMeleeTime);
+                builder.forcedMelee(forcedMelee)
+                        .baseMeleeAttackSpeed(baseAttackSpeed)
+                        .baseMeleeAttackDamage(baseAttackDamage)
+                        .enterMeleeWindowTime(enterMeleeWindowTime)
+                        .exitMeleeTime(exitMeleeTime);
+            } else {
+                builder.forcedMelee(false)
+                        .baseMeleeAttackSpeed(1)
+                        .baseMeleeAttackDamage(1)
+                        .enterMeleeWindowTime(1)
+                        .exitMeleeTime(1);
+            }
+        }
+
         if (GsonHelper.isNumberValue(obj, "max_shots")) {
             int maxShots = GsonHelper.getAsInt(obj, "max_shots");
             builder.maxShots(maxShots);

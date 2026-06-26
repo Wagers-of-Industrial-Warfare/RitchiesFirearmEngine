@@ -1,6 +1,7 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms;
 
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.ItemSteerable;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.FovModifyingItem;
@@ -21,5 +22,7 @@ public interface IFirearmItem extends HoldAttackKeyInteraction, FovModifyingItem
 
     void handleServerAutomaticFireOnClient(ItemStack itemStack, LivingEntity entity, InteractionHand hand,
                                            RFERecoilClientImpulse impulse, @Nullable UUID recoilUUID);
+
+    boolean isMeleeing(ItemStack itemStack, LivingEntity entity);
 
 }

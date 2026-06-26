@@ -18,10 +18,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemUtils;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -122,6 +119,14 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             modifiers.add(new ItemAttributeModifiers.Entry(Attributes.MOVEMENT_SPEED.getDelegate(), speedModifier, EquipmentSlotGroup.MAINHAND));
             modifiers.add(new ItemAttributeModifiers.Entry(Attributes.MOVEMENT_SPEED.getDelegate(), speedModifier, EquipmentSlotGroup.OFFHAND));
         }
+        if (mode.isMeleeing(stack)) {
+            AttributeModifier attackSpeedModifier = new AttributeModifier(BASE_ATTACK_SPEED_ID, properties.meleeAttackSpeed(), AttributeModifier.Operation.ADD_VALUE);
+            AttributeModifier attackDamageModifier = new AttributeModifier(BASE_ATTACK_DAMAGE_ID, properties.meleeAttackDamage(), AttributeModifier.Operation.ADD_VALUE);
+            modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_SPEED.getDelegate(), attackSpeedModifier, EquipmentSlotGroup.MAINHAND));
+            modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_SPEED.getDelegate(), attackSpeedModifier, EquipmentSlotGroup.OFFHAND));
+            modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_DAMAGE.getDelegate(), attackDamageModifier, EquipmentSlotGroup.MAINHAND));
+            modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_DAMAGE.getDelegate(), attackDamageModifier, EquipmentSlotGroup.OFFHAND));
+        }
         return new ItemAttributeModifiers(modifiers, true);
     }
 
@@ -142,7 +147,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
 
     @Override
     public boolean onEntitySwing(ItemStack stack, LivingEntity entity, InteractionHand hand) {
-        return true; // TODO other swinging
+        return !this.getCurrentMode(stack).isMeleeing(stack);
     }
 
     @Override
@@ -165,6 +170,9 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
 
     @Override
     public boolean onPressAttackKey(ItemStack stack, LivingEntity entity) {
+        if (this.getCurrentMode(stack).isMeleeing(stack))
+            return false;
+
         FirearmDataUtils.setHoldingAttackKey(stack, true);
         RFEFirearmMode firearmMode = this.getCurrentMode(stack);
         if (firearmMode.canFireProjectile(stack, entity)) {
@@ -175,11 +183,12 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         } else if (firearmMode.canCancelReloadOrUnloadByClick(stack, entity)) {
             firearmMode.setForceCancelAction(stack, entity, true);
         }
-        // TODO alternative API for entity interaction
         return true;
     }
 
     public void onEntityTryAttackOption(ItemStack stack, LivingEntity entity) {
+        if (this.getCurrentMode(stack).isMeleeing(stack))
+            return; // Do not handle meleeing in this method, and do mode switching in a different method
         FirearmDataUtils.setHoldingAttackKey(stack, true);
         RFEFirearmMode firearmMode = this.getCurrentMode(stack);
         if (firearmMode.canFireProjectile(stack, entity)) {
@@ -228,22 +237,33 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     }
 
     @Override
+    public boolean isMeleeing(ItemStack itemStack, LivingEntity entity) {
+        return this.getCurrentMode(itemStack).isMeleeing(itemStack);
+    }
+
+    @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
         RFETooltip.addAmmoHighlightingTooltip(stack, context, tooltipComponents, tooltipFlag);
     }
 
     public void onReload(ItemStack stack, LivingEntity entity) {
+        if (this.getCurrentMode(stack).isMeleeing(stack))
+            return;
         RFEFirearmMode firearmMode = this.getCurrentMode(stack);
         firearmMode.tryRunningReloadAction(stack, entity, ReloadPhase.PhaseType.PREPARE, true, ReloadPhaseAccessFilter.IncludeAll.INSTANCE);
     }
 
     public void onUnload(ItemStack itemStack, LivingEntity entity) {
+        if (this.getCurrentMode(itemStack).isMeleeing(itemStack))
+            return;
         RFEFirearmMode firearmMode = this.getCurrentMode(itemStack);
         firearmMode.tryRunningUnloadAction(itemStack, entity, ReloadPhase.PhaseType.PREPARE, true, ReloadPhaseAccessFilter.IncludeAll.INSTANCE);
     }
 
     public void onSwitchMode(ItemStack itemStack, LivingEntity entity) {
+        if (this.getCurrentMode(itemStack).isMeleeing(itemStack))
+            return;
         if (this.modeOrder.size() == 1)
             return;
         if (this.getCurrentAction(itemStack) != null)
@@ -649,6 +669,10 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         return 16; // TODO config and possibly per entity. This is mostly for BehaviorUtils/BehaviorUtilsMixin
     }
 
+    public void handleMeleeInput(ItemStack itemStack, Player player, InteractionHand hand, boolean meleeInput) {
+        this.getCurrentMode(itemStack).handleMeleeInput(itemStack, player, hand, meleeInput);
+    }
+
     public enum Action implements StringRepresentable {
         RELOAD(false),
         UNLOAD(false),
@@ -656,7 +680,9 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         CHARGING(true),
         DRAW(false),
         SWITCH_MODE(true),
-        COOLDOWN(false);
+        COOLDOWN(false),
+        ENTER_MELEE(false),
+        EXIT_MELEE(false);
 
         public static final Codec<Action> CODEC = StringRepresentable.fromEnum(Action::values);
         public static final StreamCodec<FriendlyByteBuf, Action> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(Action.class);

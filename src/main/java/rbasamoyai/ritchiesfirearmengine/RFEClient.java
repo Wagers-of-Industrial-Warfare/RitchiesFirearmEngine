@@ -18,6 +18,7 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -43,8 +44,10 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.compat.iris.IrisCompat;
+import rbasamoyai.ritchiesfirearmengine.mixin.client.MinecraftAccessor;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundFirearmActionPacket;
+import rbasamoyai.ritchiesfirearmengine.network.ServerboundMeleeInputPacket;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundSetAttackKeyPacket;
 
 import java.util.Collection;
@@ -55,6 +58,7 @@ public class RFEClient {
     public static final KeyMapping RELOAD_FIREARM = createSafeKeyMapping("key.ritchiesfirearmengine.reload_firearm", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R);
     public static final KeyMapping UNLOAD_FIREARM = createSafeKeyMapping("key.ritchiesfirearmengine.unload_firearm", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_U);
     public static final KeyMapping SWITCH_MODE = createSafeKeyMapping("key.ritchiesfirearmengine.switch_mode", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V);
+    public static final KeyMapping QUICK_TOGGLE_MELEE = createSafeKeyMapping("key.ritchiesfirearmengine.quick_toggle_melee", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X);
 
     public static void onClientSetup() {
         RFEClientPluginManager.onClientSetup();
@@ -154,6 +158,8 @@ public class RFEClient {
         }
     }
 
+    private static boolean meleeing = false; // TODO consider more general input state handler?
+
     public static void onKeyInput(int key, int scancode, int action, int mods) {
         Minecraft mc = Minecraft.getInstance();
 
@@ -168,6 +174,17 @@ public class RFEClient {
                 } else if (SWITCH_MODE.isDown()) {
                     RFENetwork.sendToServer(new ServerboundFirearmActionPacket(RFEFirearmItem.Action.SWITCH_MODE));
                 }
+                if (QUICK_TOGGLE_MELEE.isDown()) {
+                    boolean oldMeleeing = meleeing;
+                    meleeing = true;
+                    if (!oldMeleeing) {
+                        if (useStack.getItem() instanceof RFEFirearmItem firearmItem) {
+                            firearmItem.handleMeleeInput(useStack, mc.player, InteractionHand.MAIN_HAND, true);
+                            ((MinecraftAccessor) mc).callStartAttack();
+                            RFENetwork.sendToServer(new ServerboundMeleeInputPacket(true));
+                        }
+                    }
+                }
             }
         }
     }
@@ -180,6 +197,26 @@ public class RFEClient {
         cons.accept(RELOAD_FIREARM);
         cons.accept(UNLOAD_FIREARM);
         cons.accept(SWITCH_MODE);
+        cons.accept(QUICK_TOGGLE_MELEE);
+    }
+
+    public static void onClientTickPre() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null && !mc.player.isSpectator()) {
+            boolean oldMeleeing = meleeing;
+            meleeing = QUICK_TOGGLE_MELEE.isDown() && mc.screen == null;
+            boolean meleeOff = oldMeleeing && !meleeing;
+            ItemStack mainhand = mc.player.getMainHandItem();
+            if (mainhand.getItem() instanceof RFEFirearmItem firearmItem) {
+                // TODO offhand?
+                if (meleeOff) {
+                    firearmItem.handleMeleeInput(mainhand, mc.player, InteractionHand.MAIN_HAND, false);
+                    RFENetwork.sendToServer(new ServerboundMeleeInputPacket(false));
+                }
+            }
+        } else {
+            meleeing = false;
+        }
     }
 
     public static float modifyFov(float currentFovModifier, Player player) {
@@ -230,6 +267,7 @@ public class RFEClient {
         RFEProjectileManager.clearAllProjectiles();
         RFERecoilManager.clearTrackedRecoil();
         RFESpreadManager.clearTrackedSpread();
+        meleeing = false;
     }
 
     public static void renderAfterEntities(PoseStack poseStack, Matrix4f projectionMatrix, int renderTick,

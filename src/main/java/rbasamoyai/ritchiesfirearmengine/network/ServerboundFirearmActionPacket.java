@@ -21,6 +21,7 @@ public record ServerboundFirearmActionPacket(RFEFirearmItem.Action action) imple
     public void handle(Executor exec, PacketListener listener, Player player) {
         if (player == null)
             return;
+        // TODO offhand
         ItemStack mainhandItem = player.getMainHandItem();
         if (mainhandItem.getItem() instanceof RFEFirearmItem mainFirearm) {
             switch (this.action) {

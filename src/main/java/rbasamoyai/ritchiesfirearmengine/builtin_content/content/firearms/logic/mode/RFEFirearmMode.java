@@ -144,6 +144,12 @@ public class RFEFirearmMode {
     protected final Map<ResourceLocation, CompareValueSource> chargingCompareValues;
     protected final boolean resetChargeOnUnequip;
 
+    // Meleeing
+    protected final boolean canMelee;
+    protected final boolean forcedMelee;
+    protected final int enterMeleeWindowTime;
+    protected final int exitMeleeTime;
+
     // Overheating
     protected final boolean canOverheat;
     protected final int cooldownTime;
@@ -221,6 +227,11 @@ public class RFEFirearmMode {
         this.reloadingCompareValues = builder.reloadingCompareValues;
         this.unloadingCompareValues = builder.unloadingCompareValues;
         this.chargingCompareValues = builder.chargingCompareValues;
+
+        this.canMelee = builder.canMelee;
+        this.forcedMelee = builder.forcedMelee;
+        this.enterMeleeWindowTime = builder.enterMeleeWindowTime;
+        this.exitMeleeTime = builder.exitMeleeTime;
 
         this.canOverheat = builder.canOverheat;
         this.cooldownTime = builder.cooldownTime;
@@ -1825,7 +1836,7 @@ public class RFEFirearmMode {
     }
 
     public boolean canAim(ItemStack itemStack, LivingEntity entity) {
-        if (!this.canAim)
+        if (!this.canAim || this.isMeleeing(itemStack))
             return false;
         RFEFirearmItem.Action action = FirearmDataUtils.getAction(itemStack);
         if (action != null && !action.canAim())
@@ -1887,6 +1898,7 @@ public class RFEFirearmMode {
             FirearmDataUtils.setActionTime(itemStack, this.drawTime);
             FirearmDataUtils.setEquipped(itemStack, true);
             FirearmDataUtils.setAiming(itemStack, false);
+            FirearmDataUtils.setMeleeState(itemStack, false);
             this.setAimingTime(itemStack, entity, 0);
             this.clearBurstFiring(itemStack);
             this.setWindingUp(itemStack, entity, false);
@@ -1905,7 +1917,18 @@ public class RFEFirearmMode {
             this.clearBurstFiring(itemStack);
         if (action != RFEFirearmItem.Action.RELOAD)
             this.setForceCancelAction(itemStack, entity, false);
-        if (action != null) {
+
+        if (this.isMeleeing(itemStack)) {
+            if (action == RFEFirearmItem.Action.ENTER_MELEE) {
+                this.onTickEnterMelee(itemStack, entity);
+            } else {
+                FirearmDataUtils.setAction(itemStack, null);
+                FirearmDataUtils.setActionTime(itemStack, 0);
+            }
+            RFEFirearmItem.Action endAction = FirearmDataUtils.getAction(itemStack);
+            if (endAction == null)
+                this.startIdleEffects(itemStack, entity);
+        } else if (action != null) {
             switch (action) {
                 case RELOAD -> this.onTickReload(itemStack, entity);
                 case UNLOAD -> this.onTickUnload(itemStack, entity);
@@ -1914,6 +1937,11 @@ public class RFEFirearmMode {
                 case DRAW -> this.onTickDraw(itemStack, entity);
                 case SWITCH_MODE -> this.onTickSwitchMode(itemStack, entity);
                 case COOLDOWN -> this.onTickCooldown(itemStack, entity);
+                case EXIT_MELEE -> this.onTickExitMelee(itemStack, entity);
+                default -> {
+                    FirearmDataUtils.setAction(itemStack, null);
+                    FirearmDataUtils.setActionTime(itemStack, 0);
+                }
             }
             RFEFirearmItem.Action endAction = FirearmDataUtils.getAction(itemStack);
             if (endAction == null)
@@ -2377,6 +2405,59 @@ public class RFEFirearmMode {
 
     public float getPitchAdjustment(ItemStack itemStack) {
         return this.pitchAdjustment; // TODO adjustable sights
+    }
+
+    public void handleMeleeInput(ItemStack itemStack, Player player, InteractionHand hand, boolean meleeInput) {
+        if (!this.canMelee || this.forcedMelee)
+            return;
+        RFEFirearmItem.Action action = FirearmDataUtils.getAction(itemStack);
+        if (meleeInput && action == null) { // Quick melee
+            if (FirearmDataUtils.isInMeleeState(itemStack)) {
+                FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.EXIT_MELEE);
+                FirearmDataUtils.setActionTime(itemStack, this.exitMeleeTime);
+                FirearmDataUtils.setMeleeState(itemStack, false);
+            } else {
+                FirearmDataUtils.setAction(itemStack, RFEFirearmItem.Action.ENTER_MELEE);
+                FirearmDataUtils.setActionTime(itemStack, this.enterMeleeWindowTime);
+                FirearmDataUtils.setMeleeState(itemStack, true);
+            }
+        } else if (!meleeInput && action == RFEFirearmItem.Action.ENTER_MELEE) { // Cancel enter melee toggle
+            FirearmDataUtils.setMeleeState(itemStack, false);
+        }
+    }
+
+    public boolean isMeleeing(ItemStack itemStack) {
+        return this.forcedMelee || FirearmDataUtils.isInMeleeState(itemStack);
+    }
+
+    public void onTickEnterMelee(ItemStack itemStack, LivingEntity entity) {
+        int actionTime = FirearmDataUtils.getActionTime(itemStack);
+        if (actionTime == this.cooldownTime)
+            this.playEnterMeleeEffects(itemStack, entity);
+        if (actionTime > 0)
+            --actionTime;
+        FirearmDataUtils.setActionTime(itemStack, actionTime);
+        if (actionTime > 0)
+            return;
+        FirearmDataUtils.setAction(itemStack, null);
+    }
+
+    public void playEnterMeleeEffects(ItemStack itemStack, LivingEntity entity) {
+    }
+
+    public void onTickExitMelee(ItemStack itemStack, LivingEntity entity) {
+        int actionTime = FirearmDataUtils.getActionTime(itemStack);
+        if (actionTime == this.cooldownTime)
+            this.playExitMeleeEffects(itemStack, entity);
+        if (actionTime > 0)
+            --actionTime;
+        FirearmDataUtils.setActionTime(itemStack, actionTime);
+        if (actionTime > 0)
+            return;
+        FirearmDataUtils.setAction(itemStack, null);
+    }
+
+    public void playExitMeleeEffects(ItemStack itemStack, LivingEntity entity) {
     }
 
     public enum FiringType {

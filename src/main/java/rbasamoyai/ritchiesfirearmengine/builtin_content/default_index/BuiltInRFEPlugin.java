@@ -626,6 +626,9 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         public static final DataComponentType<Integer> FILLED_MAX_STACK_SIZE = register("filled_max_stack_size",
                 builder -> builder.persistent(ExtraCodecs.intRange(1, 99)).networkSynchronized(ByteBufCodecs.VAR_INT));
 
+        public static final DataComponentType<Boolean> MELEEING = register("meleeing",
+                builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
         private static <V> DataComponentType<V> register(String id, UnaryOperator<DataComponentType.Builder<V>> builderOp) {
             ResourceLocation loc = RitchiesFirearmEngine.resource(id);
             if (TYPES.containsKey(loc))

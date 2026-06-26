@@ -17,7 +17,7 @@ import rbasamoyai.ritchiesfirearmengine.utils.RFEByteBufCodecUtils;
 
 public record RFEFirearmModeHandlingProperties(float movementSpeedModifier, ChargingBehavior chargingBehavior,
                                                RFEFirearmHeatProperties heatProperties, int maxShots, float pitchAdjustment,
-                                               ImmutableList<RFEMisfire> misfires) {
+                                               ImmutableList<RFEMisfire> misfires, double meleeAttackSpeed, double meleeAttackDamage) {
 
     public static final Codec<RFEFirearmModeHandlingProperties> CODEC = RecordCodecBuilder.create(o -> o.group(
             Codec.floatRange(-1f, 10f).optionalFieldOf("movement_speed_modifier", 0f).forGetter(RFEFirearmModeHandlingProperties::movementSpeedModifier),
@@ -26,23 +26,28 @@ public record RFEFirearmModeHandlingProperties(float movementSpeedModifier, Char
             Codec.intRange(0, Integer.MAX_VALUE).optionalFieldOf("max_shots", 0).forGetter(RFEFirearmModeHandlingProperties::maxShots),
             Codec.floatRange(-90f, 90f).optionalFieldOf("pitch_adjustment", 0f).forGetter(RFEFirearmModeHandlingProperties::pitchAdjustment),
             RFEMisfire.LIST_CODEC.xmap(ImmutableList::copyOf, Lists::newArrayList)
-                    .optionalFieldOf("misfire_chances", ImmutableList.of()).forGetter(RFEFirearmModeHandlingProperties::misfires)
+                    .optionalFieldOf("misfire_chances", ImmutableList.of()).forGetter(RFEFirearmModeHandlingProperties::misfires),
+            Codec.doubleRange(0.01d, Double.MAX_VALUE).optionalFieldOf("melee_attack_speed", 1d).forGetter(RFEFirearmModeHandlingProperties::meleeAttackSpeed),
+            Codec.DOUBLE.optionalFieldOf("melee_attack_damage", 1d).forGetter(RFEFirearmModeHandlingProperties::meleeAttackDamage)
     ).apply(o, RFEFirearmModeHandlingProperties::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, RFEFirearmModeHandlingProperties> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<RegistryFriendlyByteBuf, RFEFirearmModeHandlingProperties> STREAM_CODEC = RFEByteBufCodecUtils.composite8(
         ByteBufCodecs.FLOAT, RFEFirearmModeHandlingProperties::movementSpeedModifier,
         NeoForgeStreamCodecs.enumCodec(ChargingBehavior.class), RFEFirearmModeHandlingProperties::chargingBehavior,
         RFEFirearmHeatProperties.STREAM_CODEC, RFEFirearmModeHandlingProperties::heatProperties,
         ByteBufCodecs.VAR_INT, RFEFirearmModeHandlingProperties::maxShots,
         ByteBufCodecs.FLOAT, RFEFirearmModeHandlingProperties::pitchAdjustment,
         RFEMisfire.STREAM_CODEC.apply(RFEByteBufCodecUtils.immutableList()), RFEFirearmModeHandlingProperties::misfires,
+        ByteBufCodecs.DOUBLE, RFEFirearmModeHandlingProperties::meleeAttackSpeed,
+        ByteBufCodecs.DOUBLE, RFEFirearmModeHandlingProperties::meleeAttackDamage,
         RFEFirearmModeHandlingProperties::new);
 
     public static RFEFirearmModeHandlingProperties fromItemDefinition(RFEFirearmModeBuilder builder) {
         return new RFEFirearmModeHandlingProperties(builder.movementSpeedModifier, builder.chargingBehavior,
                 new RFEFirearmHeatProperties(builder.heatCapacity, builder.heatRemovedPerTick, builder.heatRemovedOnCharge,
                         builder.heatAddedOnFiring, builder.coolingDelayTime),
-                builder.maxShots, builder.pitchAdjustment, ImmutableList.copyOf(builder.misfires));
+                builder.maxShots, builder.pitchAdjustment, ImmutableList.copyOf(builder.misfires), builder.baseMeleeAttackSpeed,
+                builder.baseMeleeAttackDamage);
     }
 
     public record RFEFirearmHeatProperties(float heatCapacity, float heatRemovedPerTick, float heatRemovedOnCharge,

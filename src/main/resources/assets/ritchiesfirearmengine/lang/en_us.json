@@ -21,6 +21,7 @@
   "key.ritchiesfirearmengine.reload_firearm": "Reload Firearm",
   "key.ritchiesfirearmengine.unload_firearm": "Unload Firearm",
   "key.ritchiesfirearmengine.switch_mode": "Switch Firearm Mode",
+  "key.ritchiesfirearmengine.quick_toggle_melee": "Quick Firearm Melee/Toggle Firearm Melee (Hold)",
   "ritchiesfirearmengine.tooltip.item.hold_key.ammo": "Hold [%s] to see compatible ammo",
   "ritchiesfirearmengine.tooltip.item.hold_key.ammo.compatible": "Compatible with current mode",
   "ritchiesfirearmengine.tooltip.item.hold_key.ammo.incompatible": "Compatible in another mode",

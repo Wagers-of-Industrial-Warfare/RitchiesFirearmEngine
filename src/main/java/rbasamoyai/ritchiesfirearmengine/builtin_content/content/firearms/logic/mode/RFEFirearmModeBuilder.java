@@ -105,6 +105,14 @@ public class RFEFirearmModeBuilder {
     protected float heatAddedOnFiring = 0; // Datapackable
     protected int coolingDelayTime = 0; // Datapackable
 
+    protected boolean canMelee = true;
+    protected boolean forcedMelee;
+    protected double baseMeleeAttackDamage; // Datapackable
+    protected double baseMeleeAttackSpeed; // Datapackable
+    protected int enterMeleeWindowTime;
+    protected int exitMeleeTime;
+    // TODO bayonet charge
+
     @Nullable protected ResourceLocation magazineAttachmentSlot = null;
     @Nullable protected ResourceLocation loadedRoundAttachmentSlot = null;
     @Nullable protected ResourceLocation loadedSecondaryAttachmentSlot = null;
@@ -180,6 +188,13 @@ public class RFEFirearmModeBuilder {
         newBuilder.reloadingCompareValues = new Object2ReferenceOpenHashMap<>(this.reloadingCompareValues);
         newBuilder.unloadingCompareValues = new Object2ReferenceOpenHashMap<>(this.unloadingCompareValues);
         newBuilder.chargingCompareValues = new Object2ReferenceOpenHashMap<>(this.chargingCompareValues);
+
+        newBuilder.canMelee = this.canMelee;
+        newBuilder.forcedMelee = this.forcedMelee;
+        newBuilder.baseMeleeAttackSpeed = this.baseMeleeAttackSpeed;
+        newBuilder.baseMeleeAttackDamage = this.baseMeleeAttackDamage;
+        newBuilder.enterMeleeWindowTime = this.enterMeleeWindowTime;
+        newBuilder.exitMeleeTime = this.exitMeleeTime;
 
         newBuilder.canOverheat = this.canOverheat;
         newBuilder.cooldownTime = this.cooldownTime;
@@ -679,6 +694,42 @@ public class RFEFirearmModeBuilder {
         if (pitchAdjustment < -90 || 90 < pitchAdjustment || !Float.isFinite(pitchAdjustment))
             throw new IllegalStateException("Pitch adjustment must be in the range of [-90, 90]");
         this.pitchAdjustment = pitchAdjustment;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder canMelee(boolean canMelee) {
+        this.canMelee = canMelee;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder forcedMelee(boolean forcedMelee) {
+        this.forcedMelee = forcedMelee;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder baseMeleeAttackSpeed(double baseMeleeAttackSpeed) {
+        if (baseMeleeAttackSpeed < 0.01d)
+            throw new IllegalStateException("Base melee attack speed must be at least 0.01");
+        this.baseMeleeAttackSpeed = baseMeleeAttackSpeed;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder baseMeleeAttackDamage(double baseMeleeAttackDamage) {
+        this.baseMeleeAttackDamage = baseMeleeAttackDamage;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder enterMeleeWindowTime(int enterMeleeWindowTime) {
+        if (enterMeleeWindowTime < 0)
+            throw new IllegalStateException("Cannot specify enter melee window time less than 0");
+        this.enterMeleeWindowTime = enterMeleeWindowTime;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder exitMeleeTime(int exitMeleeTime) {
+        if (exitMeleeTime < 0)
+            throw new IllegalStateException("Cannot specify exit melee time less than 0");
+        this.exitMeleeTime = exitMeleeTime;
         return this;
     }
 

@@ -23,6 +23,7 @@
     "client.ItemEntityRendererMixin",
     "client.ItemInHandRendererMixin",
     "client.ItemRendererMixin",
+    "client.MinecraftAccessor",
     "client.MinecraftMixin",
     "client.ModelManagerMixin",
     "client.MultiPlayerGameModeMixin",

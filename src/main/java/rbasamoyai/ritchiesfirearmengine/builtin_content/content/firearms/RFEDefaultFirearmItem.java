@@ -33,15 +33,14 @@ public class RFEDefaultFirearmItem extends RFEFirearmItem {
     @OnlyIn(Dist.CLIENT)
     public void initializeClient(@Nullable Consumer<IClientItemExtensions> consumer) {
         super.initializeClient(consumer);
+        final RFEDefaultFirearmItem item = this;
         consumer.accept(new IClientItemExtensions() {
             @Override
             public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack itemStack) {
-                return HumanoidModel.ArmPose.CROSSBOW_HOLD;
+                return item.isMeleeing(itemStack, entityLiving) ? HumanoidModel.ArmPose.ITEM : HumanoidModel.ArmPose.CROSSBOW_HOLD;
             }
         });
     }
-
-
 
     public static class Builder implements RFEItemBuilder {
         @Override

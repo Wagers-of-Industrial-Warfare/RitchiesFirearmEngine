@@ -33,6 +33,9 @@
     ]
   },
   "charging_behavior": "auto",
+  "melee": {
+    "can_melee": false
+  },
   "modes": {
     "range_60m": {
       "pitch_adjustment": 13.5

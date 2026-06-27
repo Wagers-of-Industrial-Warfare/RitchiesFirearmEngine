@@ -138,6 +138,13 @@
       }
     ]
   },
+  "melee": {
+    "can_melee": true,
+    "melee_attack_speed": 0.6,
+    "melee_attack_damage": 3.5,
+    "enter_melee_window_time": 10,
+    "exit_melee_time": 10
+  },
   "modes": {
     "semi_auto": {
       "firing": {

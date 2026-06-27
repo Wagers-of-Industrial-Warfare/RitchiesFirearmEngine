@@ -2430,6 +2430,8 @@ public class RFEFirearmMode {
         return this.forcedMelee || FirearmDataUtils.isInMeleeState(itemStack);
     }
 
+    public boolean canMelee(ItemStack itemStack) { return this.canMelee; }
+
     public void onTickEnterMelee(ItemStack itemStack, LivingEntity entity) {
         int actionTime = FirearmDataUtils.getActionTime(itemStack);
         if (actionTime == this.cooldownTime)

@@ -20,9 +20,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.event.GatherSkippedAttributeTooltipsEvent;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.FovModifyingItem;
@@ -138,6 +140,16 @@ public class RFEClient {
         RFEClientPluginManager.registerParticleProviders(registry);
     }
 
+    public static void gatherSkippedAttributeModifierTooltips(ItemStack stack, GatherSkippedAttributeTooltipsEvent event) {
+        if (stack.getItem() instanceof RFEFirearmItem firearmItem) {
+            Player player = event.getContext().player();
+            if (player == null || !firearmItem.isMeleeing(stack, player)) {
+                event.skipId(Item.BASE_ATTACK_DAMAGE_ID);
+                event.skipId(Item.BASE_ATTACK_SPEED_ID);
+            }
+        }
+    }
+
     public interface ParticleRegistry {
         void registerSpecial(ParticleType<?> type, ParticleProvider<?> provider);
         void registerSprite(ParticleType<?> type, ParticleProvider.Sprite<?> sprite);
@@ -180,8 +192,8 @@ public class RFEClient {
                     if (!oldMeleeing) {
                         if (useStack.getItem() instanceof RFEFirearmItem firearmItem) {
                             firearmItem.handleMeleeInput(useStack, mc.player, InteractionHand.MAIN_HAND, true);
-                            ((MinecraftAccessor) mc).callStartAttack();
                             RFENetwork.sendToServer(new ServerboundMeleeInputPacket(true));
+                            ((MinecraftAccessor) mc).callStartAttack();
                         }
                     }
                 }

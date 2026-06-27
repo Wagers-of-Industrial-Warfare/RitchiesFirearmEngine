@@ -33,6 +33,7 @@ public class RFEClientNeoForge {
         forgeBus.addListener(RFEClientNeoForge::onRenderGuiOverlay);
         forgeBus.addListener(RFEClientNeoForge::onSetupCamera);
         forgeBus.addListener(RFEClientNeoForge::onClientTick);
+        forgeBus.addListener(RFEClientNeoForge::onGatherSkippedAttributeModifierTooltips);
     }
 
     private static void onClientSetup(final FMLClientSetupEvent event) {
@@ -134,6 +135,10 @@ public class RFEClientNeoForge {
 
     private static void onClientTick(final ClientTickEvent.Pre event) {
         RFEClient.onClientTickPre();
+    }
+
+    private static void onGatherSkippedAttributeModifierTooltips(final GatherSkippedAttributeTooltipsEvent event) {
+        RFEClient.gatherSkippedAttributeModifierTooltips(event.getStack(), event);
     }
 
 }

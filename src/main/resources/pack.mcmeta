@@ -11,7 +11,7 @@
       {
         "content": "mod",
         "id": "ritchiesfirearmengine",
-        "neoforge_version": "[0.7.0,)",
+        "neoforge_version": "[0.9.0,)",
         "relation": "required"
       }
     ],

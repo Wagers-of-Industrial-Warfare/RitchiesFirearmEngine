@@ -43,6 +43,17 @@
       "model": "rfe_builtin:item/mp5/mp5_magazine_charge_aimed"
     },
     {
+      "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
+      "model": "rfe_builtin:item/mp5/mp5_empty_melee"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:has_magazine": 1,
+        "ritchiesfirearmengine:is_meleeing": 1
+      },
+      "model": "rfe_builtin:item/mp5/mp5_magazine_melee"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
       "model": "rfe_builtin:item/mp5/mp5_empty_reload"
     },

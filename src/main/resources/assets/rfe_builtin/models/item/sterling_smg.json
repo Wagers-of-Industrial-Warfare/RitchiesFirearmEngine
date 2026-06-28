@@ -69,6 +69,17 @@
       "model": "rfe_builtin:item/sterling_smg/sterling_smg_magazine_fired_aimed"
     },
     {
+      "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
+      "model": "rfe_builtin:item/sterling_smg/sterling_smg_empty_melee"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:has_magazine": 1,
+        "ritchiesfirearmengine:is_meleeing": 1
+      },
+      "model": "rfe_builtin:item/sterling_smg/sterling_smg_magazine_melee"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
       "model": "rfe_builtin:item/sterling_smg/sterling_smg_empty_reload"
     },

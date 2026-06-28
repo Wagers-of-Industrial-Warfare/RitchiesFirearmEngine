@@ -95,6 +95,17 @@
       "model": "rfe_builtin:item/mp_18/mp_18_magazine_safety_aimed"
     },
     {
+      "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
+      "model": "rfe_builtin:item/mp_18/mp_18_empty_melee"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:has_magazine": 1,
+        "ritchiesfirearmengine:is_meleeing": 1
+      },
+      "model": "rfe_builtin:item/mp_18/mp_18_magazine_melee"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
       "model": "rfe_builtin:item/mp_18/mp_18_empty_reload"
     },

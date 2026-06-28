@@ -123,12 +123,10 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             modifiers.add(new ItemAttributeModifiers.Entry(Attributes.MOVEMENT_SPEED.getDelegate(), speedModifier, EquipmentSlotGroup.OFFHAND));
         }
         if (mode.canMelee(stack)) {
-            AttributeModifier attackSpeedModifier = new AttributeModifier(BASE_ATTACK_SPEED_ID, properties.meleeAttackSpeed(), AttributeModifier.Operation.ADD_VALUE);
+            AttributeModifier attackSpeedModifier = new AttributeModifier(BASE_ATTACK_SPEED_ID, properties.meleeAttackSpeed() - 4, AttributeModifier.Operation.ADD_VALUE);
             AttributeModifier attackDamageModifier = new AttributeModifier(BASE_ATTACK_DAMAGE_ID, properties.meleeAttackDamage() - 1, AttributeModifier.Operation.ADD_VALUE);
             modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_SPEED.getDelegate(), attackSpeedModifier, EquipmentSlotGroup.MAINHAND));
-            modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_SPEED.getDelegate(), attackSpeedModifier, EquipmentSlotGroup.OFFHAND));
             modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_DAMAGE.getDelegate(), attackDamageModifier, EquipmentSlotGroup.MAINHAND));
-            modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_DAMAGE.getDelegate(), attackDamageModifier, EquipmentSlotGroup.OFFHAND));
         }
         return new ItemAttributeModifiers(modifiers, true);
     }

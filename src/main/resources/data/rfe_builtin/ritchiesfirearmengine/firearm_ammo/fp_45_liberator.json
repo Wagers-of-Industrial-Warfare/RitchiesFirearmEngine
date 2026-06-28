@@ -51,9 +51,11 @@
   "replace_secondary_ammo": false,
   "secondary_ammo": [
   ],
-  "unlimited_primary_reload_item": {
-    "id": "rfe_builtin:handgun_cartridge"
-  },
+  "unlimited_primary_reload_items": [
+    {
+      "id": "rfe_builtin:handgun_cartridge"
+    }
+  ],
   "modes": {
   }
 }

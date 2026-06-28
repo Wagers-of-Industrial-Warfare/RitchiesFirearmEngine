@@ -54,10 +54,19 @@
   "replace_secondary_ammo": false,
   "secondary_ammo": [
   ],
-  "unlimited_primary_reload_item": {
-    "id": "rfe_builtin:rifle_stripper_clip_5rds",
-    "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:rifle_cartridge","count":5},"slot":0}]}
-  },
+  "unlimited_primary_reload_items": [
+    {
+      "id": "rfe_builtin:rifle_cartridge"
+    },
+    {
+      "id": "rfe_builtin:rifle_stripper_clip_5rds",
+      "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:rifle_cartridge","count":5},"slot":0}]}
+    },
+    {
+      "id": "rfe_builtin:rifle_magazine_10rds",
+      "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:rifle_cartridge","count":10},"slot":0}]}
+    }
+  ],
   "modes": {
   }
 }

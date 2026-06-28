@@ -344,8 +344,12 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             return count;
         if (!canEntityInfiniteReload(entity))
             return 0;
-        ItemStack infiniteAmmo = ammoProperties.unlimitedPrimaryReloadItem();
-        return ammoPred.test(infiniteAmmo) ? Float.POSITIVE_INFINITY : 0;
+        List<ItemStack> infiniteAmmo = ammoProperties.unlimitedPrimaryReloadItems();
+        for (ItemStack s : infiniteAmmo) {
+            if (ammoPred.test(s))
+                return Float.POSITIVE_INFINITY;
+        }
+        return 0;
     }
 
     public int ammoCount(ItemStack itemStack, LivingEntity entity) {
@@ -415,8 +419,12 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             return count;
         if (!canEntityInfiniteReload(entity))
             return 0;
-        ItemStack infiniteAmmo = ammoProperties.unlimitedSecondaryReloadItem();
-        return ammoPred.test(infiniteAmmo) ? Float.POSITIVE_INFINITY : 0;
+        List<ItemStack> infiniteAmmo = ammoProperties.unlimitedSecondaryReloadItems();
+        for (ItemStack s : infiniteAmmo) {
+            if (ammoPred.test(s))
+                return Float.POSITIVE_INFINITY;
+        }
+        return 0;
     }
 
     public int freeSecondaryAmmoSpace(ItemStack itemStack) {

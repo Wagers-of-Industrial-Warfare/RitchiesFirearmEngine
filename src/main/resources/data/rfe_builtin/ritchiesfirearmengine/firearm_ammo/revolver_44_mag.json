@@ -101,10 +101,15 @@
   "replace_secondary_ammo": false,
   "secondary_ammo": [
   ],
-  "unlimited_primary_reload_item": {
-    "id": "rfe_builtin:revolver_speedloader_6rds",
-    "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:magnum_handgun_cartridge","count":6},"slot":0}]}
-  },
+  "unlimited_primary_reload_items": [
+    {
+      "id": "rfe_builtin:magnum_handgun_cartridge"
+    },
+    {
+      "id": "rfe_builtin:revolver_speedloader_6rds",
+      "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:magnum_handgun_cartridge","count":6},"slot":0}]}
+    }
+  ],
   "modes": {
   }
 }

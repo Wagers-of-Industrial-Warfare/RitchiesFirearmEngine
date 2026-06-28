@@ -37,10 +37,12 @@
   "replace_secondary_ammo": false,
   "secondary_ammo": [
   ],
-  "unlimited_primary_reload_item": {
-    "id": "rfe_builtin:rifle_en_bloc_clip_5rds",
-    "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:rifle_cartridge","count":5},"slot":0}]}
-  },
+  "unlimited_primary_reload_items": [
+    {
+      "id": "rfe_builtin:rifle_en_bloc_clip_5rds",
+      "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:rifle_cartridge","count":5},"slot":0}]}
+    }
+  ],
   "modes": {
   }
 }

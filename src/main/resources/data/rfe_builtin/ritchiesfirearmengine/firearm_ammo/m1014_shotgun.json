@@ -67,9 +67,11 @@
   "replace_secondary_ammo": false,
   "secondary_ammo": [
   ],
-  "unlimited_primary_reload_item": {
-    "id": "rfe_builtin:buckshot_shell"
-  },
+  "unlimited_primary_reload_items": [
+    {
+      "id": "rfe_builtin:buckshot_shell"
+    }
+  ],
   "modes": {
   }
 }

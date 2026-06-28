@@ -1698,7 +1698,7 @@ public class RFEFirearmMode {
                 if (nextPrimer.isEmpty() || FirearmDataUtils.isUsedPrimer(nextPrimer.getFirst()))
                     this.setCharged(itemStack, entity, false);
             }
-            ItemStack chamberedPrimer = this.getChamberedRound(itemStack);
+            ItemStack chamberedPrimer = this.getChamberedSecondary(itemStack);
             if (!chamberedPrimer.isEmpty()) {
                 shouldJam = true;
                 if (!FirearmDataUtils.isUsedPrimer(chamberedPrimer)) {

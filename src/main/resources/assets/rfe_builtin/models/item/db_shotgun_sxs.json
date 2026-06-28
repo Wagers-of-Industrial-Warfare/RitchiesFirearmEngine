@@ -6,6 +6,10 @@
       "model": "rfe_builtin:item/db_shotgun_sxs/db_shotgun_sxs_aimed"
     },
     {
+      "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
+      "model": "rfe_builtin:item/db_shotgun_sxs/db_shotgun_sxs_melee"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
       "model": "rfe_builtin:item/db_shotgun_sxs/db_shotgun_sxs_reload"
     },

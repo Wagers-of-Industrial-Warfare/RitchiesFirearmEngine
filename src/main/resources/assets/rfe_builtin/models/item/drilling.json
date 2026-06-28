@@ -6,6 +6,10 @@
       "model": "rfe_builtin:item/drilling/drilling_aimed"
     },
     {
+      "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
+      "model": "rfe_builtin:item/drilling/drilling_melee"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
       "model": "rfe_builtin:item/drilling/drilling_reload"
     },

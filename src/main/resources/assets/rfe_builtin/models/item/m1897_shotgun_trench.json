@@ -28,6 +28,17 @@
       "model": "rfe_builtin:item/m1897_shotgun_trench/m1897_shotgun_trench_charge_aimed"
     },
     {
+      "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
+      "model": "rfe_builtin:item/m1897_shotgun_trench/m1897_shotgun_trench_melee_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_meleeing": 1,
+        "ritchiesfirearmengine:is_charged": 1
+      },
+      "model": "rfe_builtin:item/m1897_shotgun_trench/m1897_shotgun_trench_melee_normal"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
       "model": "rfe_builtin:item/m1897_shotgun_trench/m1897_shotgun_trench_reload"
     },

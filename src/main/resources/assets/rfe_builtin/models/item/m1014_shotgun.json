@@ -28,6 +28,10 @@
       "model": "rfe_builtin:item/m1014_shotgun/m1014_shotgun_charge_aimed"
     },
     {
+      "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
+      "model": "rfe_builtin:item/m1014_shotgun/m1014_shotgun_melee"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
       "model": "rfe_builtin:item/m1014_shotgun/m1014_shotgun_reload"
     },

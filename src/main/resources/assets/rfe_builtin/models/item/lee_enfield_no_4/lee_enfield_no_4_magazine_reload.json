@@ -354,6 +354,7 @@
 		{
 			"name": "firearm",
 			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
 			"children": [
 				0,
@@ -376,35 +377,41 @@
 				{
 					"name": "strap_mount_1",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [17]
 				},
 				{
 					"name": "strap_mount_2",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [18]
 				},
 				{
 					"name": "magazine",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [19, 20]
 				},
 				{
 					"name": "bolt",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [
 						{
 							"name": "cocking_piece",
 							"origin": [8, 8, 8],
+							"scope": 0,
 							"color": 0,
 							"children": [21]
 						},
 						{
 							"name": "bolt_handle",
 							"origin": [8, 8, 8],
+							"scope": 0,
 							"color": 0,
 							"children": [22, 23, 24]
 						}
@@ -413,12 +420,14 @@
 				{
 					"name": "trigger",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [25]
 				},
 				{
 					"name": "rear_sight",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [26, 27, 28]
 				}

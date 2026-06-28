@@ -1,9 +1,20 @@
 {
-  "parent": "rfe_builtin:item/kar98k/kar98k_normal",
+  "parent": "rfe_builtin:item/kar98k/kar98k_fired",
   "overrides": [
     {
       "predicate": { "ritchiesfirearmengine:aiming": 1 },
-      "model": "rfe_builtin:item/kar98k/kar98k_aimed"
+      "model": "rfe_builtin:item/kar98k/kar98k_fired_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_charged": 1 },
+      "model": "rfe_builtin:item/kar98k/kar98k_normal"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:aiming": 1,
+        "ritchiesfirearmengine:is_charged": 1
+      },
+      "model": "rfe_builtin:item/kar98k/kar98k_normal_aimed"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_charging": 1 },
@@ -15,6 +26,17 @@
         "ritchiesfirearmengine:aiming": 1
       },
       "model": "rfe_builtin:item/kar98k/kar98k_charge_aimed"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
+      "model": "rfe_builtin:item/kar98k/kar98k_melee_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_meleeing": 1,
+        "ritchiesfirearmengine:is_charged": 1
+      },
+      "model": "rfe_builtin:item/kar98k/kar98k_melee_normal"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },

@@ -205,6 +205,31 @@
 			}
 		},
 		{
+			"from": [7.25, 3, 12.5],
+			"to": [8.75, 4, 15.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7, 2, 11.5]},
+			"faces": {
+				"north": {"uv": [1.008, 9.008, 1.492, 9.242], "texture": "#0"},
+				"east": {"uv": [8.008, 8.258, 8.742, 8.492], "texture": "#0"},
+				"south": {"uv": [1.758, 9.008, 2.242, 9.242], "texture": "#0"},
+				"west": {"uv": [0.008, 8.758, 0.742, 8.992], "texture": "#0"},
+				"down": {"uv": [7.992, 3.258, 7.508, 3.992], "texture": "#0"}
+			}
+		},
+		{
+			"from": [7.25, 4, 11.5],
+			"to": [8.75, 5, 15.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7, 3, 11.5]},
+			"faces": {
+				"north": {"uv": [9.008, 2.258, 9.492, 2.492], "texture": "#0"},
+				"east": {"uv": [8.008, 6.008, 8.992, 6.242], "texture": "#0"},
+				"south": {"uv": [9.008, 2.758, 9.492, 2.992], "texture": "#0"},
+				"west": {"uv": [0.008, 8.258, 0.992, 8.492], "texture": "#0"},
+				"up": {"uv": [1.992, 7.992, 1.508, 7.008], "texture": "#0"},
+				"down": {"uv": [2.742, 7.008, 2.258, 7.992], "texture": "#0"}
+			}
+		},
+		{
 			"from": [7.5, 6, 18],
 			"to": [8.5, 8, 19],
 			"rotation": {"angle": 0, "axis": "y", "origin": [7.5, 6, 18]},
@@ -303,12 +328,10 @@
 			"scale": [0.75, 0.75, 0.75]
 		},
 		"firstperson_righthand": {
-			"translation": [-8.975, 7.5, 3.25],
-			"scale": [1, 1, 0.5]
+			"translation": [0.25, 3.75, -6.75]
 		},
 		"firstperson_lefthand": {
-			"translation": [-8.975, 7.5, 3.25],
-			"scale": [1, 1, 0.5]
+			"translation": [0.25, 3.75, -6.75]
 		},
 		"ground": {
 			"rotation": [0, 0, 90],
@@ -329,6 +352,7 @@
 		{
 			"name": "firearm",
 			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
 			"children": [
 				0,
@@ -351,45 +375,59 @@
 				{
 					"name": "strap_mount_1",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [17]
 				},
 				{
 					"name": "strap_mount_2",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [18]
 				},
 				{
+					"name": "magazine",
+					"origin": [8, 8, 8],
+					"scope": 0,
+					"color": 0,
+					"children": [19, 20]
+				},
+				{
 					"name": "bolt",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [
 						{
 							"name": "cocking_piece",
 							"origin": [8, 8, 8],
+							"scope": 0,
 							"color": 0,
-							"children": [19]
+							"children": [21]
 						},
 						{
 							"name": "bolt_handle",
 							"origin": [8, 8, 8],
+							"scope": 0,
 							"color": 0,
-							"children": [20, 21, 22]
+							"children": [22, 23, 24]
 						}
 					]
 				},
 				{
 					"name": "trigger",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
-					"children": [23]
+					"children": [25]
 				},
 				{
 					"name": "rear_sight",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
-					"children": [24, 25, 26]
+					"children": [26, 27, 28]
 				}
 			]
 		}

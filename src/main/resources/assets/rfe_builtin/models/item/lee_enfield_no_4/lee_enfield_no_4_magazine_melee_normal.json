@@ -230,9 +230,9 @@
 			}
 		},
 		{
-			"from": [7.5, 6, 23.1],
-			"to": [8.5, 8, 24.1],
-			"rotation": {"angle": 0, "axis": "y", "origin": [7.5, 6, 23.1]},
+			"from": [7.5, 6, 19],
+			"to": [8.5, 8, 20],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7.5, 6, 19]},
 			"faces": {
 				"north": {"uv": [6.508, 9.008, 6.742, 9.492], "texture": "#0"},
 				"east": {"uv": [7.008, 9.008, 7.242, 9.492], "texture": "#0"},
@@ -243,22 +243,31 @@
 			}
 		},
 		{
-			"from": [7.4, 6.4, 15.1],
-			"to": [8.6, 7.6, 23.1],
-			"rotation": {"angle": -22.5, "axis": "z", "origin": [8, 7, 19.1]},
+			"from": [8, 6.5, 18],
+			"to": [8, 7.5, 19],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 7, 18.5]},
 			"faces": {
-				"north": {"uv": [3.758, 8.008, 4.242, 8.492], "rotation": 90, "texture": "#0"},
-				"east": {"uv": [6.492, 3.758, 6.008, 5.742], "rotation": 270, "texture": "#0"},
-				"south": {"uv": [1.258, 8.258, 1.742, 8.742], "rotation": 270, "texture": "#0"},
-				"west": {"uv": [6.492, 3.492, 6.008, 1.508], "rotation": 270, "texture": "#0"},
-				"up": {"uv": [5.758, 0.008, 7.742, 0.492], "rotation": 270, "texture": "#0"},
-				"down": {"uv": [5.758, 0.758, 7.742, 1.242], "rotation": 270, "texture": "#0"}
+				"east": {"uv": [8.508, 9.258, 8.742, 9.492], "texture": "#0"},
+				"west": {"uv": [2.008, 9.508, 2.242, 9.742], "texture": "#0"}
 			}
 		},
 		{
-			"from": [8.25, 6.75, 22.075],
-			"to": [10.25, 7.75, 23.075],
-			"rotation": {"angle": 22.5, "axis": "z", "origin": [8.25, 7.25, 22.575]},
+			"from": [7.4, 6.4, 10],
+			"to": [8.6, 7.6, 18],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 7, 14]},
+			"faces": {
+				"north": {"uv": [3.758, 8.008, 4.242, 8.492], "texture": "#0"},
+				"east": {"uv": [5.758, 0.008, 7.742, 0.492], "texture": "#0"},
+				"south": {"uv": [1.258, 8.258, 1.742, 8.742], "texture": "#0"},
+				"west": {"uv": [5.758, 0.758, 7.742, 1.242], "texture": "#0"},
+				"up": {"uv": [6.492, 3.492, 6.008, 1.508], "texture": "#0"},
+				"down": {"uv": [6.492, 3.758, 6.008, 5.742], "texture": "#0"}
+			}
+		},
+		{
+			"from": [8.25, 6.75, 16.975],
+			"to": [10.25, 7.75, 17.975],
+			"rotation": {"angle": -45, "axis": "z", "origin": [8.25, 7.25, 17.475]},
 			"faces": {
 				"north": {"uv": [9.008, 3.258, 9.492, 3.492], "texture": "#0"},
 				"south": {"uv": [4.258, 9.008, 4.742, 9.242], "texture": "#0"},
@@ -268,9 +277,9 @@
 			}
 		},
 		{
-			"from": [10.25, 6.5, 21.825],
-			"to": [11.75, 8, 23.325],
-			"rotation": {"angle": 22.5, "axis": "z", "origin": [8.25, 7.25, 22.575]},
+			"from": [10.25, 6.5, 16.725],
+			"to": [11.75, 8, 18.225],
+			"rotation": {"angle": -45, "axis": "z", "origin": [8.25, 7.25, 17.475]},
 			"faces": {
 				"north": {"uv": [2.008, 8.258, 2.492, 8.742], "texture": "#0"},
 				"east": {"uv": [8.258, 2.258, 8.742, 2.742], "texture": "#0"},
@@ -320,22 +329,22 @@
 	"gui_light": "front",
 	"display": {
 		"thirdperson_righthand": {
-			"translation": [-1, 1.75, -5.5],
+			"rotation": [-90, 0, 0],
+			"translation": [0, -4, -0.5],
 			"scale": [0.75, 0.75, 0.75]
 		},
 		"thirdperson_lefthand": {
-			"translation": [-1, 1.75, -5.5],
+			"rotation": [-90, 0, 0],
+			"translation": [0, -4, -0.5],
 			"scale": [0.75, 0.75, 0.75]
 		},
 		"firstperson_righthand": {
-			"rotation": [0, 0, 5],
-			"translation": [-8.5, 6.5, 2.5],
-			"scale": [1, 1, 0.5]
+			"rotation": [-90, 45, 0],
+			"translation": [-12, -6, -0.5]
 		},
 		"firstperson_lefthand": {
-			"rotation": [0, 0, 5],
-			"translation": [-8.5, 6.5, 2.5],
-			"scale": [1, 1, 0.5]
+			"rotation": [-90, 45, 0],
+			"translation": [-12, -6, -0.5]
 		},
 		"ground": {
 			"rotation": [0, 0, 90],
@@ -408,14 +417,14 @@
 							"origin": [8, 8, 8],
 							"scope": 0,
 							"color": 0,
-							"children": [21]
+							"children": [21, 22]
 						},
 						{
 							"name": "bolt_handle",
 							"origin": [8, 8, 8],
 							"scope": 0,
 							"color": 0,
-							"children": [22, 23, 24]
+							"children": [23, 24, 25]
 						}
 					]
 				},
@@ -424,14 +433,14 @@
 					"origin": [8, 8, 8],
 					"scope": 0,
 					"color": 0,
-					"children": [25]
+					"children": [26]
 				},
 				{
 					"name": "rear_sight",
 					"origin": [8, 8, 8],
 					"scope": 0,
 					"color": 0,
-					"children": [26, 27, 28]
+					"children": [27, 28, 29]
 				}
 			]
 		}

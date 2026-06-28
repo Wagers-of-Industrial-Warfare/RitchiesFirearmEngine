@@ -28,6 +28,17 @@
       "model": "rfe_builtin:item/gewehr_88/gewehr_88_charge_aimed"
     },
     {
+      "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
+      "model": "rfe_builtin:item/gewehr_88/gewehr_88_melee_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_meleeing": 1,
+        "ritchiesfirearmengine:is_charged": 1
+      },
+      "model": "rfe_builtin:item/gewehr_88/gewehr_88_melee_normal"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
       "model": "rfe_builtin:item/gewehr_88/gewehr_88_reload"
     },

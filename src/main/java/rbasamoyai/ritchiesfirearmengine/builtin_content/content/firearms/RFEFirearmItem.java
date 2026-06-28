@@ -245,6 +245,12 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     }
 
     @Override
+    public boolean isVisuallyMeleeing(ItemStack itemStack, LivingEntity entity) {
+        Action action = this.getCurrentAction(itemStack);
+        return IFirearmItem.super.isVisuallyMeleeing(itemStack, entity) || action == Action.ENTER_MELEE || action == Action.EXIT_MELEE;
+    }
+
+    @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
         RFETooltip.addAmmoHighlightingTooltip(stack, context, tooltipComponents, tooltipFlag);
@@ -452,7 +458,10 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     public float getAttackStrengthScaleForRendering(ItemStack itemStack, Player player, float original) {
         if (this.getCurrentAction(itemStack) == Action.DRAW)
             return this.getCurrentMode(itemStack).getDrawFraction(itemStack, player);
-        // TODO melee?
+        if (this.getCurrentAction(itemStack) == Action.EXIT_MELEE)
+            return this.getCurrentMode(itemStack).getExitMeleeFraction(itemStack, player);
+        if (this.isMeleeing(itemStack, player))
+            return original;
         return 1;
     }
 

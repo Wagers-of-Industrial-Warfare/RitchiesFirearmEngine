@@ -37,7 +37,7 @@ public class RFEDefaultFirearmItem extends RFEFirearmItem {
         consumer.accept(new IClientItemExtensions() {
             @Override
             public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack itemStack) {
-                return item.isMeleeing(itemStack, entityLiving) ? HumanoidModel.ArmPose.ITEM : HumanoidModel.ArmPose.CROSSBOW_HOLD;
+                return item.isVisuallyMeleeing(itemStack, entityLiving) ? HumanoidModel.ArmPose.ITEM : HumanoidModel.ArmPose.CROSSBOW_HOLD;
             }
         });
     }

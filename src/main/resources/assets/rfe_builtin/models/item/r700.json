@@ -17,6 +17,10 @@
       "model": "rfe_builtin:item/r700/r700_charge_aimed"
     },
     {
+      "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
+      "model": "rfe_builtin:item/r700/r700_melee"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
       "model": "rfe_builtin:item/r700/r700_reload"
     },

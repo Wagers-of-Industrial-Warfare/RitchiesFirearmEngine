@@ -1937,6 +1937,7 @@ public class RFEFirearmMode {
                 case DRAW -> this.onTickDraw(itemStack, entity);
                 case SWITCH_MODE -> this.onTickSwitchMode(itemStack, entity);
                 case COOLDOWN -> this.onTickCooldown(itemStack, entity);
+                case ENTER_MELEE -> this.onTickEnterMelee(itemStack, entity);
                 case EXIT_MELEE -> this.onTickExitMelee(itemStack, entity);
                 default -> {
                     FirearmDataUtils.setAction(itemStack, null);
@@ -2460,6 +2461,10 @@ public class RFEFirearmMode {
     }
 
     public void playExitMeleeEffects(ItemStack itemStack, LivingEntity entity) {
+    }
+
+    public float getExitMeleeFraction(ItemStack itemStack, LivingEntity entity) {
+        return this.exitMeleeTime <= 0 ? 1 : Mth.clamp(1f - (float) FirearmDataUtils.getActionTime(itemStack) / (float) this.exitMeleeTime, 0f, 1f);
     }
 
     public enum FiringType {

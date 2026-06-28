@@ -135,7 +135,7 @@ public class RFEClient {
             return FirearmDataUtils.isUsedPrimer(itemStack) ? 1 : 0;
         });
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_meleeing"), (itemStack, level, entity, seed) -> {
-            return itemStack.getItem() instanceof RFEFirearmItem firearm && firearm.isMeleeing(itemStack, entity) ? 1 : 0;
+            return itemStack.getItem() instanceof RFEFirearmItem firearm && firearm.isVisuallyMeleeing(itemStack, entity) ? 1 : 0;
         });
         // TODO bayonet predicate
     }

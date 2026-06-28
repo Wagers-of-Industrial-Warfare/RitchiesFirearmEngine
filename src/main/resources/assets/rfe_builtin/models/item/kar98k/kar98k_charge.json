@@ -375,6 +375,7 @@
 		{
 			"name": "firearm",
 			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
 			"children": [
 				0,
@@ -400,24 +401,28 @@
 				{
 					"name": "bolt",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [
 						20,
 						{
 							"name": "bolt_handle",
 							"origin": [8, 8, 8],
+							"scope": 0,
 							"color": 0,
 							"children": [21, 22, 23, 24]
 						},
 						{
 							"name": "firing_pin",
 							"origin": [8, 8, 8],
+							"scope": 0,
 							"color": 0,
 							"children": [25]
 						},
 						{
 							"name": "safety",
 							"origin": [8, 8, 8],
+							"scope": 0,
 							"color": 0,
 							"children": [26]
 						}
@@ -426,12 +431,14 @@
 				{
 					"name": "trigger",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [27]
 				},
 				{
 					"name": "rear_sights",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [28, 29]
 				}

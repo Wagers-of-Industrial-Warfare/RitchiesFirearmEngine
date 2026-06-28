@@ -18,6 +18,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.AmmoPredicate;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemContainerContents;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
@@ -42,7 +43,8 @@ public class AmmoPacketItem extends Item {
                           @Nullable SoundEvent useSound, boolean spawnParticlesOnUse,
                           ImmutableMap<AmmoPredicate, Integer> defaultPrimaryAmmoCapacities,
                           ImmutableMap<AmmoPredicate, Integer> defaultSecondaryAmmoCapacities) {
-        super(properties);
+        super(properties.component(BuiltInRFEPlugin.RFEDataComponents.ROUNDS, RFEItemContainerContents.EMPTY)
+                .component(BuiltInRFEPlugin.RFEDataComponents.PRIMERS, RFEItemContainerContents.EMPTY));
         this.glint = glint;
         this.useDuration = useDuration;
         this.reloadCooldown = reloadCooldown;

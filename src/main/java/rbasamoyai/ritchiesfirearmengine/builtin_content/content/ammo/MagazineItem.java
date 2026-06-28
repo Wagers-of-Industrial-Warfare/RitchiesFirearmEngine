@@ -17,6 +17,7 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.AmmoPredicate;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemContainerContents;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
@@ -49,7 +50,8 @@ public class MagazineItem extends Item {
                         ImmutableList<AmmoPredicate> defaultSpeedloaderPredicates,
                         ImmutableList<AmmoPredicate> defaultSecondaryPredicates,
                         int reloadCooldown, boolean trackEmptySlots, boolean trackEmptySecondarySlots) {
-        super(pProperties);
+        super(pProperties.component(RFEDataComponents.ROUNDS, RFEItemContainerContents.EMPTY)
+                .component(RFEDataComponents.PRIMERS, RFEItemContainerContents.EMPTY));
         this.glint = glint;
         this.primaryCapacity = primaryCapacity;
         this.secondaryCapacity = secondaryCapacity;

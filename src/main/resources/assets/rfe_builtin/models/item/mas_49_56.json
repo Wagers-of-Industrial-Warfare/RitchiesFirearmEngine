@@ -69,6 +69,17 @@
       "model": "rfe_builtin:item/mas_49_56/mas_49_56_magazine_fired_aimed"
     },
     {
+      "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
+      "model": "rfe_builtin:item/mas_49_56/mas_49_56_empty_melee"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:has_magazine": 1,
+        "ritchiesfirearmengine:is_meleeing": 1
+      },
+      "model": "rfe_builtin:item/mas_49_56/mas_49_56_magazine_melee"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
       "model": "rfe_builtin:item/mas_49_56/mas_49_56_empty_reload"
     },

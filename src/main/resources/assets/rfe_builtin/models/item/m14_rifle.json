@@ -69,6 +69,17 @@
       "model": "rfe_builtin:item/m14_rifle/m14_rifle_magazine_fired_aimed"
     },
     {
+      "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
+      "model": "rfe_builtin:item/m14_rifle/m14_rifle_empty_melee"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:has_magazine": 1,
+        "ritchiesfirearmengine:is_meleeing": 1
+      },
+      "model": "rfe_builtin:item/m14_rifle/m14_rifle_magazine_melee"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
       "model": "rfe_builtin:item/m14_rifle/m14_rifle_empty_reload"
     },

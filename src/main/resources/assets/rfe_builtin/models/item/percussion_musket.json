@@ -72,6 +72,31 @@
       "model": "rfe_builtin:item/percussion_musket/percussion_musket_uncharged_aimed"
     },
     {
+      "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_melee_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_meleeing": 1,
+        "ritchiesfirearmengine:round_count": 1
+      },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_melee_uncharged"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_meleeing": 1,
+        "ritchiesfirearmengine:is_jammed": 1
+      },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_melee_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_meleeing": 1,
+        "ritchiesfirearmengine:is_charged": 1
+      },
+      "model": "rfe_builtin:item/percussion_musket/percussion_musket_melee_normal"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
       "model": "rfe_builtin:item/percussion_musket/percussion_musket_reload"
     },

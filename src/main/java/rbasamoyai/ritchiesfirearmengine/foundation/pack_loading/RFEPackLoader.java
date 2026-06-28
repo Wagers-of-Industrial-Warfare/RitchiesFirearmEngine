@@ -133,7 +133,15 @@ public class RFEPackLoader {
                 } else if (resourcesSupplier != null) {
                     String packId = "mod/" + modFileInfo.moduleName();
                     PackLocationInfo locationInfo = new PackLocationInfo(packId, Component.literal(packId), PackSource.DEFAULT, Optional.empty());
-                    loadContentPack(locationInfo, resourcesSupplier, new BuiltInPackContext(modNamespaces));
+                    try {
+                        loadContentPack(locationInfo, resourcesSupplier, new BuiltInPackContext(modNamespaces));
+                    } catch (RFEPackLoadingException exception) {
+                        if (RFEUtils.isProduction()) {
+                            LOGGER.error("Exception loading built-in RFE content pack {}, skipping JAR: {}", locationInfo.id(), exception);
+                        } else {
+                            throw exception;
+                        }
+                    }
                 }
             } catch (Exception exception) {
                 throw new IllegalStateException("Could not load built-in mod RFE content packs", exception);
@@ -185,7 +193,7 @@ public class RFEPackLoader {
     }
 
     private static void loadContentPack(PackLocationInfo locationInfo, Pack.ResourcesSupplier packResourcesSupplier,
-                                        @Nullable BuiltInPackContext builtInContext) {
+                                        @Nullable BuiltInPackContext builtInContext) throws RFEPackLoadingException {
         boolean builtIn = builtInContext != null;
         String packId = locationInfo.id();
         int mcMetaPackVersion = SharedConstants.getCurrentVersion().getPackVersion(PackType.CLIENT_RESOURCES);
@@ -194,7 +202,7 @@ public class RFEPackLoader {
             throw new RFEPackLoadingException("Could not load content data for RFE content pack " + packId);
         try (PackResources packResources = packResourcesSupplier.openFull(locationInfo, mcMetadata)) {
             RFEPackMetadata rfeMetadata = FOUND_METADATA_BY_PATH.get(packId);
-            if (rfeMetadata == null)
+            if (rfeMetadata == null) // Not a pack.
                 return;
             validatePackFromMetadata(rfeMetadata, packId, builtInContext);
 

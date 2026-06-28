@@ -107,6 +107,11 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             public float getHeatCapacity(ItemStack itemStack) {
                 return RFEFirearmItem.this.getHeatCapacityForHUD(itemStack);
             }
+
+            @Override
+            public boolean isMeleeing(ItemStack itemStack, LivingEntity entity) {
+                return RFEFirearmItem.this.isMeleeing(itemStack, entity);
+            }
         });
     }
 

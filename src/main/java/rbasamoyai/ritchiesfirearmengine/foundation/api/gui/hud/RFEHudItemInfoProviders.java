@@ -1,6 +1,7 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -75,6 +76,13 @@ public class RFEHudItemInfoProviders {
          * @return the heat capacity of the firearm
          */
         default float getHeatCapacity(ItemStack itemStack) { return 1f; }
+
+        /**
+         * Get if the gun is melee mode.
+         * @param itemStack the firearm
+         * @return true if the firearm is meleeing, false if not
+         */
+        default boolean isMeleeing(ItemStack itemStack, LivingEntity entity) { return false; }
     }
 
     private RFEHudItemInfoProviders() {}

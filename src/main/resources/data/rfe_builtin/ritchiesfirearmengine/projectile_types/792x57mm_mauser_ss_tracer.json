@@ -1,6 +1,6 @@
 {
   "type": "ritchiesfirearmengine:bullet",
-  "muzzle_velocity": 44,
+  "muzzle_velocity": 38,
   "drag": 0.0025,
   "quadratic_drag": true,
   "gravity": 0.03,
@@ -8,19 +8,19 @@
   "knockback": 0.5,
   "damage_model": [
     {
-      "distance": 60,
+      "distance": 35,
       "damage": 14
     },
     {
-      "distance": 80,
+      "distance": 55,
       "damage": 18
     },
     {
-      "distance": 125,
+      "distance": 95,
       "damage": 18
     },
     {
-      "distance": 165,
+      "distance": 135,
       "damage": 14
     }
   ],

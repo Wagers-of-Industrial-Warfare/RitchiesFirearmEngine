@@ -37,7 +37,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.m
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmModeHandlingProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhase;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhaseAccessFilter;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEFirearmProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudItemInfoProviders;
@@ -66,7 +66,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
 
     protected RFEFirearmItem(Properties properties, Map<String, RFEFirearmMode> baseFirearmModes, List<String> modeOrder,
                              String defaultMode, Set<ResourceLocation> globalAttachments) {
-        super(properties.stacksTo(1));
+        super(properties.stacksTo(1).component(RFEDataComponents.USING_UNLIMITED_AMMO_RELOAD, false));
         this.baseFirearmModes = baseFirearmModes;
         this.modeOrder = modeOrder;
         this.defaultMode = defaultMode;
@@ -166,7 +166,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     }
 
     public RFEFirearmMode getCurrentMode(ItemStack stack) {
-        String stateRef = stack.getOrDefault(BuiltInRFEPlugin.RFEDataComponents.FIREARM_MODE, this.defaultMode);
+        String stateRef = stack.getOrDefault(RFEDataComponents.FIREARM_MODE, this.defaultMode);
         return this.baseFirearmModes.getOrDefault(stateRef, this.getDefaultMode());
     }
 
@@ -224,9 +224,9 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     public void handleClientFireInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs,
                                               boolean jam, @Nullable UUID recoilUUID, InteractionHand hand) {
         long currentTime = entity.level().getGameTime();
-        long lastFiredTime = itemStack.getOrDefault(BuiltInRFEPlugin.RFEDataComponents.LAST_SHOT_TIME, -1L);
+        long lastFiredTime = itemStack.getOrDefault(RFEDataComponents.LAST_SHOT_TIME, -1L);
         if (currentTime != lastFiredTime) {
-            itemStack.set(BuiltInRFEPlugin.RFEDataComponents.LAST_SHOT_TIME, currentTime);
+            itemStack.set(RFEDataComponents.LAST_SHOT_TIME, currentTime);
         } else {
             return; // Do not accept more than 1 clientbound shot from an entity/player each tick
         }
@@ -264,6 +264,12 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             return;
         RFEFirearmMode firearmMode = this.getCurrentMode(stack);
         firearmMode.tryRunningReloadAction(stack, entity, ReloadPhase.PhaseType.PREPARE, true, ReloadPhaseAccessFilter.IncludeAll.INSTANCE);
+        if (this.getCurrentAction(stack) != Action.RELOAD && entity instanceof Player player && player.isCreative()) {
+            stack.set(RFEDataComponents.USING_UNLIMITED_AMMO_RELOAD, true);
+            firearmMode.tryRunningReloadAction(stack, entity, ReloadPhase.PhaseType.PREPARE, true, ReloadPhaseAccessFilter.IncludeAll.INSTANCE);
+            if (this.getCurrentAction(stack) != Action.RELOAD)
+                stack.set(RFEDataComponents.USING_UNLIMITED_AMMO_RELOAD, false);
+        }
     }
 
     public void onUnload(ItemStack itemStack, LivingEntity entity) {
@@ -280,7 +286,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             return;
         if (this.getCurrentAction(itemStack) != null)
             return;
-        String stateRef = itemStack.getOrDefault(BuiltInRFEPlugin.RFEDataComponents.FIREARM_MODE, this.defaultMode);
+        String stateRef = itemStack.getOrDefault(RFEDataComponents.FIREARM_MODE, this.defaultMode);
         int index = this.modeOrder.indexOf(stateRef);
         if (index == -1) {
             this.warnInvalidModeAndReset(itemStack);
@@ -299,7 +305,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     }
 
     public void completeSwitchMode(ItemStack itemStack, LivingEntity entity) {
-        String stateRef = itemStack.getOrDefault(BuiltInRFEPlugin.RFEDataComponents.FIREARM_MODE, this.defaultMode);
+        String stateRef = itemStack.getOrDefault(RFEDataComponents.FIREARM_MODE, this.defaultMode);
         int index = this.modeOrder.indexOf(stateRef);
         if (index == -1) {
             this.warnInvalidModeAndReset(itemStack);
@@ -309,12 +315,12 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         if (index >= this.modeOrder.size())
             index = 0;
         String nextStateRef = this.modeOrder.get(index);
-        itemStack.set(BuiltInRFEPlugin.RFEDataComponents.FIREARM_MODE, nextStateRef);
+        itemStack.set(RFEDataComponents.FIREARM_MODE, nextStateRef);
     }
 
     protected void warnInvalidModeAndReset(ItemStack itemStack) {
         RitchiesFirearmEngine.LOGGER.warn("Firearm {} has invalid mode setup", BuiltInRegistries.ITEM.getKey(this));
-        itemStack.set(BuiltInRFEPlugin.RFEDataComponents.FIREARM_MODE, this.defaultMode);
+        itemStack.set(RFEDataComponents.FIREARM_MODE, this.defaultMode);
     }
 
     @Override
@@ -342,7 +348,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         }
         if (count > 0)
             return count;
-        if (!canEntityInfiniteReload(entity))
+        if (!canEntityInfiniteReload(entity, itemStack))
             return 0;
         List<ItemStack> infiniteAmmo = ammoProperties.unlimitedPrimaryReloadItems();
         for (ItemStack s : infiniteAmmo) {
@@ -417,7 +423,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         }
         if (count > 0)
             return count;
-        if (!canEntityInfiniteReload(entity))
+        if (!canEntityInfiniteReload(entity, itemStack))
             return 0;
         List<ItemStack> infiniteAmmo = ammoProperties.unlimitedSecondaryReloadItems();
         for (ItemStack s : infiniteAmmo) {
@@ -682,9 +688,9 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         return this.getCurrentMode(itemStack).getShotCount(itemStack);
     }
 
-    public static boolean canEntityInfiniteReload(LivingEntity entity) {
+    public static boolean canEntityInfiniteReload(LivingEntity entity, ItemStack itemStack) {
         if (entity instanceof Player player)
-            return player.isCreative();
+            return player.isCreative() && itemStack.getOrDefault(RFEDataComponents.USING_UNLIMITED_AMMO_RELOAD, false);
         return true; // TODO config
     }
 

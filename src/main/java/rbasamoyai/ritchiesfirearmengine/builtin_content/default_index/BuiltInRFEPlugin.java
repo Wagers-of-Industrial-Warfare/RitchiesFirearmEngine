@@ -629,6 +629,9 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         public static final DataComponentType<Boolean> MELEEING = register("meleeing",
                 builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
 
+        public static final DataComponentType<Boolean> USING_UNLIMITED_AMMO_RELOAD = register("using_unlimited_ammo_reload",
+                builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
         private static <V> DataComponentType<V> register(String id, UnaryOperator<DataComponentType.Builder<V>> builderOp) {
             ResourceLocation loc = RitchiesFirearmEngine.resource(id);
             if (TYPES.containsKey(loc))

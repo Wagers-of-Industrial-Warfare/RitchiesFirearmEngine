@@ -1,0 +1,7 @@
+{
+  "slot_rendering": {
+    "rfe_builtin:magazine": {
+      "model": "rfe_builtin:item/item_attachments/ak_74_30rds"
+    }
+  }
+}

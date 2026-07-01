@@ -1,5 +1,6 @@
 {
   "type": "ritchiesfirearmengine:firearm",
+  "magazine_attachment_slot": "rfe_builtin:magazine",
   "drawing": {
     "draw_time": 16,
     "sound": "rfe_builtin:item.generic.rifle.draw"

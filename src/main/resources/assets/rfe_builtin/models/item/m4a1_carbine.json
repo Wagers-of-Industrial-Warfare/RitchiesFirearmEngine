@@ -1,79 +1,32 @@
 {
-  "parent": "rfe_builtin:item/m4_carbine/m4_carbine_empty",
+  "parent": "rfe_builtin:item/m4_carbine/m4_carbine_normal",
   "overrides": [
     {
       "predicate": { "ritchiesfirearmengine:aiming": 1 },
-      "model": "rfe_builtin:item/m4_carbine/m4_carbine_empty_aimed"
-    },
-    {
-      "predicate": { "ritchiesfirearmengine:has_magazine": 1 },
-      "model": "rfe_builtin:item/m4_carbine/m4_carbine_magazine"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:has_magazine": 1,
-        "ritchiesfirearmengine:aiming": 1
-      },
-      "model": "rfe_builtin:item/m4_carbine/m4_carbine_magazine_aimed"
+      "model": "rfe_builtin:item/m4_carbine/m4_carbine_aimed"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_charging": 1 },
-      "model": "rfe_builtin:item/m4_carbine/m4_carbine_empty_charge"
+      "model": "rfe_builtin:item/m4_carbine/m4_carbine_charge"
     },
     {
       "predicate": {
         "ritchiesfirearmengine:is_charging": 1,
         "ritchiesfirearmengine:aiming": 1
       },
-      "model": "rfe_builtin:item/m4_carbine/m4_carbine_empty_charge_aimed"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_charging": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/m4_carbine/m4_carbine_magazine_charge"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_charging": 1,
-        "ritchiesfirearmengine:aiming": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/m4_carbine/m4_carbine_magazine_charge_aimed"
+      "model": "rfe_builtin:item/m4_carbine/m4_carbine_charge_aimed"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
-      "model": "rfe_builtin:item/m4_carbine/m4_carbine_empty_melee"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:has_magazine": 1,
-        "ritchiesfirearmengine:is_meleeing": 1
-      },
-      "model": "rfe_builtin:item/m4_carbine/m4_carbine_magazine_melee"
+      "model": "rfe_builtin:item/m4_carbine/m4_carbine_melee"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
-      "model": "rfe_builtin:item/m4_carbine/m4_carbine_empty_reload"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_reloading": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/m4_carbine/m4_carbine_magazine_reload"
+      "model": "rfe_builtin:item/m4_carbine/m4_carbine_reload"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
-      "model": "rfe_builtin:item/m4_carbine/m4_carbine_empty_reload"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_unloading": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/m4_carbine/m4_carbine_magazine_reload"
+      "model": "rfe_builtin:item/m4_carbine/m4_carbine_reload"
     }
   ]
 }

@@ -1,0 +1,31 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "rfe_builtin:item/usgi_20rds"
+	},
+	"elements": [
+		{
+			"from": [7.265, 5.5, 7.1],
+			"to": [8.735, 11.5, 9.9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7.02, 9.5, 18]},
+			"faces": {
+				"north": {"uv": [8, 0, 10, 6], "texture": "#0"},
+				"east": {"uv": [0, 0, 3, 6], "texture": "#0"},
+				"south": {"uv": [11, 0, 13, 6], "texture": "#0"},
+				"west": {"uv": [4, 0, 7, 6], "texture": "#0"},
+				"up": {"uv": [16, 7, 14, 4], "texture": "#0"},
+				"down": {"uv": [16, 0, 14, 3], "texture": "#0"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "magazine",
+			"origin": [8, 8, 8],
+			"scope": 0,
+			"color": 5,
+			"children": [0]
+		}
+	]
+}

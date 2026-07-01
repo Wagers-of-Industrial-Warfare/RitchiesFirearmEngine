@@ -54,7 +54,7 @@
   ],
   "unlimited_primary_reload_items": [
     {
-      "id": "rfe_builtin:infinite_pistol_magazine_32rds",
+      "id": "rfe_builtin:pistol_magazine_32rds",
       "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:handgun_cartridge","count":32},"slot":0}]}
     }
   ],

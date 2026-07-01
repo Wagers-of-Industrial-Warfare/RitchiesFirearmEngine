@@ -1,0 +1,31 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "rfe_builtin:item/m14_rifle_20rds"
+	},
+	"elements": [
+		{
+			"from": [7.25, 1.75, 12],
+			"to": [8.75, 7.75, 15],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7, 5.75, 0]},
+			"faces": {
+				"north": {"uv": [8, 0, 10, 6], "texture": "#0"},
+				"east": {"uv": [0, 0, 3, 6], "texture": "#0"},
+				"south": {"uv": [11, 0, 13, 6], "texture": "#0"},
+				"west": {"uv": [4, 0, 7, 6], "texture": "#0"},
+				"up": {"uv": [16, 3, 14, 0], "texture": "#0"},
+				"down": {"uv": [16, 4, 14, 7], "texture": "#0"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "magazine",
+			"origin": [8, 8, 8],
+			"scope": 0,
+			"color": 0,
+			"children": [0]
+		}
+	]
+}

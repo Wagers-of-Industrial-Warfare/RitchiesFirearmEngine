@@ -1,0 +1,55 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "rfe_builtin:item/lee_enfield_30rds"
+	},
+	"elements": [
+		{
+			"from": [7.265, 3.75, 11.5],
+			"to": [8.735, 6.75, 15.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 5.25, 13.5]},
+			"faces": {
+				"north": {"uv": [13, 0, 15, 3], "texture": "#0"},
+				"east": {"uv": [0, 0, 4, 3], "texture": "#0"},
+				"south": {"uv": [10, 0, 12, 3], "texture": "#0"},
+				"west": {"uv": [5, 0, 9, 3], "texture": "#0"},
+				"up": {"uv": [2, 16, 0, 12], "texture": "#0"}
+			}
+		},
+		{
+			"from": [7.25, 0.75, 11.5],
+			"to": [8.75, 3.75, 15.5],
+			"rotation": {"angle": 22.5, "axis": "x", "origin": [8, 3.75, 15.5]},
+			"faces": {
+				"north": {"uv": [13, 4, 15, 7], "texture": "#0"},
+				"east": {"uv": [0, 4, 4, 7], "texture": "#0"},
+				"south": {"uv": [10, 4, 12, 7], "texture": "#0"},
+				"west": {"uv": [5, 4, 9, 7], "texture": "#0"},
+				"up": {"uv": [9, 12, 11, 16], "texture": "#0"}
+			}
+		},
+		{
+			"from": [7.235, -2, 10.35],
+			"to": [8.765, 1, 14.35],
+			"rotation": {"angle": 45, "axis": "x", "origin": [8, 1, 14.35]},
+			"faces": {
+				"north": {"uv": [13, 8, 15, 11], "texture": "#0"},
+				"east": {"uv": [0, 8, 4, 11], "texture": "#0"},
+				"south": {"uv": [10, 8, 12, 11], "texture": "#0"},
+				"west": {"uv": [5, 8, 9, 11], "texture": "#0"},
+				"up": {"uv": [6, 12, 8, 16], "texture": "#0"},
+				"down": {"uv": [5, 12, 3, 16], "texture": "#0"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "magazine",
+			"origin": [7, 3, 11.5],
+			"scope": 0,
+			"color": 0,
+			"children": [0, 1, 2]
+		}
+	]
+}

@@ -20,9 +20,11 @@
   "secondary_ammo": [
     "#rfe_builtin:percussion_caps"
   ],
-  "unlimited_primary_reload_items": {
-    "id": "rfe_builtin:musket_rifle_cartridge"
-  },
+  "unlimited_primary_reload_items": [
+    {
+      "id": "rfe_builtin:musket_rifle_cartridge"
+    }
+  ],
   "unlimited_secondary_reload_items": [
     {
       "id": "rfe_builtin:percussion_cap"

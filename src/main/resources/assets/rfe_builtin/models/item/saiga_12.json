@@ -1,105 +1,43 @@
 {
-  "parent": "rfe_builtin:item/saiga_12/saiga_12_empty",
+  "parent": "rfe_builtin:item/saiga_12/saiga_12_normal",
   "overrides": [
     {
       "predicate": { "ritchiesfirearmengine:aiming": 1 },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_empty_aimed"
-    },
-    {
-      "predicate": { "ritchiesfirearmengine:has_magazine": 1 },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_magazine"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:has_magazine": 1,
-        "ritchiesfirearmengine:aiming": 1
-      },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_magazine_aimed"
+      "model": "rfe_builtin:item/saiga_12/saiga_12_aimed"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_charging": 1 },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_empty_charge"
+      "model": "rfe_builtin:item/saiga_12/saiga_12_charge"
     },
     {
       "predicate": {
         "ritchiesfirearmengine:is_charging": 1,
         "ritchiesfirearmengine:aiming": 1
       },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_empty_charge_aimed"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_charging": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_magazine_charge"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_charging": 1,
-        "ritchiesfirearmengine:aiming": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_magazine_charge_aimed"
+      "model": "rfe_builtin:item/saiga_12/saiga_12_charge_aimed"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_firing": 1 },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_empty_fired"
+      "model": "rfe_builtin:item/saiga_12/saiga_12_fired"
     },
     {
       "predicate": {
         "ritchiesfirearmengine:is_firing": 1,
         "ritchiesfirearmengine:aiming": 1
       },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_empty_fired_aimed"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_firing": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_magazine_fired"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_firing": 1,
-        "ritchiesfirearmengine:aiming": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_magazine_fired_aimed"
+      "model": "rfe_builtin:item/saiga_12/saiga_12_fired_aimed"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_empty_melee"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:has_magazine": 1,
-        "ritchiesfirearmengine:is_meleeing": 1
-      },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_magazine_melee"
+      "model": "rfe_builtin:item/saiga_12/saiga_12_melee"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_empty_reload"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_reloading": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_magazine_reload"
+      "model": "rfe_builtin:item/saiga_12/saiga_12_reload"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_empty_reload"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_unloading": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/saiga_12/saiga_12_magazine_reload"
+      "model": "rfe_builtin:item/saiga_12/saiga_12_reload"
     }
   ]
 }

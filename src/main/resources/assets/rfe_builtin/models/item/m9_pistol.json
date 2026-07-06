@@ -1,94 +1,39 @@
 {
-  "parent": "rfe_builtin:item/m9_pistol/m9_pistol_empty_normal",
+  "parent": "rfe_builtin:item/m9_pistol/m9_pistol_normal",
   "overrides": [
     {
       "predicate": { "ritchiesfirearmengine:aiming": 1 },
-      "model": "rfe_builtin:item/m9_pistol/m9_pistol_empty_aimed"
-    },
-    {
-      "predicate": { "ritchiesfirearmengine:has_magazine": 1 },
-      "model": "rfe_builtin:item/m9_pistol/m9_pistol_magazine_normal"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:has_magazine": 1,
-        "ritchiesfirearmengine:aiming": 1
-      },
-      "model": "rfe_builtin:item/m9_pistol/m9_pistol_magazine_aimed"
+      "model": "rfe_builtin:item/m9_pistol/m9_pistol_aimed"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_charging": 1 },
-      "model": "rfe_builtin:item/m9_pistol/m9_pistol_empty_fired"
+      "model": "rfe_builtin:item/m9_pistol/m9_pistol_fired"
     },
     {
       "predicate": {
         "ritchiesfirearmengine:is_charging": 1,
         "ritchiesfirearmengine:aiming": 1
       },
-      "model": "rfe_builtin:item/m9_pistol/m9_pistol_empty_charge_aimed"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_charging": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/m9_pistol/m9_pistol_magazine_fired"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_charging": 1,
-        "ritchiesfirearmengine:aiming": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/m9_pistol/m9_pistol_magazine_charge_aimed"
+      "model": "rfe_builtin:item/m9_pistol/m9_pistol_charge_aimed"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_firing": 1 },
-      "model": "rfe_builtin:item/m9_pistol/m9_pistol_empty_fired"
+      "model": "rfe_builtin:item/m9_pistol/m9_pistol_fired"
     },
     {
       "predicate": {
         "ritchiesfirearmengine:is_firing": 1,
         "ritchiesfirearmengine:aiming": 1
       },
-      "model": "rfe_builtin:item/m9_pistol/m9_pistol_empty_fired_aimed"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_firing": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/m9_pistol/m9_pistol_magazine_fired"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_firing": 1,
-        "ritchiesfirearmengine:aiming": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/m9_pistol/m9_pistol_magazine_fired_aimed"
+      "model": "rfe_builtin:item/m9_pistol/m9_pistol_fired_aimed"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
-      "model": "rfe_builtin:item/m9_pistol/m9_pistol_empty_reload"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_reloading": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/m9_pistol/m9_pistol_magazine_reload"
+      "model": "rfe_builtin:item/m9_pistol/m9_pistol_reload"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
-      "model": "rfe_builtin:item/m9_pistol/m9_pistol_empty_reload"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_unloading": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/m9_pistol/m9_pistol_magazine_reload"
+      "model": "rfe_builtin:item/m9_pistol/m9_pistol_reload"
     }
   ]
 }

@@ -78,7 +78,7 @@
         "condition": {
           "and": [
             { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            { "macro": "rfe_builtin:can_load_1_secondary" },
+            { "compare": "ritchiesfirearmengine:primable_ammo_count", "operator": "greater_than", "value": 0 },
             { "compare": "ritchiesfirearmengine:entity_secondary_ammo_count", "operator": "greater_than", "value": 0 },
             { "compare": "ritchiesfirearmengine:firearm_ammo_count", "operator": "greater_than", "value": 0 }
           ]
@@ -130,7 +130,6 @@
         "condition": {
           "and": [
             { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            { "macro": "rfe_builtin:can_load_1_secondary" },
             { "compare": "ritchiesfirearmengine:primable_ammo_count", "operator": "greater_than", "value": 0 },
             {
               "or": [
@@ -196,7 +195,7 @@
         "unload_type": "magazines",
         "unload_time": 50,
         "sounds": [
-          { "time": 0, "sound":  "rfe_builtin:item.generic.revolver.lever" },
+          { "time": 0, "sound": "rfe_builtin:item.generic.revolver.lever" },
           { "time": 25, "sound": "rfe_builtin:item.generic.revolver.cylinder.unload" },
           { "time": 45, "sound": "rfe_builtin:item.generic.firearm.item.stash" }
         ],

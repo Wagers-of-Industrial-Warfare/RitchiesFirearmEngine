@@ -503,8 +503,14 @@ public class RFEFirearmMode {
             boolean skip = stackToUseOrRemove.isEmpty() || FirearmDataUtils.isUsedPrimer(stackToUseOrRemove);
             if (!skip) {
                 int toUseOrFire = Math.min(newCount, stackToUseOrRemove.getCount());
-                if (toUseOrFire < 1)
-                    break;
+                if (toUseOrFire < 1) {
+                    if (this.ammoConsumedLast) {
+                        newSecondaries.addFirst(stackToUseOrRemove);
+                    } else {
+                        newSecondaries.addLast(stackToUseOrRemove);
+                    }
+                    continue;
+                }
                 if (this.secondaryAmmoRemainsAfterFiring) { // Get new stack of fired primers from unfired primers
                     ItemStack newStack = stackToUseOrRemove.split(toUseOrFire);
                     FirearmDataUtils.setUsedPrimer(newStack, true);
@@ -2342,8 +2348,8 @@ public class RFEFirearmMode {
         if (!this.requiresSecondaryAmmo())
             return 0;
         int ammoCount = this.getLoadedAmmoCount(itemStack, entity, true);
-        int secondaryCount = this.countSecondaryAmmo(itemStack);
-        return Math.max(0, ammoCount - secondaryCount);
+        int primedCount = this.primedAmmoCount(itemStack, entity);
+        return Math.max(0, ammoCount - primedCount);
     }
 
     public int primedAmmoCount(ItemStack itemStack, LivingEntity entity) {
@@ -2352,10 +2358,10 @@ public class RFEFirearmMode {
         if (!this.requiresAmmo())
             return this.countSecondaryAmmo(itemStack);
         if (!this.trackEmptySlots && !this.trackEmptySecondarySlots) {
-            // If empty slots are not tracked for both, just get loose count
+            // If empty slots are not tracked for both, just get smaller of loose count
             int ammoCount = this.getLoadedAmmoCount(itemStack, entity, true);
             int secondaryCount = this.countSecondaryAmmo(itemStack);
-            return Math.max(ammoCount, secondaryCount);
+            return Math.min(ammoCount, secondaryCount);
         }
         List<ItemStack> primaryAmmo = this.getLoadedAmmo(itemStack);
         List<ItemStack> secondaryAmmo = this.getLoadedSecondaryAmmo(itemStack);

@@ -210,13 +210,15 @@ public class MagazineItem extends Item {
     }
 
     protected boolean tryReloadForItem(ItemStack magazineStack, List<ItemStack> primaryAmmo, List<ItemStack> secondaryAmmo, ItemStack availableStack) {
-        if (this.matchesAmmoItem(magazineStack, availableStack)) {
+        if (this.matchesAmmoItem(magazineStack, availableStack)
+                && RFEItemUtils.countItems(primaryAmmo) < this.getMagazineCapacity(magazineStack)) {
             int consumed = FirearmDataUtils.addAmmo(primaryAmmo, availableStack, false, this.trackEmptySlots, 1);
             if (!availableStack.is(RFEItemTags.INFINITE_AMMO.tag))
                 availableStack.shrink(consumed);
             return true;
         }
-        if (this.matchesSecondaryItem(magazineStack, availableStack)) {
+        if (this.matchesSecondaryItem(magazineStack, availableStack)
+                && RFEItemUtils.countItemsConditional(secondaryAmmo, Predicate.not(FirearmDataUtils::isUsedPrimer)) < this.getSecondaryMagazineCapacity(magazineStack)) {
             int consumed = FirearmDataUtils.addAmmo(secondaryAmmo, availableStack, false, this.trackEmptySecondarySlots, 1);
             if (!availableStack.is(RFEItemTags.INFINITE_AMMO.tag))
                 availableStack.shrink(consumed);

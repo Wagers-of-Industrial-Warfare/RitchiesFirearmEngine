@@ -55,7 +55,11 @@
       "components": {"ritchiesfirearmengine:firearm_mode_data":{"MainMode":{"ritchiesfirearmengine:detached_magazine":[{"item":{"id":"rfe_builtin:pistol_magazine_32rds"},"slot":0}]}}}
     },
     {
-      "id": "rfe_builtin:mp_18",
+      "id": "rfe_builtin:mp_18_i",
+      "components": {"ritchiesfirearmengine:firearm_mode_data":{"MainMode":{"ritchiesfirearmengine:detached_magazine":[{"item":{"id":"rfe_builtin:pistol_drum_magazine_32rds"},"slot":0}]}}}
+    },
+    {
+      "id": "rfe_builtin:mp_18_iii",
       "components": {"ritchiesfirearmengine:firearm_mode_data":{"MainMode":{"ritchiesfirearmengine:detached_magazine":[{"item":{"id":"rfe_builtin:pistol_magazine_30rds"},"slot":0}]}}}
     },
     {

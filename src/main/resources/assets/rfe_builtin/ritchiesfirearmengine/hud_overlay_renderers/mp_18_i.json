@@ -6,12 +6,12 @@
   "show_inventory_ammo": true,
   "count_loose_rounds": false,
   "firearm_icon": {
-    "texture": "rfe_builtin:textures/gui/hud/weapon_icon/mp_18_iii.png",
+    "texture": "rfe_builtin:textures/gui/hud/weapon_icon/mp_18_i.png",
     "width": 48,
     "height": 16
   },
   "mode_translations": {
-    "default": "gui.ritchiesfirearmengine.mode.burst",
+    "default": "gui.ritchiesfirearmengine.mode.full_auto",
     "safety": "gui.ritchiesfirearmengine.mode.safety"
   }
 }

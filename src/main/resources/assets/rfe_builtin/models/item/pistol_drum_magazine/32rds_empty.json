@@ -1,0 +1,6 @@
+{
+  "parent": "rfe_builtin:item/pistol_drum_magazine/empty",
+  "textures": {
+    "ammo_count": "rfe_builtin:item/capacity_counters/32rds"
+  }
+}

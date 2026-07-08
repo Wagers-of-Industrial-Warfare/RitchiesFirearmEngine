@@ -1,0 +1,64 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg"
+    },
+    {
+      "ammo": "rfe_builtin:tracer_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_tracer_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg_tracer"
+    },
+    {
+      "ammo": "rfe_builtin:ap_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg_ap"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_ap_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg_ap"
+    },
+    {
+      "ammo": "rfe_builtin:sp_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg_sp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_sp_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg_sp"
+    },
+    {
+      "ammo": "rfe_builtin:hp_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg_hp"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_hp_handgun_cartridge",
+      "fires": "rfe_builtin:9x19mm_parabellum_smg_hp"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+    "rfe_builtin:infinite_pistol_drum_magazine_32rds",
+    "rfe_builtin:pistol_drum_magazine_32rds"
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "unlimited_primary_reload_items": [
+    {
+      "id": "rfe_builtin:pistol_drum_magazine_32rds",
+      "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:handgun_cartridge","count":32},"slot":0}]}
+    }
+  ],
+  "modes": {
+  }
+}

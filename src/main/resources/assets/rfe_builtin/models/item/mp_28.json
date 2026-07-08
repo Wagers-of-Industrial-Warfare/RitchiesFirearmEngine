@@ -1,131 +1,61 @@
 {
-  "parent": "rfe_builtin:item/mp_18_iii/mp_18_iii_empty",
+  "parent": "rfe_builtin:item/mp_18_iii/mp_18_iii_normal",
   "overrides": [
     {
       "predicate": { "ritchiesfirearmengine:aiming": 1 },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_empty_aimed"
-    },
-    {
-      "predicate": { "ritchiesfirearmengine:has_magazine": 1 },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_magazine"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:has_magazine": 1,
-        "ritchiesfirearmengine:aiming": 1
-      },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_magazine_aimed"
+      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_aimed"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_charging": 1 },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_empty_charge"
+      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_charge"
     },
     {
       "predicate": {
         "ritchiesfirearmengine:is_charging": 1,
         "ritchiesfirearmengine:aiming": 1
       },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_empty_charge_aimed"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_charging": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_magazine_charge"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_charging": 1,
-        "ritchiesfirearmengine:aiming": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_magazine_charge_aimed"
+      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_charge_aimed"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_firing": 1 },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_empty_fired"
+      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_fired"
     },
     {
       "predicate": {
         "ritchiesfirearmengine:is_firing": 1,
         "ritchiesfirearmengine:aiming": 1
       },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_empty_fired_aimed"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_firing": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_magazine_fired"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_firing": 1,
-        "ritchiesfirearmengine:aiming": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_magazine_fired_aimed"
+      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_fired_aimed"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_safety": 1 },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_empty_safety"
+      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_safety"
     },
     {
       "predicate": {
         "ritchiesfirearmengine:is_safety": 1,
         "ritchiesfirearmengine:aiming": 1
       },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_empty_safety_aimed"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_safety": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_magazine_safety"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_safety": 1,
-        "ritchiesfirearmengine:aiming": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_magazine_safety_aimed"
+      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_safety_aimed"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_empty_melee"
+      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_melee_normal"
     },
     {
       "predicate": {
-        "ritchiesfirearmengine:has_magazine": 1,
+        "ritchiesfirearmengine:is_safety": 1,
         "ritchiesfirearmengine:is_meleeing": 1
       },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_magazine_melee"
+      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_melee_safety"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_empty_reload"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_reloading": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_magazine_reload"
+      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_reload"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_unloading": 1 },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_empty_reload"
-    },
-    {
-      "predicate": {
-        "ritchiesfirearmengine:is_unloading": 1,
-        "ritchiesfirearmengine:has_magazine": 1
-      },
-      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_magazine_reload"
+      "model": "rfe_builtin:item/mp_18_iii/mp_18_iii_reload"
     }
   ]
 }

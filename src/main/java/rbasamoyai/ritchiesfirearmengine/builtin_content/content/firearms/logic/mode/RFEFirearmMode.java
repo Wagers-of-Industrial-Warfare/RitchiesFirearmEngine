@@ -2360,7 +2360,7 @@ public class RFEFirearmMode {
         List<ItemStack> primaryAmmo = this.getLoadedAmmo(itemStack);
         List<ItemStack> secondaryAmmo = this.getLoadedSecondaryAmmo(itemStack);
 
-        int sz = Math.min(RFEItemUtils.countItemsIncludingSlots(primaryAmmo), RFEItemUtils.countItems(secondaryAmmo));
+        int sz = Math.min(RFEItemUtils.countItemsIncludingSlots(primaryAmmo), RFEItemUtils.countItemsIncludingSlots(secondaryAmmo));
         int paired = 0;
         for (int i = 0; i < sz; ++i) {
             ItemStack primary = FirearmDataUtils.stripAmmo(primaryAmmo, this.ammoConsumedLast, false, false);

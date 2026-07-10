@@ -7,7 +7,7 @@
   "count_loose_rounds": true,
   "firearm_icon": {
     "texture": "rfe_builtin:textures/gui/hud/weapon_icon/russian_contract_1895.png",
-    "width": 84,
+    "width": 64,
     "height": 16
   },
   "mode_translations": {

@@ -39,6 +39,24 @@
       "model": "rfe_builtin:item/russian_contract_1895/russian_contract_1895_charge_aimed"
     },
     {
+      "predicate": { "ritchiesfirearmengine:is_meleeing": 1 },
+      "model": "rfe_builtin:item/russian_contract_1895/russian_contract_1895_melee_fired"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_meleeing": 1,
+        "ritchiesfirearmengine:is_charged": 1
+      },
+      "model": "rfe_builtin:item/russian_contract_1895/russian_contract_1895_melee_normal"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_meleeing": 1,
+        "ritchiesfirearmengine:is_safety": 1
+      },
+      "model": "rfe_builtin:item/russian_contract_1895/russian_contract_1895_melee_safety"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
       "model": "rfe_builtin:item/russian_contract_1895/russian_contract_1895_reload"
     },

@@ -39,7 +39,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.RFEItemLengths;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.effects.particles.BlackPowderSmokeOptions;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEBaseProjectilePropertiesBuilder;
-import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEProjectileClipContext;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEProjectileCollisionContext;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEProjectileDamageModel;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.explosive.SelectiveExplosionDamageCalculator;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
@@ -244,9 +244,8 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             Vec3 nextRoot = rootPos.add(nextDiff);
             Vec3 endPos = nextRoot;
 
-            RFEProjectileClipContext context = new RFEProjectileClipContext(this, instance, rootPos, endPos,
-                    ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, level.random);
-            HitResult hitResult = level.clip(context);
+            RFEProjectileCollisionContext context = new RFEProjectileCollisionContext(this, instance, level.random);
+            HitResult hitResult = level.clip(new ClipContext(rootPos, endPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, context));
             if (hitResult.getType() != HitResult.Type.MISS)
                 endPos = RFECompatHandlers.transformPosition(level, hitResult.getLocation());
 

@@ -21,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEBaseProjectilePropertiesBuilder;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bullet.RFEBulletProjectileType;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.RFECompatHandlers;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
@@ -62,7 +63,7 @@ public class RFEExplosiveProjectileType extends RFEBulletProjectileType implemen
     protected void onHit(RFEProjectileInstance instance, Level level, HitResult hitResult, Map<BlockPos, BlockState> penetratedBlocks) {
         super.onHit(instance, level, hitResult, penetratedBlocks);
         if (instance.age() >= this.armingTime)
-            this.explode(instance, hitResult.getLocation(), level);
+            this.explode(instance, RFECompatHandlers.transformPosition(level, hitResult.getLocation()), level);
     }
 
     @Override

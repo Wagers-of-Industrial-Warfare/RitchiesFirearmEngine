@@ -31,6 +31,16 @@ repositories {
         forRepository { maven { url "https://api.modrinth.com/maven" } }
         filter { includeGroup "maven.modrinth" }
     }
+    exclusiveContent { // Sable
+        forRepository {
+            maven { url "https://maven.ryanhcode.dev/releases" }
+        }
+        filter {
+            includeGroup("dev.ryanhcode.sable")
+            includeGroup("dev.ryanhcode.sable-companion")
+        }
+    }
+    maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // ForgeConfigAPIPort
     mavenCentral()
     flatDir {
         dirs("libs")
@@ -138,6 +148,15 @@ dependencies {
     runtimeOnly("curse.maven:squake-1305018:${squake_cf_file}")
 
     compileOnly("maven.modrinth:iris:${iris_version}-neoforge")
+
+    // Sable
+    api("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}") {
+        // Bunch of required groups we need to exclude
+        exclude(group: "com.simibubi.create", module: "create-${minecraft_version}")
+        exclude(group: "net.createmod.ponder", module: "ponder-neoforge")
+        exclude(group: "dev.engine-room.flywheel", module: "flywheel-neoforge-${minecraft_version}")
+        exclude(group: "com.tterrag.registrate", module: "Registrate")
+    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -155,6 +174,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             mod_version            : mod_version,
             mod_authors            : mod_authors,
             mod_description        : mod_description,
+            sable_version_range    : sable_version_range,
     ]
     inputs.properties replaceProperties
     expand replaceProperties

@@ -29,6 +29,7 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPluginManager;
+import rbasamoyai.ritchiesfirearmengine.foundation.compat.sable.SableCompat;
 import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationDataComponents;
 import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationItems;
@@ -70,6 +71,8 @@ public class RitchiesFirearmEngine {
         RFEPackLoader.prepareResources();
 
         RFENetwork.init();
+
+        RFEModsNeoForge.SABLE.executeIfInstalled(() -> () -> SableCompat.init());
     }
 
     private void onCommonSetup(final FMLCommonSetupEvent event) {

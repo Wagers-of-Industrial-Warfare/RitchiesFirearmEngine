@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 
 public enum RFEModsNeoForge {
     IRIS,
+    SABLE,
     SHOULDERSURFING;
 
     private final String id = this.name().toLowerCase(Locale.ROOT);

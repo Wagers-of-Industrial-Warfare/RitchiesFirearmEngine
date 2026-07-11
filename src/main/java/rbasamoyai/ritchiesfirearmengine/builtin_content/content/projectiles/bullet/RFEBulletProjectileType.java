@@ -44,6 +44,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEP
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.explosive.SelectiveExplosionDamageCalculator;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.RFECompatHandlers;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplierHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
@@ -247,7 +248,7 @@ public class RFEBulletProjectileType implements RFEProjectileType {
                     ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, level.random);
             HitResult hitResult = level.clip(context);
             if (hitResult.getType() != HitResult.Type.MISS)
-                endPos = hitResult.getLocation();
+                endPos = RFECompatHandlers.transformPosition(level, hitResult.getLocation());
 
             Set<Entity> hitEntities = new HashSet<>();
             while (!instance.isRemoved()) {
@@ -485,12 +486,13 @@ public class RFEBulletProjectileType implements RFEProjectileType {
         //this.lastState = blockstate;
         //blockstate.onProjectileHit(level, blockstate, pResult, this); TODO fake entity projectile for onProjectileHit
         Vec3 projPos = instance.position();
-        Vec3 terminalVel = pResult.getLocation().subtract(projPos.x, projPos.y, projPos.z);
+        Vec3 hitLoc = RFECompatHandlers.transformPosition(level, pResult.getLocation());
+        Vec3 terminalVel = hitLoc.subtract(projPos.x, projPos.y, projPos.z);
         instance.setVelocity(terminalVel);
         instance.setRemoved();
         instance.setForceSync(true);
         if (this.shouldAddFalseProjectile(instance, level))
-            this.addFalseProjectile(instance, projPos, pResult.getLocation(), level);
+            this.addFalseProjectile(instance, projPos, hitLoc, level);
 
         if (RFEConfig.SERVER.enableBlockBreaking.get()) {
             RFEProjectilePenetrationProperties penetrationProperties = this.getPenetrationProperties();
@@ -502,7 +504,6 @@ public class RFEBulletProjectileType implements RFEProjectileType {
             }
         }
 
-        Vec3 hitLoc = pResult.getLocation();
         SoundType soundType = blockstate.getSoundType();
         level.playSound(null, hitPos, soundType.getHitSound(), SoundSource.BLOCKS, 1.0F, 1.2F / (level.random.nextFloat() * 0.2F + 0.9F));
         if (level instanceof ServerLevel serverLevel)

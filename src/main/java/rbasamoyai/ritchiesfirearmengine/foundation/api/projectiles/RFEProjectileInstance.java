@@ -75,6 +75,7 @@ public class RFEProjectileInstance {
         }
         return true;
     }
+
     public float health() { return this.health; }
     public void removeHealth(float amount) { setHealth(health - amount); }
     public void setHealth(float health) { this.health = Mth.clamp(health, 0f, 1f); }

@@ -33,6 +33,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.compat.sable.SableCompat;
 import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationDataComponents;
 import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationItems;
+import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationMenus;
 import rbasamoyai.ritchiesfirearmengine.foundation.pack_loading.RFEPackLoader;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
@@ -53,6 +54,7 @@ public class RitchiesFirearmEngine {
         modBus.addListener(this::onCommonSetup);
 
         FoundationItems.ITEMS.register(modBus);
+        FoundationMenus.MENU_TYPES.register(modBus);
 
         forgeBus.addListener(this::onAddReloadListeners);
         forgeBus.addListener(this::onSyncDatapack);

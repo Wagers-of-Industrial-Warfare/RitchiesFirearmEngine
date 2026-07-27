@@ -1,0 +1,119 @@
+package rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui;
+
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+
+import java.util.List;
+
+public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAttachmentsMenu> {
+
+    private static final ResourceLocation MENU_TEXTURE = RitchiesFirearmEngine.resource("textures/gui/attachments_menu.png");
+
+    public RFEItemAttachmentsScreen(RFEItemAttachmentsMenu menu, Inventory playerInventory, Component title) {
+        super(menu, playerInventory, title);
+        this.imageHeight = 200;
+        this.inventoryLabelY = this.imageHeight - 94;
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+    }
+
+    @Override
+    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+        guiGraphics.fillGradient(this.leftPos, this.topPos, this.leftPos + this.imageWidth,
+                this.topPos + this.imageHeight - 94, 0, 0x3F000000, 0x3F1F7FFF);
+        guiGraphics.blit(MENU_TEXTURE, this.leftPos, this.topPos + this.imageHeight - 100, 0, 0, 176, 100);
+        int itemX = this.leftPos + 8 + this.menu.getSelectedIndex() * 18;
+        int itemY = this.topPos + this.imageHeight - 24;
+        guiGraphics.fillGradient(itemX, itemY, itemX + 16, itemY + 16, 100, 0, 0x7F1F7FFF);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderMainItem(guiGraphics, partialTick);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
+    }
+
+    @Override
+    protected List<Component> getTooltipFromContainerItem(ItemStack stack) {
+        List<Component> tooltip = super.getTooltipFromContainerItem(stack);
+        if (this.minecraft.player != null && this.menu.getFocusedAttachmentsItem(this.minecraft.player.getInventory()) == stack)
+            tooltip.add(1, Component.translatable("gui.ritchiesfirearmengine.attachments_menu.tooltip.focused_item")
+                    .withColor(0x1F7FFF).withStyle(ChatFormatting.ITALIC));
+        return tooltip;
+    }
+
+    @Override
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        guiGraphics.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFFFFFF, true);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
+    }
+
+    protected void renderMainItem(GuiGraphics guiGraphics, float partialTick) {
+        Player player = this.minecraft.player;
+        if (player == null)
+            return;
+        ItemStack attachmentsItem = this.menu.getFocusedAttachmentsItem(player.getInventory());
+        if (attachmentsItem.isEmpty())
+            return;
+        BakedModel bakedmodel = this.minecraft.getItemRenderer().getModel(attachmentsItem, this.minecraft.level, player, 0);
+
+        PoseStack poseStack = guiGraphics.pose();
+        poseStack.pushPose();
+
+        // TODO other model types
+        boolean gui3d = bakedmodel.isGui3d();
+        poseStack.translate(this.leftPos + this.imageWidth / 2f, this.topPos + 50, 150);
+
+        // TODO temporary, need to switch to assets folder thing
+        // TODO mouse-manipulable scaling
+        float mouseScale = 1.0f;
+        Vector3f guiScaleOriginal = bakedmodel.getTransforms().getTransform(ItemDisplayContext.GUI).scale;
+        Vector3f guiScaleCopy = guiScaleOriginal.mul(64.0f, new Vector3f());
+        poseStack.scale(guiScaleCopy.x, -guiScaleCopy.y, guiScaleCopy.z);
+
+        // TODO mouse-manipulable angles
+        float angleX = 15;
+        float angleY = 225;
+        poseStack.mulPose(new Quaternionf().rotationXYZ(angleX * Mth.DEG_TO_RAD, angleY * Mth.DEG_TO_RAD, 0));
+
+        boolean blockLight = !bakedmodel.usesBlockLight();
+        if (blockLight)
+            Lighting.setupForFlatItems();
+        this.minecraft.getItemRenderer().render(attachmentsItem, ItemDisplayContext.NONE, false, poseStack,
+                guiGraphics.bufferSource(), 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
+        guiGraphics.flush();
+        if (blockLight)
+            Lighting.setupFor3DItems();
+        poseStack.popPose();
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+}

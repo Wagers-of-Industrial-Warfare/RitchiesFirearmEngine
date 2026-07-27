@@ -38,6 +38,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEClientPluginManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRenderer;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRendererPacksHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.IHasRFEItemAttachments;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFEProjectileRenderer;
@@ -47,10 +48,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.compat.iris.IrisCompat;
 import rbasamoyai.ritchiesfirearmengine.mixin.client.MinecraftAccessor;
-import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
-import rbasamoyai.ritchiesfirearmengine.network.ServerboundFirearmActionPacket;
-import rbasamoyai.ritchiesfirearmengine.network.ServerboundMeleeInputPacket;
-import rbasamoyai.ritchiesfirearmengine.network.ServerboundSetAttackKeyPacket;
+import rbasamoyai.ritchiesfirearmengine.network.*;
 
 import java.util.Collection;
 import java.util.function.Consumer;
@@ -61,6 +59,7 @@ public class RFEClient {
     public static final KeyMapping UNLOAD_FIREARM = createSafeKeyMapping("key.ritchiesfirearmengine.unload_firearm", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_U);
     public static final KeyMapping SWITCH_MODE = createSafeKeyMapping("key.ritchiesfirearmengine.switch_mode", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V);
     public static final KeyMapping QUICK_TOGGLE_MELEE = createSafeKeyMapping("key.ritchiesfirearmengine.quick_toggle_melee", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X);
+    public static final KeyMapping OPEN_ATTACHMENTS_SCREEN = createSafeKeyMapping("key.ritchiesfirearmengine.open_attachments_screen", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_I);
 
     public static void onClientSetup() {
         RFEClientPluginManager.onClientSetup();
@@ -202,6 +201,9 @@ public class RFEClient {
                     }
                 }
             }
+            if (OPEN_ATTACHMENTS_SCREEN.isDown() && useStack.getItem() instanceof IHasRFEItemAttachments) {
+                RFENetwork.sendToServer(ServerboundOpenAttachmentsScreenPacket.INSTANCE);
+            }
         }
     }
 
@@ -214,6 +216,7 @@ public class RFEClient {
         cons.accept(UNLOAD_FIREARM);
         cons.accept(SWITCH_MODE);
         cons.accept(QUICK_TOGGLE_MELEE);
+        cons.accept(OPEN_ATTACHMENTS_SCREEN);
     }
 
     public static void onClientTickPre() {

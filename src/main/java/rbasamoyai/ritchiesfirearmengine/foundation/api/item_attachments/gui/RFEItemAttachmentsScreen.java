@@ -98,6 +98,8 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
 
         poseStack.mulPose(new Quaternionf().rotationXYZ(this.angleX * Mth.DEG_TO_RAD, this.angleY * Mth.DEG_TO_RAD, 0));
 
+        guiGraphics.enableScissor(this.leftPos + 2, this.topPos + 2, this.leftPos + 174, this.topPos + 98);
+
         boolean blockLight = !bakedmodel.usesBlockLight();
         if (blockLight)
             Lighting.setupForFlatItems();
@@ -106,6 +108,8 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
         guiGraphics.flush();
         if (blockLight)
             Lighting.setupFor3DItems();
+
+        guiGraphics.disableScissor();
         poseStack.popPose();
     }
 

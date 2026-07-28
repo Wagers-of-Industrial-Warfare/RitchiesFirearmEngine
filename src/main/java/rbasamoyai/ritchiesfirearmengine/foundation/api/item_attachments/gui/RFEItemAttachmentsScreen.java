@@ -43,7 +43,7 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         guiGraphics.fillGradient(this.leftPos, this.topPos, this.leftPos + this.imageWidth,
                 this.topPos + this.imageHeight - 94, 0, 0x3F000000, 0x3F1F7FFF);
-        guiGraphics.blit(MENU_TEXTURE, this.leftPos, this.topPos + this.imageHeight - 100, 0, 0, 176, 100);
+        guiGraphics.blit(MENU_TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
         int itemX = this.leftPos + 8 + this.menu.getSelectedIndex() * 18;
         int itemY = this.topPos + this.imageHeight - 24;
         guiGraphics.fillGradient(itemX, itemY, itemX + 16, itemY + 16, 100, 0, 0x7F1F7FFF);

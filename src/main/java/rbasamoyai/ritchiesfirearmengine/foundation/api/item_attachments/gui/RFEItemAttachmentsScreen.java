@@ -24,6 +24,10 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
 
     private static final ResourceLocation MENU_TEXTURE = RitchiesFirearmEngine.resource("textures/gui/attachments_menu.png");
 
+    protected float angleX = 15;
+    protected float angleY = -135;
+    protected float itemScale = 1;
+
     public RFEItemAttachmentsScreen(RFEItemAttachmentsMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         this.imageHeight = 200;
@@ -63,7 +67,10 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(0, 0, 600);
         guiGraphics.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFFFFFF, true);
+        guiGraphics.pose().popPose();
         guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
     }
 
@@ -85,15 +92,11 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
 
         // TODO temporary, need to switch to assets folder thing
         // TODO mouse-manipulable scaling
-        float mouseScale = 1.0f;
         Vector3f guiScaleOriginal = bakedmodel.getTransforms().getTransform(ItemDisplayContext.GUI).scale;
-        Vector3f guiScaleCopy = guiScaleOriginal.mul(64.0f, new Vector3f());
+        Vector3f guiScaleCopy = guiScaleOriginal.mul(64.0f * this.itemScale, new Vector3f());
         poseStack.scale(guiScaleCopy.x, -guiScaleCopy.y, guiScaleCopy.z);
 
-        // TODO mouse-manipulable angles
-        float angleX = 15;
-        float angleY = 225;
-        poseStack.mulPose(new Quaternionf().rotationXYZ(angleX * Mth.DEG_TO_RAD, angleY * Mth.DEG_TO_RAD, 0));
+        poseStack.mulPose(new Quaternionf().rotationXYZ(this.angleX * Mth.DEG_TO_RAD, this.angleY * Mth.DEG_TO_RAD, 0));
 
         boolean blockLight = !bakedmodel.usesBlockLight();
         if (blockLight)
@@ -108,11 +111,21 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (this.leftPos <= mouseX && mouseX < this.leftPos + this.imageWidth
+                && this.topPos <= mouseY && mouseY < this.topPos + 100 && this.menu.getCarried().isEmpty()) {
+            this.angleX = Mth.clamp(this.angleX + (float) dragY, -90f, 90f);
+            this.angleY = Mth.wrapDegrees(this.angleY + (float) dragX);
+        }
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (this.leftPos <= mouseX && mouseX < this.leftPos + this.imageWidth
+                && this.topPos <= mouseY && mouseY < this.topPos + 100 && this.menu.getCarried().isEmpty()) {
+            // TODO scroll limits config
+            this.itemScale = Mth.clamp(this.itemScale + (float) scrollY / 16f, 0.5f, 2.0f);
+        }
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 

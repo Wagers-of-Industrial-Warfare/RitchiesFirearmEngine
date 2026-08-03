@@ -18,6 +18,7 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -49,6 +50,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.compat.iris.IrisCompat;
+import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 import rbasamoyai.ritchiesfirearmengine.mixin.client.MinecraftAccessor;
 import rbasamoyai.ritchiesfirearmengine.network.*;
 
@@ -359,6 +361,20 @@ public class RFEClient {
             ItemStack offhand = mc.player.getOffhandItem();
             // TODO offhand rendering, though prioritize primary. May have something regarding supporting offhand rendering
         }
+    }
+
+    public static void onPlayerTurn(float currentSensitivity, Consumer<Float> setSensitivity) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null)
+            return;
+        float intensity = (float) RFEConfig.CLIENT.zoomTurnModifierIntensity.getAsDouble();
+        ItemStack mainhand = mc.player.getMainHandItem();
+        if (mainhand.getItem() instanceof RFEFirearmItem firearmItem && firearmItem.isAiming(mainhand, mc.player)) {
+            float zoom = Math.clamp(firearmItem.getZoomIn(mainhand, mc.player), 0.01f, 1f); // Do not decrease sensitivity if zoomed out
+            currentSensitivity *= Mth.lerp(intensity, 1f, zoom);
+            setSensitivity.accept(currentSensitivity);
+        }
+        // TODO offhand?
     }
 
     public static void renderItemAttachmentCameraOverlays(ItemStack itemStack, GuiGraphics graphics, float partialTick) {

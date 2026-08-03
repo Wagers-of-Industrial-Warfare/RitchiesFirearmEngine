@@ -6,6 +6,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
+import net.neoforged.neoforge.common.ModConfigSpec.DoubleValue;
 import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -54,6 +55,7 @@ public class RFEConfig {
         public final IntValue compatibleAmmoHighlightColor;
         public final IntValue incompatibleAmmoHighlightColor;
         public final BooleanValue compatibleAmmoHighlightGradient;
+        public final DoubleValue zoomTurnModifierIntensity;
 
         Client(ModConfigSpec.Builder builder) {
             builder.comment("Ritchie's Firearm Engine client configuration settings")
@@ -83,6 +85,11 @@ public class RFEConfig {
                     .comment("Set to true to render the compatible ammo highlight as a gradient, false as a solid color.")
                     .translation("ritchiesfirearmengine.configgui.compatibleAmmoHighlightGradient")
                     .define("compatibleAmmoHighlightGradient", true);
+
+            this.zoomTurnModifierIntensity = builder
+                    .comment("The amount that aim down sights zoom affects turn sensitivity. 0.0 (0%) disables turn modification, while 1.0 (100%) completely enables it.")
+                    .translation("ritchiesfirearmengine.configgui.zoomTurnModifierIntensity")
+                    .defineInRange("zoomTurnModifierIntensity", 1d, 0d, 1d);
 
             builder.pop();
         }

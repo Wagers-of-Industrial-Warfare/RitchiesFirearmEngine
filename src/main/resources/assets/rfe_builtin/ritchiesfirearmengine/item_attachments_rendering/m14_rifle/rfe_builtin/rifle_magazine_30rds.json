@@ -1,6 +1,7 @@
 {
   "slot_rendering": {
     "rfe_builtin:magazine": {
+      "type": "ritchiesfirearmengine:simple",
       "model": "rfe_builtin:item/item_attachments/m14_rifle_30rds"
     }
   }

@@ -1,6 +1,7 @@
 {
   "slot_rendering": {
     "rfe_builtin:loaded_percussion_cap": {
+      "type": "ritchiesfirearmengine:simple",
       "model": "rfe_builtin:item/item_attachments/percussion_cap",
       "translation": [1.5, 0.725, 3.45],
       "rotation": [45, 0, 0],

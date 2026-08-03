@@ -39,6 +39,8 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRenderer;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRendererPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.IHasRFEItemAttachments;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentRenderProperties;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentsRenderingPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFEProjectileRenderer;
@@ -51,6 +53,8 @@ import rbasamoyai.ritchiesfirearmengine.mixin.client.MinecraftAccessor;
 import rbasamoyai.ritchiesfirearmengine.network.*;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class RFEClient {
@@ -342,6 +346,37 @@ public class RFEClient {
         RFEHudOverlayRenderer mainhandHud = RFEHudOverlayRendererPacksHandler.getHudOverlayRenderer(mainhand);
         mainhandHud.renderHUD(graphics, partialTick, mainhand, mc.player, false);
         // TODO offhand rendering, though prioritize primary. May have something regarding supporting offhand rendering
+    }
+
+    public static void renderCameraOverlay(GuiGraphics graphics, float partialTick) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.options.hideGui)
+            return;
+        if (mc.options.getCameraType().isFirstPerson()) {
+            ItemStack mainhand = mc.player.getMainHandItem();
+            renderItemAttachmentCameraOverlays(mainhand, graphics, partialTick);
+
+            ItemStack offhand = mc.player.getOffhandItem();
+            // TODO offhand rendering, though prioritize primary. May have something regarding supporting offhand rendering
+        }
+    }
+
+    public static void renderItemAttachmentCameraOverlays(ItemStack itemStack, GuiGraphics graphics, float partialTick) {
+        if (!(itemStack.getItem() instanceof IHasRFEItemAttachments hasAttachments))
+            return;
+        PoseStack poseStack = graphics.pose();
+        Map<ResourceLocation, ItemStack> renderedAttachments = hasAttachments.getAttachments(itemStack);
+        for (Map.Entry<ResourceLocation, ItemStack> entry : renderedAttachments.entrySet()) {
+            ItemStack attachmentStack = entry.getValue();
+            if (attachmentStack.isEmpty())
+                continue;
+            Optional<RFEItemAttachmentRenderProperties> op = RFEItemAttachmentsRenderingPacksHandler.getRenderProperties(itemStack, attachmentStack, entry.getKey());
+            if (op.isEmpty())
+                continue;
+            poseStack.pushPose();
+            op.get().onRenderOverlay(graphics, partialTick, itemStack, attachmentStack);
+            poseStack.popPose();
+        }
     }
 
     public interface SetCameraAngles {

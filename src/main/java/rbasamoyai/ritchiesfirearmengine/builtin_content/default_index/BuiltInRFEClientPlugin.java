@@ -7,6 +7,7 @@ import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.effects.particles.BlackPowderSmokeParticle;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.hud.AmmoCounterHUDOverlayRenderer;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.hud.NoHUDOverlayRenderer;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeAttachmentRenderProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.NoOpProjectileRenderer;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFEModelProjectileRenderer;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.RFESpriteProjectileRenderer;
@@ -15,6 +16,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEClien
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEClientPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRendererPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentsRenderingPacksHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.SimpleSlotAttachmentRenderData;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFEProjectileRendererPacksHandler;
 
 import java.util.function.BiConsumer;
@@ -30,6 +32,9 @@ public class BuiltInRFEClientPlugin implements RFEClientPlugin {
 
         RFEClientContentBuilderRegistry.registerHUDOverlayRendererType(RitchiesFirearmEngine.resource("no_hud"), new NoHUDOverlayRenderer.Serializer());
         RFEClientContentBuilderRegistry.registerHUDOverlayRendererType(RitchiesFirearmEngine.resource("ammo_counter"), new AmmoCounterHUDOverlayRenderer.Serializer());
+
+        RFEClientContentBuilderRegistry.registerItemAttachmentRenderingSerializer(RitchiesFirearmEngine.resource("simple"), new SimpleSlotAttachmentRenderData.Serializer());
+        RFEClientContentBuilderRegistry.registerItemAttachmentRenderingSerializer(RitchiesFirearmEngine.resource("scope"), new ScopeAttachmentRenderProperties.Serializer());
     }
 
     @Override

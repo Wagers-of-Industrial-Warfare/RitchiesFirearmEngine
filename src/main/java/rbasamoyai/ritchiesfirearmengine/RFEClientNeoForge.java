@@ -111,6 +111,9 @@ public class RFEClientNeoForge {
         if (event.getName() == VanillaGuiLayers.HOTBAR) {
             RFEClient.renderHUDOverlay(event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
         }
+        if (event.getName() == VanillaGuiLayers.CAMERA_OVERLAYS) {
+            RFEClient.renderCameraOverlay(event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
+        }
         // TODO crosshair
     }
 

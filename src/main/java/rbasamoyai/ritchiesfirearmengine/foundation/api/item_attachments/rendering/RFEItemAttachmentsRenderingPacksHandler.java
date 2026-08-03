@@ -17,7 +17,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentsRenderData.SlotAttachmentRenderData;
 import rbasamoyai.ritchiesfirearmengine.foundation.data_packing.RFEJsonResourceReloadListener;
 
 import java.util.Map;
@@ -27,7 +26,7 @@ public class RFEItemAttachmentsRenderingPacksHandler {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final Map<Item, RFEItemAttachmentsRenderData> ATTACHMENTS = new Reference2ObjectOpenHashMap<>();
+    private static final Map<Item, RFEItemAttachmentsRenderPropertiesHolder> ATTACHMENTS = new Reference2ObjectOpenHashMap<>();
 
     public static class ReloadListener extends RFEJsonResourceReloadListener {
         private static final Gson GSON = new Gson();
@@ -64,35 +63,35 @@ public class RFEItemAttachmentsRenderingPacksHandler {
         }
     }
 
-    public static Optional<SlotAttachmentRenderData> getRenderData(ItemStack parent, ItemStack attachment, ResourceLocation slot) {
+    public static Optional<RFEItemAttachmentRenderProperties> getRenderProperties(ItemStack parent, ItemStack attachment, ResourceLocation slot) {
         if (parent.isEmpty() || attachment.isEmpty() || !ATTACHMENTS.containsKey(parent.getItem()))
             return Optional.empty();
-        RFEItemAttachmentsRenderData renderData = ATTACHMENTS.get(parent.getItem());
-        Map<Item, Map<ResourceLocation, SlotAttachmentRenderData>> renderDataByItemAndSlot = renderData.renderDataByItemAndSlot();
+        RFEItemAttachmentsRenderPropertiesHolder renderData = ATTACHMENTS.get(parent.getItem());
+        Map<Item, Map<ResourceLocation, RFEItemAttachmentRenderProperties>> renderDataByItemAndSlot = renderData.renderDataByItemAndSlot();
         if (!renderDataByItemAndSlot.containsKey(attachment.getItem()))
             return Optional.empty();
-        Map<ResourceLocation, SlotAttachmentRenderData> renderDataBySlot = renderDataByItemAndSlot.get(attachment.getItem());
+        Map<ResourceLocation, RFEItemAttachmentRenderProperties> renderDataBySlot = renderDataByItemAndSlot.get(attachment.getItem());
         return Optional.ofNullable(renderDataBySlot.get(slot));
     }
 
     private static class RendererBuilder {
-        public final Map<Item, Map<ResourceLocation, SlotAttachmentRenderData>> renderDataByItemAndSlot = new Reference2ObjectOpenHashMap<>();
+        public final Map<Item, Map<ResourceLocation, RFEItemAttachmentRenderProperties>> renderDataByItemAndSlot = new Reference2ObjectOpenHashMap<>();
 
         public void applyLayer(Item attachmentItem, RendererItemLayer layer) {
-            Map<ResourceLocation, SlotAttachmentRenderData> itemRenderDataBySlot = this.renderDataByItemAndSlot
+            Map<ResourceLocation, RFEItemAttachmentRenderProperties> itemRenderPropertiesBySlot = this.renderDataByItemAndSlot
                     .computeIfAbsent(attachmentItem, k -> new Object2ObjectOpenHashMap<>());
-            itemRenderDataBySlot.putAll(layer.itemRenderDataBySlot);
+            itemRenderPropertiesBySlot.putAll(layer.itemRenderPropertiesBySlot);
         }
 
-        public RFEItemAttachmentsRenderData build() {
-            return new RFEItemAttachmentsRenderData(this.renderDataByItemAndSlot);
+        public RFEItemAttachmentsRenderPropertiesHolder build() {
+            return new RFEItemAttachmentsRenderPropertiesHolder(this.renderDataByItemAndSlot);
         }
     }
 
-    private record RendererItemLayer(Map<ResourceLocation, SlotAttachmentRenderData> itemRenderDataBySlot) {
+    private record RendererItemLayer(Map<ResourceLocation, RFEItemAttachmentRenderProperties> itemRenderPropertiesBySlot) {
         public static final Codec<RendererItemLayer> CODEC = RecordCodecBuilder.create(o -> o.group(
-                Codec.unboundedMap(ResourceLocation.CODEC, SlotAttachmentRenderData.CODEC.codec())
-                        .fieldOf("slot_rendering").forGetter(RendererItemLayer::itemRenderDataBySlot)
+                Codec.unboundedMap(ResourceLocation.CODEC, RFEItemAttachmentRenderProperties.CODEC.codec())
+                        .fieldOf("slot_rendering").forGetter(RendererItemLayer::itemRenderPropertiesBySlot)
         ).apply(o, RendererItemLayer::new));
     }
 

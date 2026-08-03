@@ -1,7 +1,11 @@
 {
   "slot_rendering": {
     "rfe_builtin:scope": {
-      "model": "rfe_builtin:item/item_attachments/zf_39"
+      "type": "ritchiesfirearmengine:scope",
+      "model": "rfe_builtin:item/item_attachments/zf_39",
+      "aim_overlay_texture": {
+        "location": "rfe_builtin:textures/misc/crosshair_german_1.png"
+      }
     }
   }
 }

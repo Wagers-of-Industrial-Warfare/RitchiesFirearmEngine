@@ -14,8 +14,9 @@ import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.IHasRFEItemAttachments;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentsRenderData.SlotAttachmentRenderData;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentRenderProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentsRenderingPacksHandler;
+import rbasamoyai.ritchiesfirearmengine.remix.ItemRendererModificationContext;
 import rbasamoyai.ritchiesfirearmengine.remix.RFEClientRemix;
 
 import java.util.Map;
@@ -30,8 +31,9 @@ public abstract class ItemRendererMixin {
     private void ritchiesfirearmengine$render(ItemStack itemStack, ItemDisplayContext displayContext, boolean leftHand,
                                               PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight,
                                               int combinedOverlay, BakedModel model, Operation<Void> original) {
-        original.call(itemStack, displayContext, leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, model);
         Item parentItem = itemStack.getItem();
+        ItemRendererModificationContext renderContext = new ItemRendererModificationContext();
+
         if (parentItem instanceof IHasRFEItemAttachments hasAttachments) {
             Map<ResourceLocation, ItemStack> renderedAttachments = hasAttachments.getAttachments(itemStack);
             poseStack.pushPose();
@@ -40,19 +42,19 @@ public abstract class ItemRendererMixin {
                 ItemStack attachmentStack = entry.getValue();
                 if (attachmentStack.isEmpty())
                     continue;
-                Optional<SlotAttachmentRenderData> op = RFEItemAttachmentsRenderingPacksHandler.getRenderData(itemStack, attachmentStack, entry.getKey());
+                Optional<RFEItemAttachmentRenderProperties> op = RFEItemAttachmentsRenderingPacksHandler.getRenderProperties(itemStack, attachmentStack, entry.getKey());
                 if (op.isEmpty())
                     continue;
-                SlotAttachmentRenderData renderData = op.get();
-                BakedModel attachmentModel = this.getItemModelShaper().getModelManager().getModel(renderData.model());
                 poseStack.pushPose();
-                poseStack.mulPose(renderData.transforms());
-                original.call(attachmentStack, displayContext, leftHand, poseStack, bufferSource, combinedLight,
-                        combinedOverlay, attachmentModel);
+                op.get().onRenderItemModel(original, this.getItemModelShaper(), itemStack, attachmentStack, displayContext,
+                        leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, renderContext);
                 poseStack.popPose();
             }
             poseStack.popPose();
         }
+        if (renderContext.hideItem)
+            return;
+        original.call(itemStack, displayContext, leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, model);
     }
 
 }

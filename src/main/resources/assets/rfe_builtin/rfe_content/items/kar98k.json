@@ -43,11 +43,20 @@
                 { "compare": "ritchiesfirearmengine:entity_ammo_count", "operator": "greater_than", "value": 0 }
               ]
             },
-            { "macro": "rfe_builtin:can_strip_5" },
-            { "macro": "rfe_builtin:can_strip_4" },
-            { "macro": "rfe_builtin:can_strip_3" },
-            { "macro": "rfe_builtin:can_strip_2" },
-            { "macro": "rfe_builtin:can_strip_1" }
+            {
+              "and": [
+                { "macro": "rfe_builtin:is_not_blocked_by_scope" },
+                {
+                  "or": [
+                    { "macro": "rfe_builtin:can_strip_5" },
+                    { "macro": "rfe_builtin:can_strip_4" },
+                    { "macro": "rfe_builtin:can_strip_3" },
+                    { "macro": "rfe_builtin:can_strip_2" },
+                    { "macro": "rfe_builtin:can_strip_1" }
+                  ]
+                }
+              ]
+            }
           ]
         },
         "time": 20,
@@ -55,7 +64,12 @@
       },
       {
         "phase": "reload",
-        "condition": { "macro": "rfe_builtin:can_strip_5" },
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_strip_5" },
+            { "macro": "rfe_builtin:is_not_blocked_by_scope" }
+          ]
+        },
         "time": 30,
         "reload_type": "speedloaders",
         "reload_count": 5,
@@ -69,7 +83,12 @@
       },
       {
         "phase": "reload",
-        "condition": { "macro": "rfe_builtin:can_strip_4" },
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_strip_4" },
+            { "macro": "rfe_builtin:is_not_blocked_by_scope" }
+          ]
+        },
         "time": 30,
         "reload_type": "speedloaders",
         "reload_count": 4,
@@ -83,7 +102,12 @@
       },
       {
         "phase": "reload",
-        "condition": { "macro": "rfe_builtin:can_strip_3" },
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_strip_3" },
+            { "macro": "rfe_builtin:is_not_blocked_by_scope" }
+          ]
+        },
         "time": 30,
         "reload_type": "speedloaders",
         "reload_count": 3,
@@ -97,7 +121,12 @@
       },
       {
         "phase": "reload",
-        "condition": { "macro": "rfe_builtin:can_strip_2" },
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_strip_2" },
+            { "macro": "rfe_builtin:is_not_blocked_by_scope" }
+          ]
+        },
         "time": 30,
         "reload_type": "speedloaders",
         "reload_count": 2,
@@ -111,7 +140,12 @@
       },
       {
         "phase": "reload",
-        "condition": { "macro": "rfe_builtin:can_strip_1" },
+        "condition": {
+          "and": [
+            { "macro": "rfe_builtin:can_strip_1" },
+            { "macro": "rfe_builtin:is_not_blocked_by_scope" }
+          ]
+        },
         "time": 30,
         "reload_type": "speedloaders",
         "reload_count": 1,

@@ -121,7 +121,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("has_chambered_used_secondary"), BuiltInRFEPlugin::hasChamberedUsedSecondary);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("primable_ammo_count"), BuiltInRFEPlugin::primableAmmoCount);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("primed_ammo_count"), BuiltInRFEPlugin::primedAmmoCount);
-        // TODO speedloaders blocked (ritchiesfirearmengine:speedloaders_blocked)
+        RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("speedloaders_blocked"), BuiltInRFEPlugin::speedloadersBlocked);
     }
 
     @Override
@@ -431,7 +431,11 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         return 0;
     }
 
-    // TODO speedloaders blocked
+    private static float speedloadersBlocked(ItemStack itemStack, LivingEntity entity) {
+        if (itemStack.getItem() instanceof RFEFirearmItem firearm)
+            return firearm.speedloadersBlocked(itemStack, entity) ? 1 : 0;
+        return 0;
+    }
 
     public static class ProjectileTypes {
         private static final Map<ResourceLocation, RFEProjectileType.Serializer<?>> SERIALIZERS = new LinkedHashMap<>();

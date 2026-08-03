@@ -477,6 +477,22 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         return mode.primedAmmoCount(itemStack, entity);
     }
 
+    public boolean speedloadersBlocked(ItemStack itemStack, LivingEntity entity) {
+        RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
+        for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.SCOPE)) {
+            ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
+            if (attachmentStack.isEmpty())
+                continue;
+            Optional<RFEItemAttachmentProperties> attachmentData = RFEItemAttachmentsDataPacksHandler.getData(itemStack, attachmentStack, slotId);
+            if (attachmentData.isPresent() && attachmentData.get() instanceof ScopeAttachmentProperties properties
+                    && properties.overrideScopeDefaults() && properties.blocksSpeedloaders()
+                    || attachmentStack.getItem() instanceof ScopeItem scopeItem && scopeItem.blocksSpeedloadersByDefault()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean laysFlatOnGround(ItemStack stack) {
         return true;
     }

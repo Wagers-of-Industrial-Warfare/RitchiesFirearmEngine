@@ -1,7 +1,8 @@
 {
   "title": "itemGroup.rfe_builtin.attachments",
-  "icon": "rfe_builtin:zf_41",
+  "icon": "rfe_builtin:zf_39",
   "contents": [
+    "rfe_builtin:zf_39",
     "rfe_builtin:zf_41"
   ]
 }

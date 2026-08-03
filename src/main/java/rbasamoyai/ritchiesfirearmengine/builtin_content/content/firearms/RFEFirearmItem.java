@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -37,11 +38,17 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.m
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmModeHandlingProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhase;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhaseAccessFilter;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeAttachmentProperties;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemAttachmentContents;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEFirearmProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudItemInfoProviders;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.IHasRFEItemAttachments;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentsDataPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilClientImpulse;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
@@ -62,15 +69,17 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     protected final Map<String, RFEFirearmMode> baseFirearmModes;
     protected final List<String> modeOrder;
     protected final String defaultMode;
-    protected final Set<ResourceLocation> globalAttachments;
+    protected final ImmutableMultimap<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> firearmAttachments;
 
     protected RFEFirearmItem(Properties properties, Map<String, RFEFirearmMode> baseFirearmModes, List<String> modeOrder,
-                             String defaultMode, Set<ResourceLocation> globalAttachments) {
-        super(properties.stacksTo(1).component(RFEDataComponents.USING_UNLIMITED_AMMO_RELOAD, false));
+                             String defaultMode, ImmutableMultimap<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> firearmAttachments) {
+        super(properties.stacksTo(1)
+                .component(RFEDataComponents.USING_UNLIMITED_AMMO_RELOAD, false)
+                .component(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY));
         this.baseFirearmModes = baseFirearmModes;
         this.modeOrder = modeOrder;
         this.defaultMode = defaultMode;
-        this.globalAttachments = globalAttachments;
+        this.firearmAttachments = firearmAttachments;
         this.registerHUDProviders();
     }
 
@@ -488,7 +497,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     public float getFov(ItemStack itemStack, Player player, float currentFovModifier, float partialTicks) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
         boolean isAiming = player.isUsingItem();
-        float zoomIn = 0.5f; // TODO configurable by attachments, etc
+        float zoomIn = this.getZoomIn(itemStack, player);
 
         int denom = mode.isAiming(itemStack, player) ? mode.aimTime() : mode.unaimTime();
         float aimingTime = (float) denom - mode.getAimingTime(itemStack, player);
@@ -498,6 +507,35 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         d = Mth.clamp(d, 0f, 1f);
         float d1 = d * d * d;
         return Mth.lerp(d1, 1f, zoomIn) * currentFovModifier;
+    }
+
+    public float getZoomIn(ItemStack itemStack, Player player) {
+        RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
+        boolean scoped = false;
+        float zoomIn = 1.0f;
+        for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.SCOPE)) {
+            ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
+            if (attachmentStack.isEmpty())
+                continue;
+            int zoomIndex = attachmentStack.getOrDefault(RFEDataComponents.ZOOM_LEVEL_INDEX, 0);
+            List<Float> zoomLevels;
+            Optional<RFEItemAttachmentProperties> attachmentData = RFEItemAttachmentsDataPacksHandler.getData(itemStack, attachmentStack, slotId);
+            if (attachmentData.isPresent() && attachmentData.get() instanceof ScopeAttachmentProperties properties && properties.overrideScopeDefaults()) {
+                zoomLevels = properties.zoomLevels();
+            } else if (attachmentStack.getItem() instanceof ScopeItem scopeItem) {
+                zoomLevels = scopeItem.getDefaultZoomLevels();
+            } else {
+                continue;
+            }
+            if (0 <= zoomIndex && zoomIndex < zoomLevels.size()) {
+                zoomIn /= zoomLevels.get(zoomIndex);
+                scoped = true;
+            } else if (!zoomLevels.isEmpty()) {
+                zoomIn /= zoomLevels.getFirst();
+                scoped = true;
+            }
+        }
+        return scoped ? Math.max(zoomIn, 0.01f) : 0.80f;
     }
 
     @Override
@@ -679,8 +717,10 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     @Override
     public Map<ResourceLocation, ItemStack> getAttachments(ItemStack stack) {
         Map<ResourceLocation, ItemStack> attachmentsRet = new Object2ObjectOpenHashMap<>();
+        RFEItemAttachmentContents itemAttachments = stack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
+        itemAttachments.copyInto(attachmentsRet);
         for (RFEFirearmMode mode : this.getFirearmModes(stack, null).values())
-            mode.addAttachments(stack, attachmentsRet);
+            mode.addModeAttachments(stack, attachmentsRet);
         return attachmentsRet;
     }
 

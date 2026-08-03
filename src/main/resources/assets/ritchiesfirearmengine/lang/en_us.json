@@ -28,5 +28,8 @@
   "ritchiesfirearmengine.tooltip.item.hold_key.ammo": "Hold [%s] to see compatible ammo",
   "ritchiesfirearmengine.tooltip.item.hold_key.ammo.compatible": "Compatible with current mode",
   "ritchiesfirearmengine.tooltip.item.hold_key.ammo.incompatible": "Compatible in another mode",
-  "ritchiesfirearmengine.tooltip.key_shift": "Shift"
+  "ritchiesfirearmengine.tooltip.key_shift": "Shift",
+  "ritchiesfirearmengine.tooltip.current_zoom": "Current magnification level: %sx",
+  "ritchiesfirearmengine.tooltip.fixed_zoom": "Magnification level: %sx",
+  "ritchiesfirearmengine.tooltip.zoom_levels": "Magnification range: %s-%sx"
 }

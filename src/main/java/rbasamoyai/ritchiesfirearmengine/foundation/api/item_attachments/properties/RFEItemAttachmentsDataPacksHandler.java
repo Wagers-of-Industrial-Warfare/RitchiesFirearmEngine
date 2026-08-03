@@ -1,4 +1,4 @@
-package rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments;
+package rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties;
 
 import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
@@ -17,21 +17,20 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.RFEItemAttachmentsRenderData.SlotAttachmentRenderData;
 import rbasamoyai.ritchiesfirearmengine.foundation.data_packing.RFEJsonResourceReloadListener;
 
 import java.util.Map;
 import java.util.Optional;
 
-public class RFEItemAttachmentsRenderingPacksHandler {
+public class RFEItemAttachmentsDataPacksHandler {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final Map<Item, RFEItemAttachmentsRenderData> ATTACHMENTS = new Reference2ObjectOpenHashMap<>();
+    private static final Map<Item, RFEItemAttachmentsPropertiesHolder> ATTACHMENTS = new Reference2ObjectOpenHashMap<>();
 
     public static class ReloadListener extends RFEJsonResourceReloadListener {
         private static final Gson GSON = new Gson();
-        public static final ReloadListener INSTANCE = new ReloadListener(GSON, RitchiesFirearmEngine.MOD_ID + "/item_attachments_rendering");
+        public static final ReloadListener INSTANCE = new ReloadListener(GSON, RitchiesFirearmEngine.MOD_ID + "/item_attachments");
 
         private ReloadListener(Gson gson, String directory) { super(gson, directory); }
 
@@ -39,7 +38,7 @@ public class RFEItemAttachmentsRenderingPacksHandler {
         protected void apply(Multimap<ResourceLocation, JsonElement> map, ResourceManager resourceManager, ProfilerFiller profiler) {
             ATTACHMENTS.clear();
 
-            Map<Item, RendererBuilder> builders = new Reference2ObjectOpenHashMap<>();
+            Map<Item, AttachmentsBuilder> builders = new Reference2ObjectOpenHashMap<>();
 
             for (Map.Entry<ResourceLocation, JsonElement> entry : map.entries()) {
                 ResourceLocation fullId = entry.getKey();
@@ -51,51 +50,47 @@ public class RFEItemAttachmentsRenderingPacksHandler {
                             .orElseThrow(() -> new IllegalStateException("Item " + parentItemId + " does not exist"));
                     Item attachmentItem = BuiltInRegistries.ITEM.getOptional(attachmentItemId)
                             .orElseThrow(() -> new IllegalStateException("Item " + attachmentItemId + " does not exist"));
-                    RendererItemLayer layer = RendererItemLayer.CODEC.parse(JsonOps.INSTANCE, entry.getValue())
+                    AttachmentItemDataLayer layer = AttachmentItemDataLayer.CODEC.parse(JsonOps.INSTANCE, entry.getValue())
                             .getOrThrow(s -> new IllegalStateException("Error decoding JSON: " + s));
-                    builders.computeIfAbsent(parentItem, k -> new RendererBuilder()).applyLayer(attachmentItem, layer);
+                    builders.computeIfAbsent(parentItem, k -> new AttachmentsBuilder()).applyLayer(attachmentItem, layer);
                 } catch (Exception e) {
-                    LOGGER.error("Error loading item attachments for {}: {}", fullId, e);
+                    LOGGER.error("Error loading item attachments data for {}: {}", fullId, e);
                 }
             }
 
-            for (Map.Entry<Item, RendererBuilder> entry : builders.entrySet())
+            for (Map.Entry<Item, AttachmentsBuilder> entry : builders.entrySet())
                 ATTACHMENTS.put(entry.getKey(), entry.getValue().build());
         }
     }
 
-    public static Optional<SlotAttachmentRenderData> getRenderData(ItemStack parent, ItemStack attachment, ResourceLocation slot) {
+    public static Optional<RFEItemAttachmentProperties> getData(ItemStack parent, ItemStack attachment, ResourceLocation slot) {
         if (parent.isEmpty() || attachment.isEmpty() || !ATTACHMENTS.containsKey(parent.getItem()))
             return Optional.empty();
-        RFEItemAttachmentsRenderData renderData = ATTACHMENTS.get(parent.getItem());
-        Map<Item, Map<ResourceLocation, SlotAttachmentRenderData>> renderDataByItemAndSlot = renderData.renderDataByItemAndSlot();
-        if (!renderDataByItemAndSlot.containsKey(attachment.getItem()))
-            return Optional.empty();
-        Map<ResourceLocation, SlotAttachmentRenderData> renderDataBySlot = renderDataByItemAndSlot.get(attachment.getItem());
-        return Optional.ofNullable(renderDataBySlot.get(slot));
+        RFEItemAttachmentsPropertiesHolder attachmentData = ATTACHMENTS.get(parent.getItem());
+        return Optional.ofNullable(attachmentData.getAttachmentProperties(attachment, slot));
     }
 
-    private static class RendererBuilder {
-        public final Map<Item, Map<ResourceLocation, SlotAttachmentRenderData>> renderDataByItemAndSlot = new Reference2ObjectOpenHashMap<>();
+    private static class AttachmentsBuilder {
+        public final Map<Item, Map<ResourceLocation, RFEItemAttachmentProperties>> renderDataByItemAndSlot = new Reference2ObjectOpenHashMap<>();
 
-        public void applyLayer(Item attachmentItem, RendererItemLayer layer) {
-            Map<ResourceLocation, SlotAttachmentRenderData> itemRenderDataBySlot = this.renderDataByItemAndSlot
+        public void applyLayer(Item attachmentItem, AttachmentItemDataLayer layer) {
+            Map<ResourceLocation, RFEItemAttachmentProperties> itemDataBySlot = this.renderDataByItemAndSlot
                     .computeIfAbsent(attachmentItem, k -> new Object2ObjectOpenHashMap<>());
-            itemRenderDataBySlot.putAll(layer.itemRenderDataBySlot);
+            itemDataBySlot.putAll(layer.itemDataBySlot);
         }
 
-        public RFEItemAttachmentsRenderData build() {
-            return new RFEItemAttachmentsRenderData(this.renderDataByItemAndSlot);
+        public RFEItemAttachmentsPropertiesHolder build() {
+            return new RFEItemAttachmentsPropertiesHolder(this.renderDataByItemAndSlot);
         }
     }
 
-    private record RendererItemLayer(Map<ResourceLocation, SlotAttachmentRenderData> itemRenderDataBySlot) {
-        public static final Codec<RendererItemLayer> CODEC = RecordCodecBuilder.create(o -> o.group(
-                Codec.unboundedMap(ResourceLocation.CODEC, SlotAttachmentRenderData.CODEC.codec())
-                        .fieldOf("slot_rendering").forGetter(RendererItemLayer::itemRenderDataBySlot)
-        ).apply(o, RendererItemLayer::new));
+    private record AttachmentItemDataLayer(Map<ResourceLocation, RFEItemAttachmentProperties> itemDataBySlot) {
+        public static final Codec<AttachmentItemDataLayer> CODEC = RecordCodecBuilder.create(o -> o.group(
+                Codec.unboundedMap(ResourceLocation.CODEC, RFEItemAttachmentProperties.CODEC.codec())
+                        .fieldOf("slot_attachments").forGetter(AttachmentItemDataLayer::itemDataBySlot)
+        ).apply(o, AttachmentItemDataLayer::new));
     }
 
-    private RFEItemAttachmentsRenderingPacksHandler() {}
+    private RFEItemAttachmentsDataPacksHandler() {}
 
 }

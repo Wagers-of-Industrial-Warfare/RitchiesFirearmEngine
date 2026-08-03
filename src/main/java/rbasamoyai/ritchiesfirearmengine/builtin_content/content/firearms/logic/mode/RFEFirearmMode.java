@@ -2421,7 +2421,7 @@ public class RFEFirearmMode {
         return this.getHandlingProperties(itemStack).heatProperties().heatCapacity();
     }
 
-    public void addAttachments(ItemStack itemStack, Map<ResourceLocation, ItemStack> attachments) {
+    public void addModeAttachments(ItemStack itemStack, Map<ResourceLocation, ItemStack> attachments) {
         if (this.loadedRoundAttachmentSlot != null && !attachments.containsKey(this.loadedRoundAttachmentSlot)) {
             List<ItemStack> nextRound = this.getNextRoundsInItem(itemStack, null, 1, false);
             if (!nextRound.isEmpty())

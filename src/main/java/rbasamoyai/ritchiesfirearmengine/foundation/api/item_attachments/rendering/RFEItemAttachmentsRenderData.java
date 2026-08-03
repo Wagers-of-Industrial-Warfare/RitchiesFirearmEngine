@@ -1,4 +1,4 @@
-package rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments;
+package rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

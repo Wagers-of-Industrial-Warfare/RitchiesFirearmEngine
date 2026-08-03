@@ -8,6 +8,7 @@ import org.jetbrains.annotations.ApiStatus;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.CompareValueSource;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplier;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.misfires.RFEMisfire;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProvider;
@@ -152,6 +153,28 @@ public class RFEContentBuilderRegistry {
         if (!MISFIRE_PROVIDERS_IDS.containsKey(prov))
             throw new IllegalStateException("Unknown RFE misfire provider " + prov);
         return MISFIRE_PROVIDERS_IDS.get(prov);
+    }
+
+    private static final Object2ReferenceMap<ResourceLocation, RFEItemAttachmentProperties.Serializer<?>> ITEM_ATTACHMENT_SERIALIZERS = new Object2ReferenceOpenHashMap<>();
+    private static final Reference2ObjectMap<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> ITEM_ATTACHMENT_SERIALIZERS_IDS = new Reference2ObjectOpenHashMap<>();
+
+    public static void registerItemAttachmentSerializer(ResourceLocation id, RFEItemAttachmentProperties.Serializer<?> prov) {
+        if (ITEM_ATTACHMENT_SERIALIZERS.containsKey(id))
+            throw new IllegalStateException("Already registered RFE item attachment properties serializer with id '" + id + "'");
+        ITEM_ATTACHMENT_SERIALIZERS.put(id, prov);
+        ITEM_ATTACHMENT_SERIALIZERS_IDS.put(prov, id);
+    }
+
+    public static RFEItemAttachmentProperties.Serializer<?> getItemAttachmentSerializer(ResourceLocation id) {
+        if (!ITEM_ATTACHMENT_SERIALIZERS.containsKey(id))
+            throw new IllegalStateException("RFE item attachment properties serializer of type '" + id + "' not present");
+        return ITEM_ATTACHMENT_SERIALIZERS.get(id);
+    }
+
+    public static ResourceLocation getItemAttachmentSerializerId(RFEItemAttachmentProperties.Serializer<?> prov) {
+        if (!ITEM_ATTACHMENT_SERIALIZERS_IDS.containsKey(prov))
+            throw new IllegalStateException("Unknown RFE item attachment properties serializer " + prov);
+        return ITEM_ATTACHMENT_SERIALIZERS_IDS.get(prov);
     }
 
 }

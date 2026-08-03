@@ -44,6 +44,8 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.fixed.FixedHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.vulnerable_to_birdshot.BirdshotHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.vulnerable_to_birdshot.BirdshotHitMultiplierGore;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeAttachmentProperties;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemAttachmentContents;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemContainerContents;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.buck_and_ball.RFEBuckAndBallProjectileType;
@@ -56,6 +58,8 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEConte
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplierHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentsDataPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.misfires.RFEMisfire;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
@@ -89,12 +93,14 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("speedloader"), new MagazineItem.Builder()); // Alias of magazine
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("ammo_packet"), new AmmoPacketItem.Builder());
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("firearm"), new RFEDefaultFirearmItem.Builder());
+        RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("scope"), new ScopeItem.Builder());
 
         ProjectileTypes.register();
         SpreadProviders.register();
         RecoilProviders.register();
         HitMultipliers.register();
         Misfires.register();
+        AttachmentSlots.register();
 
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("entity_ammo_count"), BuiltInRFEPlugin::entityAmmoCount);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("free_ammo_space"), BuiltInRFEPlugin::freeAmmoSpace);
@@ -115,6 +121,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("has_chambered_used_secondary"), BuiltInRFEPlugin::hasChamberedUsedSecondary);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("primable_ammo_count"), BuiltInRFEPlugin::primableAmmoCount);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("primed_ammo_count"), BuiltInRFEPlugin::primedAmmoCount);
+        // TODO speedloaders blocked (ritchiesfirearmengine:speedloaders_blocked)
     }
 
     @Override
@@ -133,6 +140,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         registry.accept(RitchiesFirearmEngine.resource("firearm_recoil"), RFERecoilProviderPackHandler.ReloadListener.INSTANCE);
         registry.accept(RitchiesFirearmEngine.resource("hit_multipliers"), RFEHitMultiplierHandler.ReloadListener.INSTANCE);
         registry.accept(RitchiesFirearmEngine.resource("projectile_penetration"), RFEProjectilePenetrationHandler.ReloadListener.INSTANCE);
+        registry.accept(RitchiesFirearmEngine.resource("item_attachment_properties"), RFEItemAttachmentsDataPacksHandler.ReloadListener.INSTANCE);
     }
 
     @Override
@@ -423,6 +431,8 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         return 0;
     }
 
+    // TODO speedloaders blocked
+
     public static class ProjectileTypes {
         private static final Map<ResourceLocation, RFEProjectileType.Serializer<?>> SERIALIZERS = new LinkedHashMap<>();
         public static final RFEBulletProjectileType.Serializer BULLET = register("bullet", new RFEBulletProjectileType.Serializer());
@@ -632,6 +642,9 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         public static final DataComponentType<Boolean> USING_UNLIMITED_AMMO_RELOAD = register("using_unlimited_ammo_reload",
                 builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
 
+        public static final DataComponentType<Integer> ZOOM_LEVEL_INDEX = register("zoom_level_index",
+                builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
         private static <V> DataComponentType<V> register(String id, UnaryOperator<DataComponentType.Builder<V>> builderOp) {
             ResourceLocation loc = RitchiesFirearmEngine.resource(id);
             if (TYPES.containsKey(loc))
@@ -644,6 +657,19 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         public static void register(BiConsumer<ResourceLocation, DataComponentType<?>> registry) { TYPES.forEach(registry); }
 
         private RFEDataComponents() {}
+    }
+
+    public static class AttachmentSlots {
+        public static final RFEItemAttachmentProperties.Serializer<ScopeAttachmentProperties> SCOPE = register("scope", new ScopeAttachmentProperties.Serializer());
+
+        public static void register() {}
+
+        private static <T extends RFEItemAttachmentProperties> RFEItemAttachmentProperties.Serializer<T> register(String id, RFEItemAttachmentProperties.Serializer<T> ser) {
+            RFEContentBuilderRegistry.registerItemAttachmentSerializer(RitchiesFirearmEngine.resource(id), ser);
+            return ser;
+        }
+
+        private AttachmentSlots() {}
     }
 
 }

@@ -14,7 +14,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bull
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEClientContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEClientPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRendererPacksHandler;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.RFEItemAttachmentsRenderingPacksHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentsRenderingPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFEProjectileRendererPacksHandler;
 
 import java.util.function.BiConsumer;

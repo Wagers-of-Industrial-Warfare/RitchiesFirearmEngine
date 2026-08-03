@@ -14,8 +14,8 @@ import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.IHasRFEItemAttachments;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.RFEItemAttachmentsRenderData.SlotAttachmentRenderData;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.RFEItemAttachmentsRenderingPacksHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentsRenderData.SlotAttachmentRenderData;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentsRenderingPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.remix.RFEClientRemix;
 
 import java.util.Map;

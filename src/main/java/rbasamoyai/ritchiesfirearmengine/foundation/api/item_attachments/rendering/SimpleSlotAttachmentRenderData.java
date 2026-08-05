@@ -15,6 +15,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEClientPlugin;
 import rbasamoyai.ritchiesfirearmengine.remix.ItemRendererModificationContext;
 
 public class SimpleSlotAttachmentRenderData implements RFEItemAttachmentRenderProperties {
@@ -53,7 +54,7 @@ public class SimpleSlotAttachmentRenderData implements RFEItemAttachmentRenderPr
 
     @Override
     public RFEItemAttachmentRenderProperties.Serializer<?> getSerializer() {
-        return null;
+        return BuiltInRFEClientPlugin.ItemAttachmentRendering.SIMPLE;
     }
 
     public static class Serializer implements RFEItemAttachmentRenderProperties.Serializer<SimpleSlotAttachmentRenderData> {

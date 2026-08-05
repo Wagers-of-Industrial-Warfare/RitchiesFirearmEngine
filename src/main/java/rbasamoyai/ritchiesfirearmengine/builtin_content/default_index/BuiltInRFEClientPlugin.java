@@ -15,6 +15,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bull
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEClientContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEClientPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRendererPacksHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentRenderProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentsRenderingPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.SimpleSlotAttachmentRenderData;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.rendering.RFEProjectileRendererPacksHandler;
@@ -33,8 +34,7 @@ public class BuiltInRFEClientPlugin implements RFEClientPlugin {
         RFEClientContentBuilderRegistry.registerHUDOverlayRendererType(RitchiesFirearmEngine.resource("no_hud"), new NoHUDOverlayRenderer.Serializer());
         RFEClientContentBuilderRegistry.registerHUDOverlayRendererType(RitchiesFirearmEngine.resource("ammo_counter"), new AmmoCounterHUDOverlayRenderer.Serializer());
 
-        RFEClientContentBuilderRegistry.registerItemAttachmentRenderingSerializer(RitchiesFirearmEngine.resource("simple"), new SimpleSlotAttachmentRenderData.Serializer());
-        RFEClientContentBuilderRegistry.registerItemAttachmentRenderingSerializer(RitchiesFirearmEngine.resource("scope"), new ScopeAttachmentRenderProperties.Serializer());
+        ItemAttachmentRendering.register();
     }
 
     @Override
@@ -47,6 +47,20 @@ public class BuiltInRFEClientPlugin implements RFEClientPlugin {
     @Override
     public void registerParticleProviders(RFEClient.ParticleRegistry registry) {
         registry.registerSpriteSet(BuiltInRFEPlugin.ParticleTypes.BLACK_POWDER_SMOKE, new BlackPowderSmokeParticle.SpriteRegistration());
+    }
+
+    public static class ItemAttachmentRendering {
+        public static final RFEItemAttachmentRenderProperties.Serializer<SimpleSlotAttachmentRenderData> SIMPLE = register("simple", new SimpleSlotAttachmentRenderData.Serializer());
+        public static final RFEItemAttachmentRenderProperties.Serializer<ScopeAttachmentRenderProperties> SCOPE = register("scope", new ScopeAttachmentRenderProperties.Serializer());
+
+        public static void register() {}
+
+        private static <T extends RFEItemAttachmentRenderProperties> RFEItemAttachmentRenderProperties.Serializer<T> register(String id, RFEItemAttachmentRenderProperties.Serializer<T> ser) {
+            RFEClientContentBuilderRegistry.registerItemAttachmentRenderingSerializer(RitchiesFirearmEngine.resource(id), ser);
+            return ser;
+        }
+
+        private ItemAttachmentRendering() {}
     }
 
 }

@@ -5,6 +5,14 @@
       "model": "rfe_builtin:item/item_attachments/zf_39",
       "aim_overlay_texture": {
         "location": "rfe_builtin:textures/misc/crosshair_german_1.png"
+      },
+      "scope_glint": {
+        "texture": "rfe_builtin:textures/misc/scope_glint.png",
+        "visual_offset": [0, 2.5, -2.5],
+        "visual_scale": 1,
+        "visible_range": 1024,
+        "distance_scaling_exponent": 0.6,
+        "field_of_visibility": 30
       }
     }
   }

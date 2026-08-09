@@ -63,6 +63,7 @@ public class RFENetwork {
         addMessage(id++, ServerboundOpenAttachmentsScreenPacket.class, ServerboundOpenAttachmentsScreenPacket.STREAM_CODEC);
         addMessage(id++, ClientboundSyncItemAttachmentsPropertiesPacket.class, ClientboundSyncItemAttachmentsPropertiesPacket.STREAM_CODEC);
         addMessage(id++, ClientboundSyncItemAttachmentsMenuSlotsPacket.class, ClientboundSyncItemAttachmentsMenuSlotsPacket.STREAM_CODEC);
+        addMessage(id++, ServerboundUpdateAttachmentOptionPacket.class, ServerboundUpdateAttachmentOptionPacket.STREAM_CODEC);
     }
 
     private static <MSG extends RFEPacket> void addMessage(int id, Class<MSG> clazz, StreamCodec<RegistryFriendlyByteBuf, MSG> streamCodec) {

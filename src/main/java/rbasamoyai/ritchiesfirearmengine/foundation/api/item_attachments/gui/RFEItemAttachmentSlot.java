@@ -79,5 +79,6 @@ public class RFEItemAttachmentSlot extends Slot {
     }
 
     @Nullable public String getEmptyTextKey() { return this.slotConfig.emptyText(); }
+    public ResourceLocation getSlotId() { return this.slotId; }
 
 }

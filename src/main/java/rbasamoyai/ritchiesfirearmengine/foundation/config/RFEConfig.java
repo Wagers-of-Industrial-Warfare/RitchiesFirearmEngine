@@ -16,6 +16,7 @@ public class RFEConfig {
         public final BooleanValue enableEntityPenetration;
         public final BooleanValue enableBlockPenetration;
         public final BooleanValue enableBlockBreaking;
+        public final IntValue fieldAttachmentsMenuOpenTime;
 
         Server(ModConfigSpec.Builder builder) {
             builder.comment("Ritchie's Firearm Engine server configuration settings")
@@ -35,6 +36,11 @@ public class RFEConfig {
                     .comment("Set this to true to globally enable block projectile breaking (where supported). Default true.")
                     .translation("ritchiesfirearmengine.configgui.enableBlockBreaking")
                     .define("enableBlockBreaking", true);
+
+            this.fieldAttachmentsMenuOpenTime = builder
+                    .comment("[in Ticks]", "Time to open the attachments screen in the field (that is, without a workbench).")
+                    .translation("ritchiesfirearmengine.configgui.fieldAttachmentsMenuOpenTime")
+                    .defineInRange("fieldAttachmentsMenuOpenTime", 40, 0, Integer.MAX_VALUE);
 
             builder.pop();
         }
@@ -56,6 +62,7 @@ public class RFEConfig {
         public final IntValue incompatibleAmmoHighlightColor;
         public final BooleanValue compatibleAmmoHighlightGradient;
         public final DoubleValue zoomTurnModifierIntensity;
+        public final IntValue tooltipProgressBarLength;
 
         Client(ModConfigSpec.Builder builder) {
             builder.comment("Ritchie's Firearm Engine client configuration settings")
@@ -90,6 +97,11 @@ public class RFEConfig {
                     .comment("The amount that aim down sights zoom affects turn sensitivity. 0.0 (0%) disables turn modification, while 1.0 (100%) completely enables it.")
                     .translation("ritchiesfirearmengine.configgui.zoomTurnModifierIntensity")
                     .defineInRange("zoomTurnModifierIntensity", 1d, 0d, 1d);
+
+            this.tooltipProgressBarLength = builder
+                    .comment("The number of \"|\" characters in a tooltip progress bar, such as when opening the field attachments menu.")
+                    .translation("ritchiesfirearmengine.configgui.tooltipProgressBarLength")
+                    .defineInRange("tooltipProgressBarLength", 64, 1, 256);
 
             builder.pop();
         }

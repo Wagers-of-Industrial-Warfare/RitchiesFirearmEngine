@@ -20,7 +20,6 @@ import rbasamoyai.ritchiesfirearmengine.remix.ItemRendererModificationContext;
 import rbasamoyai.ritchiesfirearmengine.remix.RFEClientRemix;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Mixin(ItemRenderer.class)
 public abstract class ItemRendererMixin {
@@ -42,11 +41,11 @@ public abstract class ItemRendererMixin {
                 ItemStack attachmentStack = entry.getValue();
                 if (attachmentStack.isEmpty())
                     continue;
-                Optional<RFEItemAttachmentRenderProperties> op = RFEItemAttachmentsRenderingPacksHandler.getRenderProperties(itemStack, attachmentStack, entry.getKey());
-                if (op.isEmpty())
+                RFEItemAttachmentRenderProperties renderProperties = RFEItemAttachmentsRenderingPacksHandler.getRenderProperties(itemStack, attachmentStack, entry.getKey());
+                if (renderProperties == null)
                     continue;
                 poseStack.pushPose();
-                op.get().onRenderItemModel(original, this.getItemModelShaper(), itemStack, attachmentStack, displayContext,
+                renderProperties.onRenderItemModel(original, this.getItemModelShaper(), itemStack, attachmentStack, displayContext,
                         leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, renderContext);
                 poseStack.popPose();
             }

@@ -20,7 +20,6 @@ import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.foundation.data_packing.RFEJsonResourceReloadListener;
 
 import java.util.Map;
-import java.util.Optional;
 
 public class RFEItemAttachmentsRenderingPacksHandler {
 
@@ -63,15 +62,14 @@ public class RFEItemAttachmentsRenderingPacksHandler {
         }
     }
 
-    public static Optional<RFEItemAttachmentRenderProperties> getRenderProperties(ItemStack parent, ItemStack attachment, ResourceLocation slot) {
+    public static RFEItemAttachmentRenderProperties getRenderProperties(ItemStack parent, ItemStack attachment, ResourceLocation slot) {
         if (parent.isEmpty() || attachment.isEmpty() || !ATTACHMENTS.containsKey(parent.getItem()))
-            return Optional.empty();
+            return null;
         RFEItemAttachmentsRenderPropertiesHolder renderData = ATTACHMENTS.get(parent.getItem());
         Map<Item, Map<ResourceLocation, RFEItemAttachmentRenderProperties>> renderDataByItemAndSlot = renderData.renderDataByItemAndSlot();
         if (!renderDataByItemAndSlot.containsKey(attachment.getItem()))
-            return Optional.empty();
-        Map<ResourceLocation, RFEItemAttachmentRenderProperties> renderDataBySlot = renderDataByItemAndSlot.get(attachment.getItem());
-        return Optional.ofNullable(renderDataBySlot.get(slot));
+            return null;
+        return renderDataByItemAndSlot.get(attachment.getItem()).get(slot);
     }
 
     private static class RendererBuilder {

@@ -30,7 +30,6 @@ import rbasamoyai.ritchiesfirearmengine.network.RFEPacket;
 
 import javax.annotation.Nullable;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.Executor;
 
 public class RFEItemAttachmentsPropertiesHandler {
@@ -74,11 +73,11 @@ public class RFEItemAttachmentsPropertiesHandler {
         }
     }
 
-    public static Optional<RFEItemAttachmentProperties> getData(ItemStack parent, ItemStack attachment, ResourceLocation slot) {
+    public static RFEItemAttachmentProperties getData(ItemStack parent, ItemStack attachment, ResourceLocation slot) {
         if (parent.isEmpty() || attachment.isEmpty() || !ATTACHMENTS.containsKey(parent.getItem()))
-            return Optional.empty();
+            return null;
         ItemAttachmentsPropertiesHolder attachmentData = ATTACHMENTS.get(parent.getItem());
-        return Optional.ofNullable(attachmentData.getAttachmentProperties(attachment, slot));
+        return attachmentData.getAttachmentProperties(attachment, slot);
     }
 
     private static class AttachmentsBuilder {

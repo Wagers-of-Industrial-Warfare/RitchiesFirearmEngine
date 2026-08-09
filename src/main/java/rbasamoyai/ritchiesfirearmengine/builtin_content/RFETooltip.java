@@ -3,10 +3,13 @@ package rbasamoyai.ritchiesfirearmengine.builtin_content;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import rbasamoyai.ritchiesfirearmengine.RFEClient;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties.AttachmentTooltipContext;
 import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 
 import java.util.List;
@@ -25,6 +28,26 @@ public class RFETooltip {
                     .append(Component.translatable(suffix + ".compatible").withColor(RFEConfig.CLIENT.compatibleAmmoHighlightColor.getAsInt())));
             tooltipComponents.add(Component.literal("- ").withStyle(ChatFormatting.GRAY)
                     .append(Component.translatable(suffix + ".incompatible").withColor(RFEConfig.CLIENT.incompatibleAmmoHighlightColor.getAsInt())));
+        }
+    }
+
+    public static void addAttachmentsKeyTooltip(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        if (context instanceof AttachmentTooltipContext atCtx && atCtx.inAttachmentsScreen())
+            return;
+        if (RFEClient.isOpeningFieldAttachmentsScreen()) {
+            int openingTime = RFEClient.getFieldAttachmentsScreenOpeningTime();
+            if (openingTime < 1)
+                return;
+            int openingProgress = RFEClient.getFieldAttachmentsScreenOpeningProgress();
+            int totalBars = RFEConfig.CLIENT.tooltipProgressBarLength.getAsInt();
+            int progressBars = Math.min(totalBars, Mth.ceil((float) openingProgress / (float) openingTime * totalBars));
+            int emptyBars = totalBars - progressBars;
+            tooltipComponents.add(Component.literal("|".repeat(progressBars)).withStyle(ChatFormatting.GRAY)
+                    .append(Component.literal("|".repeat(emptyBars)).withStyle(ChatFormatting.DARK_GRAY)));
+        } else {
+            tooltipComponents.add(Component.translatable("ritchiesfirearmengine.tooltip.item.attachment_screen",
+                            RFEClient.OPEN_ATTACHMENTS_SCREEN.getTranslatedKeyMessage().copy().withStyle(ChatFormatting.GRAY))
+                    .withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 

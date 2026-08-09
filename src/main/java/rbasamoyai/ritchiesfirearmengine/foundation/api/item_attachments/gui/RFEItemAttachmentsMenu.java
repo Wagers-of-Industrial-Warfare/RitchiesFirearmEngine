@@ -13,6 +13,8 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.IHasRFEI
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler.MenuTypeSlotsConfig;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler.SlotConfig;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentsPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationMenus;
 
 import java.util.ArrayList;
@@ -20,10 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class RFEItemAttachmentsMenu extends AbstractContainerMenu {
+public class RFEItemAttachmentsMenu extends AbstractContainerMenu implements IRFEItemAttachmentsMenu {
 
     private final int selected;
     private final List<RFEItemAttachmentSlot> attachmentSlots = new ArrayList<>();
+    private final Slot targetSlot;
 
     public static RFEItemAttachmentsMenu client(int containerId, Inventory inventory, RegistryFriendlyByteBuf buf) {
         return new RFEItemAttachmentsMenu(FoundationMenus.FIELD_ATTACHMENTS_MENU.get(), containerId, inventory, buf.readVarInt());
@@ -48,12 +51,12 @@ public class RFEItemAttachmentsMenu extends AbstractContainerMenu {
             if (hotbarCol != this.selected)
                 this.addSlot(new Slot(inventory, hotbarCol, 8 + hotbarCol * 18, 176));
         }
-        this.addSlot(new Slot(inventory, this.selected, 8 + this.selected * 18, 176) {
+        this.targetSlot = this.addSlot(new Slot(inventory, this.selected, 8 + this.selected * 18, 176) {
             @Override public boolean mayPlace(ItemStack stack) { return false; }
             @Override public boolean mayPickup(Player player) { return false; }
         });
 
-        ItemStack targetStack = this.getFocusedAttachmentsItem(inventory);
+        ItemStack targetStack = this.getFocusedAttachmentsItem();
         MenuTypeSlotsConfig menuConfig = RFEItemAttachmentsMenuSlotsHandler.getConfig(targetStack, this.getType());
         ImmutableMap<ResourceLocation, SlotConfig> slotConfigById = menuConfig.slotConfig();
         int i = 0;
@@ -80,13 +83,25 @@ public class RFEItemAttachmentsMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return this.getFocusedAttachmentsItem(player.getInventory()).getItem() instanceof IHasRFEItemAttachments;
+        return this.targetSlot.getItem().getItem() instanceof IHasRFEItemAttachments;
     }
 
-    public ItemStack getFocusedAttachmentsItem(Inventory inventory) {
-        return inventory.getItem(this.selected);
-    }
+    public ItemStack getFocusedAttachmentsItem() { return this.targetSlot.getItem(); }
 
     public int getSelectedIndex() { return this.selected; }
+
+    @Override
+    public void modifyAttachmentOption(Player player, ResourceLocation slotId, int option) {
+        ItemStack itemStack = this.targetSlot.getItem();
+        if (!(itemStack.getItem() instanceof IHasRFEItemAttachments hasAttachments))
+            return;
+        ItemStack attachmentStack = hasAttachments.getAttachmentInSlot(itemStack, slotId);
+        RFEItemAttachmentProperties attachmentProperties = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
+        if (attachmentProperties == null)
+            return;
+        attachmentProperties.acceptAttachmentConfigOption(attachmentStack, option);
+        hasAttachments.setAttachment(itemStack, slotId, attachmentStack);
+        this.targetSlot.set(itemStack);
+    }
 
 }

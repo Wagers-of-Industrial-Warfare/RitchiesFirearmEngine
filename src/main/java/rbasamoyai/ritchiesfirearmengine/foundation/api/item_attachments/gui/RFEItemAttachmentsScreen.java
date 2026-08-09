@@ -4,21 +4,34 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.neoforged.neoforge.client.ClientTooltipFlag;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties.AttachmentMenuOptionsText;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties.AttachmentTooltipContext;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentsPropertiesHandler;
+import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
+import rbasamoyai.ritchiesfirearmengine.network.ServerboundUpdateAttachmentOptionPacket;
 
 import java.util.List;
+import java.util.Optional;
 
 public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAttachmentsMenu> {
 
@@ -71,10 +84,38 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
 
     @Override
     protected List<Component> getTooltipFromContainerItem(ItemStack stack) {
-        List<Component> tooltip = super.getTooltipFromContainerItem(stack);
-        if (this.minecraft.player != null && this.menu.getFocusedAttachmentsItem(this.minecraft.player.getInventory()) == stack)
+        ItemStack focusedItem = this.menu.getFocusedAttachmentsItem();
+        RFEItemAttachmentProperties attachmentProperties = null;
+
+        Item.TooltipContext context = new AttachmentTooltipContext(Item.TooltipContext.of(this.minecraft.level), false, true);
+        if (this.hoveredSlot instanceof RFEItemAttachmentSlot attachmentSlot && this.hoveredSlot.getItem() == stack) {
+            attachmentProperties = RFEItemAttachmentsPropertiesHandler.getData(focusedItem, stack, attachmentSlot.getSlotId());
+            if (attachmentProperties != null)
+                context = new AttachmentTooltipContext(context, attachmentProperties.overridesDefaults(), true);
+        }
+        TooltipFlag flag = ClientTooltipFlag.of(this.minecraft.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
+        List<Component> tooltip = stack.getTooltipLines(context, this.minecraft.player, flag);
+
+        if (focusedItem == stack)
             tooltip.add(1, Component.translatable("gui.ritchiesfirearmengine.attachments_menu.tooltip.focused_item")
                     .withColor(0x1F7FFF).withStyle(ChatFormatting.ITALIC));
+        if (attachmentProperties != null) {
+            Optional<AttachmentMenuOptionsText> op = attachmentProperties.getAttachmentConfigTextOptions(stack);
+            if (op.isPresent()) {
+                boolean currentlyModifying = Screen.hasShiftDown();
+                tooltip.add(Component.literal(""));
+                tooltip.add(Component.translatable("ritchiesfirearmengine.tooltip.item.hold_key.attachment_options",
+                                Component.translatable("ritchiesfirearmengine.tooltip.key_shift")
+                                        .withStyle(currentlyModifying ? ChatFormatting.WHITE : ChatFormatting.GRAY))
+                        .withStyle(ChatFormatting.DARK_GRAY));
+                if (currentlyModifying) {
+                    AttachmentMenuOptionsText options = op.get();
+                    tooltip.add(Component.literal(" ").append(options.heading()));
+                    for (Component text : options.optionComponents())
+                        tooltip.add(Component.literal("  ").append(text));
+                }
+            }
+        }
         return tooltip;
     }
 
@@ -88,7 +129,7 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
         Player player = this.minecraft.player;
         if (player == null)
             return;
-        ItemStack attachmentsItem = this.menu.getFocusedAttachmentsItem(player.getInventory());
+        ItemStack attachmentsItem = this.menu.getFocusedAttachmentsItem();
         if (attachmentsItem.isEmpty())
             return;
         BakedModel bakedmodel = this.minecraft.getItemRenderer().getModel(attachmentsItem, this.minecraft.level, player, 0);
@@ -140,7 +181,29 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
             // TODO scroll limits config
             this.itemScale = Mth.clamp(this.itemScale + (float) scrollY / 16f, 0.5f, 2.0f);
         }
+        this.handleAttachmentOptionScroll(scrollY);
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    protected void handleAttachmentOptionScroll(double scrollY) {
+        if (this.minecraft.player == null)
+            return;
+        ItemStack focusedItem = this.menu.getFocusedAttachmentsItem();
+        if (!(this.hoveredSlot instanceof RFEItemAttachmentSlot attachmentSlot))
+            return;
+        ItemStack hoveredStack = attachmentSlot.getItem();
+        RFEItemAttachmentProperties attachmentProperties = RFEItemAttachmentsPropertiesHandler.getData(focusedItem, hoveredStack, attachmentSlot.getSlotId());
+        if (attachmentProperties == null)
+            return;
+        int attachmentOption = attachmentProperties.getAttachmentConfigOption(hoveredStack);
+        if (attachmentOption == -1)
+            return;
+        int newOption = attachmentOption + (scrollY < 0 ? 1 : -1);
+        if (!attachmentProperties.acceptAttachmentConfigOption(hoveredStack, newOption))
+            return;
+        this.hoveredSlot.set(hoveredStack);
+        RFENetwork.sendToServer(new ServerboundUpdateAttachmentOptionPacket(attachmentSlot.getSlotId(), newOption));
+        this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 2f));
     }
 
 }

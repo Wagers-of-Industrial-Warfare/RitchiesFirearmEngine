@@ -266,6 +266,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
         RFETooltip.addAmmoHighlightingTooltip(stack, context, tooltipComponents, tooltipFlag);
+        RFETooltip.addAttachmentsKeyTooltip(stack, context, tooltipComponents, tooltipFlag);
     }
 
     public void onReload(ItemStack stack, LivingEntity entity) {
@@ -483,9 +484,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
             if (attachmentStack.isEmpty())
                 continue;
-            Optional<RFEItemAttachmentProperties> attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
-            if (attachmentData.isPresent() && attachmentData.get() instanceof ScopeAttachmentProperties properties
-                    && properties.overrideScopeDefaults() && properties.blocksSpeedloaders()
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
+            if (attachmentData instanceof ScopeAttachmentProperties properties && properties.overrideScopeDefaults() && properties.blocksSpeedloaders()
                     || attachmentStack.getItem() instanceof ScopeItem scopeItem && scopeItem.blocksSpeedloadersByDefault()) {
                 return true;
             }
@@ -535,8 +535,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
                 continue;
             int zoomIndex = attachmentStack.getOrDefault(RFEDataComponents.ZOOM_LEVEL_INDEX, 0);
             List<Float> zoomLevels;
-            Optional<RFEItemAttachmentProperties> attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
-            if (attachmentData.isPresent() && attachmentData.get() instanceof ScopeAttachmentProperties properties && properties.overrideScopeDefaults()) {
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
+            if (attachmentData instanceof ScopeAttachmentProperties properties && properties.overrideScopeDefaults()) {
                 zoomLevels = properties.zoomLevels();
             } else if (attachmentStack.getItem() instanceof ScopeItem scopeItem) {
                 zoomLevels = scopeItem.getDefaultZoomLevels();

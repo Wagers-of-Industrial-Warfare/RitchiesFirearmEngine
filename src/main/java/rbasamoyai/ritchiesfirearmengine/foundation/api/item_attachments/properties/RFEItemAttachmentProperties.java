@@ -45,7 +45,10 @@ public interface RFEItemAttachmentProperties {
     default Optional<AttachmentMenuOptionsText> getAttachmentConfigTextOptions(ItemStack itemStack) { return Optional.empty(); }
 
     // TODO documentation
-    default void acceptAttachmentConfigOption(ItemStack itemStack, int option) {}
+    default int getAttachmentConfigOption(ItemStack itemStack) { return -1; }
+
+    // TODO documentation
+    default boolean acceptAttachmentConfigOption(ItemStack itemStack, int option) { return false; }
 
     boolean overridesDefaults();
 
@@ -59,7 +62,7 @@ public interface RFEItemAttachmentProperties {
     record AttachmentMenuOptionsText(Component heading, List<Component> optionComponents) {
     }
 
-    record AttachmentTooltipContext(Item.TooltipContext wrapped, boolean overrideDefaults) implements Item.TooltipContext {
+    record AttachmentTooltipContext(Item.TooltipContext wrapped, boolean overrideDefaults, boolean inAttachmentsScreen) implements Item.TooltipContext {
         @Nullable
         @Override
         public HolderLookup.Provider registries() { return this.wrapped.registries(); }

@@ -2,6 +2,7 @@ package rbasamoyai.ritchiesfirearmengine;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.ChatFormatting;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
@@ -9,6 +10,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -16,11 +18,13 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -40,6 +44,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRenderer;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRendererPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.IHasRFEItemAttachments;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.IRFEItemAttachmentsMenu;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentRenderProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentsRenderingPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
@@ -51,13 +56,13 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.compat.iris.IrisCompat;
 import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
+import rbasamoyai.ritchiesfirearmengine.mixin.client.AbstractContainerScreenAccessor;
 import rbasamoyai.ritchiesfirearmengine.mixin.client.MinecraftAccessor;
 import rbasamoyai.ritchiesfirearmengine.network.*;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
+ import java.util.function.Consumer;
 
 public class RFEClient {
 
@@ -180,6 +185,7 @@ public class RFEClient {
     }
 
     private static boolean meleeing = false; // TODO consider more general input state handler?
+    private static int fieldAttachmentsScreenOpeningTime = 0;
 
     public static void onKeyInput(int key, int scancode, int action, int mods) {
         Minecraft mc = Minecraft.getInstance();
@@ -207,9 +213,9 @@ public class RFEClient {
                     }
                 }
             }
-            if (OPEN_ATTACHMENTS_SCREEN.isDown() && useStack.getItem() instanceof IHasRFEItemAttachments) {
-                RFENetwork.sendToServer(ServerboundOpenAttachmentsScreenPacket.INSTANCE);
-            }
+//            if (OPEN_ATTACHMENTS_SCREEN.isDown() && useStack.getItem() instanceof IHasRFEItemAttachments) {
+//                RFENetwork.sendToServer(ServerboundOpenAttachmentsScreenPacket.INSTANCE);
+//            }
         }
     }
 
@@ -239,10 +245,64 @@ public class RFEClient {
                     RFENetwork.sendToServer(new ServerboundMeleeInputPacket(false));
                 }
             }
+            ItemStack fieldAttachmentsItem = ItemStack.EMPTY;
+            int menuOpeningTime = RFEConfig.SERVER.fieldAttachmentsMenuOpenTime.getAsInt();
+            boolean openingFieldAttachmentsScreen = isOpeningFieldAttachmentsScreen();
+            if (mc.screen instanceof AbstractContainerScreen<?> ctScreen) {
+                Slot hoveredSlot = ((AbstractContainerScreenAccessor) ctScreen).getHoveredSlot();
+                if (hoveredSlot != null && hoveredSlot.getItem().getItem() instanceof IHasRFEItemAttachments) {
+                    if (openingFieldAttachmentsScreen) {
+                        fieldAttachmentsItem = hoveredSlot.getItem();
+                        fieldAttachmentsScreenOpeningTime = Mth.clamp(fieldAttachmentsScreenOpeningTime + 1, 0, menuOpeningTime);
+                    } else {
+                        fieldAttachmentsScreenOpeningTime = 0;
+                    }
+                } else {
+                    fieldAttachmentsScreenOpeningTime = 0;
+                }
+            } else if (mc.screen == null) {
+                int oldTime = fieldAttachmentsScreenOpeningTime;
+                if (mainhand.getItem() instanceof IHasRFEItemAttachments) {
+                    if (openingFieldAttachmentsScreen) {
+                        fieldAttachmentsItem = mainhand;
+                        fieldAttachmentsScreenOpeningTime = Mth.clamp(fieldAttachmentsScreenOpeningTime + 1, 0, menuOpeningTime);
+                        int totalBars = RFEConfig.CLIENT.tooltipProgressBarLength.getAsInt();
+                        int progressBars = Math.min(totalBars, Mth.ceil((float) fieldAttachmentsScreenOpeningTime / (float) menuOpeningTime * totalBars));
+                        int emptyBars = totalBars - progressBars;
+                        Component progressBar = Component.literal("|".repeat(progressBars)).withStyle(ChatFormatting.GRAY)
+                                .append(Component.literal("|".repeat(emptyBars)).withStyle(ChatFormatting.DARK_GRAY));
+                        mc.player.displayClientMessage(progressBar, true);
+                    } else {
+                        fieldAttachmentsScreenOpeningTime = 0;
+                    }
+                } else {
+                    fieldAttachmentsScreenOpeningTime = 0;
+                }
+                if (oldTime > 0 && fieldAttachmentsScreenOpeningTime == 0)
+                    mc.player.displayClientMessage(Component.empty(), true);
+            } else {
+                fieldAttachmentsScreenOpeningTime = 0;
+            }
+            if (mc.screen instanceof IRFEItemAttachmentsMenu) {
+                fieldAttachmentsScreenOpeningTime = 0;
+            } else if (openingFieldAttachmentsScreen && fieldAttachmentsScreenOpeningTime >= menuOpeningTime
+                    && fieldAttachmentsItem.getItem() instanceof IHasRFEItemAttachments) {
+                RFENetwork.sendToServer(ServerboundOpenAttachmentsScreenPacket.INSTANCE);
+            }
         } else {
             meleeing = false;
+            fieldAttachmentsScreenOpeningTime = 0;
         }
     }
+
+    public static boolean isOpeningFieldAttachmentsScreen() {
+        boolean raw = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), OPEN_ATTACHMENTS_SCREEN.getKey().getValue());
+        OPEN_ATTACHMENTS_SCREEN.setDown(raw);
+        return raw;
+    }
+
+    public static int getFieldAttachmentsScreenOpeningProgress() { return fieldAttachmentsScreenOpeningTime; }
+    public static int getFieldAttachmentsScreenOpeningTime() { return RFEConfig.SERVER.fieldAttachmentsMenuOpenTime.getAsInt(); }
 
     public static float modifyFov(float currentFovModifier, Player player) {
         Minecraft mc = Minecraft.getInstance();
@@ -386,11 +446,11 @@ public class RFEClient {
             ItemStack attachmentStack = entry.getValue();
             if (attachmentStack.isEmpty())
                 continue;
-            Optional<RFEItemAttachmentRenderProperties> op = RFEItemAttachmentsRenderingPacksHandler.getRenderProperties(itemStack, attachmentStack, entry.getKey());
-            if (op.isEmpty())
+            RFEItemAttachmentRenderProperties renderProperties = RFEItemAttachmentsRenderingPacksHandler.getRenderProperties(itemStack, attachmentStack, entry.getKey());
+            if (renderProperties == null)
                 continue;
             poseStack.pushPose();
-            op.get().onRenderOverlay(graphics, partialTick, itemStack, attachmentStack);
+            renderProperties.onRenderOverlay(graphics, partialTick, itemStack, attachmentStack);
             poseStack.popPose();
         }
     }

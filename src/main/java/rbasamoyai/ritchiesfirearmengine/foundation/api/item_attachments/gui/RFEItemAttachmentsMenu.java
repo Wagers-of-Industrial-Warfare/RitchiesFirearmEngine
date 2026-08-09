@@ -78,7 +78,32 @@ public class RFEItemAttachmentsMenu extends AbstractContainerMenu implements IRF
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        return ItemStack.EMPTY;
+        ItemStack returnStack = ItemStack.EMPTY;
+        Slot slot = this.slots.get(index);
+        if (slot != null && slot.hasItem()) {
+            ItemStack moveStack = slot.getItem();
+            returnStack = moveStack.copy();
+            if (index < 36) {
+
+            } else {
+                if (!this.moveItemStackTo(moveStack, 0, 36, true))
+                    return ItemStack.EMPTY;
+            }
+
+            if (moveStack.isEmpty()) {
+                slot.setByPlayer(ItemStack.EMPTY);
+            } else {
+                slot.setChanged();
+            }
+
+            if (moveStack.getCount() == returnStack.getCount()) {
+                return ItemStack.EMPTY;
+            }
+
+            slot.onTake(player, returnStack);
+        }
+
+        return returnStack;
     }
 
     @Override

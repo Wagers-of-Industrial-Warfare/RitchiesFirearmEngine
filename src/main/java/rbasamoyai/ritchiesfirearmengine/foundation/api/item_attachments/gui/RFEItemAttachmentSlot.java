@@ -9,6 +9,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.IHasRFEItemAttachments;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler.SlotConfig;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentsPropertiesHandler;
 
 import javax.annotation.Nullable;
 
@@ -28,7 +29,13 @@ public class RFEItemAttachmentSlot extends Slot {
                 ? attachments.getAttachmentInSlot(parentStack, this.slotId) : ItemStack.EMPTY;
     }
 
-    @Override public boolean mayPlace(ItemStack stack) { return !this.slotConfig.disabled(); }
+    @Override
+    public boolean mayPlace(ItemStack stack) {
+        if (this.slotConfig.disabled() || !(this.parentStack.getItem() instanceof IHasRFEItemAttachments))
+            return false;
+        return RFEItemAttachmentsPropertiesHandler.getData(this.parentStack, stack, this.slotId) != null;
+    }
+
     @Override public boolean mayPickup(Player player) { return !this.slotConfig.disabled(); }
 
     @Override public ItemStack getItem() { return this.storedStack; }

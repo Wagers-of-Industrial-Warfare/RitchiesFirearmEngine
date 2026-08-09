@@ -84,9 +84,18 @@ public class RFEItemAttachmentsMenu extends AbstractContainerMenu implements IRF
             ItemStack moveStack = slot.getItem();
             returnStack = moveStack.copy();
             if (index < 36) {
-
+                boolean placed = false;
+                for (int i = 36; i < this.slots.size(); ++i) {
+                    if (!(this.slots.get(i) instanceof RFEItemAttachmentSlot attachmentSlot))
+                        continue;
+                    if (attachmentSlot.mayPlace(moveStack) && this.moveItemStackTo(moveStack, i, i + 1, false))
+                        placed = true;
+                }
+                if (!placed)
+                    return ItemStack.EMPTY;
             } else {
-                if (!this.moveItemStackTo(moveStack, 0, 36, true))
+                if (!this.moveItemStackTo(moveStack, this.selected + 1, 36, true)
+                        && !this.moveItemStackTo(moveStack, 0, this.selected, true))
                     return ItemStack.EMPTY;
             }
 
@@ -96,13 +105,10 @@ public class RFEItemAttachmentsMenu extends AbstractContainerMenu implements IRF
                 slot.setChanged();
             }
 
-            if (moveStack.getCount() == returnStack.getCount()) {
+            if (moveStack.getCount() == returnStack.getCount())
                 return ItemStack.EMPTY;
-            }
-
             slot.onTake(player, returnStack);
         }
-
         return returnStack;
     }
 

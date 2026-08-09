@@ -2440,6 +2440,15 @@ public class RFEFirearmMode {
         }
     }
 
+    public void addModeAttachmentSlots(ItemStack itemStack, Set<ResourceLocation> slots) {
+        if (this.loadedRoundAttachmentSlot != null)
+            slots.add(this.loadedRoundAttachmentSlot);
+        if (this.magazineAttachmentSlot != null)
+            slots.add(this.magazineAttachmentSlot);
+        if (this.loadedSecondaryAttachmentSlot != null)
+            slots.add(this.loadedSecondaryAttachmentSlot);
+    }
+
     public int getShotCount(ItemStack itemStack) {
         return FirearmDataUtils.getShotCount(this.getModeData(itemStack));
     }

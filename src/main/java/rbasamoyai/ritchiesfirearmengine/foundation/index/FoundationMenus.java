@@ -16,14 +16,14 @@ public class FoundationMenus {
 
     public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(Registries.MENU, RitchiesFirearmEngine.MOD_ID);
 
-    public static final DeferredHolder<MenuType<?>, MenuType<RFEItemAttachmentsMenu>> ATTACHMENTS_MENU = MENU_TYPES.register("attachments_menu",
+    public static final DeferredHolder<MenuType<?>, MenuType<RFEItemAttachmentsMenu>> FIELD_ATTACHMENTS_MENU = MENU_TYPES.register("field_attachments_menu",
             () -> IMenuTypeExtension.create(RFEItemAttachmentsMenu::client));
 
     @EventBusSubscriber(modid = RitchiesFirearmEngine.MOD_ID)
     public static class Screens {
         @SubscribeEvent
         public static void onRegisterMenuScreens(final RegisterMenuScreensEvent evt) {
-            evt.register(ATTACHMENTS_MENU.get(), RFEItemAttachmentsScreen::new);
+            evt.register(FIELD_ATTACHMENTS_MENU.get(), RFEItemAttachmentsScreen::new);
         }
     }
 

@@ -58,8 +58,9 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEConte
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplierHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentsDataPacksHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentsPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.misfires.RFEMisfire;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
@@ -140,7 +141,8 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         registry.accept(RitchiesFirearmEngine.resource("firearm_recoil"), RFERecoilProviderPackHandler.ReloadListener.INSTANCE);
         registry.accept(RitchiesFirearmEngine.resource("hit_multipliers"), RFEHitMultiplierHandler.ReloadListener.INSTANCE);
         registry.accept(RitchiesFirearmEngine.resource("projectile_penetration"), RFEProjectilePenetrationHandler.ReloadListener.INSTANCE);
-        registry.accept(RitchiesFirearmEngine.resource("item_attachment_properties"), RFEItemAttachmentsDataPacksHandler.ReloadListener.INSTANCE);
+        registry.accept(RitchiesFirearmEngine.resource("item_attachment_properties"), RFEItemAttachmentsPropertiesHandler.ReloadListener.INSTANCE);
+        registry.accept(RitchiesFirearmEngine.resource("item_attachment_menu_slots"), RFEItemAttachmentsMenuSlotsHandler.ReloadListener.INSTANCE);
     }
 
     @Override

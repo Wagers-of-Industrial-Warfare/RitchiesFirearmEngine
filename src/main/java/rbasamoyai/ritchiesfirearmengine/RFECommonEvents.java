@@ -15,6 +15,8 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFire
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplierHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentsPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileTypeHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.penetration.RFEProjectilePenetrationHandler;
@@ -50,6 +52,8 @@ public class RFECommonEvents {
         RFESpreadProviderPackHandler.syncToAll();
         RFERecoilProviderPackHandler.syncToAll();
         RFEProjectilePenetrationHandler.syncToAll();
+        RFEItemAttachmentsPropertiesHandler.syncToAll();
+        RFEItemAttachmentsMenuSlotsHandler.syncToAll();
     }
 
     public static void onDatapackSync(ServerPlayer player, boolean singleplayer) {
@@ -64,6 +68,8 @@ public class RFECommonEvents {
         RFESpreadProviderPackHandler.syncToPlayer(player);
         RFERecoilProviderPackHandler.syncToPlayer(player);
         RFEProjectilePenetrationHandler.syncToPlayer(player);
+        RFEItemAttachmentsPropertiesHandler.syncToPlayer(player);
+        RFEItemAttachmentsMenuSlotsHandler.syncToPlayer(player);
     }
 
     public static void onLevelLoad(LevelAccessor level) {

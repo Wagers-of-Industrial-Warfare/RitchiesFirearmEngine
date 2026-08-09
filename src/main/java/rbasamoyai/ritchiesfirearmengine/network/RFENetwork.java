@@ -15,6 +15,8 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineIte
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmAmmoHandler.ClientboundSyncFirearmAmmoPropertiesPacket;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.config.RFEFirearmHandlingPropertiesHandler.ClientboundSyncFirearmHandlingPropertiesPacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.hit_multiplier.RFEHitMultiplierHandler.ClientboundSyncHitMultipliersPacket;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler.ClientboundSyncItemAttachmentsMenuSlotsPacket;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentsPropertiesHandler.ClientboundSyncItemAttachmentsPropertiesPacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager.ClientboundRemoveAllProjectilesPacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager.ClientboundRemoveRFEProjectilePacket;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager.ClientboundSpawnRFEProjectilePacket;
@@ -59,6 +61,8 @@ public class RFENetwork {
         addMessage(id++, QuietExplosion.ClientboundExplosionPacket.class, QuietExplosion.ClientboundExplosionPacket.STREAM_CODEC);
         addMessage(id++, ServerboundMeleeInputPacket.class, ServerboundMeleeInputPacket.STREAM_CODEC);
         addMessage(id++, ServerboundOpenAttachmentsScreenPacket.class, ServerboundOpenAttachmentsScreenPacket.STREAM_CODEC);
+        addMessage(id++, ClientboundSyncItemAttachmentsPropertiesPacket.class, ClientboundSyncItemAttachmentsPropertiesPacket.STREAM_CODEC);
+        addMessage(id++, ClientboundSyncItemAttachmentsMenuSlotsPacket.class, ClientboundSyncItemAttachmentsMenuSlotsPacket.STREAM_CODEC);
     }
 
     private static <MSG extends RFEPacket> void addMessage(int id, Class<MSG> clazz, StreamCodec<RegistryFriendlyByteBuf, MSG> streamCodec) {

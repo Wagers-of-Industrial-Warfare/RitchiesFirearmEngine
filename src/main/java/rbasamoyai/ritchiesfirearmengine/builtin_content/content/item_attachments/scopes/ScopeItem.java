@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties.AttachmentTooltipContext;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +37,10 @@ public class ScopeItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+
+        if (context instanceof AttachmentTooltipContext atCtx && atCtx.overrideDefaults())
+            return; // Do not display this
+
         int zoomIndex = stack.getOrDefault(BuiltInRFEPlugin.RFEDataComponents.ZOOM_LEVEL_INDEX, 0);
         if (this.defaultZoomLevels.isEmpty())
             return; // This shouldn't happen!

@@ -1,0 +1,83 @@
+package rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui;
+
+import com.mojang.datafixers.util.Pair;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.IHasRFEItemAttachments;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler.SlotConfig;
+
+import javax.annotation.Nullable;
+
+public class RFEItemAttachmentSlot extends Slot {
+
+    private final ItemStack parentStack;
+    private final ResourceLocation slotId;
+    private final SlotConfig slotConfig;
+    private ItemStack storedStack;
+
+    public RFEItemAttachmentSlot(ItemStack parentStack, ResourceLocation slotId, int x, int y, SlotConfig slotConfig) {
+        super(new SimpleContainer(0), 0, x, y);
+        this.parentStack = parentStack;
+        this.slotId = slotId;
+        this.slotConfig = slotConfig;
+        this.storedStack = this.parentStack.getItem() instanceof IHasRFEItemAttachments attachments
+                ? attachments.getAttachmentInSlot(parentStack, this.slotId) : ItemStack.EMPTY;
+    }
+
+    @Override public boolean mayPlace(ItemStack stack) { return !this.slotConfig.disabled(); }
+    @Override public boolean mayPickup(Player player) { return !this.slotConfig.disabled(); }
+
+    @Override public ItemStack getItem() { return this.storedStack; }
+
+    @Override
+    public void set(ItemStack stack) {
+        this.storedStack = stack;
+        this.setChanged();
+    }
+
+    @Override
+    public void setChanged() {
+        if (this.parentStack.getItem() instanceof IHasRFEItemAttachments attachments)
+            attachments.setAttachment(this.parentStack, this.slotId, this.storedStack);
+    }
+
+    @Override public int getMaxStackSize() { return 1; } // This may change if it's something like internal magazines.
+
+    @Override
+    public ItemStack remove(int amount) {
+        ItemStack ret = ItemStack.EMPTY;
+        if (amount > 0) {
+            ret = this.storedStack;
+            this.storedStack = ItemStack.EMPTY;
+        }
+        return ret;
+    }
+
+    @Override public int getSlotIndex() { return 0; }
+
+    @Override
+    public boolean isSameInventory(Slot other) {
+        if (this == other) {
+            return true;
+        } else if (!(other instanceof RFEItemAttachmentSlot otherAttachmentSlot)) {
+            return false;
+        } else {
+            return otherAttachmentSlot.parentStack == this.parentStack;
+        }
+    }
+
+    @Override public int getContainerSlot() { return 0; }
+
+    @Nullable
+    @Override
+    public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
+        return this.slotConfig.emptyIcon() == null ? null : Pair.of(InventoryMenu.BLOCK_ATLAS, this.slotConfig.emptyIcon());
+    }
+
+    @Nullable public String getEmptyTextKey() { return this.slotConfig.emptyText(); }
+
+}

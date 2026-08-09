@@ -1,0 +1,9 @@
+{
+  "slots": {
+    "rfe_builtin:scope": {
+      "empty_icon": "rfe_builtin:item/scope_icon",
+      "empty_text": "gui.ritchiesfirearmengine.attachments_menu.scope",
+      "disabled": false
+    }
+  }
+}

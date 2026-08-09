@@ -2,7 +2,7 @@ package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.mojang.serialization.Codec;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -48,7 +48,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEFirearmProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudItemInfoProviders;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.IHasRFEItemAttachments;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties;
-import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentsDataPacksHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentsPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilClientImpulse;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
@@ -483,7 +483,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
             if (attachmentStack.isEmpty())
                 continue;
-            Optional<RFEItemAttachmentProperties> attachmentData = RFEItemAttachmentsDataPacksHandler.getData(itemStack, attachmentStack, slotId);
+            Optional<RFEItemAttachmentProperties> attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
             if (attachmentData.isPresent() && attachmentData.get() instanceof ScopeAttachmentProperties properties
                     && properties.overrideScopeDefaults() && properties.blocksSpeedloaders()
                     || attachmentStack.getItem() instanceof ScopeItem scopeItem && scopeItem.blocksSpeedloadersByDefault()) {
@@ -535,7 +535,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
                 continue;
             int zoomIndex = attachmentStack.getOrDefault(RFEDataComponents.ZOOM_LEVEL_INDEX, 0);
             List<Float> zoomLevels;
-            Optional<RFEItemAttachmentProperties> attachmentData = RFEItemAttachmentsDataPacksHandler.getData(itemStack, attachmentStack, slotId);
+            Optional<RFEItemAttachmentProperties> attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
             if (attachmentData.isPresent() && attachmentData.get() instanceof ScopeAttachmentProperties properties && properties.overrideScopeDefaults()) {
                 zoomLevels = properties.zoomLevels();
             } else if (attachmentStack.getItem() instanceof ScopeItem scopeItem) {
@@ -732,12 +732,37 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
 
     @Override
     public Map<ResourceLocation, ItemStack> getAttachments(ItemStack stack) {
-        Map<ResourceLocation, ItemStack> attachmentsRet = new Object2ObjectOpenHashMap<>();
+        Map<ResourceLocation, ItemStack> attachmentsRet = new Object2ObjectLinkedOpenHashMap<>();
         RFEItemAttachmentContents itemAttachments = stack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
         itemAttachments.copyInto(attachmentsRet);
         for (RFEFirearmMode mode : this.getFirearmModes(stack, null).values())
             mode.addModeAttachments(stack, attachmentsRet);
         return attachmentsRet;
+    }
+
+    @Override
+    public Set<ResourceLocation> getAttachmentSlots(ItemStack stack) {
+        Set<ResourceLocation> slots = new LinkedHashSet<>(this.firearmAttachments.values());
+        for (RFEFirearmMode mode : this.getFirearmModes(stack, null).values())
+            mode.addModeAttachmentSlots(stack, slots);
+        return slots;
+    }
+
+    @Override
+    public void setAttachment(ItemStack itemStack, ResourceLocation slot, ItemStack attachmentItem) {
+        RFEItemAttachmentContents itemAttachments = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
+        Map<ResourceLocation, ItemStack> attachmentsMod = new Object2ObjectLinkedOpenHashMap<>();
+        itemAttachments.copyInto(attachmentsMod);
+        if (attachmentItem.isEmpty()) {
+            attachmentsMod.remove(slot);
+        } else {
+            attachmentsMod.put(slot, attachmentItem);
+        }
+        if (attachmentsMod.isEmpty()) {
+            itemStack.remove(RFEDataComponents.ITEM_ATTACHMENTS);
+        } else {
+            itemStack.set(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.fromItems(attachmentsMod));
+        }
     }
 
     public int getShotCount(ItemStack itemStack) {

@@ -22,7 +22,7 @@ import java.util.List;
 
 public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAttachmentsMenu> {
 
-    private static final ResourceLocation MENU_TEXTURE = RitchiesFirearmEngine.resource("textures/gui/attachments_menu.png");
+    private static final ResourceLocation MENU_TEXTURE = RitchiesFirearmEngine.resource("textures/gui/field_attachments_menu.png");
 
     protected float angleX = 15;
     protected float angleY = -135;
@@ -44,6 +44,16 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
         guiGraphics.fillGradient(this.leftPos, this.topPos, this.leftPos + this.imageWidth,
                 this.topPos + this.imageHeight - 94, 0, 0x3F000000, 0x3F1F7FFF);
         guiGraphics.blit(MENU_TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+
+        this.menu.iterateAttachmentSlots(slot -> {
+            guiGraphics.blit(MENU_TEXTURE, this.leftPos + slot.x - 1, this.topPos + slot.y - 1, this.imageWidth, 0, 18, 18);
+            if (this.menu.getCarried().isEmpty() && this.hoveredSlot == slot && !slot.hasItem()) {
+                String text = slot.getEmptyTextKey();
+                if (text != null)
+                    guiGraphics.renderTooltip(this.font, Component.translatable(text), mouseX, mouseY);
+            }
+        });
+
         int itemX = this.leftPos + 8 + this.menu.getSelectedIndex() * 18;
         int itemY = this.topPos + this.imageHeight - 24;
         guiGraphics.fillGradient(itemX, itemY, itemX + 16, itemY + 16, 100, 0, 0x7F1F7FFF);
@@ -54,6 +64,9 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         this.renderMainItem(guiGraphics, partialTick);
         this.renderTooltip(guiGraphics, mouseX, mouseY);
+
+        // TODO render item pointer overlays
+        // TODO render object options
     }
 
     @Override
@@ -67,10 +80,7 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0, 0, 600);
         guiGraphics.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFFFFFF, true);
-        guiGraphics.pose().popPose();
         guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
     }
 

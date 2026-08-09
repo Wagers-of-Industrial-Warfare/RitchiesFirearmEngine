@@ -10,23 +10,34 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.PacketListener;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.foundation.data_packing.RFEJsonResourceReloadListener;
+import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
+import rbasamoyai.ritchiesfirearmengine.network.RFEPacket;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Executor;
 
-public class RFEItemAttachmentsDataPacksHandler {
+public class RFEItemAttachmentsPropertiesHandler {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final Map<Item, RFEItemAttachmentsPropertiesHolder> ATTACHMENTS = new Reference2ObjectOpenHashMap<>();
+    private static final Map<Item, ItemAttachmentsPropertiesHolder> ATTACHMENTS = new Reference2ObjectOpenHashMap<>();
 
     public static class ReloadListener extends RFEJsonResourceReloadListener {
         private static final Gson GSON = new Gson();
@@ -66,12 +77,12 @@ public class RFEItemAttachmentsDataPacksHandler {
     public static Optional<RFEItemAttachmentProperties> getData(ItemStack parent, ItemStack attachment, ResourceLocation slot) {
         if (parent.isEmpty() || attachment.isEmpty() || !ATTACHMENTS.containsKey(parent.getItem()))
             return Optional.empty();
-        RFEItemAttachmentsPropertiesHolder attachmentData = ATTACHMENTS.get(parent.getItem());
+        ItemAttachmentsPropertiesHolder attachmentData = ATTACHMENTS.get(parent.getItem());
         return Optional.ofNullable(attachmentData.getAttachmentProperties(attachment, slot));
     }
 
     private static class AttachmentsBuilder {
-        public final Map<Item, Map<ResourceLocation, RFEItemAttachmentProperties>> renderDataByItemAndSlot = new Reference2ObjectOpenHashMap<>();
+        public final Reference2ObjectOpenHashMap<Item, Object2ObjectOpenHashMap<ResourceLocation, RFEItemAttachmentProperties>> renderDataByItemAndSlot = new Reference2ObjectOpenHashMap<>();
 
         public void applyLayer(Item attachmentItem, AttachmentItemDataLayer layer) {
             Map<ResourceLocation, RFEItemAttachmentProperties> itemDataBySlot = this.renderDataByItemAndSlot
@@ -79,8 +90,8 @@ public class RFEItemAttachmentsDataPacksHandler {
             itemDataBySlot.putAll(layer.itemDataBySlot);
         }
 
-        public RFEItemAttachmentsPropertiesHolder build() {
-            return new RFEItemAttachmentsPropertiesHolder(this.renderDataByItemAndSlot);
+        public ItemAttachmentsPropertiesHolder build() {
+            return new ItemAttachmentsPropertiesHolder(this.renderDataByItemAndSlot);
         }
     }
 
@@ -91,6 +102,47 @@ public class RFEItemAttachmentsDataPacksHandler {
         ).apply(o, AttachmentItemDataLayer::new));
     }
 
-    private RFEItemAttachmentsDataPacksHandler() {}
+    public record ItemAttachmentsPropertiesHolder(Reference2ObjectOpenHashMap<Item, Object2ObjectOpenHashMap<ResourceLocation, RFEItemAttachmentProperties>> attachmentPropertiesByItemAndSlot) {
+        public static final StreamCodec<RegistryFriendlyByteBuf, ItemAttachmentsPropertiesHolder> STREAM_CODEC =
+                ByteBufCodecs.map(Reference2ObjectOpenHashMap::new, ByteBufCodecs.registry(Registries.ITEM),
+                                ByteBufCodecs.map(Object2ObjectOpenHashMap::new, ResourceLocation.STREAM_CODEC, RFEItemAttachmentProperties.STREAM_CODEC))
+                        .map(ItemAttachmentsPropertiesHolder::new, ItemAttachmentsPropertiesHolder::attachmentPropertiesByItemAndSlot);
+
+        @Nullable
+        public RFEItemAttachmentProperties getAttachmentProperties(Item item, ResourceLocation slot) {
+            if (!this.attachmentPropertiesByItemAndSlot.containsKey(item))
+                return null;
+            return this.attachmentPropertiesByItemAndSlot.get(item).get(slot);
+        }
+
+        @Nullable
+        public RFEItemAttachmentProperties getAttachmentProperties(ItemStack itemStack, ResourceLocation slot) {
+            return this.getAttachmentProperties(itemStack.getItem(), slot);
+        }
+    }
+
+    public static void syncToAll() {
+        RFENetwork.sendToAll(new ClientboundSyncItemAttachmentsPropertiesPacket());
+    }
+
+    public static void syncToPlayer(ServerPlayer player) {
+        RFENetwork.sendToPlayer(new ClientboundSyncItemAttachmentsPropertiesPacket(), player);
+    }
+
+    public record ClientboundSyncItemAttachmentsPropertiesPacket(Reference2ObjectOpenHashMap<Item, ItemAttachmentsPropertiesHolder> attachments) implements RFEPacket {
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundSyncItemAttachmentsPropertiesPacket> STREAM_CODEC =
+                ByteBufCodecs.map(Reference2ObjectOpenHashMap::new, ByteBufCodecs.registry(Registries.ITEM), ItemAttachmentsPropertiesHolder.STREAM_CODEC)
+                        .map(ClientboundSyncItemAttachmentsPropertiesPacket::new, ClientboundSyncItemAttachmentsPropertiesPacket::attachments);
+
+        public ClientboundSyncItemAttachmentsPropertiesPacket() { this(new Reference2ObjectOpenHashMap<>(ATTACHMENTS)); }
+
+        @Override
+        public void handle(Executor exec, PacketListener listener, Player player) {
+            ATTACHMENTS.clear();
+            ATTACHMENTS.putAll(this.attachments);
+        }
+    }
+
+    private RFEItemAttachmentsPropertiesHandler() {}
 
 }

@@ -1,6 +1,7 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui;
 
 import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -23,6 +24,9 @@ import net.neoforged.neoforge.client.ClientTooltipFlag;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsScreenDisplayHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsScreenDisplayHandler.MenuTypeDisplayConfig;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsScreenDisplayHandler.SlotDisplayConfig;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties.AttachmentMenuOptionsText;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties.AttachmentTooltipContext;
@@ -30,7 +34,9 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properti
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundUpdateAttachmentOptionPacket;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAttachmentsMenu> {
@@ -41,6 +47,9 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
     protected float angleY = -135;
     protected float itemScale = 1;
 
+    protected float baseScale = 64;
+    protected Map<ResourceLocation, SlotDisplayConfig> slotDisplayMap = new HashMap<>();
+
     public RFEItemAttachmentsScreen(RFEItemAttachmentsMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         this.imageHeight = 200;
@@ -50,6 +59,9 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
     @Override
     protected void init() {
         super.init();
+        MenuTypeDisplayConfig screenConfig = RFEItemAttachmentsScreenDisplayHandler.getConfig(this.menu.getFocusedAttachmentsItem(), this.menu.getType());
+        this.baseScale = screenConfig.modelScale();
+        this.slotDisplayMap = screenConfig.slotDisplayConfig();
     }
 
     @Override
@@ -75,7 +87,9 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+        RenderSystem.disableCull();
         this.renderMainItem(guiGraphics, partialTick);
+        RenderSystem.enableCull();
         this.renderTooltip(guiGraphics, mouseX, mouseY);
 
         // TODO render item pointer overlays
@@ -141,11 +155,8 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
         boolean gui3d = bakedmodel.isGui3d();
         poseStack.translate(this.leftPos + this.imageWidth / 2f, this.topPos + 50, 150);
 
-        // TODO temporary, need to switch to assets folder thing
-        // TODO mouse-manipulable scaling
-        Vector3f guiScaleOriginal = bakedmodel.getTransforms().getTransform(ItemDisplayContext.GUI).scale;
-        Vector3f guiScaleCopy = guiScaleOriginal.mul(64.0f * this.itemScale, new Vector3f());
-        poseStack.scale(guiScaleCopy.x, -guiScaleCopy.y, guiScaleCopy.z);
+        Vector3f modelScale = new Vector3f(1, 1, 1).mul(this.baseScale * this.itemScale);
+        poseStack.scale(modelScale.x, -modelScale.y, modelScale.z);
 
         poseStack.mulPose(new Quaternionf().rotationXYZ(this.angleX * Mth.DEG_TO_RAD, this.angleY * Mth.DEG_TO_RAD, 0));
 

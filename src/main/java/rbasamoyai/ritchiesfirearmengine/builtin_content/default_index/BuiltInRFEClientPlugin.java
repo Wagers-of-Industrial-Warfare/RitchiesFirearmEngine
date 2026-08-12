@@ -15,6 +15,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.bull
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEClientContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEClientPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRendererPacksHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsScreenDisplayHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentRenderProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentsRenderingPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.SimpleSlotAttachmentRenderData;
@@ -42,6 +43,7 @@ public class BuiltInRFEClientPlugin implements RFEClientPlugin {
         registry.accept(RitchiesFirearmEngine.resource("projectile_renderers"), RFEProjectileRendererPacksHandler.ReloadListener.INSTANCE);
         registry.accept(RitchiesFirearmEngine.resource("hud_overlay_renderers"), RFEHudOverlayRendererPacksHandler.ReloadListener.INSTANCE);
         registry.accept(RitchiesFirearmEngine.resource("item_attachment_renderers"), RFEItemAttachmentsRenderingPacksHandler.ReloadListener.INSTANCE);
+        registry.accept(RitchiesFirearmEngine.resource("item_attachments_screen"), RFEItemAttachmentsScreenDisplayHandler.ReloadListener.INSTANCE);
     }
 
     @Override

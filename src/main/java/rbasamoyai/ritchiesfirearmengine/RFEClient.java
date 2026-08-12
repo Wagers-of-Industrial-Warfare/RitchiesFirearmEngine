@@ -45,6 +45,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRend
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRendererPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.IHasRFEItemAttachments;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.IRFEItemAttachmentsMenu;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.RFEItemAttachmentsMenu;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentRenderProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentsRenderingPacksHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
@@ -248,12 +249,20 @@ public class RFEClient {
             ItemStack fieldAttachmentsItem = ItemStack.EMPTY;
             int menuOpeningTime = RFEConfig.SERVER.fieldAttachmentsMenuOpenTime.getAsInt();
             boolean openingFieldAttachmentsScreen = isOpeningFieldAttachmentsScreen();
-            if (mc.screen instanceof AbstractContainerScreen<?> ctScreen) {
-                Slot hoveredSlot = ((AbstractContainerScreenAccessor) ctScreen).getHoveredSlot();
-                if (hoveredSlot != null && hoveredSlot.getItem().getItem() instanceof IHasRFEItemAttachments) {
-                    if (openingFieldAttachmentsScreen) {
-                        fieldAttachmentsItem = hoveredSlot.getItem();
-                        fieldAttachmentsScreenOpeningTime = Mth.clamp(fieldAttachmentsScreenOpeningTime + 1, 0, menuOpeningTime);
+            int selectedSlot = -1;
+            // TODO clean up this code
+            if (mc.screen instanceof AbstractContainerScreen<?> && !(mc.player.containerMenu instanceof RFEItemAttachmentsMenu)) {
+                Slot hoveredSlot = ((AbstractContainerScreenAccessor) mc.screen).getHoveredSlot();
+                if (hoveredSlot != null && hoveredSlot.container == mc.player.getInventory()) {
+                    ItemStack hoveredItem = hoveredSlot.getItem();
+                    if (hoveredItem.getItem() instanceof IHasRFEItemAttachments) {
+                        if (openingFieldAttachmentsScreen) {
+                            fieldAttachmentsItem = hoveredSlot.getItem();
+                            selectedSlot = mc.player.getInventory().items.indexOf(hoveredItem);
+                            fieldAttachmentsScreenOpeningTime = Mth.clamp(fieldAttachmentsScreenOpeningTime + 1, 0, menuOpeningTime);
+                        } else {
+                            fieldAttachmentsScreenOpeningTime = 0;
+                        }
                     } else {
                         fieldAttachmentsScreenOpeningTime = 0;
                     }
@@ -266,6 +275,8 @@ public class RFEClient {
                     if (openingFieldAttachmentsScreen) {
                         fieldAttachmentsItem = mainhand;
                         fieldAttachmentsScreenOpeningTime = Mth.clamp(fieldAttachmentsScreenOpeningTime + 1, 0, menuOpeningTime);
+                        selectedSlot = mc.player.getInventory().selected;
+
                         int totalBars = RFEConfig.CLIENT.tooltipProgressBarLength.getAsInt();
                         int progressBars = Math.min(totalBars, Mth.ceil((float) fieldAttachmentsScreenOpeningTime / (float) menuOpeningTime * totalBars));
                         int emptyBars = totalBars - progressBars;
@@ -287,7 +298,7 @@ public class RFEClient {
                 fieldAttachmentsScreenOpeningTime = 0;
             } else if (openingFieldAttachmentsScreen && fieldAttachmentsScreenOpeningTime >= menuOpeningTime
                     && fieldAttachmentsItem.getItem() instanceof IHasRFEItemAttachments) {
-                RFENetwork.sendToServer(ServerboundOpenAttachmentsScreenPacket.INSTANCE);
+                RFENetwork.sendToServer(new ServerboundOpenAttachmentsScreenPacket(selectedSlot));
             }
         } else {
             meleeing = false;

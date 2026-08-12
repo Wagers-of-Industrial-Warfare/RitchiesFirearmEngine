@@ -1,9 +1,12 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -11,6 +14,7 @@ import rbasamoyai.ritchiesfirearmengine.RFEClient;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties.AttachmentTooltipContext;
 import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
+import rbasamoyai.ritchiesfirearmengine.mixin.client.AbstractContainerScreenAccessor;
 
 import java.util.List;
 
@@ -33,6 +37,12 @@ public class RFETooltip {
 
     public static void addAttachmentsKeyTooltip(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         if (context instanceof AttachmentTooltipContext atCtx && atCtx.inAttachmentsScreen())
+            return;
+        Minecraft mc = Minecraft.getInstance();
+        if (!(mc.screen instanceof AbstractContainerScreen<?>))
+            return;
+        Slot hoveredSlot = ((AbstractContainerScreenAccessor) mc.screen).getHoveredSlot();
+        if (hoveredSlot == null || mc.player == null || hoveredSlot.container != mc.player.getInventory())
             return;
         if (RFEClient.isOpeningFieldAttachmentsScreen()) {
             int openingTime = RFEClient.getFieldAttachmentsScreenOpeningTime();

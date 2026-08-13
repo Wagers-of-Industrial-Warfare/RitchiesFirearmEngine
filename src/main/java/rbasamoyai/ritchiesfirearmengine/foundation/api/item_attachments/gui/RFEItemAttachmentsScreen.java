@@ -97,6 +97,14 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
     }
 
     @Override
+    protected void renderTooltip(GuiGraphics guiGraphics, int x, int y) {
+        boolean hide = this.hoveredSlot instanceof RFEItemAttachmentSlot && Screen.hasControlDown();
+        if (!hide)
+            super.renderTooltip(guiGraphics, x, y);
+        super.renderTooltip(guiGraphics, x, y);
+    }
+
+    @Override
     protected List<Component> getTooltipFromContainerItem(ItemStack stack) {
         ItemStack focusedItem = this.menu.getFocusedAttachmentsItem();
         RFEItemAttachmentProperties attachmentProperties = null;
@@ -129,6 +137,11 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
                         tooltip.add(Component.literal("  ").append(text));
                 }
             }
+        }
+        if (this.hoveredSlot instanceof RFEItemAttachmentSlot) {
+            tooltip.add(Component.translatable("ritchiesfirearmengine.tooltip.item.hold_key.hide_attachment_tooltip",
+                            Component.translatable("ritchiesfirearmengine.tooltip.key_ctrl").withStyle(ChatFormatting.GRAY))
+                    .withStyle(ChatFormatting.DARK_GRAY));
         }
         return tooltip;
     }

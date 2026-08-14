@@ -2,7 +2,7 @@
   "model_scale": 64.0,
   "slots": {
     "rfe_builtin:scope": {
-      "model_pos": [0, 0, 0]
+      "model_pos": [8, 8, 10]
     }
   }
 }

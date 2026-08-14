@@ -63,6 +63,10 @@ public class RFEConfig {
         public final BooleanValue compatibleAmmoHighlightGradient;
         public final DoubleValue zoomTurnModifierIntensity;
         public final IntValue tooltipProgressBarLength;
+        public final IntValue attachmentScreenBackgroundColor;
+        public final IntValue attachmentScreenItemColor;
+        public final BooleanValue attachmentScreenItemGradient;
+        public final IntValue attachmentScreenPointerColor;
 
         Client(ModConfigSpec.Builder builder) {
             builder.comment("Ritchie's Firearm Engine client configuration settings")
@@ -79,12 +83,12 @@ public class RFEConfig {
                     .define("renderCrosshairOnShoulderSurfingAim", true);
 
             this.compatibleAmmoHighlightColor = builder
-                    .comment("The color that is shown when highlighting currently compatible firearm ammo.")
+                    .comment("The color that is shown when highlighting currently compatible firearm ammo in ARGB.")
                     .translation("ritchiesfirearmengine.configgui.compatibleAmmoHighlightColor")
                     .defineInRange("compatibleAmmoHighlightColor", 0x7F_00FF00, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
             this.incompatibleAmmoHighlightColor = builder
-                    .comment("The color that is shown when highlighting currently incompatible firearm ammo.")
+                    .comment("The color that is shown when highlighting currently incompatible firearm ammo in ARGB.")
                     .translation("ritchiesfirearmengine.configgui.incompatibleAmmoHighlightColor")
                     .defineInRange("incompatibleAmmoHighlightColor", 0x7F_FFDF00, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
@@ -102,6 +106,26 @@ public class RFEConfig {
                     .comment("The number of \"|\" characters in a tooltip progress bar, such as when opening the field attachments menu.")
                     .translation("ritchiesfirearmengine.configgui.tooltipProgressBarLength")
                     .defineInRange("tooltipProgressBarLength", 64, 1, 256);
+
+            this.attachmentScreenBackgroundColor = builder
+                    .comment("The base color of the attachment screen background gradient in RGB.")
+                    .translation("ritchiesfirearmengine.configgui.attachmentScreenBackgroundColor")
+                    .defineInRange("attachmentScreenBackgroundColor", 0x1F7FFF, 0x000000, 0xFFFFFF);
+
+            this.attachmentScreenItemColor = builder
+                    .comment("The base color of the attachment screen item slot gradient in ARGB.")
+                    .translation("ritchiesfirearmengine.configgui.attachmentScreenItemColor")
+                    .defineInRange("attachmentScreenItemColor", 0x7F_1F7FFF, Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+            this.attachmentScreenItemGradient = builder
+                    .comment("Set to true to render the attachment menu item highlight as a gradient, false as a solid color.")
+                    .translation("ritchiesfirearmengine.configgui.attachmentScreenItemGradient")
+                    .define("attachmentScreenItemGradient", true);
+
+            this.attachmentScreenPointerColor = builder
+                    .comment("The color of the attachment screen pointer in ARGB.")
+                    .translation("ritchiesfirearmengine.configgui.attachmentScreenPointerColor")
+                    .defineInRange("attachmentScreenPointerColor", 0x7F_5FDFFF, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
             builder.pop();
         }

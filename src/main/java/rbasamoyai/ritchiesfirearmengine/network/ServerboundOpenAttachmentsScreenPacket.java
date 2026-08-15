@@ -28,7 +28,8 @@ public record ServerboundOpenAttachmentsScreenPacket(int slot) implements RFEPac
         if (!(itemStack.getItem() instanceof IHasRFEItemAttachments))
             return;
         if (player instanceof ServerPlayer splayer)
-            splayer.openMenu(new SimpleMenuProvider(RFEItemAttachmentsMenu::server, Component.translatable("gui.ritchiesfirearmengine.attachments_menu")),
+            splayer.openMenu(new SimpleMenuProvider((id, inv, p) -> RFEItemAttachmentsMenu.server(id, inv, p, this.slot),
+                            Component.translatable("gui.ritchiesfirearmengine.attachments_menu")),
                     buf -> buf.writeVarInt(this.slot));
     }
 

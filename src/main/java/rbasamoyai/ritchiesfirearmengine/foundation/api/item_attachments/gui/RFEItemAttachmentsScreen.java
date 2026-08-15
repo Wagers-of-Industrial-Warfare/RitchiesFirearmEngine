@@ -15,6 +15,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -82,8 +83,9 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
             }
         });
 
-        int itemX = this.leftPos + 8 + this.menu.getSelectedIndex() * 18;
-        int itemY = this.topPos + this.imageHeight - 24;
+        Slot targetSlot = this.menu.getTargetSlot();
+        int itemX = this.leftPos + targetSlot.x;
+        int itemY = this.topPos + targetSlot.y;
         int ITEM_HIGHLIGHT_COLOR = RFEConfig.CLIENT.attachmentScreenItemColor.getAsInt();
         if (RFEConfig.CLIENT.attachmentScreenItemGradient.getAsBoolean()) {
             guiGraphics.fillGradient(itemX, itemY, itemX + 16, itemY + 16, 100, 0, ITEM_HIGHLIGHT_COLOR);

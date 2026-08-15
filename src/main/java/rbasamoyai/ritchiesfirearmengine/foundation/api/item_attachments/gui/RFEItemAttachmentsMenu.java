@@ -32,8 +32,8 @@ public class RFEItemAttachmentsMenu extends AbstractContainerMenu implements IRF
         return new RFEItemAttachmentsMenu(FoundationMenus.FIELD_ATTACHMENTS_MENU.get(), containerId, inventory, buf.readVarInt());
     }
 
-    public static RFEItemAttachmentsMenu server(int containerId, Inventory inventory, Player player) {
-        return new RFEItemAttachmentsMenu(FoundationMenus.FIELD_ATTACHMENTS_MENU.get(), containerId, inventory, inventory.selected);
+    public static RFEItemAttachmentsMenu server(int containerId, Inventory inventory, Player player, int selected) {
+        return new RFEItemAttachmentsMenu(FoundationMenus.FIELD_ATTACHMENTS_MENU.get(), containerId, inventory, selected);
     }
 
     protected RFEItemAttachmentsMenu(MenuType<? extends RFEItemAttachmentsMenu> menuType, int containerId,
@@ -51,7 +51,18 @@ public class RFEItemAttachmentsMenu extends AbstractContainerMenu implements IRF
             if (hotbarCol != this.selected)
                 this.addSlot(new Slot(inventory, hotbarCol, 8 + hotbarCol * 18, 176));
         }
-        this.targetSlot = this.addSlot(new Slot(inventory, this.selected, 8 + this.selected * 18, 176) {
+        int selectedX;
+        int selectedY;
+        if (this.selected < 9) {
+            selectedX = 8 + this.selected * 18;
+            selectedY = 176;
+        } else {
+            int row = Math.floorDiv(this.selected, 9) - 1;
+            int col = this.selected % 9;
+            selectedX = 8 + col * 18;
+            selectedY = 118 + row * 18;
+        }
+        this.targetSlot = this.addSlot(new Slot(inventory, this.selected, selectedX, selectedY) {
             @Override public boolean mayPlace(ItemStack stack) { return false; }
             @Override public boolean mayPickup(Player player) { return false; }
         });
@@ -120,6 +131,8 @@ public class RFEItemAttachmentsMenu extends AbstractContainerMenu implements IRF
     public ItemStack getFocusedAttachmentsItem() { return this.targetSlot.getItem(); }
 
     public int getSelectedIndex() { return this.selected; }
+
+    public Slot getTargetSlot() { return this.targetSlot; }
 
     @Override
     public void modifyAttachmentOption(Player player, ResourceLocation slotId, int option) {

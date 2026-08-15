@@ -302,6 +302,7 @@
   "subtitles.rfe_builtin.item.generic.rifle.gunpowder.pour": "Gunpowder poured",
   "subtitles.rfe_builtin.item.generic.rifle.magazine.reload": "Rifle magazine reloaded",
   "subtitles.rfe_builtin.item.generic.rifle.magazine.unload": "Rifle magazine unloaded",
+  "subtitles.rfe_builtin.item.generic.rifle.lever.cycle": "Lever-action rifle cycled",
   "subtitles.rfe_builtin.item.generic.rifle.rack": "Rifle racked",
   "subtitles.rfe_builtin.item.generic.rifle.ramrod.draw": "Rifle ramrod drawn",
   "subtitles.rfe_builtin.item.generic.rifle.ramrod.insert": "Rifle ramrod inserted",

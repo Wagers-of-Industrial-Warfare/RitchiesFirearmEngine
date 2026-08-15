@@ -97,9 +97,13 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+        PoseStack pose = guiGraphics.pose();
+        pose.pushPose();
+        pose.translate(0, 0, 300);
         this.renderMainItem(guiGraphics, partialTick);
         this.renderSlotPointers(guiGraphics, partialTick);
         this.renderTooltip(guiGraphics, mouseX, mouseY);
+        pose.popPose();
     }
 
     @Override

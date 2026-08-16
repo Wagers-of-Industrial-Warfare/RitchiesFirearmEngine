@@ -43,7 +43,7 @@
         "ritchiesfirearmengine:is_meleeing": 1,
         "ritchiesfirearmengine:has_bayonet": 1
       },
-      "model": "rfe_builtin:item/kar98k/kar98k_fired"
+      "model": "rfe_builtin:item/kar98k/kar98k_melee_bayonet_fired"
     },
     {
       "predicate": {
@@ -51,7 +51,7 @@
         "ritchiesfirearmengine:is_charged": 1,
         "ritchiesfirearmengine:has_bayonet": 1
       },
-      "model": "rfe_builtin:item/kar98k/kar98k_normal"
+      "model": "rfe_builtin:item/kar98k/kar98k_melee_bayonet_normal"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },

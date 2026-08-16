@@ -43,7 +43,7 @@
         "ritchiesfirearmengine:is_meleeing": 1,
         "ritchiesfirearmengine:has_bayonet": 1
       },
-      "model": "rfe_builtin:item/gewehr_88/gewehr_88_fired"
+      "model": "rfe_builtin:item/gewehr_88/gewehr_88_melee_bayonet_fired"
     },
     {
       "predicate": {
@@ -51,7 +51,7 @@
         "ritchiesfirearmengine:is_charged": 1,
         "ritchiesfirearmengine:has_bayonet": 1
       },
-      "model": "rfe_builtin:item/gewehr_88/gewehr_88_normal"
+      "model": "rfe_builtin:item/gewehr_88/gewehr_88_melee_bayonet_normal"
     },
     {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },

@@ -3,7 +3,7 @@
     "rfe_builtin:bayonet": {
       "type": "ritchiesfirearmengine:bayonet",
       "added_attack_damage": 7,
-      "added_attack_speed": -3.2,
+      "added_attack_speed": -3.6,
       "added_attack_range": 1.5,
       "blocks_shooting": false
     }

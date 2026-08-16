@@ -36,9 +36,9 @@ public class ScopeAttachmentRenderProperties extends SimpleSlotAttachmentRenderD
     protected final AimOverlayTexture aimOverlayTexture;
     protected final ScopeGlint scopeGlint;
 
-    protected ScopeAttachmentRenderProperties(ModelResourceLocation model, Matrix4f transforms,
+    protected ScopeAttachmentRenderProperties(ModelResourceLocation model, Vector3f scale, Vector3f rotations, Vector3f translation,
                                               AimOverlayTexture aimOverlayTexture, ScopeGlint scopeGlint) {
-        super(model, transforms);
+        super(model, scale, rotations, translation);
         this.aimOverlayTexture = aimOverlayTexture;
         this.scopeGlint = scopeGlint;
     }
@@ -166,7 +166,8 @@ public class ScopeAttachmentRenderProperties extends SimpleSlotAttachmentRenderD
 
         protected static ScopeAttachmentRenderProperties fromCodec(SimpleSlotAttachmentRenderData parentData,
                                                                    AimOverlayTexture overlayTexture, ScopeGlint scopeGlint) {
-            return new ScopeAttachmentRenderProperties(parentData.model(), parentData.transforms(), overlayTexture, scopeGlint);
+            return new ScopeAttachmentRenderProperties(parentData.model(), parentData.scale(), parentData.rotations(),
+                    parentData.translation(), overlayTexture, scopeGlint);
         }
 
         @Override public MapCodec<ScopeAttachmentRenderProperties> codec() { return CODEC; }

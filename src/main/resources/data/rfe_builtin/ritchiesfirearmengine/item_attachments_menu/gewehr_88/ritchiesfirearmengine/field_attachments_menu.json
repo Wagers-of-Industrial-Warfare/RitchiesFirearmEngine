@@ -1,0 +1,9 @@
+{
+  "slots": {
+    "rfe_builtin:bayonet": {
+      "empty_icon": "ritchiesfirearmengine:item/bayonet_icon",
+      "empty_text": "gui.ritchiesfirearmengine.attachments_menu.bayonet",
+      "disabled": false
+    }
+  }
+}

@@ -21,27 +21,23 @@ import rbasamoyai.ritchiesfirearmengine.remix.ItemRendererModificationContext;
 public class SimpleSlotAttachmentRenderData implements RFEItemAttachmentRenderProperties {
 
     protected final ModelResourceLocation model;
-    protected final Matrix4f transforms;
+    protected final Vector3f scale;
+    protected final Vector3f rotations;
+    protected final Matrix4f rotationMat;
+    protected final Vector3f translation;
 
-    public SimpleSlotAttachmentRenderData(ModelResourceLocation model, Matrix4f transforms) {
+    public SimpleSlotAttachmentRenderData(ModelResourceLocation model, Vector3f scale, Vector3f rotations, Vector3f translation) {
         this.model = model;
-        this.transforms = transforms;
-    }
-
-    public static SimpleSlotAttachmentRenderData fromSRTVectors(ModelResourceLocation model, Vector3f scale,
-                                                                Vector3f rotationXYZDeg, Vector3f translation) {
-        Matrix4f transforms = new Matrix4f().identity();
-        transforms.translation(translation.div(16f));
-        transforms.rotateAffineZYX(rotationXYZDeg.z * Mth.DEG_TO_RAD, rotationXYZDeg.y * Mth.DEG_TO_RAD, rotationXYZDeg.x * Mth.DEG_TO_RAD);
-        transforms.scale(scale);
-        return new SimpleSlotAttachmentRenderData(model, transforms);
+        this.scale = scale;
+        this.rotations = rotations;
+        this.rotationMat = new Matrix4f().rotateAffineZYX(this.rotations.z * Mth.DEG_TO_RAD, this.rotations.y * Mth.DEG_TO_RAD, this.rotations.x * Mth.DEG_TO_RAD);
+        this.translation = translation;
     }
 
     public ModelResourceLocation model() { return this.model; }
-    public Matrix4f transforms() { return this.transforms; }
-    public Vector3f scale() { return this.transforms.getScale(new Vector3f()); }
-    public Vector3f rotations() { return this.transforms.getEulerAnglesZYX(new Vector3f()).mul(Mth.RAD_TO_DEG); }
-    public Vector3f translation() { return this.transforms.getTranslation(new Vector3f()); }
+    public Vector3f scale() { return this.scale; }
+    public Vector3f rotations() { return this.rotations; }
+    public Vector3f translation() { return this.translation; }
 
     @Override
     public void onRenderItemModel(Operation<Void> renderOp, ItemModelShaper modelShaper, ItemStack parentItem, ItemStack attachmentStack,
@@ -50,7 +46,9 @@ public class SimpleSlotAttachmentRenderData implements RFEItemAttachmentRenderPr
         if (renderContext.hideItem)
             return;
         BakedModel attachmentModel = modelShaper.getModelManager().getModel(this.model);
-        poseStack.mulPose(this.transforms);
+        poseStack.scale(this.scale.x, this.scale.y, this.scale.z);
+        poseStack.mulPose(this.rotationMat);
+        poseStack.translate(this.translation.x / 16f, this.translation.y / 16f, this.translation.z / 16f);
         renderOp.call(attachmentStack, displayContext, leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, attachmentModel);
     }
 
@@ -65,7 +63,7 @@ public class SimpleSlotAttachmentRenderData implements RFEItemAttachmentRenderPr
                 ExtraCodecs.VECTOR3F.optionalFieldOf("scale", new Vector3f(1f, 1f, 1f)).forGetter(SimpleSlotAttachmentRenderData::scale),
                 ExtraCodecs.VECTOR3F.optionalFieldOf("rotation", new Vector3f()).forGetter(SimpleSlotAttachmentRenderData::rotations),
                 ExtraCodecs.VECTOR3F.optionalFieldOf("translation", new Vector3f()).forGetter(SimpleSlotAttachmentRenderData::translation)
-        ).apply(o, SimpleSlotAttachmentRenderData::fromSRTVectors));
+        ).apply(o, SimpleSlotAttachmentRenderData::new));
 
         @Override public MapCodec<SimpleSlotAttachmentRenderData> codec() { return CODEC; }
     }

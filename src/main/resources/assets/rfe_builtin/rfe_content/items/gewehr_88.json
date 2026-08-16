@@ -1,5 +1,8 @@
 {
   "type": "ritchiesfirearmengine:firearm",
+  "firearm_attachments": {
+    "rfe_builtin:bayonet": "ritchiesfirearmengine:bayonet"
+  },
   "drawing": {
     "draw_time": 18,
     "sound": "rfe_builtin:item.generic.rifle.draw"

@@ -148,7 +148,9 @@ public class RFEClient {
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_meleeing"), (itemStack, level, entity, seed) -> {
             return itemStack.getItem() instanceof RFEFirearmItem firearm && firearm.isVisuallyMeleeing(itemStack, entity) ? 1 : 0;
         });
-        // TODO bayonet predicate
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("has_bayonet"), (itemStack, level, entity, seed) -> {
+            return itemStack.getItem() instanceof RFEFirearmItem firearm && firearm.hasBayonet(itemStack) ? 1 : 0;
+        });
     }
 
     public static void onRegisterParticleProviders(ParticleRegistry registry) {

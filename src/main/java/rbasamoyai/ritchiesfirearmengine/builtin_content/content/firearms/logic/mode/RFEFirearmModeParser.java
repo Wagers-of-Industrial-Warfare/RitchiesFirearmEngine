@@ -248,17 +248,20 @@ public abstract class RFEFirearmModeParser<T extends RFEFirearmModeBuilder> {
                 boolean forcedMelee = GsonHelper.getAsBoolean(meleeObj, "forced_melee", builder.forcedMelee);
                 double baseAttackSpeed = GsonHelper.getAsDouble(meleeObj, "melee_attack_speed", builder.baseMeleeAttackSpeed);
                 double baseAttackDamage = GsonHelper.getAsDouble(meleeObj, "melee_attack_damage", builder.baseMeleeAttackDamage);
+                double baseAddedAttackRange = GsonHelper.getAsDouble(meleeObj, "melee_added_attack_range", builder.baseMeleeAddedAttackRange);
                 int enterMeleeWindowTime = GsonHelper.getAsInt(meleeObj, "enter_melee_window_time", builder.enterMeleeWindowTime);
                 int exitMeleeTime = GsonHelper.getAsInt(meleeObj, "exit_melee_time", builder.exitMeleeTime);
                 builder.forcedMelee(forcedMelee)
                         .baseMeleeAttackSpeed(baseAttackSpeed)
                         .baseMeleeAttackDamage(baseAttackDamage)
+                        .baseMeleeAddedAttackRange(baseAddedAttackRange)
                         .enterMeleeWindowTime(enterMeleeWindowTime)
                         .exitMeleeTime(exitMeleeTime);
             } else {
                 builder.forcedMelee(false)
                         .baseMeleeAttackSpeed(1)
                         .baseMeleeAttackDamage(1)
+                        .baseMeleeAddedAttackRange(0)
                         .enterMeleeWindowTime(1)
                         .exitMeleeTime(1);
             }

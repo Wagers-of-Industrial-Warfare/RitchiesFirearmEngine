@@ -38,6 +38,8 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.m
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmModeHandlingProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhase;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhaseAccessFilter;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.bayonets.BayonetAttachmentProperties;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.bayonets.BayonetItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemAttachmentContents;
@@ -65,6 +67,8 @@ import java.util.stream.Collectors;
  * Basic firearms class.
  */
 public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasRFEItemAttachments {
+
+    public static final ResourceLocation BASE_ATTACK_RANGE_ID = RitchiesFirearmEngine.resource("base_attack_range");
 
     protected final Map<String, RFEFirearmMode> baseFirearmModes;
     protected final List<String> modeOrder;
@@ -128,8 +132,8 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
         List<ItemAttributeModifiers.Entry> modifiers = new ArrayList<>(2);
         RFEFirearmMode mode = this.getCurrentMode(stack);
-        RFEFirearmModeHandlingProperties properties = mode.getHandlingProperties(stack);
-        float speedModifierValue = properties.movementSpeedModifier();
+        RFEFirearmModeHandlingProperties handlingProperties = mode.getHandlingProperties(stack);
+        float speedModifierValue = handlingProperties.movementSpeedModifier();
         if (speedModifierValue != 0f) {
             AttributeModifier speedModifier = new AttributeModifier(RitchiesFirearmEngine.resource("handling_movement_speed"),
                     speedModifierValue, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
@@ -137,10 +141,45 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             modifiers.add(new ItemAttributeModifiers.Entry(Attributes.MOVEMENT_SPEED.getDelegate(), speedModifier, EquipmentSlotGroup.OFFHAND));
         }
         if (mode.canMelee(stack)) {
-            AttributeModifier attackSpeedModifier = new AttributeModifier(BASE_ATTACK_SPEED_ID, properties.meleeAttackSpeed() - 4, AttributeModifier.Operation.ADD_VALUE);
-            AttributeModifier attackDamageModifier = new AttributeModifier(BASE_ATTACK_DAMAGE_ID, properties.meleeAttackDamage() - 1, AttributeModifier.Operation.ADD_VALUE);
-            modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_SPEED.getDelegate(), attackSpeedModifier, EquipmentSlotGroup.MAINHAND));
-            modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_DAMAGE.getDelegate(), attackDamageModifier, EquipmentSlotGroup.MAINHAND));
+            boolean hasBayonet = false;
+            RFEItemAttachmentContents firearmAttachmentContents = stack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
+            for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BAYONET)) {
+                ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
+                if (attachmentStack.isEmpty())
+                    continue;
+                RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(stack, attachmentStack, slotId);
+                float addedAttackDamage = 0;
+                float addedAttackSpeed = 0;
+                float addedAttackRange = 0;
+                if (attachmentData instanceof BayonetAttachmentProperties bayonetProperties && bayonetProperties.overrideBayonetDefaults()) {
+                    addedAttackDamage = bayonetProperties.addedAttackDamage();
+                    addedAttackSpeed = bayonetProperties.addedAttackSpeed();
+                    addedAttackRange = bayonetProperties.addedAttackRange();
+                    hasBayonet = true;
+                } else if (attachmentStack.getItem() instanceof BayonetItem bayonetItem) {
+                    addedAttackDamage = bayonetItem.defaultAddedAttackDamage();
+                    addedAttackSpeed = bayonetItem.defaultAddedAttackSpeed();
+                    addedAttackRange = bayonetItem.defaultAddedAttackRange();
+                    hasBayonet = true;
+                }
+                if (hasBayonet) {
+                    AttributeModifier attackSpeedModifier = new AttributeModifier(BASE_ATTACK_SPEED_ID, addedAttackSpeed, AttributeModifier.Operation.ADD_VALUE);
+                    AttributeModifier attackDamageModifier = new AttributeModifier(BASE_ATTACK_DAMAGE_ID, addedAttackDamage, AttributeModifier.Operation.ADD_VALUE);
+                    AttributeModifier attackRangeModifier = new AttributeModifier(BASE_ATTACK_RANGE_ID, addedAttackRange, AttributeModifier.Operation.ADD_VALUE);
+                    modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_SPEED.getDelegate(), attackSpeedModifier, EquipmentSlotGroup.MAINHAND));
+                    modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_DAMAGE.getDelegate(), attackDamageModifier, EquipmentSlotGroup.MAINHAND));
+                    modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ENTITY_INTERACTION_RANGE.getDelegate(), attackRangeModifier, EquipmentSlotGroup.MAINHAND));
+                    break;
+                }
+            }
+            if (!hasBayonet) {
+                AttributeModifier attackSpeedModifier = new AttributeModifier(BASE_ATTACK_SPEED_ID, handlingProperties.meleeAttackSpeed() - 4, AttributeModifier.Operation.ADD_VALUE);
+                AttributeModifier attackDamageModifier = new AttributeModifier(BASE_ATTACK_DAMAGE_ID, handlingProperties.meleeAttackDamage() - 1, AttributeModifier.Operation.ADD_VALUE);
+                AttributeModifier attackRangeModifier = new AttributeModifier(BASE_ATTACK_RANGE_ID, handlingProperties.meleeAddedAttackRange(), AttributeModifier.Operation.ADD_VALUE);
+                modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_SPEED.getDelegate(), attackSpeedModifier, EquipmentSlotGroup.MAINHAND));
+                modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_DAMAGE.getDelegate(), attackDamageModifier, EquipmentSlotGroup.MAINHAND));
+                modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ENTITY_INTERACTION_RANGE.getDelegate(), attackRangeModifier, EquipmentSlotGroup.MAINHAND));
+            }
         }
         return new ItemAttributeModifiers(modifiers, true);
     }
@@ -183,9 +222,23 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         return this.baseFirearmModes.get(this.defaultMode);
     }
 
+    public boolean isPluggedByBayonet(ItemStack itemStack) {
+        RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
+        for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BAYONET)) {
+            ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
+            if (attachmentStack.isEmpty())
+                continue;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
+            if (attachmentData instanceof BayonetAttachmentProperties bayonetAttachmentProperties && bayonetAttachmentProperties.blocksShooting()
+                    || attachmentStack.getItem() instanceof BayonetItem bayonetItem && bayonetItem.blocksShootingByDefault())
+                return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean onPressAttackKey(ItemStack stack, LivingEntity entity) {
-        if (this.getCurrentMode(stack).isMeleeing(stack))
+        if (this.getCurrentMode(stack).isMeleeing(stack) || this.isPluggedByBayonet(stack))
             return false;
 
         FirearmDataUtils.setHoldingAttackKey(stack, true);
@@ -202,7 +255,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     }
 
     public void onEntityTryAttackOption(ItemStack stack, LivingEntity entity) {
-        if (this.getCurrentMode(stack).isMeleeing(stack))
+        if (this.getCurrentMode(stack).isMeleeing(stack) || this.isPluggedByBayonet(stack))
             return; // Do not handle meleeing in this method, and do mode switching in a different method
         FirearmDataUtils.setHoldingAttackKey(stack, true);
         RFEFirearmMode firearmMode = this.getCurrentMode(stack);
@@ -612,6 +665,36 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     public boolean isAiming(ItemStack itemStack, LivingEntity entity) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
         return mode.isAiming(itemStack, entity);
+    }
+
+    public boolean hasScope(ItemStack itemStack) {
+        RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
+        for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.SCOPE)) {
+            ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
+            if (attachmentStack.isEmpty())
+                continue;
+            if (attachmentStack.getItem() instanceof ScopeItem)
+                return true;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
+            if (attachmentData instanceof ScopeAttachmentProperties)
+                return true;
+        }
+        return false;
+    }
+
+    public boolean hasBayonet(ItemStack itemStack) {
+        RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
+        for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BAYONET)) {
+            ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
+            if (attachmentStack.isEmpty())
+                continue;
+            if (attachmentStack.getItem() instanceof BayonetItem)
+                return true;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
+            if (attachmentData instanceof BayonetAttachmentProperties)
+                return true;
+        }
+        return false;
     }
 
     public List<ItemStack> getAmmoItemsForHUD(ItemStack itemStack) {

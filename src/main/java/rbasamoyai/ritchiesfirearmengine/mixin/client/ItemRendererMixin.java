@@ -37,6 +37,20 @@ public abstract class ItemRendererMixin {
             Map<ResourceLocation, ItemStack> renderedAttachments = hasAttachments.getAttachments(itemStack);
             poseStack.pushPose();
             RFEClientRemix.handleItemCameraTransforms(poseStack, model, displayContext, leftHand); // Restore parent item transforms
+            // First iteration - mainly use for setting context, can also do rendering
+            for (Map.Entry<ResourceLocation, ItemStack> entry : renderedAttachments.entrySet()) {
+                ItemStack attachmentStack = entry.getValue();
+                if (attachmentStack.isEmpty())
+                    continue;
+                RFEItemAttachmentRenderProperties renderProperties = RFEItemAttachmentsRenderingPacksHandler.getRenderProperties(itemStack, attachmentStack, entry.getKey());
+                if (renderProperties == null)
+                    continue;
+                poseStack.pushPose();
+                renderProperties.onRenderItemModelPre(original, this.getItemModelShaper(), itemStack, attachmentStack, displayContext,
+                        leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, renderContext);
+                poseStack.popPose();
+            }
+            // Second iteration - mainly for context-sensitive rendering
             for (Map.Entry<ResourceLocation, ItemStack> entry : renderedAttachments.entrySet()) {
                 ItemStack attachmentStack = entry.getValue();
                 if (attachmentStack.isEmpty())

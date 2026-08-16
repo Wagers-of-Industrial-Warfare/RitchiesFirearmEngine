@@ -44,60 +44,66 @@ public class ScopeAttachmentRenderProperties extends SimpleSlotAttachmentRenderD
     }
 
     @Override
+    public void onRenderItemModelPre(Operation<Void> renderOp, ItemModelShaper modelShaper, ItemStack parentItem, ItemStack attachmentStack,
+                                     ItemDisplayContext displayContext, boolean leftHand, PoseStack poseStack, MultiBufferSource bufferSource,
+                                     int combinedLight, int combinedOverlay, ItemRendererModificationContext renderContext) {
+        boolean isAiming = parentItem.getItem() instanceof RFEFirearmItem firearmItem && firearmItem.isAiming(parentItem, null);
+        if (isAiming && displayContext.firstPerson())
+            renderContext.hideItem = true;
+    }
+
+    @Override
     public void onRenderItemModel(Operation<Void> renderOp, ItemModelShaper modelShaper, ItemStack parentItem, ItemStack attachmentStack,
                                   ItemDisplayContext displayContext, boolean leftHand, PoseStack poseStack, MultiBufferSource bufferSource,
                                   int combinedLight, int combinedOverlay, ItemRendererModificationContext renderContext) {
+        poseStack.pushPose();
+        super.onRenderItemModel(renderOp, modelShaper, parentItem, attachmentStack, displayContext, leftHand, poseStack,
+                bufferSource, combinedLight, combinedOverlay, renderContext);
+        poseStack.popPose();
         boolean isAiming = parentItem.getItem() instanceof RFEFirearmItem firearmItem && firearmItem.isAiming(parentItem, null);
-        if (isAiming && displayContext.firstPerson()) {
-            renderContext.hideItem = true;
-        } else {
+        if (isAiming && !displayContext.firstPerson() && this.scopeGlint.visualScale > 0
+                && (displayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND || displayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND)) {
             poseStack.pushPose();
-            super.onRenderItemModel(renderOp, modelShaper, parentItem, attachmentStack, displayContext, leftHand, poseStack,
-                    bufferSource, combinedLight, combinedOverlay, renderContext);
-            poseStack.popPose();
-            if (isAiming && this.scopeGlint.visualScale > 0 && (displayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND || displayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND)) {
-                poseStack.pushPose();
-                poseStack.translate(this.scopeGlint.visualOffset.x / 16f, this.scopeGlint.visualOffset.y / 16f, this.scopeGlint.visualOffset.z / 16f);
-                double limitSqr = this.scopeGlint.visibleRange * this.scopeGlint.visibleRange;
-                Matrix4f lastMat = poseStack.last().pose();
-                Vector3f cameraRenderPos = lastMat.getTranslation(new Vector3f());
-                if (cameraRenderPos.lengthSquared() < limitSqr) {
-                    Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+            poseStack.translate(this.scopeGlint.visualOffset.x / 16f, this.scopeGlint.visualOffset.y / 16f, this.scopeGlint.visualOffset.z / 16f);
+            double limitSqr = this.scopeGlint.visibleRange * this.scopeGlint.visibleRange;
+            Matrix4f lastMat = poseStack.last().pose();
+            Vector3f cameraRenderPos = lastMat.getTranslation(new Vector3f());
+            if (cameraRenderPos.lengthSquared() < limitSqr) {
+                Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
 
-                    float cameraXRot = camera.getXRot() * Mth.DEG_TO_RAD;
-                    float cameraYRot = -camera.getYRot() * Mth.DEG_TO_RAD;
-                    float camCosX = Mth.cos(cameraXRot);
-                    Vector3f cameraViewVec = new Vector3f(Mth.sin(cameraYRot) * camCosX, -Mth.sin(cameraXRot), Mth.cos(cameraYRot) * camCosX);
+                float cameraXRot = camera.getXRot() * Mth.DEG_TO_RAD;
+                float cameraYRot = -camera.getYRot() * Mth.DEG_TO_RAD;
+                float camCosX = Mth.cos(cameraXRot);
+                Vector3f cameraViewVec = new Vector3f(Mth.sin(cameraYRot) * camCosX, -Mth.sin(cameraXRot), Mth.cos(cameraYRot) * camCosX);
 
-                    Quaternionf qf = lastMat.getUnnormalizedRotation(new Quaternionf()).normalize();
-                    // TODO possible customization of orientation to fit model, but very rare and probably not needed.
-                    Vector3f modelViewVec = new Vector3f(0, 0, -1).rotate(qf);
+                Quaternionf qf = lastMat.getUnnormalizedRotation(new Quaternionf()).normalize();
+                // TODO possible customization of orientation to fit model, but very rare and probably not needed.
+                Vector3f modelViewVec = new Vector3f(0, 0, -1).rotate(qf);
 
-                    Vector3f cameraPosVec = cameraRenderPos.normalize(new Vector3f());
+                Vector3f cameraPosVec = cameraRenderPos.normalize(new Vector3f());
 
-                    float cameraAndPositionAlignment = cameraViewVec.dot(cameraPosVec);
-                    float positionAndModelAlignment = cameraPosVec.dot(modelViewVec);
+                float cameraAndPositionAlignment = cameraViewVec.dot(cameraPosVec);
+                float positionAndModelAlignment = cameraPosVec.dot(modelViewVec);
 
-                    final float FADE_TO_CUTOFF_ANGLE = 30;
-                    float glintCutoffAlignment = Mth.cos((float) (this.scopeGlint.fieldOfVisibility + FADE_TO_CUTOFF_ANGLE) * Mth.DEG_TO_RAD / 2f);
-                    float glintFadeAlignment = Mth.cos((float) this.scopeGlint.fieldOfVisibility * Mth.DEG_TO_RAD / 2f);
+                final float FADE_TO_CUTOFF_ANGLE = 30;
+                float glintCutoffAlignment = Mth.cos((float) (this.scopeGlint.fieldOfVisibility + FADE_TO_CUTOFF_ANGLE) * Mth.DEG_TO_RAD / 2f);
+                float glintFadeAlignment = Mth.cos((float) this.scopeGlint.fieldOfVisibility * Mth.DEG_TO_RAD / 2f);
 
-                    if (cameraAndPositionAlignment > glintCutoffAlignment && positionAndModelAlignment < -glintCutoffAlignment) {
-                        float fadeScale = Mth.clamp((cameraAndPositionAlignment - glintCutoffAlignment) / (glintFadeAlignment - glintCutoffAlignment), 0, 1);
-                        float rotation = cameraViewVec.cross(cameraPosVec, new Vector3f()).dot(0, 1, 0);
+                if (cameraAndPositionAlignment > glintCutoffAlignment && positionAndModelAlignment < -glintCutoffAlignment) {
+                    float fadeScale = Mth.clamp((cameraAndPositionAlignment - glintCutoffAlignment) / (glintFadeAlignment - glintCutoffAlignment), 0, 1);
+                    float rotation = cameraViewVec.cross(cameraPosVec, new Vector3f()).dot(0, 1, 0);
 
-                        Quaternionf glintRot = new Quaternionf().set(camera.rotation());
-                        glintRot.rotateZ(rotation * Mth.PI);
+                    Quaternionf glintRot = new Quaternionf().set(camera.rotation());
+                    glintRot.rotateZ(rotation * Mth.PI);
 
-                        RenderType glintRenderType = RenderType.entityTranslucentCull(this.scopeGlint.textureLocation);
+                    RenderType glintRenderType = RenderType.entityTranslucentCull(this.scopeGlint.textureLocation);
 
-                        float glintScale = this.scopeGlint.calculateVisualScale(cameraRenderPos.length()) / 4f * fadeScale * fadeScale;
-                        this.renderRotatedQuad(bufferSource.getBuffer(glintRenderType), glintRot, cameraRenderPos.x,
-                                cameraRenderPos.y, cameraRenderPos.z, LightTexture.FULL_BRIGHT, glintScale);
-                    }
+                    float glintScale = this.scopeGlint.calculateVisualScale(cameraRenderPos.length()) / 4f * fadeScale * fadeScale;
+                    this.renderRotatedQuad(bufferSource.getBuffer(glintRenderType), glintRot, cameraRenderPos.x,
+                            cameraRenderPos.y, cameraRenderPos.z, LightTexture.FULL_BRIGHT, glintScale);
                 }
-                poseStack.popPose();
             }
+            poseStack.popPose();
         }
     }
 

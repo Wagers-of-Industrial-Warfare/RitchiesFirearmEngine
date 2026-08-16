@@ -1,7 +1,8 @@
 {
   "type": "ritchiesfirearmengine:firearm",
   "firearm_attachments": {
-    "rfe_builtin:scope": "ritchiesfirearmengine:scope"
+    "rfe_builtin:scope": "ritchiesfirearmengine:scope",
+    "rfe_builtin:bayonet": "ritchiesfirearmengine:bayonet"
   },
   "drawing": {
     "draw_time": 18,

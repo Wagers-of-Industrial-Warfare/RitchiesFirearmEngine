@@ -3,6 +3,9 @@
   "slots": {
     "rfe_builtin:scope": {
       "model_pos": [8, 8, 10]
+    },
+    "rfe_builtin:bayonet": {
+      "model_pos": [8, 6, -12]
     }
   }
 }

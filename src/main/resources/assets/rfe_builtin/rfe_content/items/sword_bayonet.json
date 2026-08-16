@@ -1,0 +1,7 @@
+{
+  "type": "ritchiesfirearmengine:bayonet",
+  "added_attack_damage": 5,
+  "added_attack_speed": -2.4,
+  "added_attack_range": 0,
+  "blocks_shooting": false
+}

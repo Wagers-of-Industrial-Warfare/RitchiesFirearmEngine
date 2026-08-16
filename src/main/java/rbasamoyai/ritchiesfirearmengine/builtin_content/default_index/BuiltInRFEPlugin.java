@@ -44,6 +44,8 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.fixed.FixedHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.vulnerable_to_birdshot.BirdshotHitMultiplier;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.vulnerable_to_birdshot.BirdshotHitMultiplierGore;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.bayonets.BayonetAttachmentProperties;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.bayonets.BayonetItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemAttachmentContents;
@@ -95,6 +97,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("ammo_packet"), new AmmoPacketItem.Builder());
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("firearm"), new RFEDefaultFirearmItem.Builder());
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("scope"), new ScopeItem.Builder());
+        RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("bayonet"), new BayonetItem.Builder());
 
         ProjectileTypes.register();
         SpreadProviders.register();
@@ -667,6 +670,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
 
     public static class AttachmentSlots {
         public static final RFEItemAttachmentProperties.Serializer<ScopeAttachmentProperties> SCOPE = register("scope", new ScopeAttachmentProperties.Serializer());
+        public static final RFEItemAttachmentProperties.Serializer<BayonetAttachmentProperties> BAYONET = register("bayonet", new BayonetAttachmentProperties.Serializer());
 
         public static void register() {}
 

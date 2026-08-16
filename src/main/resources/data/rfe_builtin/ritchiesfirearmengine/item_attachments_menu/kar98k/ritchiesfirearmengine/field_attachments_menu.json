@@ -1,8 +1,13 @@
 {
   "slots": {
     "rfe_builtin:scope": {
-      "empty_icon": "rfe_builtin:item/scope_icon",
+      "empty_icon": "ritchiesfirearmengine:item/scope_icon",
       "empty_text": "gui.ritchiesfirearmengine.attachments_menu.scope",
+      "disabled": false
+    },
+    "rfe_builtin:bayonet": {
+      "empty_icon": "ritchiesfirearmengine:item/bayonet_icon",
+      "empty_text": "gui.ritchiesfirearmengine.attachments_menu.bayonet",
       "disabled": false
     }
   }

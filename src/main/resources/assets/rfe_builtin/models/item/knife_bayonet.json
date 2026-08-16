@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "rfe_builtin:item/knife_bayonet"
+  }
+}

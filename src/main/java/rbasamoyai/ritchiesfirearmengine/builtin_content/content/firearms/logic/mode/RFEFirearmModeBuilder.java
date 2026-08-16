@@ -109,6 +109,7 @@ public class RFEFirearmModeBuilder {
     protected boolean forcedMelee;
     protected double baseMeleeAttackDamage; // Datapackable
     protected double baseMeleeAttackSpeed; // Datapackable
+    protected double baseMeleeAddedAttackRange; // Datapackable
     protected int enterMeleeWindowTime;
     protected int exitMeleeTime;
     // TODO bayonet charge
@@ -193,6 +194,7 @@ public class RFEFirearmModeBuilder {
         newBuilder.forcedMelee = this.forcedMelee;
         newBuilder.baseMeleeAttackSpeed = this.baseMeleeAttackSpeed;
         newBuilder.baseMeleeAttackDamage = this.baseMeleeAttackDamage;
+        newBuilder.baseMeleeAddedAttackRange = this.baseMeleeAddedAttackRange;
         newBuilder.enterMeleeWindowTime = this.enterMeleeWindowTime;
         newBuilder.exitMeleeTime = this.exitMeleeTime;
 
@@ -716,6 +718,11 @@ public class RFEFirearmModeBuilder {
 
     public RFEFirearmModeBuilder baseMeleeAttackDamage(double baseMeleeAttackDamage) {
         this.baseMeleeAttackDamage = baseMeleeAttackDamage;
+        return this;
+    }
+
+    public RFEFirearmModeBuilder baseMeleeAddedAttackRange(double baseMeleeAddedAttackRange) {
+        this.baseMeleeAddedAttackRange = baseMeleeAddedAttackRange;
         return this;
     }
 

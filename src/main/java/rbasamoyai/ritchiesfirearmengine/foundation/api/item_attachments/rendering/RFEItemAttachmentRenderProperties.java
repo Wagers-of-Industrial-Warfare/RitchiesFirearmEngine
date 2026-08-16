@@ -33,6 +33,10 @@ public interface RFEItemAttachmentRenderProperties {
                     })
             .dispatchMap(RFEItemAttachmentRenderProperties::getSerializer, Serializer::codec);
 
+    default void onRenderItemModelPre(Operation<Void> renderOp, ItemModelShaper modelShaper, ItemStack parentItem, ItemStack attachmentStack,
+                                      ItemDisplayContext displayContext, boolean leftHand, PoseStack poseStack, MultiBufferSource bufferSource,
+                                      int combinedLight, int combinedOverlay, ItemRendererModificationContext renderContext) {}
+
     default void onRenderItemModel(Operation<Void> renderOp, ItemModelShaper modelShaper, ItemStack parentItem, ItemStack attachmentStack,
                                    ItemDisplayContext displayContext, boolean leftHand, PoseStack poseStack, MultiBufferSource bufferSource,
                                    int combinedLight, int combinedOverlay, ItemRendererModificationContext renderContext) {}

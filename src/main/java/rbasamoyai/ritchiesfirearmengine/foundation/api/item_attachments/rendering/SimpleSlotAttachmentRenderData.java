@@ -47,6 +47,8 @@ public class SimpleSlotAttachmentRenderData implements RFEItemAttachmentRenderPr
     public void onRenderItemModel(Operation<Void> renderOp, ItemModelShaper modelShaper, ItemStack parentItem, ItemStack attachmentStack,
                                   ItemDisplayContext displayContext, boolean leftHand, PoseStack poseStack, MultiBufferSource bufferSource,
                                   int combinedLight, int combinedOverlay, ItemRendererModificationContext renderContext) {
+        if (renderContext.hideItem)
+            return;
         BakedModel attachmentModel = modelShaper.getModelManager().getModel(this.model);
         poseStack.mulPose(this.transforms);
         renderOp.call(attachmentStack, displayContext, leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, attachmentModel);

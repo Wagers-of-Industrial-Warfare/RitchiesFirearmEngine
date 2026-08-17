@@ -1,7 +1,9 @@
 package rbasamoyai.ritchiesfirearmengine.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -13,6 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.RFEItemAttachmentsScreen;
 import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 import rbasamoyai.ritchiesfirearmengine.remix.RFEClientRemix;
 
@@ -42,6 +45,19 @@ public abstract class AbstractContainerScreenMixin {
             }
         }
         original.call(instance, guiGraphics, mouseX, mouseY);
+    }
+
+    @WrapMethod(method = "renderFloatingItem")
+    private void ritchiesfirearmengine$renderFloatingItem(GuiGraphics guiGraphics, ItemStack stack, int x, int y, String text, Operation<Void> original) {
+        if ((Object) this instanceof RFEItemAttachmentsScreen) {
+            PoseStack poseStack = guiGraphics.pose();
+            poseStack.pushPose();
+            poseStack.translate(0, 0, 700);
+            original.call(guiGraphics, stack, x, y, text);
+            poseStack.popPose();
+        } else {
+            original.call(guiGraphics, stack, x, y, text);
+        }
     }
 
 }

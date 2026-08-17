@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.SimpleContainer;
@@ -13,6 +14,9 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.conf
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentsPropertiesHandler;
 
 import javax.annotation.Nullable;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class RFEItemAttachmentSlot extends Slot {
 
@@ -35,7 +39,7 @@ public class RFEItemAttachmentSlot extends Slot {
 
     @Override
     public boolean mayPlace(ItemStack stack) {
-        if (this.slotConfig.disabled() || !(this.parentStack.getItem() instanceof IHasRFEItemAttachments))
+        if (this.slotConfig.disabled() || !(this.parentStack.getItem() instanceof IHasRFEItemAttachments) || !this.getBlockingSlots().isEmpty())
             return false;
         return RFEItemAttachmentsPropertiesHandler.getData(this.parentStack, stack, this.slotId) != null;
     }
@@ -103,6 +107,20 @@ public class RFEItemAttachmentSlot extends Slot {
     }
 
     @Nullable public String getEmptyTextKey() { return this.slotConfig.emptyText(); }
+
     public ResourceLocation getSlotId() { return this.slotId; }
+
+    public Set<ResourceLocation> getBlockingSlots() {
+        if (!(this.parentStack.getItem() instanceof IHasRFEItemAttachments hasAttachments))
+            return null;
+        ImmutableMultimap<ResourceLocation, ResourceLocation> mutuallyExclusiveSlots = hasAttachments.getMutuallyExclusiveSlots(this.parentStack);
+        Map<ResourceLocation, ItemStack> attachmentStacks = hasAttachments.getAttachments(this.parentStack);
+        Set<ResourceLocation> blockingSlots = new LinkedHashSet<>();
+        for (ResourceLocation slot : mutuallyExclusiveSlots.get(this.slotId)) {
+            if (!attachmentStacks.getOrDefault(slot, ItemStack.EMPTY).isEmpty())
+                blockingSlots.add(slot);
+        }
+        return blockingSlots;
+    }
 
 }

@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments;
 
+import com.google.common.collect.ImmutableMultimap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
@@ -10,6 +11,7 @@ public interface IHasRFEItemAttachments {
 
     Map<ResourceLocation, ItemStack> getAttachments(ItemStack stack);
     Set<ResourceLocation> getAttachmentSlots(ItemStack stack);
+    ImmutableMultimap<ResourceLocation, ResourceLocation> getMutuallyExclusiveSlots(ItemStack stack);
 
     void setAttachment(ItemStack itemStack, ResourceLocation slot, ItemStack attachmentItem);
 

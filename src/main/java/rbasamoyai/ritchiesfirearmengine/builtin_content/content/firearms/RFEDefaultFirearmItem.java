@@ -1,6 +1,7 @@
 package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms;
 
 import com.google.common.collect.ImmutableMultimap;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -30,8 +31,9 @@ import java.util.function.Consumer;
 public class RFEDefaultFirearmItem extends RFEFirearmItem {
 
     public RFEDefaultFirearmItem(Properties properties, Map<String, RFEFirearmMode> baseFirearmModes, List<String> modeOrder,
-                                 ImmutableMultimap<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> firearmAttachments) {
-        super(properties, baseFirearmModes, modeOrder, "default", firearmAttachments);
+                                 ImmutableMultimap<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> firearmAttachments,
+                                 ImmutableMultimap<ResourceLocation, ResourceLocation> mutuallyExclusiveAttachmentSlots) {
+        super(properties, baseFirearmModes, modeOrder, "default", firearmAttachments, mutuallyExclusiveAttachmentSlots);
     }
 
     @Override
@@ -74,20 +76,33 @@ public class RFEDefaultFirearmItem extends RFEFirearmItem {
             }
 
             ImmutableMultimap.Builder<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> firearmAttachments = ImmutableMultimap.builder();
+            ImmutableMultimap.Builder<ResourceLocation, ResourceLocation> mutuallyExclusiveAttachmentSlots = ImmutableMultimap.builder();
             if (GsonHelper.isObjectNode(obj, "firearm_attachments")) {
                 JsonObject globalAttachmentsJson = obj.getAsJsonObject("firearm_attachments");
                 for (Map.Entry<String, JsonElement> entry : globalAttachmentsJson.entrySet()) {
                     String modeName = entry.getKey();
                     JsonElement slotEl = entry.getValue();
-                    if (!GsonHelper.isStringValue(slotEl))
-                        throw new JsonParseException("Invalid firearm attachment slot JSON element, must be a string");
-                    ResourceLocation typeLoc = ResourceLocation.read(slotEl.getAsString()).getOrThrow();
                     ResourceLocation slotLoc = ResourceLocation.read(modeName).getOrThrow();
-                    firearmAttachments.put(RFEContentBuilderRegistry.getItemAttachmentSerializer(typeLoc), slotLoc);
+                    if (GsonHelper.isStringValue(slotEl)) {
+                        ResourceLocation typeLoc = ResourceLocation.read(slotEl.getAsString()).getOrThrow();
+                        firearmAttachments.put(RFEContentBuilderRegistry.getItemAttachmentSerializer(typeLoc), slotLoc);
+                    } else if (slotEl.isJsonObject()) {
+                        JsonObject slotObj = slotEl.getAsJsonObject();
+                        ResourceLocation typeLoc = ResourceLocation.read(GsonHelper.getAsString(slotObj, "type")).getOrThrow();
+                        firearmAttachments.put(RFEContentBuilderRegistry.getItemAttachmentSerializer(typeLoc), slotLoc);
+                        JsonArray exclusive = GsonHelper.getAsJsonArray(slotObj, "mutually_exclusive_with", new JsonArray());
+                        for (JsonElement exclusiveEl : exclusive) {
+                            ResourceLocation exclusiveSlotLoc = ResourceLocation.read(exclusiveEl.getAsString()).getOrThrow();
+                            mutuallyExclusiveAttachmentSlots.put(slotLoc, exclusiveSlotLoc);
+                            mutuallyExclusiveAttachmentSlots.put(exclusiveSlotLoc, slotLoc);
+                        }
+                    } else {
+                        throw new JsonParseException("Invalid firearm attachment slot JSON element, must be a string or a JSON object");
+                    }
                 }
             }
 
-            return new RFEDefaultFirearmItem(properties, firearmModes, modeOrder, firearmAttachments.build());
+            return new RFEDefaultFirearmItem(properties, firearmModes, modeOrder, firearmAttachments.build(), mutuallyExclusiveAttachmentSlots.build());
         }
     }
 

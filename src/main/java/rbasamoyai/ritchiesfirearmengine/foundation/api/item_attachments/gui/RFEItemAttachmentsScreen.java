@@ -174,6 +174,7 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
         ItemStack focusedItem = this.menu.getFocusedAttachmentsItem();
         int VALID_SLOT_COLOR = RFEConfig.CLIENT.attachmentScreenValidSlotColor.getAsInt();
         boolean VALID_SLOT_GRADIENT = RFEConfig.CLIENT.attachmentScreenValidSlotGradient.getAsBoolean();
+        int BLOCKED_SLOT_COLOR = RFEConfig.CLIENT.attachmentScreenBlockedSlotColor.getAsInt();
 
         for (int k = 0; k < this.menu.slots.size(); k++) {
             Slot slot = this.menu.slots.get(k);
@@ -183,7 +184,11 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
             int slotY = slot.y;
             if (slot instanceof RFEItemAttachmentSlot attachmentSlot) {
                 ResourceLocation slotId = attachmentSlot.getSlotId();
-                if (carried.isEmpty() && this.hoveredSlot != null && this.hoveredSlot != slot) {
+                boolean attachmentIsEmpty = slot.getItem().isEmpty();
+                if (!attachmentSlot.getBlockingSlots().isEmpty()) {
+                    // Render blocked highlight
+                    guiGraphics.fill(slotX, slotY, slotX + 16, slotY + 16, 100, BLOCKED_SLOT_COLOR);
+                } else if (attachmentIsEmpty && carried.isEmpty() && this.hoveredSlot != null && this.hoveredSlot != slot) {
                     // Render highlight on attachment slot when hovering eligible item outside of attachment slot
                     ItemStack hoveredStack = this.hoveredSlot.getItem();
                     RFEItemAttachmentProperties attachmentProperties = RFEItemAttachmentsPropertiesHandler.getData(focusedItem, hoveredStack, slotId);
@@ -194,7 +199,7 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
                             guiGraphics.fill(slotX, slotY, slotX + 16, slotY + 16, 100, VALID_SLOT_COLOR);
                         }
                     }
-                } else if (!carried.isEmpty()) {
+                } else if (attachmentIsEmpty && !carried.isEmpty()) {
                     // Render highlight on attachment slot when carrying item
                     RFEItemAttachmentProperties attachmentProperties = RFEItemAttachmentsPropertiesHandler.getData(focusedItem, carried, slotId);
                     if (attachmentProperties != null) {
@@ -205,7 +210,8 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
                         }
                     }
                 }
-            } else if (this.hoveredSlot != slot && this.hoveredSlot instanceof RFEItemAttachmentSlot attachmentSlot && this.hoveredSlot.getItem().isEmpty()) {
+            } else if (this.hoveredSlot != slot && this.hoveredSlot instanceof RFEItemAttachmentSlot attachmentSlot
+                    && this.hoveredSlot.getItem().isEmpty() && attachmentSlot.getBlockingSlots().isEmpty()) {
                 // Render highlight on slot if this item is eligible when hovering empty attachment slot
                 ResourceLocation slotId = attachmentSlot.getSlotId();
                 RFEItemAttachmentProperties attachmentProperties = RFEItemAttachmentsPropertiesHandler.getData(focusedItem, slot.getItem(), slotId);

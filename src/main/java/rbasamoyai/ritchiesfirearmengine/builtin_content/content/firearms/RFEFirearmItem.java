@@ -74,9 +74,11 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     protected final List<String> modeOrder;
     protected final String defaultMode;
     protected final ImmutableMultimap<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> firearmAttachments;
+    protected final ImmutableMultimap<ResourceLocation, ResourceLocation> mutuallyExclusiveAttachmentSlots;
 
     protected RFEFirearmItem(Properties properties, Map<String, RFEFirearmMode> baseFirearmModes, List<String> modeOrder,
-                             String defaultMode, ImmutableMultimap<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> firearmAttachments) {
+                             String defaultMode, ImmutableMultimap<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> firearmAttachments,
+                             ImmutableMultimap<ResourceLocation, ResourceLocation> mutuallyExclusiveAttachmentSlots) {
         super(properties.stacksTo(1)
                 .component(RFEDataComponents.USING_UNLIMITED_AMMO_RELOAD, false)
                 .component(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY));
@@ -84,6 +86,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         this.modeOrder = modeOrder;
         this.defaultMode = defaultMode;
         this.firearmAttachments = firearmAttachments;
+        this.mutuallyExclusiveAttachmentSlots = mutuallyExclusiveAttachmentSlots;
         this.registerHUDProviders();
     }
 
@@ -829,6 +832,11 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         for (RFEFirearmMode mode : this.getFirearmModes(stack, null).values())
             mode.addModeAttachmentSlots(stack, slots);
         return slots;
+    }
+
+    @Override
+    public ImmutableMultimap<ResourceLocation, ResourceLocation> getMutuallyExclusiveSlots(ItemStack stack) {
+        return this.mutuallyExclusiveAttachmentSlots;
     }
 
     @Override

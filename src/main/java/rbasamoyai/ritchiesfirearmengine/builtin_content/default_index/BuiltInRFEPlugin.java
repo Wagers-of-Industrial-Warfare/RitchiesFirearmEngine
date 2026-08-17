@@ -540,7 +540,8 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         private ParticleTypes() {}
     }
 
-    public static class RFEDataComponents {
+    public static class
+    RFEDataComponents {
         private static final Map<ResourceLocation, DataComponentType<?>> TYPES = new LinkedHashMap<>();
 
         public static final DataComponentType<RFEItemContainerContents> ROUNDS = register("rounds",

@@ -69,6 +69,7 @@ public class RFEConfig {
         public final IntValue attachmentScreenPointerColor;
         public final IntValue attachmentScreenValidSlotColor;
         public final BooleanValue attachmentScreenValidSlotGradient;
+        public final IntValue attachmentScreenBlockedSlotColor;
 
         Client(ModConfigSpec.Builder builder) {
             builder.comment("Ritchie's Firearm Engine client configuration settings")
@@ -131,13 +132,18 @@ public class RFEConfig {
 
             this.attachmentScreenValidSlotColor = builder
                     .comment("The base color of the attachment screen valid slot gradient in ARGB.")
-                    .translation("ritchiesfirearmengine.configgui.attachmentScreenItemColor")
-                    .defineInRange("attachmentScreenItemColor", 0x7F_00FF00, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    .translation("ritchiesfirearmengine.configgui.attachmentScreenValidSlotColor")
+                    .defineInRange("attachmentScreenValidSlotColor", 0x7F_00FF00, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
             this.attachmentScreenValidSlotGradient = builder
                     .comment("Set to true to render the attachment screen valid slot highlight as a gradient, false as a solid color.")
-                    .translation("ritchiesfirearmengine.configgui.attachmentScreenItemGradient")
-                    .define("attachmentScreenItemGradient", true);
+                    .translation("ritchiesfirearmengine.configgui.attachmentScreenValidSlotGradient")
+                    .define("attachmentScreenValidSlotGradient", true);
+
+            this.attachmentScreenBlockedSlotColor = builder
+                    .comment("The base color of the attachment screen blocked slot in ARGB.")
+                    .translation("ritchiesfirearmengine.configgui.attachmentScreenBlockedSlotColor")
+                    .defineInRange("attachmentScreenBlockedSlot", 0x7F_7F7F7F, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
             builder.pop();
         }

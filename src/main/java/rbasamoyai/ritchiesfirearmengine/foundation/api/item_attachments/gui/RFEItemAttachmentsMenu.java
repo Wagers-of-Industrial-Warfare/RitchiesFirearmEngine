@@ -74,7 +74,7 @@ public class RFEItemAttachmentsMenu extends AbstractContainerMenu implements IRF
         for (Map.Entry<ResourceLocation, SlotConfig> entry : slotConfigById.entrySet()) {
             int x = i / 6 * -18 - 17;
             int y = i % 6 * 18 + 1;
-            this.addAttachmentSlot(new RFEItemAttachmentSlot(targetStack, entry.getKey(), x, y, entry.getValue()));
+            this.addAttachmentSlot(new RFEItemAttachmentSlot(targetStack, entry.getKey(), x, y, entry.getValue(), inventory.player));
             ++i;
         }
     }

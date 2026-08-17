@@ -3,6 +3,7 @@ package rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
@@ -19,14 +20,17 @@ public class RFEItemAttachmentSlot extends Slot {
     private final ResourceLocation slotId;
     private final SlotConfig slotConfig;
     private ItemStack storedStack;
+    @Nullable
+    private final LivingEntity owner;
 
-    public RFEItemAttachmentSlot(ItemStack parentStack, ResourceLocation slotId, int x, int y, SlotConfig slotConfig) {
+    public RFEItemAttachmentSlot(ItemStack parentStack, ResourceLocation slotId, int x, int y, SlotConfig slotConfig, @Nullable LivingEntity owner) {
         super(new SimpleContainer(0), 0, x, y);
         this.parentStack = parentStack;
         this.slotId = slotId;
         this.slotConfig = slotConfig;
         this.storedStack = this.parentStack.getItem() instanceof IHasRFEItemAttachments attachments
                 ? attachments.getAttachmentInSlot(parentStack, this.slotId) : ItemStack.EMPTY;
+        this.owner = owner;
     }
 
     @Override
@@ -50,6 +54,19 @@ public class RFEItemAttachmentSlot extends Slot {
     public void setChanged() {
         if (this.parentStack.getItem() instanceof IHasRFEItemAttachments attachments)
             attachments.setAttachment(this.parentStack, this.slotId, this.storedStack);
+    }
+
+    @Override
+    public void setByPlayer(ItemStack newStack, ItemStack oldStack) {
+        super.setByPlayer(newStack, oldStack);
+        if (this.owner == null || !this.owner.level().isClientSide)
+            return;
+        if (newStack.isEmpty()) {
+            if (this.slotConfig.soundOnRemove() != null)
+                this.owner.playSound(this.slotConfig.soundOnRemove());
+        } else if (this.slotConfig.soundOnAdd() != null) {
+            this.owner.playSound(this.slotConfig.soundOnAdd());
+        }
     }
 
     @Override public int getMaxStackSize() { return 1; } // This may change if it's something like internal magazines.

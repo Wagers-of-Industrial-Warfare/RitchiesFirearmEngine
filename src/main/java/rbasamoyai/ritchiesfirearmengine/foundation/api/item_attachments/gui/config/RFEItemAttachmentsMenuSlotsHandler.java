@@ -18,6 +18,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
@@ -97,16 +98,22 @@ public class RFEItemAttachmentsMenuSlotsHandler {
                         .map(MenuTypeSlotsConfig::new, MenuTypeSlotsConfig::slotConfig);
     }
 
-    public record SlotConfig(@Nullable ResourceLocation emptyIcon, @Nullable String emptyText, boolean disabled) {
+    public record SlotConfig(@Nullable ResourceLocation emptyIcon, @Nullable String emptyText, @Nullable SoundEvent soundOnAdd,
+                             @Nullable SoundEvent soundOnRemove, boolean disabled) {
         public static final Codec<SlotConfig> CODEC = RecordCodecBuilder.create(o -> o.group(
                 ResourceLocation.CODEC.optionalFieldOf("empty_icon").forGetter(p -> Optional.ofNullable(p.emptyIcon)),
                 Codec.STRING.optionalFieldOf("empty_text").forGetter(p -> Optional.ofNullable(p.emptyText)),
+                SoundEvent.DIRECT_CODEC.optionalFieldOf("sound_on_add").forGetter(p -> Optional.ofNullable(p.soundOnAdd)),
+                SoundEvent.DIRECT_CODEC.optionalFieldOf("sound_on_remove").forGetter(p -> Optional.ofNullable(p.soundOnRemove)),
                 Codec.BOOL.optionalFieldOf("disabled", false).forGetter(SlotConfig::disabled)
-        ).apply(o, (opBg, opTxt, disabled) -> new SlotConfig(opBg.orElse(null), opTxt.orElse(null), disabled)));
+        ).apply(o, (opBg, opTxt, opSoA, opSoR, disabled) ->
+                new SlotConfig(opBg.orElse(null), opTxt.orElse(null), opSoA.orElse(null), opSoR.orElse(null), disabled)));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, SlotConfig> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC).map(op -> op.orElse(null), Optional::ofNullable), SlotConfig::emptyIcon,
                 ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8).map(op -> op.orElse(null), Optional::ofNullable), SlotConfig::emptyText,
+                ByteBufCodecs.optional(ByteBufCodecs.registry(Registries.SOUND_EVENT)).map(op -> op.orElse(null), Optional::ofNullable), SlotConfig::soundOnAdd,
+                ByteBufCodecs.optional(ByteBufCodecs.registry(Registries.SOUND_EVENT)).map(op -> op.orElse(null), Optional::ofNullable), SlotConfig::soundOnRemove,
                 ByteBufCodecs.BOOL, SlotConfig::disabled,
                 SlotConfig::new);
     }

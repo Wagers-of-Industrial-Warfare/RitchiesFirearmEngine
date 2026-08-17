@@ -2059,6 +2059,38 @@
       }
     ]
   },
+  "item_attachments.generic.bayonet.equip": {
+    "sounds": [
+      {
+        "name": "minecraft:item/armor/equip_iron1",
+        "pitch": 1.55
+      }
+    ]
+  },
+  "item_attachments.generic.bayonet.unequip": {
+    "sounds": [
+      {
+        "name": "minecraft:block/chain/step1",
+        "pitch": 0.9
+      }
+    ]
+  },
+  "item_attachments.generic.scope.equip": {
+    "sounds": [
+      {
+        "name": "minecraft:item/spyglass/use",
+        "pitch": 1.55
+      }
+    ]
+  },
+  "item_attachments.generic.scope.unequip": {
+    "sounds": [
+      {
+        "name": "minecraft:block/chain/step1",
+        "pitch": 0.8
+      }
+    ]
+  },
   "projectile.generic.crack": {
     "sounds": [
       {

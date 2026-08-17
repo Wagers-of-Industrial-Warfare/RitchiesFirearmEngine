@@ -3,6 +3,8 @@
     "rfe_builtin:bayonet": {
       "empty_icon": "ritchiesfirearmengine:item/bayonet_icon",
       "empty_text": "gui.ritchiesfirearmengine.attachments_menu.bayonet",
+      "sound_on_add": { "sound_id": "rfe_builtin:item_attachments.generic.bayonet.equip" },
+      "sound_on_remove": { "sound_id": "rfe_builtin:item_attachments.generic.bayonet.unequip" },
       "disabled": false
     }
   }

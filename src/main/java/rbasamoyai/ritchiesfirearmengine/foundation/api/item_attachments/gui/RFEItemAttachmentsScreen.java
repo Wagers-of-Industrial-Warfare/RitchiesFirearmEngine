@@ -74,24 +74,13 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
                 this.topPos + this.imageHeight - 94, 0, 0x3F000000, 0x3F000000 | BACKGROUND_COLOR);
         guiGraphics.blit(MENU_TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
 
+        PoseStack pose = guiGraphics.pose();
+        ItemStack carried = this.menu.getCarried();
         this.menu.iterateAttachmentSlots(slot -> {
-            guiGraphics.blit(MENU_TEXTURE, this.leftPos + slot.x - 1, this.topPos + slot.y - 1, this.imageWidth, 0, 18, 18);
-            if (this.menu.getCarried().isEmpty() && this.hoveredSlot == slot && !slot.hasItem()) {
-                String text = slot.getEmptyTextKey();
-                if (text != null)
-                    guiGraphics.renderTooltip(this.font, Component.translatable(text), mouseX, mouseY);
-            }
+            int slotX = this.leftPos + slot.x;
+            int slotY = this.topPos + slot.y;
+            guiGraphics.blit(MENU_TEXTURE, slotX - 1, slotY - 1, this.imageWidth, 0, 18, 18);
         });
-
-        Slot targetSlot = this.menu.getTargetSlot();
-        int itemX = this.leftPos + targetSlot.x;
-        int itemY = this.topPos + targetSlot.y;
-        int ITEM_HIGHLIGHT_COLOR = RFEConfig.CLIENT.attachmentScreenItemColor.getAsInt();
-        if (RFEConfig.CLIENT.attachmentScreenItemGradient.getAsBoolean()) {
-            guiGraphics.fillGradient(itemX, itemY, itemX + 16, itemY + 16, 100, 0, ITEM_HIGHLIGHT_COLOR);
-        } else {
-            guiGraphics.fill(itemX, itemY, itemX + 16, itemY + 16, 100, ITEM_HIGHLIGHT_COLOR);
-        }
     }
 
     @Override
@@ -107,10 +96,32 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
     }
 
     @Override
+    protected void renderSlot(GuiGraphics guiGraphics, Slot slot) {
+        super.renderSlot(guiGraphics, slot);
+        int slotX = slot.x;
+        int slotY = slot.y;
+        if (slot == this.menu.getTargetSlot()) {
+            // Render attachment item focus highlight
+            int ITEM_HIGHLIGHT_COLOR = RFEConfig.CLIENT.attachmentScreenItemColor.getAsInt();
+            if (RFEConfig.CLIENT.attachmentScreenItemGradient.getAsBoolean()) {
+                guiGraphics.fillGradient(slotX, slotY, slotX + 16, slotY + 16, 100, 0, ITEM_HIGHLIGHT_COLOR);
+            } else {
+                guiGraphics.fill(slotX, slotY, slotX + 16, slotY + 16, 100, ITEM_HIGHLIGHT_COLOR);
+            }
+        }
+    }
+
+    @Override
     protected void renderTooltip(GuiGraphics guiGraphics, int x, int y) {
         boolean hide = this.hoveredSlot instanceof RFEItemAttachmentSlot && Screen.hasControlDown();
-        if (!hide)
-            super.renderTooltip(guiGraphics, x, y);
+        if (hide)
+            return;
+        super.renderTooltip(guiGraphics, x, y);
+        if (this.menu.getCarried().isEmpty() && this.hoveredSlot instanceof RFEItemAttachmentSlot attachmentSlot && !this.hoveredSlot.hasItem()) {
+            String text = attachmentSlot.getEmptyTextKey();
+            if (text != null)
+                guiGraphics.renderTooltip(this.font, Component.translatable(text), x, y);
+        }
     }
 
     @Override
@@ -158,8 +169,61 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
         return tooltip;
     }
 
+    protected void renderValidSlotHighlights(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        ItemStack carried = this.menu.getCarried();
+        ItemStack focusedItem = this.menu.getFocusedAttachmentsItem();
+        int VALID_SLOT_COLOR = RFEConfig.CLIENT.attachmentScreenValidSlotColor.getAsInt();
+        boolean VALID_SLOT_GRADIENT = RFEConfig.CLIENT.attachmentScreenValidSlotGradient.getAsBoolean();
+
+        for (int k = 0; k < this.menu.slots.size(); k++) {
+            Slot slot = this.menu.slots.get(k);
+            if (!slot.isActive())
+                continue;
+            int slotX = slot.x;
+            int slotY = slot.y;
+            if (slot instanceof RFEItemAttachmentSlot attachmentSlot) {
+                ResourceLocation slotId = attachmentSlot.getSlotId();
+                if (carried.isEmpty() && this.hoveredSlot != null && this.hoveredSlot != slot) {
+                    // Render highlight on attachment slot when hovering eligible item outside of attachment slot
+                    ItemStack hoveredStack = this.hoveredSlot.getItem();
+                    RFEItemAttachmentProperties attachmentProperties = RFEItemAttachmentsPropertiesHandler.getData(focusedItem, hoveredStack, slotId);
+                    if (attachmentProperties != null) {
+                        if (VALID_SLOT_GRADIENT) {
+                            guiGraphics.fillGradient(slotX, slotY, slotX + 16, slotY + 16, 100, 0, VALID_SLOT_COLOR);
+                        } else {
+                            guiGraphics.fill(slotX, slotY, slotX + 16, slotY + 16, 100, VALID_SLOT_COLOR);
+                        }
+                    }
+                } else if (!carried.isEmpty()) {
+                    // Render highlight on attachment slot when carrying item
+                    RFEItemAttachmentProperties attachmentProperties = RFEItemAttachmentsPropertiesHandler.getData(focusedItem, carried, slotId);
+                    if (attachmentProperties != null) {
+                        if (VALID_SLOT_GRADIENT) {
+                            guiGraphics.fillGradient(slotX, slotY, slotX + 16, slotY + 16, 100, 0, VALID_SLOT_COLOR);
+                        } else {
+                            guiGraphics.fill(slotX, slotY, slotX + 16, slotY + 16, 100, VALID_SLOT_COLOR);
+                        }
+                    }
+                }
+            } else if (this.hoveredSlot != slot && this.hoveredSlot instanceof RFEItemAttachmentSlot attachmentSlot && this.hoveredSlot.getItem().isEmpty()) {
+                // Render highlight on slot if this item is eligible when hovering empty attachment slot
+                // TODO this doesn't work properly
+                ResourceLocation slotId = attachmentSlot.getSlotId();
+                RFEItemAttachmentProperties attachmentProperties = RFEItemAttachmentsPropertiesHandler.getData(focusedItem, slot.getItem(), slotId);
+                if (attachmentProperties != null) {
+                    if (VALID_SLOT_GRADIENT) {
+                        guiGraphics.fillGradient(slotX, slotY, slotX + 16, slotY + 16, 100, 0, VALID_SLOT_COLOR);
+                    } else {
+                        guiGraphics.fill(slotX, slotY, slotX + 16, slotY + 16, 100, VALID_SLOT_COLOR);
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        this.renderValidSlotHighlights(guiGraphics, mouseX, mouseY); // Labels rendered after hoveredSlot set
         guiGraphics.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFFFFFF, true);
         guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
     }

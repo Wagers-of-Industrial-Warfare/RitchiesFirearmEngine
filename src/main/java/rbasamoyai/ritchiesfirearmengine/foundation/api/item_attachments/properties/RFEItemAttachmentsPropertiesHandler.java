@@ -73,6 +73,7 @@ public class RFEItemAttachmentsPropertiesHandler {
         }
     }
 
+    @Nullable
     public static RFEItemAttachmentProperties getData(ItemStack parent, ItemStack attachment, ResourceLocation slot) {
         if (parent.isEmpty() || attachment.isEmpty() || !ATTACHMENTS.containsKey(parent.getItem()))
             return null;

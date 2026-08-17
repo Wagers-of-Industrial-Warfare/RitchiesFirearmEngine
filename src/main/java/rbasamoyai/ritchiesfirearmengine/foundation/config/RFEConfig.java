@@ -67,6 +67,8 @@ public class RFEConfig {
         public final IntValue attachmentScreenItemColor;
         public final BooleanValue attachmentScreenItemGradient;
         public final IntValue attachmentScreenPointerColor;
+        public final IntValue attachmentScreenValidSlotColor;
+        public final BooleanValue attachmentScreenValidSlotGradient;
 
         Client(ModConfigSpec.Builder builder) {
             builder.comment("Ritchie's Firearm Engine client configuration settings")
@@ -118,7 +120,7 @@ public class RFEConfig {
                     .defineInRange("attachmentScreenItemColor", 0x7F_1F7FFF, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
             this.attachmentScreenItemGradient = builder
-                    .comment("Set to true to render the attachment menu item highlight as a gradient, false as a solid color.")
+                    .comment("Set to true to render the attachment screen item highlight as a gradient, false as a solid color.")
                     .translation("ritchiesfirearmengine.configgui.attachmentScreenItemGradient")
                     .define("attachmentScreenItemGradient", true);
 
@@ -126,6 +128,16 @@ public class RFEConfig {
                     .comment("The color of the attachment screen pointer in ARGB.")
                     .translation("ritchiesfirearmengine.configgui.attachmentScreenPointerColor")
                     .defineInRange("attachmentScreenPointerColor", 0x7F_5FDFFF, Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+            this.attachmentScreenValidSlotColor = builder
+                    .comment("The base color of the attachment screen valid slot gradient in ARGB.")
+                    .translation("ritchiesfirearmengine.configgui.attachmentScreenItemColor")
+                    .defineInRange("attachmentScreenItemColor", 0x7F_00FF00, Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+            this.attachmentScreenValidSlotGradient = builder
+                    .comment("Set to true to render the attachment screen valid slot highlight as a gradient, false as a solid color.")
+                    .translation("ritchiesfirearmengine.configgui.attachmentScreenItemGradient")
+                    .define("attachmentScreenItemGradient", true);
 
             builder.pop();
         }

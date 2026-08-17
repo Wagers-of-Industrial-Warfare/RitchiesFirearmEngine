@@ -211,7 +211,7 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
                     }
                 }
             } else if (this.hoveredSlot != slot && this.hoveredSlot instanceof RFEItemAttachmentSlot attachmentSlot
-                    && this.hoveredSlot.getItem().isEmpty() && attachmentSlot.getBlockingSlots().isEmpty()) {
+                    && this.hoveredSlot.getItem().isEmpty() && attachmentSlot.getBlockingSlots().isEmpty() && carried.isEmpty()) {
                 // Render highlight on slot if this item is eligible when hovering empty attachment slot
                 ResourceLocation slotId = attachmentSlot.getSlotId();
                 RFEItemAttachmentProperties attachmentProperties = RFEItemAttachmentsPropertiesHandler.getData(focusedItem, slot.getItem(), slotId);

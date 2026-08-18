@@ -56,7 +56,7 @@ public class RFETooltip {
                     .append(Component.literal("|".repeat(emptyBars)).withStyle(ChatFormatting.DARK_GRAY)));
         } else {
             tooltipComponents.add(Component.translatable("ritchiesfirearmengine.tooltip.item.attachment_screen",
-                            RFEClient.OPEN_ATTACHMENTS_SCREEN.getTranslatedKeyMessage().copy().withStyle(ChatFormatting.GRAY))
+                            RFEClient.OPEN_ATTACHMENTS_MENU.getTranslatedKeyMessage().copy().withStyle(ChatFormatting.GRAY))
                     .withStyle(ChatFormatting.DARK_GRAY));
         }
     }

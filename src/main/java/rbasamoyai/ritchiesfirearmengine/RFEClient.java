@@ -71,7 +71,7 @@ public class RFEClient {
     public static final KeyMapping UNLOAD_FIREARM = createSafeKeyMapping("key.ritchiesfirearmengine.unload_firearm", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_U);
     public static final KeyMapping SWITCH_MODE = createSafeKeyMapping("key.ritchiesfirearmengine.switch_mode", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V);
     public static final KeyMapping QUICK_TOGGLE_MELEE = createSafeKeyMapping("key.ritchiesfirearmengine.quick_toggle_melee", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X);
-    public static final KeyMapping OPEN_ATTACHMENTS_SCREEN = createSafeKeyMapping("key.ritchiesfirearmengine.open_attachments_screen", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_I);
+    public static final KeyMapping OPEN_ATTACHMENTS_MENU = createSafeKeyMapping("key.ritchiesfirearmengine.open_attachments_menu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_I);
 
     public static void onClientSetup() {
         RFEClientPluginManager.onClientSetup();
@@ -231,7 +231,7 @@ public class RFEClient {
         cons.accept(UNLOAD_FIREARM);
         cons.accept(SWITCH_MODE);
         cons.accept(QUICK_TOGGLE_MELEE);
-        cons.accept(OPEN_ATTACHMENTS_SCREEN);
+        cons.accept(OPEN_ATTACHMENTS_MENU);
     }
 
     public static void onClientTickPre() {
@@ -309,8 +309,8 @@ public class RFEClient {
     }
 
     public static boolean isOpeningFieldAttachmentsScreen() {
-        boolean raw = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), OPEN_ATTACHMENTS_SCREEN.getKey().getValue());
-        OPEN_ATTACHMENTS_SCREEN.setDown(raw);
+        boolean raw = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), OPEN_ATTACHMENTS_MENU.getKey().getValue());
+        OPEN_ATTACHMENTS_MENU.setDown(raw);
         return raw;
     }
 

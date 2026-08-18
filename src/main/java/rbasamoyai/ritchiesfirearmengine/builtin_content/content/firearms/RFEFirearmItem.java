@@ -42,6 +42,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.bayonets.BayonetItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.supperssors.SuppressorAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemAttachmentContents;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
@@ -698,6 +699,20 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
                 return true;
         }
         return false;
+    }
+
+    @Nullable
+    public SuppressorAttachmentProperties getSuppressorProperties(ItemStack itemStack) {
+        RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
+        for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.SUPPRESSOR)) {
+            ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
+            if (attachmentStack.isEmpty())
+                continue;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
+            if (attachmentData instanceof SuppressorAttachmentProperties properties)
+                return properties;
+        }
+        return null;
     }
 
     public List<ItemStack> getAmmoItemsForHUD(ItemStack itemStack) {

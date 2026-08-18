@@ -2,7 +2,14 @@
   "type": "ritchiesfirearmengine:firearm",
   "firearm_attachments": {
     "rfe_builtin:scope": "ritchiesfirearmengine:scope",
-    "rfe_builtin:bayonet": "ritchiesfirearmengine:bayonet"
+    "rfe_builtin:bayonet": {
+      "type": "ritchiesfirearmengine:bayonet",
+      "mutually_exclusive_with": [ "rfe_builtin:suppressor" ]
+    },
+    "rfe_builtin:suppressor": {
+      "type": "ritchiesfirearmengine:suppressor",
+      "mutually_exclusive_with": [ "rfe_builtin:bayonet" ]
+    }
   },
   "drawing": {
     "draw_time": 18,

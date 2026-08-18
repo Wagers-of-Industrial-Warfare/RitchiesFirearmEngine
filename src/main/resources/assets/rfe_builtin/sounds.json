@@ -2059,6 +2059,25 @@
       }
     ]
   },
+  "item.generic.suppressed_rifle.shot": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/suppressed_rifle/shot",
+        "volume": 1.0
+      },
+      {
+        "name": "rfe_builtin:item/generic/suppressed_rifle/shot",
+        "volume": 1.0,
+        "pitch": 0.98
+      },
+      {
+        "name": "rfe_builtin:item/generic/suppressed_rifle/shot",
+        "volume": 1.0,
+        "pitch": 0.97
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.shot"
+  },
   "item_attachments.generic.bayonet.equip": {
     "sounds": [
       {
@@ -2087,6 +2106,22 @@
     "sounds": [
       {
         "name": "minecraft:block/chain/step1",
+        "pitch": 0.8
+      }
+    ]
+  },
+  "item_attachments.generic.suppressor.equip": {
+    "sounds": [
+      {
+        "name": "minecraft:item/spyglass/use",
+        "pitch": 1.55
+      }
+    ]
+  },
+  "item_attachments.generic.suppressor.unequip": {
+    "sounds": [
+      {
+        "name": "minecraft:item/spyglass/use",
         "pitch": 0.8
       }
     ]

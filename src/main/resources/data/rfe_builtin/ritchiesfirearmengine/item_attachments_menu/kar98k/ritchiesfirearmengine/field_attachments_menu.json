@@ -13,6 +13,13 @@
       "sound_on_add": { "sound_id": "rfe_builtin:item_attachments.generic.bayonet.equip" },
       "sound_on_remove": { "sound_id": "rfe_builtin:item_attachments.generic.bayonet.unequip" },
       "disabled": false
+    },
+    "rfe_builtin:suppressor": {
+      "empty_icon": "ritchiesfirearmengine:item/suppressor_icon",
+      "empty_text": "gui.ritchiesfirearmengine.attachments_menu.suppressor",
+      "sound_on_add": { "sound_id": "rfe_builtin:item_attachments.generic.suppressor.equip" },
+      "sound_on_remove": { "sound_id": "rfe_builtin:item_attachments.generic.suppressor.unequip" },
+      "disabled": false
     }
   }
 }

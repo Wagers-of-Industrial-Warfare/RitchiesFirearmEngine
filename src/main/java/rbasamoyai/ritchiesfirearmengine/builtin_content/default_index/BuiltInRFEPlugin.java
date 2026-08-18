@@ -48,6 +48,8 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.bayonets.BayonetItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.supperssors.SuppressorAttachmentProperties;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.supperssors.SuppressorItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemAttachmentContents;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemContainerContents;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.buck_and_ball.RFEBuckAndBallProjectileType;
@@ -98,6 +100,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("firearm"), new RFEDefaultFirearmItem.Builder());
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("scope"), new ScopeItem.Builder());
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("bayonet"), new BayonetItem.Builder());
+        RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("suppressor"), new SuppressorItem.Builder());
 
         ProjectileTypes.register();
         SpreadProviders.register();
@@ -672,6 +675,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
     public static class AttachmentSlots {
         public static final RFEItemAttachmentProperties.Serializer<ScopeAttachmentProperties> SCOPE = register("scope", new ScopeAttachmentProperties.Serializer());
         public static final RFEItemAttachmentProperties.Serializer<BayonetAttachmentProperties> BAYONET = register("bayonet", new BayonetAttachmentProperties.Serializer());
+        public static final RFEItemAttachmentProperties.Serializer<SuppressorAttachmentProperties> SUPPRESSOR = register("suppressor", new SuppressorAttachmentProperties.Serializer());
 
         public static void register() {}
 

@@ -1,0 +1,11 @@
+{
+  "slot_attachments": {
+    "rfe_builtin:suppressor": {
+      "type": "ritchiesfirearmengine:suppressor",
+      "firing_sound": "rfe_builtin:item.generic.suppressed_rifle.shot",
+      "range": 5,
+      "modes": {
+      }
+    }
+  }
+}

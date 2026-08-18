@@ -84,18 +84,23 @@ public class RFEItemAttachmentsMenuSlotsHandler {
         return MENU_SLOTS.get(parent.getItem()).getOrDefault(menu, MenuTypeSlotsConfig.EMPTY);
     }
 
-    public record MenuTypeSlotsConfig(ImmutableMap<ResourceLocation, SlotConfig> slotConfig) {
-        private static final MenuTypeSlotsConfig EMPTY = new MenuTypeSlotsConfig(ImmutableMap.of());
+    public record MenuTypeSlotsConfig(ImmutableMap<ResourceLocation, SlotConfig> slotConfig,
+                                      ImmutableMap<ResourceLocation, String> otherSlotTextKeys) {
+        private static final MenuTypeSlotsConfig EMPTY = new MenuTypeSlotsConfig(ImmutableMap.of(), ImmutableMap.of());
 
         public static final Codec<MenuTypeSlotsConfig> CODEC = RecordCodecBuilder.create(o -> o.group(
                 Codec.unboundedMap(ResourceLocation.CODEC, SlotConfig.CODEC).xmap(ImmutableMap::copyOf, LinkedHashMap::new)
-                        .fieldOf("slots").forGetter(MenuTypeSlotsConfig::slotConfig)
+                        .fieldOf("slots").forGetter(MenuTypeSlotsConfig::slotConfig),
+                Codec.unboundedMap(ResourceLocation.CODEC, Codec.STRING).xmap(ImmutableMap::copyOf, LinkedHashMap::new)
+                        .optionalFieldOf("other_slot_text", ImmutableMap.of()).forGetter(MenuTypeSlotsConfig::otherSlotTextKeys)
         ).apply(o, MenuTypeSlotsConfig::new));
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, MenuTypeSlotsConfig> STREAM_CODEC =
+        public static final StreamCodec<RegistryFriendlyByteBuf, MenuTypeSlotsConfig> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, SlotConfig.STREAM_CODEC)
-                        .map(ImmutableMap::copyOf, HashMap::new)
-                        .map(MenuTypeSlotsConfig::new, MenuTypeSlotsConfig::slotConfig);
+                        .map(ImmutableMap::copyOf, HashMap::new), MenuTypeSlotsConfig::slotConfig,
+                ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, ByteBufCodecs.STRING_UTF8)
+                        .map(ImmutableMap::copyOf, HashMap::new), MenuTypeSlotsConfig::otherSlotTextKeys,
+                MenuTypeSlotsConfig::new);
     }
 
     public record SlotConfig(@Nullable ResourceLocation emptyIcon, @Nullable String emptyText, @Nullable SoundEvent soundOnAdd,
@@ -112,8 +117,8 @@ public class RFEItemAttachmentsMenuSlotsHandler {
         public static final StreamCodec<RegistryFriendlyByteBuf, SlotConfig> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC).map(op -> op.orElse(null), Optional::ofNullable), SlotConfig::emptyIcon,
                 ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8).map(op -> op.orElse(null), Optional::ofNullable), SlotConfig::emptyText,
-                ByteBufCodecs.optional(ByteBufCodecs.registry(Registries.SOUND_EVENT)).map(op -> op.orElse(null), Optional::ofNullable), SlotConfig::soundOnAdd,
-                ByteBufCodecs.optional(ByteBufCodecs.registry(Registries.SOUND_EVENT)).map(op -> op.orElse(null), Optional::ofNullable), SlotConfig::soundOnRemove,
+                ByteBufCodecs.optional(SoundEvent.DIRECT_STREAM_CODEC).map(op -> op.orElse(null), Optional::ofNullable), SlotConfig::soundOnAdd,
+                ByteBufCodecs.optional(SoundEvent.DIRECT_STREAM_CODEC).map(op -> op.orElse(null), Optional::ofNullable), SlotConfig::soundOnRemove,
                 ByteBufCodecs.BOOL, SlotConfig::disabled,
                 SlotConfig::new);
     }

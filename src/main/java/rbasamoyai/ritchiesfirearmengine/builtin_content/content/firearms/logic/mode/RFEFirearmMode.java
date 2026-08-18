@@ -30,6 +30,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.*
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.condition.FirearmCondition;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhase;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhaseAccessFilter;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.supperssors.SuppressorAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemContainerContents;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
@@ -804,8 +805,18 @@ public class RFEFirearmMode {
     }
 
     public void playFiringEffects(ItemStack itemStack, LivingEntity entity) {
-        if (this.firingSound != null)
-            entity.level().playSound(null, entity.blockPosition(), this.firingSound, SoundSource.NEUTRAL, this.firingSoundRange, 1);
+        SoundEvent firingSound = this.firingSound;
+        float firingSoundRange = this.firingSoundRange;
+        if (itemStack.getItem() instanceof RFEFirearmItem firearmItem) {
+            SuppressorAttachmentProperties suppressorProperties = firearmItem.getSuppressorProperties(itemStack);
+            if (suppressorProperties != null) {
+                SuppressorAttachmentProperties.SuppressedSound suppressedSound = suppressorProperties.getSound(this.modeId);
+                firingSound = suppressedSound.firingSound();
+                firingSoundRange = suppressedSound.audibleRange();
+            }
+        }
+        if (firingSound != null)
+            entity.level().playSound(null, entity.blockPosition(), firingSound, SoundSource.NEUTRAL, firingSoundRange, 1);
     }
 
     public void playDryFiringEffects(ItemStack itemStack, LivingEntity entity) {

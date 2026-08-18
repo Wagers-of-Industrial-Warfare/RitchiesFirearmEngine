@@ -70,6 +70,8 @@ public class RFEConfig {
         public final IntValue attachmentScreenValidSlotColor;
         public final BooleanValue attachmentScreenValidSlotGradient;
         public final IntValue attachmentScreenBlockedSlotColor;
+        public final IntValue attachmentScreenBlockingSlotColor;
+        public final BooleanValue attachmentScreenBlockingSlotGradient;
 
         Client(ModConfigSpec.Builder builder) {
             builder.comment("Ritchie's Firearm Engine client configuration settings")
@@ -141,9 +143,19 @@ public class RFEConfig {
                     .define("attachmentScreenValidSlotGradient", true);
 
             this.attachmentScreenBlockedSlotColor = builder
-                    .comment("The base color of the attachment screen blocked slot in ARGB.")
+                    .comment("The base color of blocked slots in the attachment screen in ARGB.")
                     .translation("ritchiesfirearmengine.configgui.attachmentScreenBlockedSlotColor")
-                    .defineInRange("attachmentScreenBlockedSlot", 0x7F_7F7F7F, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    .defineInRange("attachmentScreenBlockedSlot", 0x7F_000000, Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+            this.attachmentScreenBlockingSlotColor = builder
+                    .comment("The base color of blocking slots in the attachment screen blocked in ARGB.")
+                    .translation("ritchiesfirearmengine.configgui.attachmentScreenBlockingSlotColor")
+                    .defineInRange("attachmentScreenBlockingSlot", 0x7F_FF3A3A, Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+            this.attachmentScreenBlockingSlotGradient = builder
+                    .comment("Set to true to render blocking slot highlights on the attachment screen as a gradient, false as a solid color.")
+                    .translation("ritchiesfirearmengine.configgui.attachmentScreenBlockingSlotGradient")
+                    .define("attachmentScreenBlockingSlotGradient", true);
 
             builder.pop();
         }

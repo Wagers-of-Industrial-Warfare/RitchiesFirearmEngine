@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -25,6 +26,9 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler.MenuTypeSlotsConfig;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler.SlotConfig;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsScreenDisplayHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsScreenDisplayHandler.MenuTypeDisplayConfig;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsScreenDisplayHandler.SlotDisplayConfig;
@@ -36,10 +40,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundUpdateAttachmentOptionPacket;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAttachmentsMenu> {
 
@@ -118,9 +119,45 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
             return;
         super.renderTooltip(guiGraphics, x, y);
         if (this.menu.getCarried().isEmpty() && this.hoveredSlot instanceof RFEItemAttachmentSlot attachmentSlot && !this.hoveredSlot.hasItem()) {
+            List<Component> tooltip = new ArrayList<>();
             String text = attachmentSlot.getEmptyTextKey();
             if (text != null)
-                guiGraphics.renderTooltip(this.font, Component.translatable(text), x, y);
+                tooltip.add(Component.translatable(text));
+            Set<ResourceLocation> blockingSlots = attachmentSlot.getBlockingSlots();
+            if (!blockingSlots.isEmpty()) {
+                MenuTypeSlotsConfig menuConfig = RFEItemAttachmentsMenuSlotsHandler.getConfig(this.menu.getFocusedAttachmentsItem(), this.menu.getType());
+                Map<ResourceLocation, SlotConfig> slotConfig = menuConfig.slotConfig();
+                Map<ResourceLocation, String> otherKeys = menuConfig.otherSlotTextKeys();
+                int blockedCount = 0;
+                final int MAX_SLOTS_BLOCKED_MESSAGE = 5;
+                int sz = blockingSlots.size();
+                StringBuilder blockedText = new StringBuilder();
+                for (ResourceLocation loc : blockingSlots) {
+                    String appendText;
+                    if (slotConfig.containsKey(loc) && slotConfig.get(loc).emptyText() != null) {
+                        appendText = I18n.get(slotConfig.get(loc).emptyText());
+                    } else if (otherKeys.containsKey(loc)) {
+                        appendText = I18n.get(otherKeys.get(loc));
+                    } else {
+                        appendText = loc.toString();
+                    }
+                    blockedText.append(appendText);
+                    ++blockedCount;
+                    if (blockedCount > MAX_SLOTS_BLOCKED_MESSAGE)
+                        break;
+                    if (blockedCount < sz)
+                        blockedText.append(", ");
+                }
+                if (blockedCount <= MAX_SLOTS_BLOCKED_MESSAGE) {
+                    tooltip.add(Component.translatable("gui.ritchiesfirearmengine.attachments_menu.blocked_by",
+                            blockedText.toString()).withStyle(ChatFormatting.RED));
+                } else {
+                    tooltip.add(Component.translatable("gui.ritchiesfirearmengine.attachments_menu.blocked_by.extra",
+                            blockedText.toString(), sz - blockedCount).withStyle(ChatFormatting.RED));
+                }
+            }
+            if (!tooltip.isEmpty())
+                guiGraphics.renderComponentTooltip(this.font, tooltip, x, y);
         }
     }
 
@@ -139,7 +176,7 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
         List<Component> tooltip = stack.getTooltipLines(context, this.minecraft.player, flag);
 
         if (focusedItem == stack) {
-            int ITEM_HIGHLIGHT_COLOR = RFEConfig.CLIENT.attachmentScreenItemColor.getAsInt() & 0xFFFFFF;
+            final int ITEM_HIGHLIGHT_COLOR = RFEConfig.CLIENT.attachmentScreenItemColor.getAsInt() & 0xFFFFFF;
             tooltip.add(1, Component.translatable("gui.ritchiesfirearmengine.attachments_menu.tooltip.focused_item")
                     .withColor(ITEM_HIGHLIGHT_COLOR).withStyle(ChatFormatting.ITALIC));
         }
@@ -172,9 +209,11 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
     protected void renderValidSlotHighlights(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         ItemStack carried = this.menu.getCarried();
         ItemStack focusedItem = this.menu.getFocusedAttachmentsItem();
-        int VALID_SLOT_COLOR = RFEConfig.CLIENT.attachmentScreenValidSlotColor.getAsInt();
-        boolean VALID_SLOT_GRADIENT = RFEConfig.CLIENT.attachmentScreenValidSlotGradient.getAsBoolean();
-        int BLOCKED_SLOT_COLOR = RFEConfig.CLIENT.attachmentScreenBlockedSlotColor.getAsInt();
+        final int VALID_SLOT_COLOR = RFEConfig.CLIENT.attachmentScreenValidSlotColor.getAsInt();
+        final boolean VALID_SLOT_GRADIENT = RFEConfig.CLIENT.attachmentScreenValidSlotGradient.getAsBoolean();
+        final int BLOCKED_SLOT_COLOR = RFEConfig.CLIENT.attachmentScreenBlockedSlotColor.getAsInt();
+        final int BLOCKING_SLOT_COLOR = RFEConfig.CLIENT.attachmentScreenBlockingSlotColor.getAsInt();
+        final boolean BLOCKING_SLOT_GRADIENT = RFEConfig.CLIENT.attachmentScreenBlockingSlotGradient.getAsBoolean();
 
         for (int k = 0; k < this.menu.slots.size(); k++) {
             Slot slot = this.menu.slots.get(k);
@@ -185,8 +224,16 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
             if (slot instanceof RFEItemAttachmentSlot attachmentSlot) {
                 ResourceLocation slotId = attachmentSlot.getSlotId();
                 boolean attachmentIsEmpty = slot.getItem().isEmpty();
-                if (!attachmentSlot.getBlockingSlots().isEmpty()) {
-                    // Render blocked highlight
+                if (this.hoveredSlot != slot && this.hoveredSlot instanceof RFEItemAttachmentSlot attachmentSlot1
+                    && attachmentSlot1.getBlockingSlots().contains(slotId)) {
+                    // Render blocking highlight
+                    if (BLOCKING_SLOT_GRADIENT) {
+                        guiGraphics.fillGradient(slotX, slotY, slotX + 16, slotY + 16, 100, 0, BLOCKING_SLOT_COLOR);
+                    } else {
+                        guiGraphics.fill(slotX, slotY, slotX + 16, slotY + 16, 100, BLOCKING_SLOT_COLOR);
+                    }
+                } else if (!attachmentSlot.getBlockingSlots().isEmpty()) {
+                    // Render blocked highlight. No gradient as we want to make clear the entire thing is blocked
                     guiGraphics.fill(slotX, slotY, slotX + 16, slotY + 16, 100, BLOCKED_SLOT_COLOR);
                 } else if (attachmentIsEmpty && carried.isEmpty() && this.hoveredSlot != null && this.hoveredSlot != slot) {
                     // Render highlight on attachment slot when hovering eligible item outside of attachment slot
@@ -302,7 +349,7 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
             int diffY = pointY - slotY;
             int diffYMag = Mth.abs(diffY);
             int diffXDraw = diffX - diffYMag;
-            int POINTER_COLOR = RFEConfig.CLIENT.attachmentScreenPointerColor.getAsInt();
+            final int POINTER_COLOR = RFEConfig.CLIENT.attachmentScreenPointerColor.getAsInt();
             if (diffXDraw >= 0) {
                 graphics.fill(slotX, slotY, slotX + diffXDraw + 1, slotY + 1, POINTER_COLOR);
                 int lineX = slotX + diffXDraw + 1;

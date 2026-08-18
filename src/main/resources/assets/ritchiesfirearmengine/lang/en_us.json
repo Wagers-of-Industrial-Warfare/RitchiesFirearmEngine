@@ -1,7 +1,10 @@
 {
   "gui.ritchiesfirearmengine.attachments_menu": "Attachments",
+  "gui.ritchiesfirearmengine.attachments_menu.blocked_by": "(Blocked by %s)",
+  "gui.ritchiesfirearmengine.attachments_menu.blocked_by.extra": "(Blocked by %s, %s other slots)",
   "gui.ritchiesfirearmengine.attachments_menu.bayonet": "Bayonet",
   "gui.ritchiesfirearmengine.attachments_menu.scope": "Scope Sight",
+  "gui.ritchiesfirearmengine.attachments_menu.suppressor": "Suppressor",
   "gui.ritchiesfirearmengine.attachments_menu.tooltip.focused_item": "Currently modifying attachments...",
   "gui.ritchiesfirearmengine.attachments_menu.option.zoom": "Magnification level",
   "gui.ritchiesfirearmengine.attachments_menu.option.zoom.value": "%sx",

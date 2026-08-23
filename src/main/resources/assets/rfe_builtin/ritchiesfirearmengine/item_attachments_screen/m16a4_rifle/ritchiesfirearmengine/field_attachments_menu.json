@@ -1,0 +1,8 @@
+{
+  "model_scale": 64.0,
+  "slots": {
+    "rfe_builtin:vertical_grip": {
+      "model_pos": [8, 6, 3]
+    }
+  }
+}

@@ -2094,6 +2094,22 @@
       }
     ]
   },
+  "item_attachments.generic.grip.equip": {
+    "sounds": [
+      {
+        "name": "minecraft:item/armor/equip_iron1",
+        "pitch": 1.05
+      }
+    ]
+  },
+  "item_attachments.generic.grip.unequip": {
+    "sounds": [
+      {
+        "name": "minecraft:block/chain/step1",
+        "pitch": 0.9
+      }
+    ]
+  },
   "item_attachments.generic.scope.equip": {
     "sounds": [
       {

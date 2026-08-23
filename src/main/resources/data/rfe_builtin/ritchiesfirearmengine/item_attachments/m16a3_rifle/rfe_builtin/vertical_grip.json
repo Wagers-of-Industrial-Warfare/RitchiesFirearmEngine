@@ -1,0 +1,14 @@
+{
+  "slot_attachments": {
+    "rfe_builtin:vertical_grip": {
+      "type": "ritchiesfirearmengine:grip",
+      "recoil": {
+        "type": "ritchiesfirearmengine:simple",
+        "vertical_recoil": 0.13,
+        "horizontal_recoil": 0.12,
+        "recoil_decrease": 4,
+        "camera_shake": 0.16
+      }
+    }
+  }
+}

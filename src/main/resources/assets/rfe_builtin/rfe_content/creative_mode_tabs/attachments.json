@@ -6,6 +6,7 @@
     "rfe_builtin:zf_41",
     "rfe_builtin:knife_bayonet",
     "rfe_builtin:sword_bayonet",
-    "rfe_builtin:rifle_suppressor"
+    "rfe_builtin:rifle_suppressor",
+    "rfe_builtin:vertical_grip"
   ]
 }

@@ -40,6 +40,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.r
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhaseAccessFilter;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.bayonets.BayonetAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.bayonets.BayonetItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.recoil_control.GripAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.supperssors.SuppressorAttachmentProperties;
@@ -54,7 +55,9 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properti
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentsPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilClientImpulse;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilManager;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProvider;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadManager;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.spread.RFESpreadProvider;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
@@ -711,6 +714,36 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
             if (attachmentData instanceof SuppressorAttachmentProperties properties)
                 return properties;
+        }
+        return null;
+    }
+
+    @Nullable
+    public RFEFirearmProperties<RFERecoilProvider> getAttachmentRecoilProperties(ItemStack itemStack) {
+        RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
+        // TODO bipods
+        for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.GRIP)) {
+            ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
+            if (attachmentStack.isEmpty())
+                continue;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
+            if (attachmentData instanceof GripAttachmentProperties properties && properties.recoilProperties().isPresent())
+                return properties.recoilProperties().get();
+        }
+        return null;
+    }
+
+    @Nullable
+    public RFEFirearmProperties<RFESpreadProvider> getAttachmentSpreadProperties(ItemStack itemStack) {
+        RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
+        // TODO bipods
+        for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.GRIP)) {
+            ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
+            if (attachmentStack.isEmpty())
+                continue;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
+            if (attachmentData instanceof GripAttachmentProperties properties && properties.spreadProperties().isPresent())
+                return properties.spreadProperties().get();
         }
         return null;
     }

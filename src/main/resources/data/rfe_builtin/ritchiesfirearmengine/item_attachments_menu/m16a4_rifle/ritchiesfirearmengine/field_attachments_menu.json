@@ -1,0 +1,11 @@
+{
+  "slots": {
+    "rfe_builtin:vertical_grip": {
+      "empty_icon": "ritchiesfirearmengine:item/vertical_grip_icon",
+      "empty_text": "gui.ritchiesfirearmengine.attachments_menu.slot.vertical_grip",
+      "sound_on_add": { "sound_id": "rfe_builtin:item_attachments.generic.grip.equip" },
+      "sound_on_remove": { "sound_id": "rfe_builtin:item_attachments.generic.grip.unequip" },
+      "disabled": false
+    }
+  }
+}

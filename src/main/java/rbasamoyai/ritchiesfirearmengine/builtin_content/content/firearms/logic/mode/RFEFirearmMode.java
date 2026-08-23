@@ -35,6 +35,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RF
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
 import rbasamoyai.ritchiesfirearmengine.foundation.RFETags.RFEItemTags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEFirearmProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.misfires.RFEMisfire;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileInstance;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileManager;
@@ -722,7 +723,7 @@ public class RFEFirearmMode {
         RFERecoilClientImpulse impulse = new RFERecoilClientImpulse(RFEAimAngles.ZERO_ANGLES, RFEAimAngles.ZERO_ANGLES, 0);
         if (!firingInputs.isEmpty()) {
             RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(entity, itemStack);
-            RFERecoilProvider provider = RFERecoilProviderPackHandler.getRecoilProviders(itemStack).getProperties(this.modeId);
+            RFERecoilProvider provider = this.getRecoilProvider(entity, itemStack);
             if (recoilInstance == null || provider != RFERecoilManager.getCurrentProvider(entity, hand)) {
                 recoilInstance = provider.createRecoilInstance(itemStack, entity, entity.getRandom());
                 RFERecoilManager.trackRecoil(recoilInstance, provider, entity, itemStack, hand);
@@ -748,12 +749,21 @@ public class RFEFirearmMode {
                                    RFERecoilClientImpulse recoil, @Nullable UUID recoilUUID) {
         RFERecoilManager.setRecoilId(itemStack, recoilUUID);
         RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(entity, itemStack);
-        RFERecoilProvider provider = RFERecoilProviderPackHandler.getRecoilProviders(itemStack).getProperties(this.modeId);
+        RFERecoilProvider provider = this.getRecoilProvider(entity, itemStack);
         if (recoilInstance == null || provider != RFERecoilManager.getCurrentProvider(entity, hand)) {
             recoilInstance = provider.createRecoilInstance(itemStack, entity, entity.getRandom());
             RFERecoilManager.trackRecoil(recoilInstance, provider, entity, itemStack, hand);
         }
         recoilInstance.updateRecoilWithImpulse(itemStack, entity, recoil);
+    }
+
+    protected RFERecoilProvider getRecoilProvider(LivingEntity entity, ItemStack itemStack) {
+        if (itemStack.getItem() instanceof RFEFirearmItem firearmItem) {
+            RFEFirearmProperties<RFERecoilProvider> recoilProperties = firearmItem.getAttachmentRecoilProperties(itemStack);
+            if (recoilProperties != null)
+                return recoilProperties.getProperties(this.modeId);
+        }
+        return RFERecoilProviderPackHandler.getRecoilProviders(itemStack).getProperties(this.modeId);
     }
 
     public void handleFiringInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs,
@@ -777,7 +787,7 @@ public class RFEFirearmMode {
         }
 
         RFESpreadInstance spreadInstance = RFESpreadManager.getSpreadInstance(entity, itemStack);
-        RFESpreadProvider provider = RFESpreadProviderPackHandler.getSpreadProviders(itemStack).getProperties(this.modeId);
+        RFESpreadProvider provider = this.getSpreadProvider(entity, itemStack);
         if (spreadInstance == null || provider != RFESpreadManager.getCurrentProvider(entity, hand)) {
             spreadInstance = provider.createSpreadInstance(itemStack, entity, entity.getRandom());
             RFESpreadManager.trackSpread(spreadInstance, provider, entity, itemStack, hand);
@@ -802,6 +812,15 @@ public class RFEFirearmMode {
         this.saveModeData(itemStack, FirearmDataUtils.setShotCount(modeData, FirearmDataUtils.getShotCount(modeData) + firingInputs.size()));
 
         this.fireFirearm(itemStack, entity, FiringType.EFFECTS);
+    }
+
+    protected RFESpreadProvider getSpreadProvider(LivingEntity entity, ItemStack itemStack) {
+        if (itemStack.getItem() instanceof RFEFirearmItem firearmItem) {
+            RFEFirearmProperties<RFESpreadProvider> spreadProperties = firearmItem.getAttachmentSpreadProperties(itemStack);
+            if (spreadProperties != null)
+                return spreadProperties.getProperties(this.modeId);
+        }
+        return RFESpreadProviderPackHandler.getSpreadProviders(itemStack).getProperties(this.modeId);
     }
 
     public void playFiringEffects(ItemStack itemStack, LivingEntity entity) {

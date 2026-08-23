@@ -3,7 +3,7 @@
     "rfe_builtin:loaded_percussion_cap": {
       "type": "ritchiesfirearmengine:simple",
       "model": "rfe_builtin:item/item_attachments/percussion_cap",
-      "translation": [0.575, -0.275, 6.65],
+      "translation": [1.1, -0.525, 12.8],
       "rotation": [45, 0, 0],
       "scale": [0.52, 0.52, 0.52]
     }

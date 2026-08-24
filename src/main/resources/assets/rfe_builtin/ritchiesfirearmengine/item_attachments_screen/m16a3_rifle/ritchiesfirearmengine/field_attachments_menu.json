@@ -6,6 +6,12 @@
     },
     "rfe_builtin:bipod": {
       "model_pos": [8, 6, -5]
+    },
+    "rfe_builtin:suppressor": {
+      "model_pos": [8, 8, -16]
+    },
+    "rfe_builtin:bayonet": {
+      "model_pos": [8, 7, -11]
     }
   }
 }

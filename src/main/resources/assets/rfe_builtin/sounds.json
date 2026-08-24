@@ -2059,6 +2059,25 @@
       }
     ]
   },
+  "item.generic.suppressed_assault_rifle.shot": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/suppressed_assault_rifle/shot",
+        "volume": 1.0
+      },
+      {
+        "name": "rfe_builtin:item/generic/suppressed_assault_rifle/shot",
+        "volume": 1.0,
+        "pitch": 0.98
+      },
+      {
+        "name": "rfe_builtin:item/generic/suppressed_assault_rifle/shot",
+        "volume": 1.0,
+        "pitch": 0.97
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.rifle.shot"
+  },
   "item.generic.suppressed_rifle.shot": {
     "sounds": [
       {

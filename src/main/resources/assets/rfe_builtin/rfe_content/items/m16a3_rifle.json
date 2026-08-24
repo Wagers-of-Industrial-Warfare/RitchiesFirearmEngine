@@ -2,7 +2,15 @@
   "type": "ritchiesfirearmengine:firearm",
   "firearm_attachments": {
     "rfe_builtin:vertical_grip": "ritchiesfirearmengine:grip",
-    "rfe_builtin:bipod": "ritchiesfirearmengine:bipod"
+    "rfe_builtin:bipod": "ritchiesfirearmengine:bipod",
+    "rfe_builtin:suppressor": {
+      "type": "ritchiesfirearmengine:suppressor",
+      "mutually_exclusive_with": [ "rfe_builtin:bayonet" ]
+    },
+    "rfe_builtin:bayonet": {
+      "type": "ritchiesfirearmengine:bayonet",
+      "mutually_exclusive_with": [ "rfe_builtin:suppressor" ]
+    }
   },
   "magazine_attachment_slot": "rfe_builtin:magazine",
   "drawing": {

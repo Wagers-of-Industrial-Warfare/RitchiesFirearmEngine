@@ -1,0 +1,11 @@
+{
+  "slot_attachments": {
+    "rfe_builtin:bayonet": {
+      "type": "ritchiesfirearmengine:bayonet",
+      "added_attack_damage": 5.5,
+      "added_attack_speed": -3.45,
+      "added_attack_range": 0.5,
+      "blocks_shooting": false
+    }
+  }
+}

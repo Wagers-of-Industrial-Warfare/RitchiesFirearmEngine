@@ -83,6 +83,13 @@ public class RFEHudItemInfoProviders {
          * @return true if the firearm is meleeing, false if not
          */
         default boolean isMeleeing(ItemStack itemStack, LivingEntity entity) { return false; }
+
+        /**
+         * Get if the gun has a bipod deployed and in position.
+         * @param itemStack the firearm
+         * @return true if the firearm is using its bipod, false if not
+         */
+        default boolean isBipodDeployed(ItemStack itemStack, LivingEntity entity) { return false; }
     }
 
     private RFEHudItemInfoProviders() {}

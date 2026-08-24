@@ -22,6 +22,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.elements.RFEHudIc
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import java.util.function.Predicate;
 public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
 
     public static final ResourceLocation MELEE_ICON_LOCATION = RitchiesFirearmEngine.resource("textures/gui/hud/elements/melee_icon.png");
+    public static final ResourceLocation BIPOD_DEPLOYED_ICON_LOCATION = RitchiesFirearmEngine.resource("textures/gui/hud/elements/bipod_deployed_icon.png");
 
     protected final Minecraft minecraft;
     protected final Font font;
@@ -131,10 +133,16 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
             this.firearmIcon.blit(graphics, originX - this.firearmIcon.blitWidth() / 2, originY - this.firearmIcon.blitHeight() - 4);
         }
         if (this.showModifiers) {
-            // TODO dynamic sizing
-            if (hudInfo.isMeleeing(item, player)) {
-                int yOffset = 40;
-                graphics.blit(MELEE_ICON_LOCATION, originX - 8, originY + yOffset, 0, 0, 16, 16, 16, 16);
+            List<ResourceLocation> icons = new ArrayList<>();
+            if (hudInfo.isMeleeing(item, player))
+                icons.add(MELEE_ICON_LOCATION);
+            if (hudInfo.isBipodDeployed(item, player))
+                icons.add(BIPOD_DEPLOYED_ICON_LOCATION);
+            int yOffset = 40;
+            int iconsWidth = Math.max(0, 20 * icons.size() - 4);
+            for (int i = 0; i < icons.size(); ++i) {
+                graphics.blit(icons.get(i), originX - iconsWidth / 2 + 20 * i, originY + yOffset,
+                        0, 0, 16, 16, 16, 16);
             }
         }
         if (!this.hideOverheating) {

@@ -133,6 +133,11 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             public boolean isMeleeing(ItemStack itemStack, LivingEntity entity) {
                 return RFEFirearmItem.this.isMeleeing(itemStack, entity);
             }
+
+            @Override
+            public boolean isBipodDeployed(ItemStack itemStack, LivingEntity entity) {
+                return RFEFirearmItem.this.isBipodDeployed(itemStack, entity);
+            }
         });
     }
 
@@ -767,6 +772,21 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
                 return properties.spreadProperties().get();
         }
         return null;
+    }
+
+    public boolean isBipodDeployed(ItemStack itemStack, LivingEntity entity) {
+        if (!this.getCurrentMode(itemStack).isInBipodPosition(entity, itemStack))
+            return false;
+        RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
+        for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BIPOD)) {
+            ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
+            if (attachmentStack.isEmpty())
+                continue;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
+            if (attachmentData instanceof BipodAttachmentProperties properties && properties.isDeployed(attachmentStack))
+                return true;
+        }
+        return false;
     }
 
     public List<ItemStack> getAmmoItemsForHUD(ItemStack itemStack) {

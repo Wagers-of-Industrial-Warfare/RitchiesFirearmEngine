@@ -1,0 +1,8 @@
+{
+  "model_scale": 64.0,
+  "slots": {
+    "rfe_builtin:bipod": {
+      "model_pos": [8, 5, 1]
+    }
+  }
+}

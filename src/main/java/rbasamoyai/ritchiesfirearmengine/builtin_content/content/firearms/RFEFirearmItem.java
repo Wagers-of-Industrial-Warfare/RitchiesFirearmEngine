@@ -40,6 +40,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.r
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.reload_phase.ReloadPhaseAccessFilter;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.bayonets.BayonetAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.bayonets.BayonetItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.recoil_control.BipodAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.recoil_control.GripAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeItem;
@@ -305,9 +306,9 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
 
     @Override
     public void handleServerAutomaticFireOnClient(ItemStack itemStack, LivingEntity entity, InteractionHand hand,
-                                                  RFERecoilClientImpulse recoil, @Nullable UUID recoilUUID) {
+                                                  RFERecoilClientImpulse recoil, @Nullable UUID recoilUUID, boolean inBipodPosition) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
-        mode.handleServerRecoil(itemStack, entity, hand, recoil, recoilUUID);
+        mode.handleServerRecoil(itemStack, entity, hand, recoil, recoilUUID, inBipodPosition);
         mode.fireFirearm(itemStack, entity, RFEFirearmMode.FiringType.AUTOMATIC);
     }
 
@@ -719,9 +720,19 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     }
 
     @Nullable
-    public RFEFirearmProperties<RFERecoilProvider> getAttachmentRecoilProperties(ItemStack itemStack) {
+    public RFEFirearmProperties<RFERecoilProvider> getAttachmentRecoilProperties(ItemStack itemStack, boolean inBipodPosition) {
         RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
-        // TODO bipods
+        if (inBipodPosition) {
+            for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BIPOD)) {
+                ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
+                if (attachmentStack.isEmpty())
+                    continue;
+                RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
+                if (attachmentData instanceof BipodAttachmentProperties properties && properties.isDeployed(attachmentStack)
+                        && properties.recoilProperties().isPresent())
+                    return properties.recoilProperties().get();
+            }
+        }
         for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.GRIP)) {
             ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
             if (attachmentStack.isEmpty())
@@ -734,9 +745,19 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     }
 
     @Nullable
-    public RFEFirearmProperties<RFESpreadProvider> getAttachmentSpreadProperties(ItemStack itemStack) {
+    public RFEFirearmProperties<RFESpreadProvider> getAttachmentSpreadProperties(ItemStack itemStack, boolean inBipodPosition) {
         RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
-        // TODO bipods
+        if (inBipodPosition) {
+            for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BIPOD)) {
+                ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
+                if (attachmentStack.isEmpty())
+                    continue;
+                RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
+                if (attachmentData instanceof BipodAttachmentProperties properties && properties.isDeployed(attachmentStack)
+                        && properties.spreadProperties().isPresent())
+                    return properties.spreadProperties().get();
+            }
+        }
         for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.GRIP)) {
             ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
             if (attachmentStack.isEmpty())

@@ -3,6 +3,9 @@
   "slots": {
     "rfe_builtin:vertical_grip": {
       "model_pos": [8, 6, 3]
+    },
+    "rfe_builtin:bipod": {
+      "model_pos": [8, 6, -5]
     }
   }
 }

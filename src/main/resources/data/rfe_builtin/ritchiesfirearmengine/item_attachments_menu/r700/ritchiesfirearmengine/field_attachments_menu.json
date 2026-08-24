@@ -1,0 +1,11 @@
+{
+  "slots": {
+    "rfe_builtin:bipod": {
+      "empty_icon": "ritchiesfirearmengine:item/bipod_icon",
+      "empty_text": "gui.ritchiesfirearmengine.attachments_menu.slot.bipod",
+      "sound_on_add": { "sound_id": "rfe_builtin:item_attachments.generic.bipod.equip" },
+      "sound_on_remove": { "sound_id": "rfe_builtin:item_attachments.generic.bipod.unequip" },
+      "disabled": false
+    }
+  }
+}

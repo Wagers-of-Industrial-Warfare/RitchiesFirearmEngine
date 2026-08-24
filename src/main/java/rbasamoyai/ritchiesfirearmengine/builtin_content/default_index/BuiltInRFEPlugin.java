@@ -47,6 +47,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.hit_multipliers.
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.GenericAttachmentItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.bayonets.BayonetAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.bayonets.BayonetItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.recoil_control.BipodAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.recoil_control.GripAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeItem;
@@ -661,6 +662,9 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         public static final DataComponentType<Integer> ZOOM_LEVEL_INDEX = register("zoom_level_index",
                 builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
+        public static final DataComponentType<Boolean> DEPLOYED_SETTING = register("deployed_setting",
+                builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
         private static <V> DataComponentType<V> register(String id, UnaryOperator<DataComponentType.Builder<V>> builderOp) {
             ResourceLocation loc = RitchiesFirearmEngine.resource(id);
             if (TYPES.containsKey(loc))
@@ -680,6 +684,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         public static final RFEItemAttachmentProperties.Serializer<BayonetAttachmentProperties> BAYONET = register("bayonet", new BayonetAttachmentProperties.Serializer());
         public static final RFEItemAttachmentProperties.Serializer<SuppressorAttachmentProperties> SUPPRESSOR = register("suppressor", new SuppressorAttachmentProperties.Serializer());
         public static final RFEItemAttachmentProperties.Serializer<GripAttachmentProperties> GRIP = register("grip", new GripAttachmentProperties.Serializer());
+        public static final RFEItemAttachmentProperties.Serializer<BipodAttachmentProperties> BIPOD = register("bipod", new BipodAttachmentProperties.Serializer());
 
         public static void register() {}
 

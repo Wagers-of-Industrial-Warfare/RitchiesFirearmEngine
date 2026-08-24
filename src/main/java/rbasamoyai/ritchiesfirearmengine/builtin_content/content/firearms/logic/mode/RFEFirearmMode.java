@@ -19,7 +19,12 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.HoldAttackKeyInteraction;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ai.ICanFireRFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
@@ -654,6 +659,23 @@ public class RFEFirearmMode {
             entity.level().playSound(null, entity.blockPosition(), this.windUpSound, SoundSource.NEUTRAL, 1, 1);
     }
 
+    public boolean isInBipodPosition(LivingEntity entity, ItemStack itemStack) {
+        // TODO other entities?
+        Vec3 aimDirection = entity.getViewVector(0);
+        Vec3 eyePos = entity.getEyePosition();
+        Vec3 mountingDirection = entity.calculateViewVector(entity.getViewXRot(0) + 90, entity.getViewYRot(0));
+        Level level = entity.level();
+        final double[] SCALES = new double[]{0.25d, 0.5d};
+        for (double s : SCALES) {
+            Vec3 origin = eyePos.add(aimDirection.scale(s));
+            BlockHitResult result = level.clip(new ClipContext(origin, origin.add(mountingDirection.scale(1)),
+                    ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
+            if (result.getType() != HitResult.Type.MISS)
+                return true;
+        }
+        return false;
+    }
+
     protected void handlePlayerAmmoAndShootingOnClient(ItemStack itemStack, LivingEntity entity, FiringType firing) {
         if (!FirearmDataUtils.isHoldingAttackKey(itemStack) && this.fireMode == FireMode.FULL_AUTO)
             return;
@@ -720,10 +742,11 @@ public class RFEFirearmMode {
             }
         }
 
+        boolean inBipodPosition = this.isInBipodPosition(entity, itemStack);
         RFERecoilClientImpulse impulse = new RFERecoilClientImpulse(RFEAimAngles.ZERO_ANGLES, RFEAimAngles.ZERO_ANGLES, 0);
         if (!firingInputs.isEmpty()) {
             RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(entity, itemStack);
-            RFERecoilProvider provider = this.getRecoilProvider(entity, itemStack);
+            RFERecoilProvider provider = this.getRecoilProvider(entity, itemStack, inBipodPosition);
             if (recoilInstance == null || provider != RFERecoilManager.getCurrentProvider(entity, hand)) {
                 recoilInstance = provider.createRecoilInstance(itemStack, entity, entity.getRandom());
                 RFERecoilManager.trackRecoil(recoilInstance, provider, entity, itemStack, hand);
@@ -737,19 +760,19 @@ public class RFEFirearmMode {
                 RFENetwork.sendToServer(new ServerboundRunFiringLogicPacket(firingInputs, jam, hand, recoilUUID));
         } else {
             if (entity instanceof ServerPlayer splayer) {
-                RFENetwork.sendToPlayer(new ClientboundRunFiringLogicPacket(hand, impulse, recoilUUID), splayer);
+                RFENetwork.sendToPlayer(new ClientboundRunFiringLogicPacket(hand, impulse, recoilUUID, inBipodPosition), splayer);
             } else if (!(entity instanceof Player)) {
-                this.handleServerRecoil(itemStack, entity, hand, impulse, recoilUUID);
+                this.handleServerRecoil(itemStack, entity, hand, impulse, recoilUUID, inBipodPosition);
             }
             this.handleFiringInputOnServer(itemStack, entity, firingInputs, jam, recoilUUID, hand);
         }
     }
 
     public void handleServerRecoil(ItemStack itemStack, LivingEntity entity, InteractionHand hand,
-                                   RFERecoilClientImpulse recoil, @Nullable UUID recoilUUID) {
+                                   RFERecoilClientImpulse recoil, @Nullable UUID recoilUUID, boolean inBipodPosition) {
         RFERecoilManager.setRecoilId(itemStack, recoilUUID);
         RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(entity, itemStack);
-        RFERecoilProvider provider = this.getRecoilProvider(entity, itemStack);
+        RFERecoilProvider provider = this.getRecoilProvider(entity, itemStack, inBipodPosition);
         if (recoilInstance == null || provider != RFERecoilManager.getCurrentProvider(entity, hand)) {
             recoilInstance = provider.createRecoilInstance(itemStack, entity, entity.getRandom());
             RFERecoilManager.trackRecoil(recoilInstance, provider, entity, itemStack, hand);
@@ -757,9 +780,9 @@ public class RFEFirearmMode {
         recoilInstance.updateRecoilWithImpulse(itemStack, entity, recoil);
     }
 
-    protected RFERecoilProvider getRecoilProvider(LivingEntity entity, ItemStack itemStack) {
+    protected RFERecoilProvider getRecoilProvider(LivingEntity entity, ItemStack itemStack, boolean inBipodPosition) {
         if (itemStack.getItem() instanceof RFEFirearmItem firearmItem) {
-            RFEFirearmProperties<RFERecoilProvider> recoilProperties = firearmItem.getAttachmentRecoilProperties(itemStack);
+            RFEFirearmProperties<RFERecoilProvider> recoilProperties = firearmItem.getAttachmentRecoilProperties(itemStack, inBipodPosition);
             if (recoilProperties != null)
                 return recoilProperties.getProperties(this.modeId);
         }
@@ -786,8 +809,9 @@ public class RFEFirearmMode {
                 this.useOrRemoveNextSecondariesInItem(itemStack, entity, firingInputs.size());
         }
 
+        boolean inBipodPosition = this.isInBipodPosition(entity, itemStack);
         RFESpreadInstance spreadInstance = RFESpreadManager.getSpreadInstance(entity, itemStack);
-        RFESpreadProvider provider = this.getSpreadProvider(entity, itemStack);
+        RFESpreadProvider provider = this.getSpreadProvider(entity, itemStack, inBipodPosition);
         if (spreadInstance == null || provider != RFESpreadManager.getCurrentProvider(entity, hand)) {
             spreadInstance = provider.createSpreadInstance(itemStack, entity, entity.getRandom());
             RFESpreadManager.trackSpread(spreadInstance, provider, entity, itemStack, hand);
@@ -814,9 +838,9 @@ public class RFEFirearmMode {
         this.fireFirearm(itemStack, entity, FiringType.EFFECTS);
     }
 
-    protected RFESpreadProvider getSpreadProvider(LivingEntity entity, ItemStack itemStack) {
+    protected RFESpreadProvider getSpreadProvider(LivingEntity entity, ItemStack itemStack, boolean inBipodPosition) {
         if (itemStack.getItem() instanceof RFEFirearmItem firearmItem) {
-            RFEFirearmProperties<RFESpreadProvider> spreadProperties = firearmItem.getAttachmentSpreadProperties(itemStack);
+            RFEFirearmProperties<RFESpreadProvider> spreadProperties = firearmItem.getAttachmentSpreadProperties(itemStack, inBipodPosition);
             if (spreadProperties != null)
                 return spreadProperties.getProperties(this.modeId);
         }

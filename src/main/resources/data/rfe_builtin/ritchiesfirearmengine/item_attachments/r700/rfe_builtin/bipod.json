@@ -1,0 +1,20 @@
+{
+  "slot_attachments": {
+    "rfe_builtin:bipod": {
+      "type": "ritchiesfirearmengine:bipod",
+      "recoil": {
+        "type": "ritchiesfirearmengine:simple",
+        "vertical_recoil": 0.3,
+        "horizontal_recoil": 0.1,
+        "recoil_decrease": 4.5,
+        "camera_shake": 0.75
+      },
+      "spread": {
+        "type": "ritchiesfirearmengine:simple",
+        "spread": 0,
+        "unaimed_spread": 0.5,
+        "tighten": false
+      }
+    }
+  }
+}

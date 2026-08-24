@@ -1,7 +1,8 @@
 {
   "type": "ritchiesfirearmengine:firearm",
   "firearm_attachments": {
-    "rfe_builtin:vertical_grip": "ritchiesfirearmengine:grip"
+    "rfe_builtin:vertical_grip": "ritchiesfirearmengine:grip",
+    "rfe_builtin:bipod": "ritchiesfirearmengine:bipod"
   },
   "magazine_attachment_slot": "rfe_builtin:magazine",
   "drawing": {

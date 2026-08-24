@@ -16,12 +16,13 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 
-public record ClientboundRunFiringLogicPacket(InteractionHand hand, RFERecoilClientImpulse recoil, @Nullable UUID recoilUUID) implements RFEPacket {
+public record ClientboundRunFiringLogicPacket(InteractionHand hand, RFERecoilClientImpulse recoil, @Nullable UUID recoilUUID, boolean inBipodPosition) implements RFEPacket {
     
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundRunFiringLogicPacket> STREAM_CODEC = StreamCodec.composite(
             NeoForgeStreamCodecs.enumCodec(InteractionHand.class), ClientboundRunFiringLogicPacket::hand,
             RFERecoilClientImpulse.STREAM_CODEC, ClientboundRunFiringLogicPacket::recoil,
             ByteBufCodecs.optional(UUIDUtil.STREAM_CODEC).map(o -> o.orElse(null), Optional::ofNullable), ClientboundRunFiringLogicPacket::recoilUUID,
+            ByteBufCodecs.BOOL, ClientboundRunFiringLogicPacket::inBipodPosition,
             ClientboundRunFiringLogicPacket::new);
 
     @Override

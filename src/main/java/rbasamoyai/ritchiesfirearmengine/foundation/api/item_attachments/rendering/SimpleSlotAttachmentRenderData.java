@@ -46,10 +46,12 @@ public class SimpleSlotAttachmentRenderData implements RFEItemAttachmentRenderPr
         if (renderContext.hideItem)
             return;
         BakedModel attachmentModel = modelShaper.getModelManager().getModel(this.model);
+        // TODO combine context from both attachment and firearm item, or pass extra context to attachment stack
+        BakedModel overrideModel = attachmentModel.getOverrides().resolve(attachmentModel, attachmentStack, null, null, 42);
         poseStack.scale(this.scale.x, this.scale.y, this.scale.z);
         poseStack.translate(this.translation.x / 16f, this.translation.y / 16f, this.translation.z / 16f);
         poseStack.mulPose(this.rotationMat);
-        renderOp.call(attachmentStack, displayContext, leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, attachmentModel);
+        renderOp.call(attachmentStack, displayContext, leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, overrideModel);
     }
 
     @Override

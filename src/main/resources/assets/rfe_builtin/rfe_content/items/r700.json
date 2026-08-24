@@ -1,5 +1,8 @@
 {
   "type": "ritchiesfirearmengine:firearm",
+  "firearm_attachments": {
+    "rfe_builtin:bipod": "ritchiesfirearmengine:bipod"
+  },
   "drawing": {
     "draw_time": 18,
     "sound": "rfe_builtin:item.generic.rifle.draw"

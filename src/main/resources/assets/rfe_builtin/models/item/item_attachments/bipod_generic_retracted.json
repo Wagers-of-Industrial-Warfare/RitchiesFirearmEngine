@@ -1,0 +1,57 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "rfe_builtin:item/bipod_generic"
+	},
+	"elements": [
+		{
+			"from": [7, 7, 7],
+			"to": [9, 8, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 7.5, 8]},
+			"faces": {
+				"north": {"uv": [10, 0, 12, 1], "texture": "#0"},
+				"east": {"uv": [10, 2, 12, 3], "texture": "#0"},
+				"south": {"uv": [10, 4, 12, 5], "texture": "#0"},
+				"west": {"uv": [10, 6, 12, 7], "texture": "#0"},
+				"up": {"uv": [8, 10, 6, 8], "texture": "#0"},
+				"down": {"uv": [11, 8, 9, 10], "texture": "#0"}
+			}
+		},
+		{
+			"from": [8.25, 6.5, 8],
+			"to": [9.25, 7.5, 15],
+			"rotation": {"angle": 22.5, "axis": "y", "origin": [8, 7, 8]},
+			"faces": {
+				"north": {"uv": [7, 12, 6, 11], "texture": "#0"},
+				"east": {"uv": [6, 0, 7, 7], "rotation": 90, "texture": "#0"},
+				"south": {"uv": [9, 11, 8, 12], "rotation": 180, "texture": "#0"},
+				"west": {"uv": [2, 0, 3, 7], "rotation": 270, "texture": "#0"},
+				"up": {"uv": [0, 0, 1, 7], "texture": "#0"},
+				"down": {"uv": [4, 0, 5, 7], "rotation": 180, "texture": "#0"}
+			}
+		},
+		{
+			"from": [6.75, 6.5, 8],
+			"to": [7.75, 7.5, 15],
+			"rotation": {"angle": -22.5, "axis": "y", "origin": [8, 7, 8]},
+			"faces": {
+				"north": {"uv": [11, 12, 10, 11], "texture": "#0"},
+				"east": {"uv": [4, 8, 5, 15], "rotation": 90, "texture": "#0"},
+				"south": {"uv": [13, 8, 12, 9], "rotation": 180, "texture": "#0"},
+				"west": {"uv": [8, 0, 9, 7], "rotation": 270, "texture": "#0"},
+				"up": {"uv": [0, 8, 1, 15], "texture": "#0"},
+				"down": {"uv": [2, 8, 3, 15], "rotation": 180, "texture": "#0"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "bipod",
+			"origin": [8, 8, 8],
+			"scope": 0,
+			"color": 0,
+			"children": [0, 1, 2]
+		}
+	]
+}

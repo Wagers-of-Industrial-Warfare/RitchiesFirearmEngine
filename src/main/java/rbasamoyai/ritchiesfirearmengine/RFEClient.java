@@ -39,6 +39,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineIte
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.RFEFirearmItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FireMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEAimAngles;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEClientPluginManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.gui.hud.RFEHudOverlayRenderer;
@@ -150,6 +151,9 @@ public class RFEClient {
         });
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("has_bayonet"), (itemStack, level, entity, seed) -> {
             return itemStack.getItem() instanceof RFEFirearmItem firearm && firearm.hasBayonet(itemStack) ? 1 : 0;
+        });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_deployed"), (itemStack, level, entity, seed) -> {
+            return itemStack.getOrDefault(BuiltInRFEPlugin.RFEDataComponents.DEPLOYED_SETTING, false) ? 1 : 0;
         });
     }
 

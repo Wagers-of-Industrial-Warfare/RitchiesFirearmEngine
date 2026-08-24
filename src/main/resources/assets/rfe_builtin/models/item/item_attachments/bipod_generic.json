@@ -1,0 +1,9 @@
+{
+  "parent": "rfe_builtin:item/item_attachments/bipod_generic_retracted",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:is_deployed": 1 },
+      "model": "rfe_builtin:item/item_attachments/bipod_generic_deployed"
+    }
+  ]
+}

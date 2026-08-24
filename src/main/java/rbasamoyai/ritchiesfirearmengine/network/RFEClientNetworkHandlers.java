@@ -76,7 +76,7 @@ public class RFEClientNetworkHandlers {
             return;
         ItemStack itemStack = mc.player.getItemInHand(packet.hand());
         if (itemStack.getItem() instanceof IFirearmItem firearm)
-            firearm.handleServerAutomaticFireOnClient(itemStack, mc.player, packet.hand(), packet.recoil(), packet.recoilUUID());
+            firearm.handleServerAutomaticFireOnClient(itemStack, mc.player, packet.hand(), packet.recoil(), packet.recoilUUID(), packet.inBipodPosition());
     }
 
     public static void handleExplosionPacket(RFEExplosionPacket<?> packet) {

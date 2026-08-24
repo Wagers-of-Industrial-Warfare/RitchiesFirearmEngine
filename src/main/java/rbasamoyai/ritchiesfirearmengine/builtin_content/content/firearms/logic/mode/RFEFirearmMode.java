@@ -665,10 +665,11 @@ public class RFEFirearmMode {
         Vec3 eyePos = entity.getEyePosition();
         Vec3 mountingDirection = entity.calculateViewVector(entity.getViewXRot(0) + 90, entity.getViewYRot(0));
         Level level = entity.level();
-        final double[] SCALES = new double[]{0.25d, 0.5d};
-        for (double s : SCALES) {
+        final double[] AIM_SCALES = new double[]{0.25d, 0.5d};
+        final double MOUNTING_SCALE = 0.75d;
+        for (double s : AIM_SCALES) {
             Vec3 origin = eyePos.add(aimDirection.scale(s));
-            BlockHitResult result = level.clip(new ClipContext(origin, origin.add(mountingDirection.scale(1)),
+            BlockHitResult result = level.clip(new ClipContext(origin, origin.add(mountingDirection.scale(MOUNTING_SCALE)),
                     ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
             if (result.getType() != HitResult.Type.MISS)
                 return true;

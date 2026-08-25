@@ -12,6 +12,9 @@
     },
     "rfe_builtin:bayonet": {
       "model_pos": [8, 7, -11]
+    },
+    "rfe_builtin:scope": {
+      "model_pos": [8, 10.5, 15]
     }
   }
 }

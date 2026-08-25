@@ -27,6 +27,13 @@
       "sound_on_add": { "sound_id": "rfe_builtin:item_attachments.generic.bayonet.equip" },
       "sound_on_remove": { "sound_id": "rfe_builtin:item_attachments.generic.bayonet.unequip" },
       "disabled": false
+    },
+    "rfe_builtin:scope": {
+      "empty_icon": "ritchiesfirearmengine:item/scope_icon",
+      "empty_text": "gui.ritchiesfirearmengine.attachments_menu.slot.scope",
+      "sound_on_add": { "sound_id": "rfe_builtin:item_attachments.generic.scope.equip" },
+      "sound_on_remove": { "sound_id": "rfe_builtin:item_attachments.generic.scope.unequip" },
+      "disabled": false
     }
   }
 }

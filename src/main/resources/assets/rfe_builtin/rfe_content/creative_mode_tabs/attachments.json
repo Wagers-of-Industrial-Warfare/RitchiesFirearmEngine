@@ -2,6 +2,7 @@
   "title": "itemGroup.rfe_builtin.attachments",
   "icon": "rfe_builtin:zf_39",
   "contents": [
+    "rfe_builtin:acog_4x_scope",
     "rfe_builtin:zf_39",
     "rfe_builtin:zf_41",
     "rfe_builtin:knife_bayonet",

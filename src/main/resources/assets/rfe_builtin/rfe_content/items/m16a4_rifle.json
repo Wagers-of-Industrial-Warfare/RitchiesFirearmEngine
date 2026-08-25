@@ -10,7 +10,8 @@
     "rfe_builtin:bayonet": {
       "type": "ritchiesfirearmengine:bayonet",
       "mutually_exclusive_with": [ "rfe_builtin:suppressor" ]
-    }
+    },
+    "rfe_builtin:scope": "ritchiesfirearmengine:scope"
   },
   "magazine_attachment_slot": "rfe_builtin:magazine",
   "drawing": {

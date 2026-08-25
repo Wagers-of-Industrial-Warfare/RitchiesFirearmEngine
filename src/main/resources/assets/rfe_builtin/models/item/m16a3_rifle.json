@@ -21,6 +21,13 @@
       "model": "rfe_builtin:item/m16_rifle/m16_rifle_melee"
     },
     {
+      "predicate": {
+        "ritchiesfirearmengine:is_meleeing": 1,
+        "ritchiesfirearmengine:has_bayonet": 1
+      },
+      "model": "rfe_builtin:item/m16_rifle/m16_rifle_melee_bayonet"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
       "model": "rfe_builtin:item/m16_rifle/m16_rifle_reload"
     },

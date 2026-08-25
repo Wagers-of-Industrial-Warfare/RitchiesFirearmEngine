@@ -21,6 +21,13 @@
       "model": "rfe_builtin:item/m4_carbine/m4_carbine_melee"
     },
     {
+      "predicate": {
+        "ritchiesfirearmengine:is_meleeing": 1,
+        "ritchiesfirearmengine:has_bayonet": 1
+      },
+      "model": "rfe_builtin:item/m4_carbine/m4_carbine_melee_bayonet"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_reloading": 1 },
       "model": "rfe_builtin:item/m4_carbine/m4_carbine_reload"
     },

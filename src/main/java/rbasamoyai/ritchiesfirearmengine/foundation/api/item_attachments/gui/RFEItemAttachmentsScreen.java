@@ -199,8 +199,8 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
         pose.translate(0, 0, 300);
         this.renderMainItem(guiGraphics, partialTick);
         this.renderSlotPointers(guiGraphics, partialTick);
-        this.renderTooltip(guiGraphics, mouseX, mouseY);
         pose.popPose();
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
     @Override

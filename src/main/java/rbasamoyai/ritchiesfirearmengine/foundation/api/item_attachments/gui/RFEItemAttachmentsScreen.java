@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.model.BakedModel;
@@ -61,6 +62,8 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
     protected List<RFEIntegralAttachmentButton> integralSlotButtons = new ArrayList<>();
     @Nullable protected RFEIntegralAttachmentButton hoveredIntegralSlot = null;
 
+    protected final List<Rect2i> extraAreas = new ArrayList<>();
+
     public RFEItemAttachmentsScreen(RFEItemAttachmentsMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         this.imageHeight = 200;
@@ -77,6 +80,7 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
         this.slotDisplayMap = screenConfig.slotDisplayConfig();
         this.integralSlotButtons.clear();
 
+        this.extraAreas.clear();
         if (targetStack.getItem() instanceof IHasRFEItemAttachments hasAttachments) {
             MenuTypeSlotsConfig menuConfig = RFEItemAttachmentsMenuSlotsHandler.getConfig(targetStack, this.menu.getType());
             ImmutableMap<ResourceLocation, SlotConfig> slotConfigById = menuConfig.slotConfig();
@@ -105,6 +109,10 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
                                         slotId, this.menu::getFocusedAttachmentsItem)
                         .pos(x, y).build()));
                 ++i;
+            }
+            if (i > 0) {
+                int cols = Mth.floorDiv(i, 5) + 2;
+                this.extraAreas.add(new Rect2i(this.leftPos - 18 * cols, this.topPos - 18, 18 * cols, 108));
             }
         }
     }
@@ -596,5 +604,7 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
         RFENetwork.sendToServer(ServerboundUpdateAttachmentOptionPacket.forItem(attachmentSlot.getSlotId(), newOption));
         this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 2f));
     }
+
+    public List<Rect2i> getExtraAreas() { return this.extraAreas; }
 
 }

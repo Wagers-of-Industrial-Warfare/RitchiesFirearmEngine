@@ -7,6 +7,7 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.ItemModelShaper;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -41,7 +42,19 @@ public interface RFEItemAttachmentRenderProperties {
                                    ItemDisplayContext displayContext, boolean leftHand, PoseStack poseStack, MultiBufferSource bufferSource,
                                    int combinedLight, int combinedOverlay, ItemRendererModificationContext renderContext) {}
 
+    default void onRenderIntegralAttachmentPre(Operation<Void> renderOp, ItemModelShaper modelShaper, ItemStack parentItem,
+                                               DataComponentPatch attachmentData, ItemDisplayContext displayContext,
+                                               boolean leftHand, PoseStack poseStack, MultiBufferSource bufferSource,
+                                               int combinedLight, int combinedOverlay, ItemRendererModificationContext renderContext) {}
+
+    default void onRenderIntegralAttachmentModel(Operation<Void> renderOp, ItemModelShaper modelShaper, ItemStack parentItem,
+                                                 DataComponentPatch attachmentData, ItemDisplayContext displayContext,
+                                                 boolean leftHand, PoseStack poseStack, MultiBufferSource bufferSource,
+                                                 int combinedLight, int combinedOverlay, ItemRendererModificationContext renderContext) {}
+
     default void onRenderOverlay(GuiGraphics graphics, float partialTick, ItemStack parentItem, ItemStack attachmentStack) {}
+
+    default void onRenderIntegralOverlay(GuiGraphics graphics, float partialTick, ItemStack parentItem, DataComponentPatch attachmentData) {}
 
     Serializer<?> getSerializer();
 

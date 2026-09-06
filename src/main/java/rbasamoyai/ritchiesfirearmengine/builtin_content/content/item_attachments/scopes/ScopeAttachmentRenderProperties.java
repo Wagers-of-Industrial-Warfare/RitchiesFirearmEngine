@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Mth;
@@ -53,6 +54,13 @@ public class ScopeAttachmentRenderProperties extends SimpleSlotAttachmentRenderD
     }
 
     @Override
+    public void onRenderIntegralAttachmentPre(Operation<Void> renderOp, ItemModelShaper modelShaper, ItemStack parentItem, DataComponentPatch attachmentData, ItemDisplayContext displayContext, boolean leftHand, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight, int combinedOverlay, ItemRendererModificationContext renderContext) {
+        boolean isAiming = parentItem.getItem() instanceof RFEFirearmItem firearmItem && firearmItem.isAiming(parentItem, null);
+        if (isAiming && displayContext.firstPerson())
+            renderContext.hideItem = true;
+    }
+
+    @Override
     public void onRenderItemModel(Operation<Void> renderOp, ItemModelShaper modelShaper, ItemStack parentItem, ItemStack attachmentStack,
                                   ItemDisplayContext displayContext, boolean leftHand, PoseStack poseStack, MultiBufferSource bufferSource,
                                   int combinedLight, int combinedOverlay, ItemRendererModificationContext renderContext) {
@@ -60,6 +68,23 @@ public class ScopeAttachmentRenderProperties extends SimpleSlotAttachmentRenderD
         super.onRenderItemModel(renderOp, modelShaper, parentItem, attachmentStack, displayContext, leftHand, poseStack,
                 bufferSource, combinedLight, combinedOverlay, renderContext);
         poseStack.popPose();
+        this.innerOnRenderAttachment(parentItem, displayContext, poseStack, bufferSource);
+    }
+
+    @Override
+    public void onRenderIntegralAttachmentModel(Operation<Void> renderOp, ItemModelShaper modelShaper, ItemStack parentItem,
+                                                DataComponentPatch attachmentData, ItemDisplayContext displayContext,
+                                                boolean leftHand, PoseStack poseStack, MultiBufferSource bufferSource,
+                                                int combinedLight, int combinedOverlay, ItemRendererModificationContext renderContext) {
+        poseStack.pushPose();
+        super.onRenderIntegralAttachmentModel(renderOp, modelShaper, parentItem, attachmentData, displayContext, leftHand,
+                poseStack, bufferSource, combinedLight, combinedOverlay, renderContext);
+        poseStack.popPose();
+        this.innerOnRenderAttachment(parentItem, displayContext, poseStack, bufferSource);
+    }
+
+    protected void innerOnRenderAttachment(ItemStack parentItem, ItemDisplayContext displayContext, PoseStack poseStack,
+                                           MultiBufferSource bufferSource) {
         boolean isAiming = parentItem.getItem() instanceof RFEFirearmItem firearmItem && firearmItem.isAiming(parentItem, null);
         if (isAiming && !displayContext.firstPerson() && this.scopeGlint.visualScale > 0
                 && (displayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND || displayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND)) {
@@ -129,6 +154,15 @@ public class ScopeAttachmentRenderProperties extends SimpleSlotAttachmentRenderD
 
     @Override
     public void onRenderOverlay(GuiGraphics graphics, float partialTick, ItemStack parentItem, ItemStack attachmentStack) {
+        this.innerOnRenderOverlay(graphics, partialTick, parentItem);
+    }
+
+    @Override
+    public void onRenderIntegralOverlay(GuiGraphics graphics, float partialTick, ItemStack parentItem, DataComponentPatch attachmentData) {
+        this.innerOnRenderOverlay(graphics, partialTick, parentItem);
+    }
+
+    protected void innerOnRenderOverlay(GuiGraphics graphics, float partialTick, ItemStack parentItem) {
         if (parentItem.getItem() instanceof RFEFirearmItem firearmItem && firearmItem.isAiming(parentItem, null)) {
             int width = graphics.guiWidth();
             int height = graphics.guiHeight();

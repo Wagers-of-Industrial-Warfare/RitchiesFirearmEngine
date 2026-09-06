@@ -2495,6 +2495,9 @@ public class RFEFirearmMode {
         }
     }
 
+    public void addModeIntegralAttachments(ItemStack stack, Map<ResourceLocation, DataComponentPatch> attachmentsRet) {
+    }
+
     public void addModeAttachmentSlots(ItemStack itemStack, Set<ResourceLocation> slots) {
         if (this.loadedRoundAttachmentSlot != null)
             slots.add(this.loadedRoundAttachmentSlot);
@@ -2502,6 +2505,9 @@ public class RFEFirearmMode {
             slots.add(this.magazineAttachmentSlot);
         if (this.loadedSecondaryAttachmentSlot != null)
             slots.add(this.loadedSecondaryAttachmentSlot);
+    }
+
+    public void addModeIntegralAttachmentSlots(ItemStack itemStack, Set<ResourceLocation> slots) {
     }
 
     public int getShotCount(ItemStack itemStack) {

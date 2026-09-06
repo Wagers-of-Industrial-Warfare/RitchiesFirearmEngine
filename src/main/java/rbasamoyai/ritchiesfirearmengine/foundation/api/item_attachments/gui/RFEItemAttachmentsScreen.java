@@ -1,15 +1,18 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui;
 
+import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -26,6 +29,8 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.IHasRFEItemAttachments;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler.MenuTypeSlotsConfig;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler.SlotConfig;
@@ -40,6 +45,7 @@ import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundUpdateAttachmentOptionPacket;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAttachmentsMenu> {
@@ -52,6 +58,8 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
 
     protected float baseScale = 64;
     protected Map<ResourceLocation, SlotDisplayConfig> slotDisplayMap = new HashMap<>();
+    protected List<RFEIntegralAttachmentButton> integralSlotButtons = new ArrayList<>();
+    @Nullable protected RFEIntegralAttachmentButton hoveredIntegralSlot = null;
 
     public RFEItemAttachmentsScreen(RFEItemAttachmentsMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -63,9 +71,95 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
     @Override
     protected void init() {
         super.init();
-        MenuTypeDisplayConfig screenConfig = RFEItemAttachmentsScreenDisplayHandler.getConfig(this.menu.getFocusedAttachmentsItem(), this.menu.getType());
+        ItemStack targetStack = this.menu.getFocusedAttachmentsItem();
+        MenuTypeDisplayConfig screenConfig = RFEItemAttachmentsScreenDisplayHandler.getConfig(targetStack, this.menu.getType());
         this.baseScale = screenConfig.modelScale();
         this.slotDisplayMap = screenConfig.slotDisplayConfig();
+        this.integralSlotButtons.clear();
+
+        if (targetStack.getItem() instanceof IHasRFEItemAttachments hasAttachments) {
+            MenuTypeSlotsConfig menuConfig = RFEItemAttachmentsMenuSlotsHandler.getConfig(targetStack, this.menu.getType());
+            ImmutableMap<ResourceLocation, SlotConfig> slotConfigById = menuConfig.slotConfig();
+            Set<ResourceLocation> itemSlots = hasAttachments.getAttachmentSlots(targetStack);
+            Set<ResourceLocation> integralSlots = hasAttachments.getIntegralAttachmentSlots(targetStack);
+            int i = 0;
+            for (Map.Entry<ResourceLocation, SlotConfig> entry : slotConfigById.entrySet()) {
+                if (itemSlots.contains(entry.getKey()))
+                    ++i;
+            }
+            for (Map.Entry<ResourceLocation, SlotConfig> entry : slotConfigById.entrySet()) {
+                ResourceLocation slotId = entry.getKey();
+                if (!integralSlots.contains(slotId))
+                    continue;
+                int x = this.leftPos + i / 5 * -18 - 18;
+                int y = this.topPos + i % 5 * 18;
+                SlotConfig slotConfig = entry.getValue();
+                Component message = slotConfig.emptyText() != null ? Component.translatable(slotConfig.emptyText()) : Component.empty();
+                this.integralSlotButtons.add(
+                        this.addRenderableWidget(RFEIntegralAttachmentButton.builder(message,
+                                        this::onPressIntegralSlotButton,
+                                        slotConfig,
+                                        () -> this.isIntegralSlotEnabled(slotId),
+                                        (mouseX, mouseY, scrollX, scrollY) ->
+                                                this.onScrollIntegralSlotButton(slotId, mouseX, mouseY, scrollX, scrollY),
+                                        slotId, this.menu::getFocusedAttachmentsItem)
+                        .pos(x, y).build()));
+                ++i;
+            }
+        }
+    }
+
+    protected void onPressIntegralSlotButton(Button button) {
+        if (!(button instanceof RFEIntegralAttachmentButton integralSlot))
+            return;
+        ItemStack targetStack = this.menu.getFocusedAttachmentsItem();
+        ResourceLocation slotId = integralSlot.getSlotId();
+        if (!integralSlot.getBlockingSlots(targetStack).isEmpty())
+            return;
+        if (!(targetStack.getItem() instanceof IHasRFEItemAttachments hasAttachments))
+            return;
+        RFEItemAttachmentProperties attachmentProperties = RFEItemAttachmentsPropertiesHandler.getIntegralData(targetStack, slotId);
+        if (attachmentProperties == null)
+            return;
+        DataComponentPatch data = hasAttachments.getIntegralAttachmentDataInSlot(targetStack, slotId);
+        boolean removedToggle = !FirearmDataUtils.isAttachmentRemoved(data);
+        hasAttachments.setIntegralAttachmentData(targetStack, slotId, FirearmDataUtils.setAttachmentRemoved(data, removedToggle));
+        RFENetwork.sendToServer(ServerboundUpdateAttachmentOptionPacket.forIntegral(slotId,
+                attachmentProperties.getIntegralAttachmentConfigOption(data), removedToggle));
+    }
+
+    protected boolean isIntegralSlotEnabled(ResourceLocation slotId) {
+        ItemStack targetStack = this.menu.getFocusedAttachmentsItem();
+        if (!(targetStack.getItem() instanceof IHasRFEItemAttachments hasAttachments))
+            return false;
+        RFEItemAttachmentProperties attachmentProperties = RFEItemAttachmentsPropertiesHandler.getIntegralData(targetStack, slotId);
+        if (attachmentProperties == null)
+            return false;
+        DataComponentPatch data = hasAttachments.getIntegralAttachmentDataInSlot(targetStack, slotId);
+        return !FirearmDataUtils.isAttachmentRemoved(data);
+    }
+
+    protected boolean onScrollIntegralSlotButton(ResourceLocation slotId, double mouseX, double mouseY, double scrollX, double scrollY) {
+        ItemStack targetStack = this.menu.getFocusedAttachmentsItem();
+        if (!(targetStack.getItem() instanceof IHasRFEItemAttachments hasAttachments))
+            return false;
+        RFEItemAttachmentProperties attachmentProperties = RFEItemAttachmentsPropertiesHandler.getIntegralData(targetStack, slotId);
+        if (attachmentProperties == null)
+            return false;
+        DataComponentPatch data = hasAttachments.getIntegralAttachmentDataInSlot(targetStack, slotId);
+        if (FirearmDataUtils.isAttachmentRemoved(data))
+            return false; // Cannot modify removed integral attachments
+        int attachmentOption = attachmentProperties.getIntegralAttachmentConfigOption(data);
+        if (attachmentOption == -1)
+            return false;
+        int newOption = attachmentOption + (scrollY < 0 ? 1 : -1);
+        Optional<DataComponentPatch> dataModOp = attachmentProperties.acceptIntegralAttachmentConfigOption(data, newOption);
+        if (dataModOp.isEmpty())
+            return false;
+        hasAttachments.setIntegralAttachmentData(targetStack, slotId, dataModOp.get());
+        RFENetwork.sendToServer(ServerboundUpdateAttachmentOptionPacket.forIntegral(slotId, newOption, false));
+        this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 2f));
+        return true;
     }
 
     @Override
@@ -75,8 +169,6 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
                 this.topPos + this.imageHeight - 94, 0, 0x3F000000, 0x3F000000 | BACKGROUND_COLOR);
         guiGraphics.blit(MENU_TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
 
-        PoseStack pose = guiGraphics.pose();
-        ItemStack carried = this.menu.getCarried();
         this.menu.iterateAttachmentSlots(slot -> {
             int slotX = this.leftPos + slot.x;
             int slotY = this.topPos + slot.y;
@@ -86,6 +178,13 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        this.hoveredIntegralSlot = null;
+        for (RFEIntegralAttachmentButton button : this.integralSlotButtons) {
+            if (button.isHovered()) {
+                this.hoveredIntegralSlot = button;
+                break;
+            }
+        }
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         PoseStack pose = guiGraphics.pose();
         pose.pushPose();
@@ -114,50 +213,100 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
 
     @Override
     protected void renderTooltip(GuiGraphics guiGraphics, int x, int y) {
-        boolean hide = this.hoveredSlot instanceof RFEItemAttachmentSlot && Screen.hasControlDown();
+        boolean hide = (this.hoveredSlot instanceof RFEItemAttachmentSlot || this.hoveredIntegralSlot != null) && Screen.hasControlDown();
         if (hide)
             return;
         super.renderTooltip(guiGraphics, x, y);
-        if (this.menu.getCarried().isEmpty() && this.hoveredSlot instanceof RFEItemAttachmentSlot attachmentSlot && !this.hoveredSlot.hasItem()) {
-            List<Component> tooltip = new ArrayList<>();
-            String text = attachmentSlot.getEmptyTextKey();
-            if (text != null)
-                tooltip.add(Component.translatable(text));
-            Set<ResourceLocation> blockingSlots = attachmentSlot.getBlockingSlots();
-            if (!blockingSlots.isEmpty()) {
-                MenuTypeSlotsConfig menuConfig = RFEItemAttachmentsMenuSlotsHandler.getConfig(this.menu.getFocusedAttachmentsItem(), this.menu.getType());
-                Map<ResourceLocation, SlotConfig> slotConfig = menuConfig.slotConfig();
-                Map<ResourceLocation, String> otherKeys = menuConfig.otherSlotTextKeys();
-                int blockedCount = 0;
-                final int MAX_SLOTS_BLOCKED_MESSAGE = 5;
-                int sz = blockingSlots.size();
-                StringBuilder blockedText = new StringBuilder();
-                for (ResourceLocation loc : blockingSlots) {
-                    String appendText;
-                    if (slotConfig.containsKey(loc) && slotConfig.get(loc).emptyText() != null) {
-                        appendText = I18n.get(slotConfig.get(loc).emptyText());
-                    } else if (otherKeys.containsKey(loc)) {
-                        appendText = I18n.get(otherKeys.get(loc));
-                    } else {
-                        appendText = loc.toString();
+        if (!this.menu.getCarried().isEmpty())
+            return;
+        if (this.hoveredSlot instanceof RFEItemAttachmentSlot attachmentSlot && !this.hoveredSlot.hasItem()) {
+            this.renderEmptyAttachmentSlotTooltip(guiGraphics, x, y, attachmentSlot);
+        } else if (this.hoveredIntegralSlot != null) {
+            this.renderIntegralAttachmentButtonTooltip(guiGraphics, x, y);
+        }
+    }
+
+    protected void renderEmptyAttachmentSlotTooltip(GuiGraphics guiGraphics, int x, int y, RFEItemAttachmentSlot attachmentSlot) {
+        List<Component> tooltip = new ArrayList<>();
+        String text = attachmentSlot.getEmptyTextKey();
+        if (text != null)
+            tooltip.add(Component.translatable(text));
+        this.addBlockedSlotsToTooltip(tooltip, attachmentSlot.getBlockingSlots());
+        if (!tooltip.isEmpty())
+            guiGraphics.renderComponentTooltip(this.font, tooltip, x, y);
+    }
+
+    protected void renderIntegralAttachmentButtonTooltip(GuiGraphics guiGraphics, int x, int y) {
+        if (this.hoveredIntegralSlot == null || !this.hoveredIntegralSlot.visible)
+            return;
+        List<Component> tooltip = new ArrayList<>();
+        ItemStack targetStack = this.menu.getFocusedAttachmentsItem();
+        ResourceLocation slotId = this.hoveredIntegralSlot.getSlotId();
+
+        String slotKey = this.hoveredIntegralSlot.getSlotKey();
+        if (slotKey != null)
+            tooltip.add(Component.translatable(slotKey));
+
+        Set<ResourceLocation> blockingSlots = this.hoveredIntegralSlot.getBlockingSlots(targetStack);
+        this.addBlockedSlotsToTooltip(tooltip, blockingSlots);
+
+        if (blockingSlots.isEmpty() && this.hoveredIntegralSlot.slotEnabled.get()) {
+            RFEItemAttachmentProperties attachmentProperties = RFEItemAttachmentsPropertiesHandler.getIntegralData(targetStack, slotId);
+            if (attachmentProperties != null && targetStack.getItem() instanceof IHasRFEItemAttachments hasAttachments) {
+                DataComponentPatch data = hasAttachments.getIntegralAttachmentDataInSlot(targetStack, slotId);
+                Optional<AttachmentMenuOptionsText> op = attachmentProperties.getIntegralAttachmentConfigTextOptions(data);
+                if (op.isPresent()) {
+                    boolean currentlyModifying = Screen.hasShiftDown();
+                    tooltip.add(Component.literal(""));
+                    tooltip.add(Component.translatable("ritchiesfirearmengine.tooltip.item.hold_key.attachment_options",
+                                    Component.translatable("ritchiesfirearmengine.tooltip.key_shift")
+                                            .withStyle(currentlyModifying ? ChatFormatting.WHITE : ChatFormatting.GRAY))
+                            .withStyle(ChatFormatting.DARK_GRAY));
+                    if (currentlyModifying) {
+                        AttachmentMenuOptionsText options = op.get();
+                        tooltip.add(Component.literal(" ").append(options.heading()));
+                        for (Component text : options.optionComponents())
+                            tooltip.add(Component.literal("  ").append(text));
                     }
-                    blockedText.append(appendText);
-                    ++blockedCount;
-                    if (blockedCount > MAX_SLOTS_BLOCKED_MESSAGE)
-                        break;
-                    if (blockedCount < sz)
-                        blockedText.append(", ");
-                }
-                if (blockedCount <= MAX_SLOTS_BLOCKED_MESSAGE) {
-                    tooltip.add(Component.translatable("gui.ritchiesfirearmengine.attachments_menu.blocked_by",
-                            blockedText.toString()).withStyle(ChatFormatting.RED));
-                } else {
-                    tooltip.add(Component.translatable("gui.ritchiesfirearmengine.attachments_menu.blocked_by.extra",
-                            blockedText.toString(), sz - blockedCount).withStyle(ChatFormatting.RED));
                 }
             }
-            if (!tooltip.isEmpty())
-                guiGraphics.renderComponentTooltip(this.font, tooltip, x, y);
+        }
+        if (!tooltip.isEmpty())
+            guiGraphics.renderComponentTooltip(this.font, tooltip, x, y);
+    }
+
+    protected void addBlockedSlotsToTooltip(List<Component> tooltip, Set<ResourceLocation> blockingSlots) {
+        if (blockingSlots.isEmpty())
+            return;
+        MenuTypeSlotsConfig menuConfig = RFEItemAttachmentsMenuSlotsHandler.getConfig(this.menu.getFocusedAttachmentsItem(), this.menu.getType());
+        Map<ResourceLocation, SlotConfig> slotConfig = menuConfig.slotConfig();
+        Map<ResourceLocation, String> otherKeys = menuConfig.otherSlotTextKeys();
+        int blockedCount = 0;
+        final int MAX_SLOTS_BLOCKED_MESSAGE = 5;
+        int sz = blockingSlots.size();
+        StringBuilder blockedText = new StringBuilder();
+        for (ResourceLocation loc : blockingSlots) {
+            String appendText;
+            if (slotConfig.containsKey(loc) && slotConfig.get(loc).emptyText() != null) {
+                appendText = I18n.get(slotConfig.get(loc).emptyText());
+            } else if (otherKeys.containsKey(loc)) {
+                appendText = I18n.get(otherKeys.get(loc));
+            } else {
+                appendText = loc.toString();
+            }
+            blockedText.append(appendText);
+            ++blockedCount;
+            if (blockedCount > MAX_SLOTS_BLOCKED_MESSAGE)
+                break;
+            if (blockedCount < sz)
+                blockedText.append(", ");
+        }
+        if (blockedCount <= MAX_SLOTS_BLOCKED_MESSAGE) {
+            tooltip.add(Component.translatable("gui.ritchiesfirearmengine.attachments_menu.blocked_by",
+                    blockedText.toString()).withStyle(ChatFormatting.RED));
+        } else {
+            tooltip.add(Component.translatable("gui.ritchiesfirearmengine.attachments_menu.blocked_by.extra",
+                    blockedText.toString(), sz - blockedCount).withStyle(ChatFormatting.RED));
         }
     }
 
@@ -215,8 +364,14 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
         final int BLOCKING_SLOT_COLOR = RFEConfig.CLIENT.attachmentScreenBlockingSlotColor.getAsInt();
         final boolean BLOCKING_SLOT_GRADIENT = RFEConfig.CLIENT.attachmentScreenBlockingSlotGradient.getAsBoolean();
 
-        for (int k = 0; k < this.menu.slots.size(); k++) {
-            Slot slot = this.menu.slots.get(k);
+        Set<ResourceLocation> blockingSlots = Set.of();
+        if (this.hoveredSlot instanceof RFEItemAttachmentSlot attachmentSlot) {
+            blockingSlots = attachmentSlot.getBlockingSlots();
+        } else if (this.hoveredIntegralSlot != null) {
+            blockingSlots = this.hoveredIntegralSlot.getBlockingSlots(focusedItem);
+        }
+
+        for (Slot slot : this.menu.slots) {
             if (!slot.isActive())
                 continue;
             int slotX = slot.x;
@@ -224,8 +379,7 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
             if (slot instanceof RFEItemAttachmentSlot attachmentSlot) {
                 ResourceLocation slotId = attachmentSlot.getSlotId();
                 boolean attachmentIsEmpty = slot.getItem().isEmpty();
-                if (this.hoveredSlot != slot && this.hoveredSlot instanceof RFEItemAttachmentSlot attachmentSlot1
-                    && attachmentSlot1.getBlockingSlots().contains(slotId)) {
+                if (blockingSlots.contains(slotId)) {
                     // Render blocking highlight
                     if (BLOCKING_SLOT_GRADIENT) {
                         guiGraphics.fillGradient(slotX, slotY, slotX + 16, slotY + 16, 100, 0, BLOCKING_SLOT_COLOR);
@@ -269,6 +423,20 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
                         guiGraphics.fill(slotX, slotY, slotX + 16, slotY + 16, 100, VALID_SLOT_COLOR);
                     }
                 }
+            }
+        }
+
+        for (RFEIntegralAttachmentButton button : this.integralSlotButtons) {
+            if (!button.visible)
+                continue;
+            int slotX = button.getX() - this.leftPos + 1;
+            int slotY = button.getY() - this.topPos + 1;
+            if (!blockingSlots.contains(button.getSlotId()))
+                continue;
+            if (BLOCKING_SLOT_GRADIENT) {
+                guiGraphics.fillGradient(slotX, slotY, slotX + 16, slotY + 16, 100, 0, BLOCKING_SLOT_COLOR);
+            } else {
+                guiGraphics.fill(slotX, slotY, slotX + 16, slotY + 16, 100, BLOCKING_SLOT_COLOR);
             }
         }
     }
@@ -317,9 +485,20 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
     }
 
     protected void renderSlotPointers(GuiGraphics graphics, float partialTick) {
-        if (!(this.hoveredSlot instanceof RFEItemAttachmentSlot attachmentSlot))
+        ResourceLocation slotId;
+        int baseSlotX;
+        int baseSlotY;
+        if (this.hoveredSlot instanceof RFEItemAttachmentSlot attachmentSlot) {
+            slotId = attachmentSlot.getSlotId();
+            baseSlotX = this.hoveredSlot.x;
+            baseSlotY = this.hoveredSlot.y;
+        } else if (this.hoveredIntegralSlot != null) {
+            slotId = this.hoveredIntegralSlot.getSlotId();
+            baseSlotX = this.hoveredIntegralSlot.getX() - this.leftPos + 1;
+            baseSlotY = this.hoveredIntegralSlot.getY() - this.topPos + 1;
+        } else {
             return;
-        ResourceLocation slotId = attachmentSlot.getSlotId();
+        }
         MenuTypeDisplayConfig menuConfig = RFEItemAttachmentsScreenDisplayHandler.getConfig(this.menu.getFocusedAttachmentsItem(), this.menu.getType());
         SlotDisplayConfig slotDisplay = menuConfig.slotDisplayConfig().get(slotId);
         if (slotDisplay == null)
@@ -343,8 +522,8 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
         if (MIN_X <= pointX && pointX < MAX_X && MIN_Y <= pointY && pointY < MAX_Y) {
             poseStack.pushPose();
             poseStack.translate(0, 0, 400);
-            int slotX = this.leftPos + this.hoveredSlot.x + 8;
-            int slotY = this.topPos + this.hoveredSlot.y + 8;
+            int slotX = this.leftPos + baseSlotX + 8;
+            int slotY = this.topPos + baseSlotY + 8;
             int diffX = pointX - slotX;
             int diffY = pointY - slotY;
             int diffYMag = Mth.abs(diffY);
@@ -414,7 +593,7 @@ public class RFEItemAttachmentsScreen extends AbstractContainerScreen<RFEItemAtt
         if (!attachmentProperties.acceptAttachmentConfigOption(hoveredStack, newOption))
             return;
         this.hoveredSlot.set(hoveredStack);
-        RFENetwork.sendToServer(new ServerboundUpdateAttachmentOptionPacket(attachmentSlot.getSlotId(), newOption));
+        RFENetwork.sendToServer(ServerboundUpdateAttachmentOptionPacket.forItem(attachmentSlot.getSlotId(), newOption));
         this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 2f));
     }
 

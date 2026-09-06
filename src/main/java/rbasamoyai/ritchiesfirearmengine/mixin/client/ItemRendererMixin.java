@@ -7,12 +7,14 @@ import net.minecraft.client.renderer.ItemModelShaper;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.IHasRFEItemAttachments;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentRenderProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.rendering.RFEItemAttachmentsRenderingPacksHandler;
@@ -20,6 +22,7 @@ import rbasamoyai.ritchiesfirearmengine.remix.ItemRendererModificationContext;
 import rbasamoyai.ritchiesfirearmengine.remix.RFEClientRemix;
 
 import java.util.Map;
+import java.util.Set;
 
 @Mixin(ItemRenderer.class)
 public abstract class ItemRendererMixin {
@@ -35,6 +38,9 @@ public abstract class ItemRendererMixin {
 
         if (parentItem instanceof IHasRFEItemAttachments hasAttachments) {
             Map<ResourceLocation, ItemStack> renderedAttachments = hasAttachments.getAttachments(itemStack);
+            Map<ResourceLocation, DataComponentPatch> renderedIntegralAttachments = hasAttachments.getIntegralAttachmentData(itemStack);
+            Set<ResourceLocation> renderedIntegralSlots = hasAttachments.getIntegralAttachmentSlots(itemStack);
+
             poseStack.pushPose();
             RFEClientRemix.handleItemCameraTransforms(poseStack, model, displayContext, leftHand); // Restore parent item transforms
             // First iteration - mainly use for setting context, can also do rendering
@@ -50,6 +56,18 @@ public abstract class ItemRendererMixin {
                         leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, renderContext);
                 poseStack.popPose();
             }
+            for (ResourceLocation slotId : renderedIntegralSlots) {
+                DataComponentPatch data = renderedIntegralAttachments.getOrDefault(slotId, DataComponentPatch.EMPTY);
+                if (FirearmDataUtils.isAttachmentRemoved(data))
+                    continue;
+                RFEItemAttachmentRenderProperties renderProperties = RFEItemAttachmentsRenderingPacksHandler.getIntegralRenderProperties(itemStack, slotId);
+                if (renderProperties == null)
+                    continue;
+                poseStack.pushPose();
+                renderProperties.onRenderIntegralAttachmentPre(original, this.getItemModelShaper(), itemStack, data,
+                        displayContext, leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, renderContext);
+                poseStack.popPose();
+            }
             // Second iteration - mainly for context-sensitive rendering
             for (Map.Entry<ResourceLocation, ItemStack> entry : renderedAttachments.entrySet()) {
                 ItemStack attachmentStack = entry.getValue();
@@ -61,6 +79,18 @@ public abstract class ItemRendererMixin {
                 poseStack.pushPose();
                 renderProperties.onRenderItemModel(original, this.getItemModelShaper(), itemStack, attachmentStack, displayContext,
                         leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, renderContext);
+                poseStack.popPose();
+            }
+            for (ResourceLocation slotId : renderedIntegralSlots) {
+                DataComponentPatch data = renderedIntegralAttachments.getOrDefault(slotId, DataComponentPatch.EMPTY);
+                if (FirearmDataUtils.isAttachmentRemoved(data))
+                    continue;
+                RFEItemAttachmentRenderProperties renderProperties = RFEItemAttachmentsRenderingPacksHandler.getIntegralRenderProperties(itemStack, slotId);
+                if (renderProperties == null)
+                    continue;
+                poseStack.pushPose();
+                renderProperties.onRenderIntegralAttachmentModel(original, this.getItemModelShaper(), itemStack, data,
+                        displayContext, leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, renderContext);
                 poseStack.popPose();
             }
             poseStack.popPose();

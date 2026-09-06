@@ -19,13 +19,17 @@ import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.RitchiesFirearmEngine;
 import rbasamoyai.ritchiesfirearmengine.foundation.data_packing.RFEJsonResourceReloadListener;
 
+import javax.annotation.Nullable;
 import java.util.Map;
+
+import static rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentsPropertiesHandler.INTEGRAL_ATTACHMENT_ID;
 
 public class RFEItemAttachmentsRenderingPacksHandler {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final Map<Item, RFEItemAttachmentsRenderPropertiesHolder> ATTACHMENTS = new Reference2ObjectOpenHashMap<>();
+    private static final Map<Item, RFEIntegralAttachmentsRenderPropertiesHolder> INTEGRAL_ATTACHMENTS = new Reference2ObjectOpenHashMap<>();
 
     public static class ReloadListener extends RFEJsonResourceReloadListener {
         private static final Gson GSON = new Gson();
@@ -36,8 +40,10 @@ public class RFEItemAttachmentsRenderingPacksHandler {
         @Override
         protected void apply(Multimap<ResourceLocation, JsonElement> map, ResourceManager resourceManager, ProfilerFiller profiler) {
             ATTACHMENTS.clear();
+            INTEGRAL_ATTACHMENTS.clear();
 
-            Map<Item, RendererBuilder> builders = new Reference2ObjectOpenHashMap<>();
+            Map<Item, RendererBuilder> itemBuilders = new Reference2ObjectOpenHashMap<>();
+            Map<Item, IntegralRendererBuilder> integralBuilders = new Reference2ObjectOpenHashMap<>();
 
             for (Map.Entry<ResourceLocation, JsonElement> entry : map.entries()) {
                 ResourceLocation fullId = entry.getKey();
@@ -47,21 +53,30 @@ public class RFEItemAttachmentsRenderingPacksHandler {
                     ResourceLocation attachmentItemId = ResourceLocation.fromNamespaceAndPath(components[1], components[2]);
                     Item parentItem = BuiltInRegistries.ITEM.getOptional(parentItemId)
                             .orElseThrow(() -> new IllegalStateException("Item " + parentItemId + " does not exist"));
-                    Item attachmentItem = BuiltInRegistries.ITEM.getOptional(attachmentItemId)
-                            .orElseThrow(() -> new IllegalStateException("Item " + attachmentItemId + " does not exist"));
-                    RendererItemLayer layer = RendererItemLayer.CODEC.parse(JsonOps.INSTANCE, entry.getValue())
-                            .getOrThrow(s -> new IllegalStateException("Error decoding JSON: " + s));
-                    builders.computeIfAbsent(parentItem, k -> new RendererBuilder()).applyLayer(attachmentItem, layer);
+                    if (attachmentItemId.equals(INTEGRAL_ATTACHMENT_ID)) {
+                        RendererItemLayer layer = RendererItemLayer.CODEC.parse(JsonOps.INSTANCE, entry.getValue())
+                                .getOrThrow(s -> new IllegalStateException("Error decoding JSON: " + s));
+                        integralBuilders.computeIfAbsent(parentItem, k -> new IntegralRendererBuilder()).applyLayer(layer);
+                    } else {
+                        Item attachmentItem = BuiltInRegistries.ITEM.getOptional(attachmentItemId)
+                                .orElseThrow(() -> new IllegalStateException("Item " + attachmentItemId + " does not exist"));
+                        RendererItemLayer layer = RendererItemLayer.CODEC.parse(JsonOps.INSTANCE, entry.getValue())
+                                .getOrThrow(s -> new IllegalStateException("Error decoding JSON: " + s));
+                        itemBuilders.computeIfAbsent(parentItem, k -> new RendererBuilder()).applyLayer(attachmentItem, layer);
+                    }
                 } catch (Exception e) {
                     LOGGER.error("Error loading item attachments rendering data for {}: {}", fullId, e);
                 }
             }
 
-            for (Map.Entry<Item, RendererBuilder> entry : builders.entrySet())
+            for (Map.Entry<Item, RendererBuilder> entry : itemBuilders.entrySet())
                 ATTACHMENTS.put(entry.getKey(), entry.getValue().build());
+            for (Map.Entry<Item, IntegralRendererBuilder> entry : integralBuilders.entrySet())
+                INTEGRAL_ATTACHMENTS.put(entry.getKey(), entry.getValue().build());
         }
     }
 
+    @Nullable
     public static RFEItemAttachmentRenderProperties getRenderProperties(ItemStack parent, ItemStack attachment, ResourceLocation slot) {
         if (parent.isEmpty() || attachment.isEmpty() || !ATTACHMENTS.containsKey(parent.getItem()))
             return null;
@@ -70,6 +85,13 @@ public class RFEItemAttachmentsRenderingPacksHandler {
         if (!renderDataByItemAndSlot.containsKey(attachment.getItem()))
             return null;
         return renderDataByItemAndSlot.get(attachment.getItem()).get(slot);
+    }
+
+    @Nullable
+    public static RFEItemAttachmentRenderProperties getIntegralRenderProperties(ItemStack parent, ResourceLocation slot) {
+        if (parent.isEmpty() || !INTEGRAL_ATTACHMENTS.containsKey(parent.getItem()))
+            return null;
+        return INTEGRAL_ATTACHMENTS.get(parent.getItem()).renderDataBySlot().get(slot);
     }
 
     private static class RendererBuilder {
@@ -83,6 +105,18 @@ public class RFEItemAttachmentsRenderingPacksHandler {
 
         public RFEItemAttachmentsRenderPropertiesHolder build() {
             return new RFEItemAttachmentsRenderPropertiesHolder(this.renderDataByItemAndSlot);
+        }
+    }
+
+    private static class IntegralRendererBuilder {
+        public final Map<ResourceLocation, RFEItemAttachmentRenderProperties> renderDataBySlot = new Object2ObjectOpenHashMap<>();
+
+        public void applyLayer(RendererItemLayer layer) {
+            this.renderDataBySlot.putAll(layer.itemRenderPropertiesBySlot);
+        }
+
+        public RFEIntegralAttachmentsRenderPropertiesHolder build() {
+            return new RFEIntegralAttachmentsRenderPropertiesHolder(this.renderDataBySlot);
         }
     }
 

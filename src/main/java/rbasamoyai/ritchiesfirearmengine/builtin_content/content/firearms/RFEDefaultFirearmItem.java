@@ -5,7 +5,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.mojang.serialization.JsonOps;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.InteractionHand;
@@ -17,6 +20,8 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmMode;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.mode.RFEFirearmModeBuilder;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEIntegralAttachmentData;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.RFEContentBuilderRegistry;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties;
@@ -32,8 +37,9 @@ public class RFEDefaultFirearmItem extends RFEFirearmItem {
 
     public RFEDefaultFirearmItem(Properties properties, Map<String, RFEFirearmMode> baseFirearmModes, List<String> modeOrder,
                                  ImmutableMultimap<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> firearmAttachments,
+                                 ImmutableMultimap<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> integralFirearmAttachments,
                                  ImmutableMultimap<ResourceLocation, ResourceLocation> mutuallyExclusiveAttachmentSlots) {
-        super(properties, baseFirearmModes, modeOrder, "default", firearmAttachments, mutuallyExclusiveAttachmentSlots);
+        super(properties, baseFirearmModes, modeOrder, "default", firearmAttachments, integralFirearmAttachments, mutuallyExclusiveAttachmentSlots);
     }
 
     @Override
@@ -76,7 +82,9 @@ public class RFEDefaultFirearmItem extends RFEFirearmItem {
             }
 
             ImmutableMultimap.Builder<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> firearmAttachments = ImmutableMultimap.builder();
+            ImmutableMultimap.Builder<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> integralFirearmAttachments = ImmutableMultimap.builder();
             ImmutableMultimap.Builder<ResourceLocation, ResourceLocation> mutuallyExclusiveAttachmentSlots = ImmutableMultimap.builder();
+            Map<ResourceLocation, DataComponentPatch> defaultIntegralSettings = new Object2ObjectLinkedOpenHashMap<>();
             if (GsonHelper.isObjectNode(obj, "firearm_attachments")) {
                 JsonObject globalAttachmentsJson = obj.getAsJsonObject("firearm_attachments");
                 for (Map.Entry<String, JsonElement> entry : globalAttachmentsJson.entrySet()) {
@@ -89,7 +97,18 @@ public class RFEDefaultFirearmItem extends RFEFirearmItem {
                     } else if (slotEl.isJsonObject()) {
                         JsonObject slotObj = slotEl.getAsJsonObject();
                         ResourceLocation typeLoc = ResourceLocation.read(GsonHelper.getAsString(slotObj, "type")).getOrThrow();
-                        firearmAttachments.put(RFEContentBuilderRegistry.getItemAttachmentSerializer(typeLoc), slotLoc);
+                        boolean integral = GsonHelper.getAsBoolean(slotObj, "integral_attachment", false);
+                        if (integral) {
+                            integralFirearmAttachments.put(RFEContentBuilderRegistry.getItemAttachmentSerializer(typeLoc), slotLoc);
+                            if (GsonHelper.isObjectNode(slotObj, "default_settings")) {
+                                DataComponentPatch defaultSettingsData = DataComponentPatch.CODEC
+                                        .parse(JsonOps.INSTANCE, slotObj.getAsJsonObject("default_settings"))
+                                        .getOrThrow(s -> new IllegalStateException("Error parsing default_settings JSON: " + s));
+                                defaultIntegralSettings.put(slotLoc, defaultSettingsData);
+                            }
+                        } else {
+                            firearmAttachments.put(RFEContentBuilderRegistry.getItemAttachmentSerializer(typeLoc), slotLoc);
+                        }
                         JsonArray exclusive = GsonHelper.getAsJsonArray(slotObj, "mutually_exclusive_with", new JsonArray());
                         for (JsonElement exclusiveEl : exclusive) {
                             ResourceLocation exclusiveSlotLoc = ResourceLocation.read(exclusiveEl.getAsString()).getOrThrow();
@@ -101,8 +120,11 @@ public class RFEDefaultFirearmItem extends RFEFirearmItem {
                     }
                 }
             }
+            RFEIntegralAttachmentData defaultIntegralData = defaultIntegralSettings.isEmpty() ? RFEIntegralAttachmentData.EMPTY
+                    : RFEIntegralAttachmentData.fromDataMap(defaultIntegralSettings);
 
-            return new RFEDefaultFirearmItem(properties, firearmModes, modeOrder, firearmAttachments.build(), mutuallyExclusiveAttachmentSlots.build());
+            return new RFEDefaultFirearmItem(properties.component(BuiltInRFEPlugin.RFEDataComponents.INTEGRAL_ATTACHMENTS, defaultIntegralData),
+                    firearmModes, modeOrder, firearmAttachments.build(), integralFirearmAttachments.build(), mutuallyExclusiveAttachmentSlots.build());
         }
     }
 

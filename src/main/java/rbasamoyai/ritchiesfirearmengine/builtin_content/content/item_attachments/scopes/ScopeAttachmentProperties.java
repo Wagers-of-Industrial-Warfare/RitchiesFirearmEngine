@@ -6,6 +6,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -39,6 +42,19 @@ public record ScopeAttachmentProperties(boolean overrideScopeDefaults, Immutable
         if (zoomLevels.size() <= 1) // Do not provide options for fixed-power scopes
             return Optional.empty();
         int zoomIndex = itemStack.getOrDefault(RFEDataComponents.ZOOM_LEVEL_INDEX, 0);
+        return innerConfigText(zoomLevels, zoomIndex);
+    }
+
+    @Override
+    public Optional<AttachmentMenuOptionsText> getIntegralAttachmentConfigTextOptions(DataComponentPatch data) {
+        if (this.zoomLevels.size() <= 1) // Do not provide options for fixed-power scopes
+            return Optional.empty();
+        Optional<? extends Integer> op = data.get(RFEDataComponents.ZOOM_LEVEL_INDEX);
+        int zoomIndex = op != null && op.isPresent() ? op.get() : 0;
+        return innerConfigText(this.zoomLevels, zoomIndex);
+    }
+
+    private static Optional<AttachmentMenuOptionsText> innerConfigText(List<Float> zoomLevels, int zoomIndex) {
         if (zoomIndex < 0 || zoomLevels.size() <= zoomIndex)
             zoomIndex = 0;
         List<Component> options = new ArrayList<>();
@@ -83,6 +99,16 @@ public record ScopeAttachmentProperties(boolean overrideScopeDefaults, Immutable
     }
 
     @Override
+    public int getIntegralAttachmentConfigOption(DataComponentPatch data) {
+        int sz = this.zoomLevels.size();
+        if (sz <= 1)
+            return -1;
+        Optional<? extends Integer> op = data.get(RFEDataComponents.ZOOM_LEVEL_INDEX);
+        int zoomIndex = op != null && op.isPresent() ? op.get() : 0;
+        return Mth.clamp(zoomIndex, 0, sz - 1);
+    }
+
+    @Override
     public boolean acceptAttachmentConfigOption(ItemStack itemStack, int option) {
         int sz;
         if (this.overrideScopeDefaults) {
@@ -97,6 +123,19 @@ public record ScopeAttachmentProperties(boolean overrideScopeDefaults, Immutable
         int finalOption = Mth.clamp(option, 0, sz - 1);
         itemStack.set(RFEDataComponents.ZOOM_LEVEL_INDEX, finalOption);
         return finalOption == option; // Sync only if not restricted
+    }
+
+    @Override
+    public Optional<DataComponentPatch> acceptIntegralAttachmentConfigOption(DataComponentPatch data, int option) {
+        int sz = this.zoomLevels.size();
+        if (sz <= 1) // Don't change fixed-power scopes
+            return Optional.empty();
+        int finalOption = Mth.clamp(option, 0, sz - 1);
+        if (finalOption == option) // Sync only if not restricted
+            return Optional.empty();
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
+        patched.set(RFEDataComponents.ZOOM_LEVEL_INDEX, finalOption);
+        return Optional.of(patched.asPatch());
     }
 
     @Override public boolean overridesDefaults() { return this.overrideScopeDefaults; }

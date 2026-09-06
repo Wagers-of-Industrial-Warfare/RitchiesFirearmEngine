@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -16,6 +17,8 @@ public record BayonetAttachmentProperties(boolean overrideBayonetDefaults, float
     public static final BayonetAttachmentProperties DONT_OVERRIDE_DEFAULTS = new BayonetAttachmentProperties(false, 0, 0, 0, false);
     
     @Override public boolean overridesDefaults() { return this.overrideBayonetDefaults; }
+
+    @Override public boolean isActive(DataComponentPatch data) { return true; }
 
     @Override
     public RFEItemAttachmentProperties.Serializer<?> getSerializer() {

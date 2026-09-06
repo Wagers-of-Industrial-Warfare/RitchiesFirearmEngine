@@ -1,6 +1,5 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui;
 
-import com.google.common.collect.ImmutableMultimap;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.SimpleContainer;
@@ -14,34 +13,34 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.conf
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentsPropertiesHandler;
 
 import javax.annotation.Nullable;
-import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class RFEItemAttachmentSlot extends Slot {
 
-    private final ItemStack parentStack;
+    private final Slot parentSlot;
     private final ResourceLocation slotId;
     private final SlotConfig slotConfig;
     private ItemStack storedStack;
     @Nullable
     private final LivingEntity owner;
 
-    public RFEItemAttachmentSlot(ItemStack parentStack, ResourceLocation slotId, int x, int y, SlotConfig slotConfig, @Nullable LivingEntity owner) {
+    public RFEItemAttachmentSlot(Slot parentSlot, ResourceLocation slotId, int x, int y, SlotConfig slotConfig, @Nullable LivingEntity owner) {
         super(new SimpleContainer(0), 0, x, y);
-        this.parentStack = parentStack;
+        this.parentSlot = parentSlot;
         this.slotId = slotId;
         this.slotConfig = slotConfig;
-        this.storedStack = this.parentStack.getItem() instanceof IHasRFEItemAttachments attachments
-                ? attachments.getAttachmentInSlot(parentStack, this.slotId) : ItemStack.EMPTY;
+        ItemStack targetStack = this.parentSlot.getItem();
+        this.storedStack = targetStack.getItem() instanceof IHasRFEItemAttachments attachments
+                ? attachments.getAttachmentInSlot(targetStack, this.slotId) : ItemStack.EMPTY;
         this.owner = owner;
     }
 
     @Override
     public boolean mayPlace(ItemStack stack) {
-        if (this.slotConfig.disabled() || !(this.parentStack.getItem() instanceof IHasRFEItemAttachments) || !this.getBlockingSlots().isEmpty())
+        ItemStack targetStack = this.parentSlot.getItem();
+        if (this.slotConfig.disabled() || !(targetStack.getItem() instanceof IHasRFEItemAttachments) || !this.getBlockingSlots().isEmpty())
             return false;
-        return RFEItemAttachmentsPropertiesHandler.getData(this.parentStack, stack, this.slotId) != null;
+        return RFEItemAttachmentsPropertiesHandler.getData(targetStack, stack, this.slotId) != null;
     }
 
     @Override public boolean mayPickup(Player player) { return !this.slotConfig.disabled(); }
@@ -56,8 +55,9 @@ public class RFEItemAttachmentSlot extends Slot {
 
     @Override
     public void setChanged() {
-        if (this.parentStack.getItem() instanceof IHasRFEItemAttachments attachments)
-            attachments.setAttachment(this.parentStack, this.slotId, this.storedStack);
+        ItemStack targetStack = this.parentSlot.getItem();
+        if (targetStack.getItem() instanceof IHasRFEItemAttachments attachments)
+            attachments.setAttachment(targetStack, this.slotId, this.storedStack);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class RFEItemAttachmentSlot extends Slot {
         } else if (!(other instanceof RFEItemAttachmentSlot otherAttachmentSlot)) {
             return false;
         } else {
-            return otherAttachmentSlot.parentStack == this.parentStack;
+            return otherAttachmentSlot.parentSlot == this.parentSlot;
         }
     }
 
@@ -111,16 +111,9 @@ public class RFEItemAttachmentSlot extends Slot {
     public ResourceLocation getSlotId() { return this.slotId; }
 
     public Set<ResourceLocation> getBlockingSlots() {
-        if (!(this.parentStack.getItem() instanceof IHasRFEItemAttachments hasAttachments))
-            return null;
-        ImmutableMultimap<ResourceLocation, ResourceLocation> mutuallyExclusiveSlots = hasAttachments.getMutuallyExclusiveSlots(this.parentStack);
-        Map<ResourceLocation, ItemStack> attachmentStacks = hasAttachments.getAttachments(this.parentStack);
-        Set<ResourceLocation> blockingSlots = new LinkedHashSet<>();
-        for (ResourceLocation slot : mutuallyExclusiveSlots.get(this.slotId)) {
-            if (!attachmentStacks.getOrDefault(slot, ItemStack.EMPTY).isEmpty())
-                blockingSlots.add(slot);
-        }
-        return blockingSlots;
+        ItemStack targetStack = this.parentSlot.getItem();
+        return targetStack.getItem() instanceof IHasRFEItemAttachments hasAttachments ?
+                hasAttachments.getBlockingSlots(targetStack, this.getSlotId()) : Set.of();
     }
 
 }

@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.ItemModelShaper;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Mth;
@@ -52,6 +53,24 @@ public class SimpleSlotAttachmentRenderData implements RFEItemAttachmentRenderPr
         poseStack.translate(this.translation.x / 16f, this.translation.y / 16f, this.translation.z / 16f);
         poseStack.mulPose(this.rotationMat);
         renderOp.call(attachmentStack, displayContext, leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, overrideModel);
+    }
+
+    @Override
+    public void onRenderIntegralAttachmentModel(Operation<Void> renderOp, ItemModelShaper modelShaper, ItemStack parentItem,
+                                                DataComponentPatch attachmentData, ItemDisplayContext displayContext,
+                                                boolean leftHand, PoseStack poseStack, MultiBufferSource bufferSource,
+                                                int combinedLight, int combinedOverlay, ItemRendererModificationContext renderContext) {
+        if (renderContext.hideItem)
+            return;
+        // TODO combine context from both attachment and firearm item, or pass extra context to attachment stack
+        ItemStack contextItemStack = parentItem.copy();
+        contextItemStack.applyComponents(attachmentData); // This could be better? e.g. different item
+        BakedModel attachmentModel = modelShaper.getModelManager().getModel(this.model);
+        BakedModel overrideModel = attachmentModel.getOverrides().resolve(attachmentModel, contextItemStack, null, null, 42);
+        poseStack.scale(this.scale.x, this.scale.y, this.scale.z);
+        poseStack.translate(this.translation.x / 16f, this.translation.y / 16f, this.translation.z / 16f);
+        poseStack.mulPose(this.rotationMat);
+        renderOp.call(parentItem, displayContext, leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, overrideModel);
     }
 
     @Override

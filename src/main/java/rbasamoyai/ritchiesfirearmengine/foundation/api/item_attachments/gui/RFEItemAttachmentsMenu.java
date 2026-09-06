@@ -1,6 +1,7 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui;
 
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -9,17 +10,18 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.IHasRFEItemAttachments;
+import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.RFEAttachmentSlotType;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler.MenuTypeSlotsConfig;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.gui.config.RFEItemAttachmentsMenuSlotsHandler.SlotConfig;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentsPropertiesHandler;
 import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationMenus;
+import rbasamoyai.ritchiesfirearmengine.network.ServerboundUpdateAttachmentOptionPacket;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class RFEItemAttachmentsMenu extends AbstractContainerMenu implements IRFEItemAttachmentsMenu {
@@ -68,14 +70,19 @@ public class RFEItemAttachmentsMenu extends AbstractContainerMenu implements IRF
         });
 
         ItemStack targetStack = this.getFocusedAttachmentsItem();
-        MenuTypeSlotsConfig menuConfig = RFEItemAttachmentsMenuSlotsHandler.getConfig(targetStack, this.getType());
-        ImmutableMap<ResourceLocation, SlotConfig> slotConfigById = menuConfig.slotConfig();
-        int i = 0;
-        for (Map.Entry<ResourceLocation, SlotConfig> entry : slotConfigById.entrySet()) {
-            int x = i / 6 * -18 - 17;
-            int y = i % 6 * 18 + 1;
-            this.addAttachmentSlot(new RFEItemAttachmentSlot(targetStack, entry.getKey(), x, y, entry.getValue(), inventory.player));
-            ++i;
+        if (targetStack.getItem() instanceof IHasRFEItemAttachments hasAttachments) {
+            MenuTypeSlotsConfig menuConfig = RFEItemAttachmentsMenuSlotsHandler.getConfig(targetStack, this.getType());
+            ImmutableMap<ResourceLocation, SlotConfig> slotConfigById = menuConfig.slotConfig();
+            Set<ResourceLocation> itemSlots = hasAttachments.getAttachmentSlots(targetStack);
+            int i = 0;
+            for (Map.Entry<ResourceLocation, SlotConfig> entry : slotConfigById.entrySet()) {
+                if (!itemSlots.contains(entry.getKey()))
+                    continue;
+                int x = i / 5 * -18 - 17;
+                int y = i % 5 * 18 + 1;
+                this.addAttachmentSlot(new RFEItemAttachmentSlot(this.targetSlot, entry.getKey(), x, y, entry.getValue(), inventory.player));
+                ++i;
+            }
         }
     }
 
@@ -135,17 +142,33 @@ public class RFEItemAttachmentsMenu extends AbstractContainerMenu implements IRF
     public Slot getTargetSlot() { return this.targetSlot; }
 
     @Override
-    public void modifyAttachmentOption(Player player, ResourceLocation slotId, int option) {
+    public void modifyAttachmentOption(Player player, ServerboundUpdateAttachmentOptionPacket packet) {
         ItemStack itemStack = this.targetSlot.getItem();
         if (!(itemStack.getItem() instanceof IHasRFEItemAttachments hasAttachments))
             return;
-        ItemStack attachmentStack = hasAttachments.getAttachmentInSlot(itemStack, slotId);
-        RFEItemAttachmentProperties attachmentProperties = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
-        if (attachmentProperties == null)
-            return;
-        attachmentProperties.acceptAttachmentConfigOption(attachmentStack, option);
-        hasAttachments.setAttachment(itemStack, slotId, attachmentStack);
-        this.targetSlot.set(itemStack);
+        ResourceLocation slotId = packet.slotId();
+        RFEAttachmentSlotType slotType = packet.slotType();
+        int option = packet.option();
+        boolean removed = packet.removed();
+        if (slotType == RFEAttachmentSlotType.ITEM) {
+            ItemStack attachmentStack = hasAttachments.getAttachmentInSlot(itemStack, slotId);
+            RFEItemAttachmentProperties attachmentProperties = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
+            if (attachmentProperties == null)
+                return;
+            attachmentProperties.acceptAttachmentConfigOption(attachmentStack, option);
+            hasAttachments.setAttachment(itemStack, slotId, attachmentStack);
+            this.targetSlot.set(itemStack);
+        } else if (slotType == RFEAttachmentSlotType.INTEGRAL) {
+            DataComponentPatch data = hasAttachments.getIntegralAttachmentDataInSlot(itemStack, slotId);
+            RFEItemAttachmentProperties attachmentProperties = RFEItemAttachmentsPropertiesHandler.getIntegralData(itemStack, slotId);
+            if (attachmentProperties == null)
+                return;
+            data = FirearmDataUtils.setAttachmentRemoved(data, removed);
+            Optional<DataComponentPatch> modifiedOp = attachmentProperties.acceptIntegralAttachmentConfigOption(data, option);
+            data = modifiedOp.orElse(data);
+            hasAttachments.setIntegralAttachmentData(itemStack, slotId, data);
+            this.targetSlot.set(itemStack);
+        }
     }
 
 }

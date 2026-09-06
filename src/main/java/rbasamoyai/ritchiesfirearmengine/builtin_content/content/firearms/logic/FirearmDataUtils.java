@@ -641,6 +641,24 @@ public class FirearmDataUtils {
         return itemStack.getOrDefault(RFEDataComponents.MELEEING, false);
     }
 
+    // Attachment data methods
+
+    public static boolean isAttachmentRemoved(DataComponentPatch patch) {
+        // Not nice but this is the reality of using datacomponentpatch directly --ritchie
+        Optional<? extends Boolean> op = patch.get(RFEDataComponents.REMOVED_ATTACHMENT);
+        return op != null && op.isPresent() ? op.get() : false;
+    }
+
+    public static DataComponentPatch setAttachmentRemoved(DataComponentPatch data, boolean removed) {
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
+        if (removed) {
+            patched.set(RFEDataComponents.REMOVED_ATTACHMENT, true);
+        } else {
+            patched.remove(RFEDataComponents.REMOVED_ATTACHMENT);
+        }
+        return patched.asPatch();
+    }
+
     private FirearmDataUtils() {}
 
 }

@@ -37,6 +37,9 @@ public class RFEItemAttachmentsPropertiesHandler {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final Map<Item, ItemAttachmentsPropertiesHolder> ATTACHMENTS = new Reference2ObjectOpenHashMap<>();
+    private static final Map<Item, IntegralAttachmentsPropertiesHolder> INTEGRAL_ATTACHMENTS = new Reference2ObjectOpenHashMap<>();
+
+    public static final ResourceLocation INTEGRAL_ATTACHMENT_ID = RitchiesFirearmEngine.resource("integral_attachments");
 
     public static class ReloadListener extends RFEJsonResourceReloadListener {
         private static final Gson GSON = new Gson();
@@ -47,8 +50,10 @@ public class RFEItemAttachmentsPropertiesHandler {
         @Override
         protected void apply(Multimap<ResourceLocation, JsonElement> map, ResourceManager resourceManager, ProfilerFiller profiler) {
             ATTACHMENTS.clear();
+            INTEGRAL_ATTACHMENTS.clear();
 
-            Map<Item, AttachmentsBuilder> builders = new Reference2ObjectOpenHashMap<>();
+            Map<Item, AttachmentsBuilder> attachmentBuilders = new Reference2ObjectOpenHashMap<>();
+            Map<Item, IntegralAttachmentsBuilder> integralAttachmentBuilders = new Reference2ObjectOpenHashMap<>();
 
             for (Map.Entry<ResourceLocation, JsonElement> entry : map.entries()) {
                 ResourceLocation fullId = entry.getKey();
@@ -58,18 +63,26 @@ public class RFEItemAttachmentsPropertiesHandler {
                     ResourceLocation attachmentItemId = ResourceLocation.fromNamespaceAndPath(components[1], components[2]);
                     Item parentItem = BuiltInRegistries.ITEM.getOptional(parentItemId)
                             .orElseThrow(() -> new IllegalStateException("Item " + parentItemId + " does not exist"));
-                    Item attachmentItem = BuiltInRegistries.ITEM.getOptional(attachmentItemId)
-                            .orElseThrow(() -> new IllegalStateException("Item " + attachmentItemId + " does not exist"));
-                    AttachmentItemDataLayer layer = AttachmentItemDataLayer.CODEC.parse(JsonOps.INSTANCE, entry.getValue())
-                            .getOrThrow(s -> new IllegalStateException("Error decoding JSON: " + s));
-                    builders.computeIfAbsent(parentItem, k -> new AttachmentsBuilder()).applyLayer(attachmentItem, layer);
+                    if (attachmentItemId.equals(INTEGRAL_ATTACHMENT_ID)) {
+                        AttachmentItemDataLayer layer = AttachmentItemDataLayer.CODEC.parse(JsonOps.INSTANCE, entry.getValue())
+                                .getOrThrow(s -> new IllegalStateException("Error decoding JSON: " + s));
+                        integralAttachmentBuilders.computeIfAbsent(parentItem, k -> new IntegralAttachmentsBuilder()).applyLayer(layer);
+                    } else {
+                        Item attachmentItem = BuiltInRegistries.ITEM.getOptional(attachmentItemId)
+                                .orElseThrow(() -> new IllegalStateException("Item " + attachmentItemId + " does not exist"));
+                        AttachmentItemDataLayer layer = AttachmentItemDataLayer.CODEC.parse(JsonOps.INSTANCE, entry.getValue())
+                                .getOrThrow(s -> new IllegalStateException("Error decoding JSON: " + s));
+                        attachmentBuilders.computeIfAbsent(parentItem, k -> new AttachmentsBuilder()).applyLayer(attachmentItem, layer);
+                    }
                 } catch (Exception e) {
                     LOGGER.error("Error loading item attachments data for {}: {}", fullId, e);
                 }
             }
 
-            for (Map.Entry<Item, AttachmentsBuilder> entry : builders.entrySet())
+            for (Map.Entry<Item, AttachmentsBuilder> entry : attachmentBuilders.entrySet())
                 ATTACHMENTS.put(entry.getKey(), entry.getValue().build());
+            for (Map.Entry<Item, IntegralAttachmentsBuilder> entry : integralAttachmentBuilders.entrySet())
+                INTEGRAL_ATTACHMENTS.put(entry.getKey(), entry.getValue().build());
         }
     }
 
@@ -81,17 +94,25 @@ public class RFEItemAttachmentsPropertiesHandler {
         return attachmentData.getAttachmentProperties(attachment, slot);
     }
 
+    @Nullable
+    public static RFEItemAttachmentProperties getIntegralData(ItemStack parent, ResourceLocation slot) {
+        if (parent.isEmpty() || !INTEGRAL_ATTACHMENTS.containsKey(parent.getItem()))
+            return null;
+        IntegralAttachmentsPropertiesHolder attachmentData = INTEGRAL_ATTACHMENTS.get(parent.getItem());
+        return attachmentData.getAttachmentProperties(slot);
+    }
+
     private static class AttachmentsBuilder {
-        public final Reference2ObjectOpenHashMap<Item, Object2ObjectOpenHashMap<ResourceLocation, RFEItemAttachmentProperties>> renderDataByItemAndSlot = new Reference2ObjectOpenHashMap<>();
+        public final Reference2ObjectOpenHashMap<Item, Object2ObjectOpenHashMap<ResourceLocation, RFEItemAttachmentProperties>> attachmentDataByItemAndSlot = new Reference2ObjectOpenHashMap<>();
 
         public void applyLayer(Item attachmentItem, AttachmentItemDataLayer layer) {
-            Map<ResourceLocation, RFEItemAttachmentProperties> itemDataBySlot = this.renderDataByItemAndSlot
+            Map<ResourceLocation, RFEItemAttachmentProperties> itemDataBySlot = this.attachmentDataByItemAndSlot
                     .computeIfAbsent(attachmentItem, k -> new Object2ObjectOpenHashMap<>());
             itemDataBySlot.putAll(layer.itemDataBySlot);
         }
 
         public ItemAttachmentsPropertiesHolder build() {
-            return new ItemAttachmentsPropertiesHolder(this.renderDataByItemAndSlot);
+            return new ItemAttachmentsPropertiesHolder(this.attachmentDataByItemAndSlot);
         }
     }
 
@@ -100,6 +121,18 @@ public class RFEItemAttachmentsPropertiesHandler {
                 Codec.unboundedMap(ResourceLocation.CODEC, RFEItemAttachmentProperties.CODEC.codec())
                         .fieldOf("slot_attachments").forGetter(AttachmentItemDataLayer::itemDataBySlot)
         ).apply(o, AttachmentItemDataLayer::new));
+    }
+
+    private static class IntegralAttachmentsBuilder {
+        public final Object2ObjectOpenHashMap<ResourceLocation, RFEItemAttachmentProperties> integralAttachmentDataBySlot = new Object2ObjectOpenHashMap<>();
+
+        public void applyLayer(AttachmentItemDataLayer layer) {
+            this.integralAttachmentDataBySlot.putAll(layer.itemDataBySlot);
+        }
+
+        public IntegralAttachmentsPropertiesHolder build() {
+            return new IntegralAttachmentsPropertiesHolder(this.integralAttachmentDataBySlot);
+        }
     }
 
     public record ItemAttachmentsPropertiesHolder(Reference2ObjectOpenHashMap<Item, Object2ObjectOpenHashMap<ResourceLocation, RFEItemAttachmentProperties>> attachmentPropertiesByItemAndSlot) {
@@ -121,6 +154,17 @@ public class RFEItemAttachmentsPropertiesHandler {
         }
     }
 
+    public record IntegralAttachmentsPropertiesHolder(Object2ObjectOpenHashMap<ResourceLocation, RFEItemAttachmentProperties> integralAttachmentPropertiesBySlot) {
+        public static final StreamCodec<RegistryFriendlyByteBuf, IntegralAttachmentsPropertiesHolder> STREAM_CODEC =
+                ByteBufCodecs.map(Object2ObjectOpenHashMap::new, ResourceLocation.STREAM_CODEC, RFEItemAttachmentProperties.STREAM_CODEC)
+                        .map(IntegralAttachmentsPropertiesHolder::new, IntegralAttachmentsPropertiesHolder::integralAttachmentPropertiesBySlot);
+
+        @Nullable
+        public RFEItemAttachmentProperties getAttachmentProperties(ResourceLocation slot) {
+           return this.integralAttachmentPropertiesBySlot.get(slot);
+        }
+    }
+
     public static void syncToAll() {
         RFENetwork.sendToAll(new ClientboundSyncItemAttachmentsPropertiesPacket());
     }
@@ -129,17 +173,26 @@ public class RFEItemAttachmentsPropertiesHandler {
         RFENetwork.sendToPlayer(new ClientboundSyncItemAttachmentsPropertiesPacket(), player);
     }
 
-    public record ClientboundSyncItemAttachmentsPropertiesPacket(Reference2ObjectOpenHashMap<Item, ItemAttachmentsPropertiesHolder> attachments) implements RFEPacket {
-        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundSyncItemAttachmentsPropertiesPacket> STREAM_CODEC =
-                ByteBufCodecs.map(Reference2ObjectOpenHashMap::new, ByteBufCodecs.registry(Registries.ITEM), ItemAttachmentsPropertiesHolder.STREAM_CODEC)
-                        .map(ClientboundSyncItemAttachmentsPropertiesPacket::new, ClientboundSyncItemAttachmentsPropertiesPacket::attachments);
+    public record ClientboundSyncItemAttachmentsPropertiesPacket(Reference2ObjectOpenHashMap<Item, ItemAttachmentsPropertiesHolder> attachments,
+                                                                 Reference2ObjectOpenHashMap<Item, IntegralAttachmentsPropertiesHolder> integralAttachments) implements RFEPacket {
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundSyncItemAttachmentsPropertiesPacket> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.map(Reference2ObjectOpenHashMap::new, ByteBufCodecs.registry(Registries.ITEM),
+                        ItemAttachmentsPropertiesHolder.STREAM_CODEC), ClientboundSyncItemAttachmentsPropertiesPacket::attachments,
+                ByteBufCodecs.map(Reference2ObjectOpenHashMap::new, ByteBufCodecs.registry(Registries.ITEM),
+                        IntegralAttachmentsPropertiesHolder.STREAM_CODEC), ClientboundSyncItemAttachmentsPropertiesPacket::integralAttachments,
+                ClientboundSyncItemAttachmentsPropertiesPacket::new);
 
-        public ClientboundSyncItemAttachmentsPropertiesPacket() { this(new Reference2ObjectOpenHashMap<>(ATTACHMENTS)); }
+        public ClientboundSyncItemAttachmentsPropertiesPacket() {
+            this(new Reference2ObjectOpenHashMap<>(ATTACHMENTS), new Reference2ObjectOpenHashMap<>(INTEGRAL_ATTACHMENTS));
+        }
 
         @Override
         public void handle(Executor exec, PacketListener listener, Player player) {
             ATTACHMENTS.clear();
             ATTACHMENTS.putAll(this.attachments);
+
+            INTEGRAL_ATTACHMENTS.clear();
+            INTEGRAL_ATTACHMENTS.putAll(this.integralAttachments);
         }
     }
 

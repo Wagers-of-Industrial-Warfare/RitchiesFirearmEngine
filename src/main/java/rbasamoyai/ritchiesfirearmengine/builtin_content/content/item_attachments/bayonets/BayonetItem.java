@@ -24,6 +24,7 @@ public class BayonetItem extends Item {
         this.defaultAddedAttackDamage = defaultAddedAttackDamage;
         this.defaultAddedAttackSpeed = defaultAddedAttackSpeed;
         this.defaultAddedAttackRange = defaultAddedAttackRange;
+        // TODO folding bayonets?
     }
 
     public static ItemAttributeModifiers createAttributes(float damage, float attackSpeed, float range) {

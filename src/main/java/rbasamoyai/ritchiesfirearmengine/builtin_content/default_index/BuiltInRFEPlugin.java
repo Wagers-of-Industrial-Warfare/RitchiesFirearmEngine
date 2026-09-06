@@ -53,6 +53,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.supperssors.SuppressorAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.supperssors.SuppressorItem;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEIntegralAttachmentData;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemAttachmentContents;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemContainerContents;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.projectiles.buck_and_ball.RFEBuckAndBallProjectileType;
@@ -638,6 +639,9 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         public static final DataComponentType<RFEItemAttachmentContents> ITEM_ATTACHMENTS = register("item_attachments",
                 builder -> builder.persistent(RFEItemAttachmentContents.CODEC).networkSynchronized(RFEItemAttachmentContents.STREAM_CODEC));
 
+        public static final DataComponentType<RFEIntegralAttachmentData> INTEGRAL_ATTACHMENTS = register("integral_attachments",
+                builder -> builder.persistent(RFEIntegralAttachmentData.CODEC).networkSynchronized(RFEIntegralAttachmentData.STREAM_CODEC));
+
         public static final DataComponentType<Integer> SHOT_COUNT = register("shot_count",
                 builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
@@ -657,6 +661,9 @@ public class BuiltInRFEPlugin implements RFEPlugin {
                 builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
 
         public static final DataComponentType<Boolean> USING_UNLIMITED_AMMO_RELOAD = register("using_unlimited_ammo_reload",
+                builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
+        public static final DataComponentType<Boolean> REMOVED_ATTACHMENT = register("removed_attachment",
                 builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
 
         public static final DataComponentType<Integer> ZOOM_LEVEL_INDEX = register("zoom_level_index",

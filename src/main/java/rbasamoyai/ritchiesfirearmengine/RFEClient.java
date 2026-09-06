@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -64,7 +65,8 @@ import rbasamoyai.ritchiesfirearmengine.network.*;
 
 import java.util.Collection;
 import java.util.Map;
- import java.util.function.Consumer;
+import java.util.Set;
+import java.util.function.Consumer;
 
 public class RFEClient {
 
@@ -459,6 +461,8 @@ public class RFEClient {
             return;
         PoseStack poseStack = graphics.pose();
         Map<ResourceLocation, ItemStack> renderedAttachments = hasAttachments.getAttachments(itemStack);
+        Map<ResourceLocation, DataComponentPatch> renderedIntegralAttachments = hasAttachments.getIntegralAttachmentData(itemStack);
+        Set<ResourceLocation> renderedIntegralSlots = hasAttachments.getIntegralAttachmentSlots(itemStack);
         for (Map.Entry<ResourceLocation, ItemStack> entry : renderedAttachments.entrySet()) {
             ItemStack attachmentStack = entry.getValue();
             if (attachmentStack.isEmpty())
@@ -468,6 +472,17 @@ public class RFEClient {
                 continue;
             poseStack.pushPose();
             renderProperties.onRenderOverlay(graphics, partialTick, itemStack, attachmentStack);
+            poseStack.popPose();
+        }
+        for (ResourceLocation slotId : renderedIntegralSlots) {
+            DataComponentPatch data = renderedIntegralAttachments.getOrDefault(slotId, DataComponentPatch.EMPTY);
+            if (FirearmDataUtils.isAttachmentRemoved(data))
+                continue;
+            RFEItemAttachmentRenderProperties renderProperties = RFEItemAttachmentsRenderingPacksHandler.getIntegralRenderProperties(itemStack, slotId);
+            if (renderProperties == null)
+                continue;
+            poseStack.pushPose();
+            renderProperties.onRenderIntegralOverlay(graphics, partialTick, itemStack, data);
             poseStack.popPose();
         }
     }

@@ -3,6 +3,7 @@ package rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms;
 import com.google.common.collect.ImmutableMultimap;
 import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -45,6 +46,7 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.scopes.ScopeItem;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachments.supperssors.SuppressorAttachmentProperties;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEIntegralAttachmentData;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemAttachmentContents;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
@@ -79,10 +81,12 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     protected final List<String> modeOrder;
     protected final String defaultMode;
     protected final ImmutableMultimap<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> firearmAttachments;
+    protected final ImmutableMultimap<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> integralFirearmAttachments;
     protected final ImmutableMultimap<ResourceLocation, ResourceLocation> mutuallyExclusiveAttachmentSlots;
 
     protected RFEFirearmItem(Properties properties, Map<String, RFEFirearmMode> baseFirearmModes, List<String> modeOrder,
                              String defaultMode, ImmutableMultimap<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> firearmAttachments,
+                             ImmutableMultimap<RFEItemAttachmentProperties.Serializer<?>, ResourceLocation> integralFirearmAttachments,
                              ImmutableMultimap<ResourceLocation, ResourceLocation> mutuallyExclusiveAttachmentSlots) {
         super(properties.stacksTo(1)
                 .component(RFEDataComponents.USING_UNLIMITED_AMMO_RELOAD, false)
@@ -91,6 +95,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         this.modeOrder = modeOrder;
         this.defaultMode = defaultMode;
         this.firearmAttachments = firearmAttachments;
+        this.integralFirearmAttachments = integralFirearmAttachments;
         this.mutuallyExclusiveAttachmentSlots = mutuallyExclusiveAttachmentSlots;
         this.registerHUDProviders();
     }
@@ -154,47 +159,52 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             modifiers.add(new ItemAttributeModifiers.Entry(Attributes.MOVEMENT_SPEED.getDelegate(), speedModifier, EquipmentSlotGroup.OFFHAND));
         }
         if (mode.canMelee(stack)) {
-            boolean hasBayonet = false;
-            RFEItemAttachmentContents firearmAttachmentContents = stack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
-            for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BAYONET)) {
-                ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
-                if (attachmentStack.isEmpty())
-                    continue;
-                RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(stack, attachmentStack, slotId);
-                float addedAttackDamage = 0;
-                float addedAttackSpeed = 0;
-                float addedAttackRange = 0;
-                if (attachmentData instanceof BayonetAttachmentProperties bayonetProperties && bayonetProperties.overrideBayonetDefaults()) {
-                    addedAttackDamage = bayonetProperties.addedAttackDamage();
-                    addedAttackSpeed = bayonetProperties.addedAttackSpeed();
-                    addedAttackRange = bayonetProperties.addedAttackRange();
-                    hasBayonet = true;
-                } else if (attachmentStack.getItem() instanceof BayonetItem bayonetItem) {
-                    addedAttackDamage = bayonetItem.defaultAddedAttackDamage();
-                    addedAttackSpeed = bayonetItem.defaultAddedAttackSpeed();
-                    addedAttackRange = bayonetItem.defaultAddedAttackRange();
-                    hasBayonet = true;
-                }
-                if (hasBayonet) {
-                    AttributeModifier attackSpeedModifier = new AttributeModifier(BASE_ATTACK_SPEED_ID, addedAttackSpeed, AttributeModifier.Operation.ADD_VALUE);
-                    AttributeModifier attackDamageModifier = new AttributeModifier(BASE_ATTACK_DAMAGE_ID, addedAttackDamage, AttributeModifier.Operation.ADD_VALUE);
-                    AttributeModifier attackRangeModifier = new AttributeModifier(BASE_ATTACK_RANGE_ID, addedAttackRange, AttributeModifier.Operation.ADD_VALUE);
-                    modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_SPEED.getDelegate(), attackSpeedModifier, EquipmentSlotGroup.MAINHAND));
-                    modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_DAMAGE.getDelegate(), attackDamageModifier, EquipmentSlotGroup.MAINHAND));
-                    modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ENTITY_INTERACTION_RANGE.getDelegate(), attackRangeModifier, EquipmentSlotGroup.MAINHAND));
-                    break;
-                }
+            double addedAttackDamage = handlingProperties.meleeAttackDamage() - 1;
+            double addedAttackSpeed = handlingProperties.meleeAttackSpeed() - 4;
+            double addedAttackRange = handlingProperties.meleeAddedAttackRange();
+            BayonetAttachmentProperties attachmentProperties = this.getBayonetProperties(stack);
+            if (attachmentProperties != null) {
+                addedAttackDamage = attachmentProperties.addedAttackDamage();
+                addedAttackSpeed = attachmentProperties.addedAttackSpeed();
+                addedAttackRange = attachmentProperties.addedAttackRange();
             }
-            if (!hasBayonet) {
-                AttributeModifier attackSpeedModifier = new AttributeModifier(BASE_ATTACK_SPEED_ID, handlingProperties.meleeAttackSpeed() - 4, AttributeModifier.Operation.ADD_VALUE);
-                AttributeModifier attackDamageModifier = new AttributeModifier(BASE_ATTACK_DAMAGE_ID, handlingProperties.meleeAttackDamage() - 1, AttributeModifier.Operation.ADD_VALUE);
-                AttributeModifier attackRangeModifier = new AttributeModifier(BASE_ATTACK_RANGE_ID, handlingProperties.meleeAddedAttackRange(), AttributeModifier.Operation.ADD_VALUE);
-                modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_SPEED.getDelegate(), attackSpeedModifier, EquipmentSlotGroup.MAINHAND));
-                modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_DAMAGE.getDelegate(), attackDamageModifier, EquipmentSlotGroup.MAINHAND));
-                modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ENTITY_INTERACTION_RANGE.getDelegate(), attackRangeModifier, EquipmentSlotGroup.MAINHAND));
-            }
+            AttributeModifier attackDamageModifier = new AttributeModifier(BASE_ATTACK_DAMAGE_ID, addedAttackDamage, AttributeModifier.Operation.ADD_VALUE);
+            AttributeModifier attackSpeedModifier = new AttributeModifier(BASE_ATTACK_SPEED_ID, addedAttackSpeed, AttributeModifier.Operation.ADD_VALUE);
+            AttributeModifier attackRangeModifier = new AttributeModifier(BASE_ATTACK_RANGE_ID, addedAttackRange, AttributeModifier.Operation.ADD_VALUE);
+            modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_DAMAGE.getDelegate(), attackDamageModifier, EquipmentSlotGroup.MAINHAND));
+            modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ATTACK_SPEED.getDelegate(), attackSpeedModifier, EquipmentSlotGroup.MAINHAND));
+            modifiers.add(new ItemAttributeModifiers.Entry(Attributes.ENTITY_INTERACTION_RANGE.getDelegate(), attackRangeModifier, EquipmentSlotGroup.MAINHAND));
         }
         return new ItemAttributeModifiers(modifiers, true);
+    }
+
+    @Nullable
+    public BayonetAttachmentProperties getBayonetProperties(ItemStack stack) {
+        RFEItemAttachmentContents firearmAttachmentContents = stack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
+        for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BAYONET)) {
+            ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
+            if (attachmentStack.isEmpty())
+                continue;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(stack, attachmentStack, slotId);
+            if (attachmentData instanceof BayonetAttachmentProperties bayonetProperties && bayonetProperties.overrideBayonetDefaults()) {
+                if (bayonetProperties.isActive(attachmentStack))
+                    return bayonetProperties;
+            } else if (attachmentStack.getItem() instanceof BayonetItem bayonetItem) { // TODO folding bayonets?
+                return new BayonetAttachmentProperties(false, bayonetItem.defaultAddedAttackDamage(),
+                        bayonetItem.defaultAddedAttackSpeed(), bayonetItem.defaultAddedAttackRange(), bayonetItem.blocksShootingByDefault());
+            }
+        }
+        RFEIntegralAttachmentData integralAttachmentData = stack.getOrDefault(RFEDataComponents.INTEGRAL_ATTACHMENTS, RFEIntegralAttachmentData.EMPTY);
+        for (ResourceLocation slotId : this.integralFirearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BAYONET)) {
+            DataComponentPatch integralData = integralAttachmentData.getSlot(slotId);
+            // Not nice but this is the reality of using datacomponentpatch directly --ritchie
+            if (FirearmDataUtils.isAttachmentRemoved(integralData))
+                continue;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getIntegralData(stack, slotId);
+            if (attachmentData instanceof BayonetAttachmentProperties bayonetProperties && attachmentData.isActive(integralData))
+                return bayonetProperties;
+        }
+        return null;
     }
 
     @Override
@@ -244,6 +254,16 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
             if (attachmentData instanceof BayonetAttachmentProperties bayonetAttachmentProperties && bayonetAttachmentProperties.blocksShooting()
                     || attachmentStack.getItem() instanceof BayonetItem bayonetItem && bayonetItem.blocksShootingByDefault())
+                return true;
+        }
+        RFEIntegralAttachmentData integralAttachmentData = itemStack.getOrDefault(RFEDataComponents.INTEGRAL_ATTACHMENTS, RFEIntegralAttachmentData.EMPTY);
+        for (ResourceLocation slotId : this.integralFirearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BAYONET)) {
+            DataComponentPatch integralData = integralAttachmentData.getSlot(slotId);
+            if (FirearmDataUtils.isAttachmentRemoved(integralData))
+                continue;
+            // TODO deployed logic?
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getIntegralData(itemStack, slotId);
+            if (attachmentData instanceof BayonetAttachmentProperties bayonetProperties && bayonetProperties.blocksShooting())
                 return true;
         }
         return false;
@@ -545,6 +565,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     }
 
     public boolean speedloadersBlocked(ItemStack itemStack, LivingEntity entity) {
+        // NOTE: activation does not affect speedloader blocking
         RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
         for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.SCOPE)) {
             ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
@@ -555,6 +576,15 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
                     || attachmentStack.getItem() instanceof ScopeItem scopeItem && scopeItem.blocksSpeedloadersByDefault()) {
                 return true;
             }
+        }
+        RFEIntegralAttachmentData integralAttachmentData = itemStack.getOrDefault(RFEDataComponents.INTEGRAL_ATTACHMENTS, RFEIntegralAttachmentData.EMPTY);
+        for (ResourceLocation slotId : this.integralFirearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.SCOPE)) {
+            DataComponentPatch integralData = integralAttachmentData.getSlot(slotId);
+            if (FirearmDataUtils.isAttachmentRemoved(integralData))
+                continue;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getIntegralData(itemStack, slotId);
+            if (attachmentData instanceof ScopeAttachmentProperties properties && properties.blocksSpeedloaders())
+                return true;
         }
         return false;
     }
@@ -592,9 +622,9 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     }
 
     public float getZoomIn(ItemStack itemStack, Player player) {
-        RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
         boolean scoped = false;
         float zoomIn = 1.0f;
+        RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
         for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.SCOPE)) {
             ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
             if (attachmentStack.isEmpty())
@@ -609,6 +639,25 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             } else {
                 continue;
             }
+            if (0 <= zoomIndex && zoomIndex < zoomLevels.size()) {
+                zoomIn /= zoomLevels.get(zoomIndex);
+                scoped = true;
+            } else if (!zoomLevels.isEmpty()) {
+                zoomIn /= zoomLevels.getFirst();
+                scoped = true;
+            }
+        }
+        RFEIntegralAttachmentData integralAttachmentData = itemStack.getOrDefault(RFEDataComponents.INTEGRAL_ATTACHMENTS, RFEIntegralAttachmentData.EMPTY);
+        for (ResourceLocation slotId : this.integralFirearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.SCOPE)) {
+            DataComponentPatch integralData = integralAttachmentData.getSlot(slotId);
+            if (FirearmDataUtils.isAttachmentRemoved(integralData))
+                continue;
+            Optional<? extends Integer> op = integralData.get(RFEDataComponents.ZOOM_LEVEL_INDEX);
+            int zoomIndex = op != null && op.isPresent() ? op.get() : 0;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getIntegralData(itemStack, slotId);
+            if (!(attachmentData instanceof ScopeAttachmentProperties properties))
+                continue;
+            List<Float> zoomLevels = properties.zoomLevels();
             if (0 <= zoomIndex && zoomIndex < zoomLevels.size()) {
                 zoomIn /= zoomLevels.get(zoomIndex);
                 scoped = true;
@@ -692,6 +741,15 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             if (attachmentData instanceof ScopeAttachmentProperties)
                 return true;
         }
+        RFEIntegralAttachmentData integralAttachmentData = itemStack.getOrDefault(RFEDataComponents.INTEGRAL_ATTACHMENTS, RFEIntegralAttachmentData.EMPTY);
+        for (ResourceLocation slotId : this.integralFirearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.SCOPE)) {
+            DataComponentPatch integralData = integralAttachmentData.getSlot(slotId);
+            if (FirearmDataUtils.isAttachmentRemoved(integralData))
+                continue;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getIntegralData(itemStack, slotId);
+            if (attachmentData instanceof ScopeAttachmentProperties)
+                return true;
+        }
         return false;
     }
 
@@ -704,7 +762,16 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             if (attachmentStack.getItem() instanceof BayonetItem)
                 return true;
             RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
-            if (attachmentData instanceof BayonetAttachmentProperties)
+            if (attachmentData instanceof BayonetAttachmentProperties properties && properties.isActive(attachmentStack))
+                return true;
+        }
+        RFEIntegralAttachmentData integralAttachmentData = itemStack.getOrDefault(RFEDataComponents.INTEGRAL_ATTACHMENTS, RFEIntegralAttachmentData.EMPTY);
+        for (ResourceLocation slotId : this.integralFirearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BAYONET)) {
+            DataComponentPatch integralData = integralAttachmentData.getSlot(slotId);
+            if (FirearmDataUtils.isAttachmentRemoved(integralData))
+                continue;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getIntegralData(itemStack, slotId);
+            if (attachmentData instanceof BayonetAttachmentProperties properties && properties.isActive(integralData))
                 return true;
         }
         return false;
@@ -721,19 +788,38 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             if (attachmentData instanceof SuppressorAttachmentProperties properties)
                 return properties;
         }
+        RFEIntegralAttachmentData integralAttachmentData = itemStack.getOrDefault(RFEDataComponents.INTEGRAL_ATTACHMENTS, RFEIntegralAttachmentData.EMPTY);
+        for (ResourceLocation slotId : this.integralFirearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.SUPPRESSOR)) {
+            DataComponentPatch integralData = integralAttachmentData.getSlot(slotId);
+            if (FirearmDataUtils.isAttachmentRemoved(integralData))
+                continue;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getIntegralData(itemStack, slotId);
+            if (attachmentData instanceof SuppressorAttachmentProperties properties)
+                return properties;
+        }
         return null;
     }
 
     @Nullable
     public RFEFirearmProperties<RFERecoilProvider> getAttachmentRecoilProperties(ItemStack itemStack, boolean inBipodPosition) {
         RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
+        RFEIntegralAttachmentData integralAttachmentData = itemStack.getOrDefault(RFEDataComponents.INTEGRAL_ATTACHMENTS, RFEIntegralAttachmentData.EMPTY);
         if (inBipodPosition) {
             for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BIPOD)) {
                 ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
                 if (attachmentStack.isEmpty())
                     continue;
                 RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
-                if (attachmentData instanceof BipodAttachmentProperties properties && properties.isDeployed(attachmentStack)
+                if (attachmentData instanceof BipodAttachmentProperties properties && properties.isActive(attachmentStack)
+                        && properties.recoilProperties().isPresent())
+                    return properties.recoilProperties().get();
+            }
+            for (ResourceLocation slotId : this.integralFirearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BIPOD)) {
+                DataComponentPatch integralData = integralAttachmentData.getSlot(slotId);
+                if (FirearmDataUtils.isAttachmentRemoved(integralData))
+                    continue;
+                RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getIntegralData(itemStack, slotId);
+                if (attachmentData instanceof BipodAttachmentProperties properties && properties.isActive(integralData)
                         && properties.recoilProperties().isPresent())
                     return properties.recoilProperties().get();
             }
@@ -746,19 +832,37 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             if (attachmentData instanceof GripAttachmentProperties properties && properties.recoilProperties().isPresent())
                 return properties.recoilProperties().get();
         }
+        for (ResourceLocation slotId : this.integralFirearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.GRIP)) {
+            DataComponentPatch integralData = integralAttachmentData.getSlot(slotId);
+            if (FirearmDataUtils.isAttachmentRemoved(integralData))
+                continue;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getIntegralData(itemStack, slotId);
+            if (attachmentData instanceof GripAttachmentProperties properties && properties.recoilProperties().isPresent())
+                return properties.recoilProperties().get();
+        }
         return null;
     }
 
     @Nullable
     public RFEFirearmProperties<RFESpreadProvider> getAttachmentSpreadProperties(ItemStack itemStack, boolean inBipodPosition) {
         RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
+        RFEIntegralAttachmentData integralAttachmentData = itemStack.getOrDefault(RFEDataComponents.INTEGRAL_ATTACHMENTS, RFEIntegralAttachmentData.EMPTY);
         if (inBipodPosition) {
             for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BIPOD)) {
                 ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
                 if (attachmentStack.isEmpty())
                     continue;
                 RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
-                if (attachmentData instanceof BipodAttachmentProperties properties && properties.isDeployed(attachmentStack)
+                if (attachmentData instanceof BipodAttachmentProperties properties && properties.isActive(attachmentStack)
+                        && properties.spreadProperties().isPresent())
+                    return properties.spreadProperties().get();
+            }
+            for (ResourceLocation slotId : this.integralFirearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BIPOD)) {
+                DataComponentPatch integralData = integralAttachmentData.getSlot(slotId);
+                if (FirearmDataUtils.isAttachmentRemoved(integralData))
+                    continue;
+                RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getIntegralData(itemStack, slotId);
+                if (attachmentData instanceof BipodAttachmentProperties properties && properties.isActive(integralData)
                         && properties.spreadProperties().isPresent())
                     return properties.spreadProperties().get();
             }
@@ -768,6 +872,14 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             if (attachmentStack.isEmpty())
                 continue;
             RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
+            if (attachmentData instanceof GripAttachmentProperties properties && properties.spreadProperties().isPresent())
+                return properties.spreadProperties().get();
+        }
+        for (ResourceLocation slotId : this.integralFirearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.GRIP)) {
+            DataComponentPatch integralData = integralAttachmentData.getSlot(slotId);
+            if (FirearmDataUtils.isAttachmentRemoved(integralData))
+                continue;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getIntegralData(itemStack, slotId);
             if (attachmentData instanceof GripAttachmentProperties properties && properties.spreadProperties().isPresent())
                 return properties.spreadProperties().get();
         }
@@ -783,7 +895,16 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             if (attachmentStack.isEmpty())
                 continue;
             RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
-            if (attachmentData instanceof BipodAttachmentProperties properties && properties.isDeployed(attachmentStack))
+            if (attachmentData instanceof BipodAttachmentProperties properties && properties.isActive(attachmentStack))
+                return true;
+        }
+        RFEIntegralAttachmentData integralAttachmentData = itemStack.getOrDefault(RFEDataComponents.INTEGRAL_ATTACHMENTS, RFEIntegralAttachmentData.EMPTY);
+        for (ResourceLocation slotId : this.integralFirearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BIPOD)) {
+            DataComponentPatch integralData = integralAttachmentData.getSlot(slotId);
+            if (FirearmDataUtils.isAttachmentRemoved(integralData))
+                continue;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getIntegralData(itemStack, slotId);
+            if (attachmentData instanceof BipodAttachmentProperties properties && properties.isActive(integralData))
                 return true;
         }
         return false;
@@ -916,10 +1037,28 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
     }
 
     @Override
+    public Map<ResourceLocation, DataComponentPatch> getIntegralAttachmentData(ItemStack stack) {
+        Map<ResourceLocation, DataComponentPatch> attachmentsRet = new Object2ObjectLinkedOpenHashMap<>();
+        RFEIntegralAttachmentData integralAttachments = stack.getOrDefault(RFEDataComponents.INTEGRAL_ATTACHMENTS, RFEIntegralAttachmentData.EMPTY);
+        integralAttachments.copyInto(attachmentsRet);
+        for (RFEFirearmMode mode : this.getFirearmModes(stack, null).values())
+            mode.addModeIntegralAttachments(stack, attachmentsRet);
+        return attachmentsRet;
+    }
+
+    @Override
     public Set<ResourceLocation> getAttachmentSlots(ItemStack stack) {
         Set<ResourceLocation> slots = new LinkedHashSet<>(this.firearmAttachments.values());
         for (RFEFirearmMode mode : this.getFirearmModes(stack, null).values())
             mode.addModeAttachmentSlots(stack, slots);
+        return slots;
+    }
+
+    @Override
+    public Set<ResourceLocation> getIntegralAttachmentSlots(ItemStack stack) {
+        Set<ResourceLocation> slots = new LinkedHashSet<>(this.integralFirearmAttachments.values());
+        for (RFEFirearmMode mode : this.getFirearmModes(stack, null).values())
+            mode.addModeIntegralAttachmentSlots(stack, slots);
         return slots;
     }
 
@@ -942,6 +1081,23 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             itemStack.remove(RFEDataComponents.ITEM_ATTACHMENTS);
         } else {
             itemStack.set(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.fromItems(attachmentsMod));
+        }
+    }
+
+    @Override
+    public void setIntegralAttachmentData(ItemStack itemStack, ResourceLocation slot, DataComponentPatch data) {
+        RFEIntegralAttachmentData integralAttachments = itemStack.getOrDefault(RFEDataComponents.INTEGRAL_ATTACHMENTS, RFEIntegralAttachmentData.EMPTY);
+        Map<ResourceLocation, DataComponentPatch> dataMod = new Object2ObjectLinkedOpenHashMap<>();
+        integralAttachments.copyInto(dataMod);
+        if (data.isEmpty()) {
+            dataMod.remove(slot);
+        } else {
+            dataMod.put(slot, data);
+        }
+        if (dataMod.isEmpty()) {
+            itemStack.remove(RFEDataComponents.INTEGRAL_ATTACHMENTS);
+        } else {
+            itemStack.set(RFEDataComponents.INTEGRAL_ATTACHMENTS, RFEIntegralAttachmentData.fromDataMap(dataMod));
         }
     }
 

@@ -3,12 +3,16 @@ package rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_attachment
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin;
+import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.RFEFirearmProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properties.RFEItemAttachmentProperties;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.recoil.RFERecoilProvider;
@@ -23,14 +27,24 @@ public record BipodAttachmentProperties(Optional<RFEFirearmProperties<RFERecoilP
 
     @Override public boolean overridesDefaults() { return true; }
 
-    public boolean isDeployed(ItemStack itemStack) {
-        return itemStack.getOrDefault(BuiltInRFEPlugin.RFEDataComponents.DEPLOYED_SETTING, false);
+    @Override
+    public boolean isActive(DataComponentPatch data) {
+        Optional<? extends Boolean> op = data.get(RFEDataComponents.DEPLOYED_SETTING);
+        return op != null && op.isPresent() ? op.get() : false;
     }
 
     @Override
     public Optional<AttachmentMenuOptionsText> getAttachmentConfigTextOptions(ItemStack itemStack) {
+        return innerConfigText(this.isActive(itemStack));
+    }
+
+    @Override
+    public Optional<AttachmentMenuOptionsText> getIntegralAttachmentConfigTextOptions(DataComponentPatch data) {
+        return innerConfigText(this.isActive(data));
+    }
+
+    private static Optional<AttachmentMenuOptionsText> innerConfigText(boolean deployed) {
         List<Component> options = new ArrayList<>();
-        boolean deployed = this.isDeployed(itemStack);
         options.add(Component.translatable("gui.ritchiesfirearmengine.attachments_menu.option.generic.retracted")
                 .withStyle(deployed ? ChatFormatting.DARK_GRAY : ChatFormatting.WHITE));
         options.add(Component.translatable("gui.ritchiesfirearmengine.attachments_menu.option.generic.deployed")
@@ -41,15 +55,33 @@ public record BipodAttachmentProperties(Optional<RFEFirearmProperties<RFERecoilP
 
     @Override
     public int getAttachmentConfigOption(ItemStack itemStack) {
-        return this.isDeployed(itemStack) ? 1 : 0;
+        return this.isActive(itemStack) ? 1 : 0;
+    }
+
+    @Override
+    public int getIntegralAttachmentConfigOption(DataComponentPatch data) {
+        return this.isActive(data) ? 1 : 0;
     }
 
     @Override
     public boolean acceptAttachmentConfigOption(ItemStack itemStack, int option) {
         if (option != 0 && option != 1)
             return false;
-        itemStack.set(BuiltInRFEPlugin.RFEDataComponents.DEPLOYED_SETTING, option == 1);
+        itemStack.set(RFEDataComponents.DEPLOYED_SETTING, option == 1);
         return true;
+    }
+
+    @Override
+    public Optional<DataComponentPatch> acceptIntegralAttachmentConfigOption(DataComponentPatch data, int option) {
+        if (option != 0 && option != 1)
+            return Optional.empty();
+        PatchedDataComponentMap patched = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, data);
+        if (option == 1) {
+            patched.set(RFEDataComponents.DEPLOYED_SETTING, true);
+        } else {
+            patched.remove(RFEDataComponents.DEPLOYED_SETTING);
+        }
+        return Optional.of(patched.asPatch());
     }
 
     @Override public RFEItemAttachmentProperties.Serializer<?> getSerializer() { return BuiltInRFEPlugin.AttachmentSlots.BIPOD; }

@@ -3,6 +3,7 @@ package rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.propert
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
@@ -50,7 +51,20 @@ public interface RFEItemAttachmentProperties {
     // TODO documentation
     default boolean acceptAttachmentConfigOption(ItemStack itemStack, int option) { return false; }
 
+    // TODO documentation
+    default Optional<AttachmentMenuOptionsText> getIntegralAttachmentConfigTextOptions(DataComponentPatch data) { return Optional.empty(); }
+
+    // TODO documentation
+    default int getIntegralAttachmentConfigOption(DataComponentPatch data) { return -1; }
+
+    // TODO documentation
+    default Optional<DataComponentPatch> acceptIntegralAttachmentConfigOption(DataComponentPatch data, int option) { return Optional.empty(); }
+
     boolean overridesDefaults();
+
+    default boolean isActive(DataComponentPatch data) { return true; }
+
+    default boolean isActive(ItemStack itemStack) { return this.isActive(itemStack.getComponentsPatch()); }
 
     Serializer<?> getSerializer();
 

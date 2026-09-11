@@ -100,6 +100,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("ammo"), new RFEBasicItem.Builder()); // Alias of basic
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("magazine"), new MagazineItem.Builder());
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("speedloader"), new MagazineItem.Builder()); // Alias of magazine
+        RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("nested_magazine"), new NestedMagazineItem.Builder());
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("ammo_packet"), new AmmoPacketItem.Builder());
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("firearm"), new RFEDefaultFirearmItem.Builder());
         RFEContentBuilderRegistry.registerItemBuilder(RitchiesFirearmEngine.resource("scope"), new ScopeItem.Builder());
@@ -671,6 +672,9 @@ public class BuiltInRFEPlugin implements RFEPlugin {
 
         public static final DataComponentType<Boolean> DEPLOYED_SETTING = register("deployed_setting",
                 builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
+        public static final DataComponentType<RFEItemContainerContents> NESTED_MAGAZINES = register("nested_magazines",
+                builder -> builder.persistent(RFEItemContainerContents.CODEC).networkSynchronized(RFEItemContainerContents.STREAM_CODEC));
 
         private static <V> DataComponentType<V> register(String id, UnaryOperator<DataComponentType.Builder<V>> builderOp) {
             ResourceLocation loc = RitchiesFirearmEngine.resource(id);

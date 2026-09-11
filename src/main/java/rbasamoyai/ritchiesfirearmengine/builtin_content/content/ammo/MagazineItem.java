@@ -36,11 +36,11 @@ import java.util.function.Predicate;
 public class MagazineItem extends Item {
 
     private final boolean glint;
-    private final int primaryCapacity;
-    private final int secondaryCapacity;
-    private final ImmutableList<AmmoPredicate> defaultAmmoPredicates; // Datapackable
-    private final ImmutableList<AmmoPredicate> defaultSpeedloaderPredicates; // Datapackable
-    private final ImmutableList<AmmoPredicate> defaultSecondaryPredicates; // Datapackable
+    protected final int primaryCapacity;
+    protected final int secondaryCapacity;
+    protected final ImmutableList<AmmoPredicate> defaultAmmoPredicates; // Datapackable
+    protected final ImmutableList<AmmoPredicate> defaultSpeedloaderPredicates; // Datapackable
+    protected final ImmutableList<AmmoPredicate> defaultSecondaryPredicates; // Datapackable
     private final int reloadCooldown;
     private final boolean trackEmptySlots;
     private final boolean trackEmptySecondarySlots;
@@ -288,7 +288,11 @@ public class MagazineItem extends Item {
     @Override
     public void appendHoverText(ItemStack itemStack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(itemStack, context, tooltip, flag);
-        List<ItemStack> storedAmmo = this.getStoredAmmo(itemStack);
+        this.addAmmoLinesToTooltip(this.getStoredAmmo(itemStack), tooltip);
+        this.addAmmoLinesToTooltip(this.getStoredSecondaryAmmo(itemStack), tooltip);
+    }
+
+    protected void addAmmoLinesToTooltip(List<ItemStack> storedAmmo, List<Component> tooltip) {
         Map<Item, Integer> storedIndex = new LinkedHashMap<>();
         for (ItemStack ammoStack : storedAmmo) {
             if (!ammoStack.isEmpty())

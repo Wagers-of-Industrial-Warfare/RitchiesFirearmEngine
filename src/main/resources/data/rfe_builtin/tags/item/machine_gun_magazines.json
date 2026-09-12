@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "rfe_builtin:infinite_machine_gun_drum_magazine_100rds",
+    "rfe_builtin:machine_gun_drum_magazine_100rds"
+  ]
+}

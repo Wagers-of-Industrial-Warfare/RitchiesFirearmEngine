@@ -1206,7 +1206,7 @@ public class RFEFirearmMode {
         int actualTime = phase.time() - actionTime;
         if (phase.reloadType() == ReloadPhase.ReloadType.MAGAZINES) {
             if (phase.reloadMagazineTime() == actualTime) {
-                Predicate<ItemStack> magPred = RFEUtils.orAllPredicates(ammoProperties.magazines());
+                Predicate<ItemStack> magPred = ammoProperties.extraMagazineItemPredicate();
                 Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
                 ItemStack foundMagazine = unlimitedItemReloading ? ItemStack.EMPTY
                         : RFEItemUtils.findFullestMagazine(entity, magPred, ammoPred, true);
@@ -2238,7 +2238,7 @@ public class RFEFirearmMode {
         if (this.internalCapacity > 0)
             return false;
         RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
-        Predicate<ItemStack> magazinePred = RFEUtils.orAllPredicates(ammoProperties.magazines());
+        Predicate<ItemStack> magazinePred = ammoProperties.extraMagazineItemPredicate();
         Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
         ItemStack magazine = RFEItemUtils.findFullestMagazine(entity, magazinePred, ammoPred, false);
         if (!magazine.isEmpty())

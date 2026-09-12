@@ -976,7 +976,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         RFEFirearmModeAmmoProperties ammoProperties = mode.getAmmoProperties(itemStack);
         Predicate<ItemStack> secondaryPred = RFEUtils.orAllPredicates(ammoProperties.secondaryAmmo());
         Predicate<ItemStack> primaryAmmoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
-        Predicate<ItemStack> magazinePred = RFEUtils.orAllPredicates(ammoProperties.magazines());
+        Predicate<ItemStack> magazinePred = ammoProperties.extraMagazineItemPredicate();
         int count = 0;
         for (ItemStack invStack : inventory) {
             if (FirearmDataUtils.isUsedPrimer(invStack))

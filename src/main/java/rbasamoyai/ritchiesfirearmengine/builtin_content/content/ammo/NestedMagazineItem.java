@@ -137,7 +137,7 @@ public class NestedMagazineItem extends MagazineItem {
 
     protected boolean canReloadNestedMagazine(ItemStack itemStack, int effectiveOldCount, ItemStack candidateMagazine) {
         if (candidateMagazine.isEmpty() || !(candidateMagazine.getItem() instanceof MagazineItem candidateItem)
-            || !this.matchesSpeedloaderItem(itemStack, candidateMagazine))
+            || !this.matchesAmmoItem(itemStack, candidateMagazine))
             return false;
         int newPrimaryCount = candidateItem.countAmmo(candidateMagazine);
         int newSecondaryCount = candidateItem.countSecondaryAmmo(candidateMagazine);
@@ -170,6 +170,15 @@ public class NestedMagazineItem extends MagazineItem {
         RFEItemUtils.addItemToEntity(nested, entity);
         this.setNestedMagazine(itemStack, ItemStack.EMPTY);
         this.applyCooldown(itemStack, entity);
+    }
+
+    @Override
+    public boolean testInnerData(ItemStack itemStack, Predicate<ItemStack> magazinePredicate, int recursionDepth) {
+        if (recursionDepth < 0)
+            return false;
+        ItemStack nested = this.getNestedMagazine(itemStack);
+        return magazinePredicate.test(nested) && nested.getItem() instanceof MagazineItem magazineItem
+                && magazineItem.testInnerData(nested, magazinePredicate, recursionDepth - 1);
     }
 
     public static class Builder implements RFEItemBuilder {

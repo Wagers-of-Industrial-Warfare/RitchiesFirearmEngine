@@ -1,0 +1,9 @@
+{
+  "parent": "rfe_builtin:item/machine_gun_drum_magazine_100rds/0rds",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 1 },
+      "model": "rfe_builtin:item/machine_gun_drum_magazine_100rds/1rds"
+    }
+  ]
+}

@@ -380,6 +380,10 @@ public class MagazineItem extends Item {
         return this.getStoredSecondaryAmmo(itemStack);
     }
 
+    public boolean testInnerData(ItemStack itemStack, Predicate<ItemStack> magazinePredicate, int recursionDepth) {
+        return true;
+    }
+
     public static class Builder implements RFEItemBuilder {
         @Override
         public Item apply(JsonObject obj) {

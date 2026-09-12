@@ -8,9 +8,11 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineIte
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.AmmoPredicate;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.projectiles.RFEProjectileType;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Predicate;
 
 public record RFEFirearmModeAmmoProperties(ImmutableMap<AmmoPredicate, RFEProjectileType> primaryAmmo, ImmutableList<AmmoPredicate> magazines,
                                            ImmutableList<AmmoPredicate> speedloaders, ImmutableList<AmmoPredicate> secondaryAmmo,
@@ -19,22 +21,32 @@ public record RFEFirearmModeAmmoProperties(ImmutableMap<AmmoPredicate, RFEProjec
 
     public ImmutableCollection<AmmoPredicate> primaryAmmoPredicates() { return this.primaryAmmo.keySet(); }
 
+    public Predicate<ItemStack> extraMagazineItemPredicate() {
+        Predicate<ItemStack> basePred = RFEUtils.orAllPredicates(this.magazines);
+        return basePred.and(s -> s.getItem() instanceof MagazineItem magazineItem && magazineItem.testInnerData(s, basePred, 16));
+    }
+
     public boolean isValidItem(ItemStack item) {
         if (this.isValidPrimaryAmmo(item))
             return true;
-        for (AmmoPredicate magPred : this.magazines) {
-            if (magPred.test(item)) {
-                if (!(item.getItem() instanceof MagazineItem magazineItem))
+        Predicate<ItemStack> magPred = this.extraMagazineItemPredicate();
+        if (magPred.test(item)) {
+            MagazineItem magazineItem = (MagazineItem) item.getItem();
+            List<ItemStack> storedAmmo = magazineItem.getStoredAmmo(item);
+            List<ItemStack> storedPrimers = magazineItem.getStoredSecondaryAmmo(item);
+            if (storedAmmo.isEmpty() && storedPrimers.isEmpty())
+                return false;
+            for (ItemStack magAmmo : storedAmmo) {
+                if (!this.isValidPrimaryAmmo(magAmmo))
                     return false;
-                List<ItemStack> storedAmmo = magazineItem.getStoredAmmo(item);
-                if (storedAmmo.isEmpty())
-                    return false;
-                for (ItemStack magAmmo : storedAmmo) {
-                    if (!this.isValidPrimaryAmmo(magAmmo))
+            }
+            for (ItemStack magAmmo : storedPrimers) {
+                for (AmmoPredicate secondaryPred : this.secondaryAmmo) {
+                    if (!secondaryPred.test(magAmmo))
                         return false;
                 }
-                return true;
             }
+            return true;
         }
         for (AmmoPredicate loaderPred : this.speedloaders) {
             if (loaderPred.test(item)) {
@@ -50,8 +62,10 @@ public record RFEFirearmModeAmmoProperties(ImmutableMap<AmmoPredicate, RFEProjec
                 return true;
             }
         }
+        if (FirearmDataUtils.isUsedPrimer(item))
+            return false;
         for (AmmoPredicate secondaryPred : this.secondaryAmmo) {
-            if (!FirearmDataUtils.isUsedPrimer(item) && secondaryPred.test(item))
+            if (secondaryPred.test(item))
                 return true;
         }
         return false;

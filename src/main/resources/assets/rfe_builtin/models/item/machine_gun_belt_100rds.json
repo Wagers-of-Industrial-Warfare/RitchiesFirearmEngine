@@ -1,0 +1,25 @@
+{
+  "parent": "rfe_builtin:item/machine_gun_belt_100rds/0rds",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 1 },
+      "model": "rfe_builtin:item/machine_gun_belt_100rds/1rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 2 },
+      "model": "rfe_builtin:item/machine_gun_belt_100rds/2rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 3 },
+      "model": "rfe_builtin:item/machine_gun_belt_100rds/3rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 4 },
+      "model": "rfe_builtin:item/machine_gun_belt_100rds/4rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 5 },
+      "model": "rfe_builtin:item/machine_gun_belt_100rds/5rds"
+    }
+  ]
+}

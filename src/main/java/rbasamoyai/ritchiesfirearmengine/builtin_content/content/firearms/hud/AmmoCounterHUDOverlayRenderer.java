@@ -149,7 +149,7 @@ public class AmmoCounterHUDOverlayRenderer implements RFEHudOverlayRenderer {
             float heat = hudInfo.getHeatAmount(item);
             float heatCapacity = hudInfo.getHeatCapacity(item);
             boolean overheated = heat >= heatCapacity;
-            float percentage = heatCapacity <= 1e-4d ? 1 : heat / heatCapacity;
+            float percentage = heatCapacity <= 1e-4d ? 1 : Mth.clamp(heat / heatCapacity, 0f, 1f);
             int rgb = Mth.hsvToRgb((1f - percentage) / 7.5f, 0.75f * Mth.clamp(percentage * 10, 0f, 1f), 1.0f);
             int r = rgb >> 16 & 255;
             int g = rgb >> 8 & 255;

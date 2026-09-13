@@ -135,6 +135,7 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("primable_ammo_count"), BuiltInRFEPlugin::primableAmmoCount);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("primed_ammo_count"), BuiltInRFEPlugin::primedAmmoCount);
         RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("speedloaders_blocked"), BuiltInRFEPlugin::speedloadersBlocked);
+        RFEContentBuilderRegistry.registerCompareValueSource(RitchiesFirearmEngine.resource("better_magazine_exists"), BuiltInRFEPlugin::betterMagazineExists);
     }
 
     @Override
@@ -445,9 +446,21 @@ public class BuiltInRFEPlugin implements RFEPlugin {
         return 0;
     }
 
+    /**
+     * Whether speedloaders are blocked by various attachments (particularly scopes)
+     */
     private static float speedloadersBlocked(ItemStack itemStack, LivingEntity entity) {
         if (itemStack.getItem() instanceof RFEFirearmItem firearm)
             return firearm.speedloadersBlocked(itemStack, entity) ? 1 : 0;
+        return 0;
+    }
+
+    /**
+     * Whether a magazine with more ammo is in the entity menu
+     */
+    private static float betterMagazineExists(ItemStack itemStack, LivingEntity entity) {
+        if (itemStack.getItem() instanceof RFEFirearmItem firearm)
+            return firearm.betterMagazineExists(itemStack, entity) ? 1 : 0;
         return 0;
     }
 

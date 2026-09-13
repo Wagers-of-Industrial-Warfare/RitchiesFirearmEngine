@@ -1,0 +1,37 @@
+{
+  "parent": "rfe_builtin:item/item_attachments/mg_08_belt_2rds",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 3 },
+      "model": "rfe_builtin:item/item_attachments/mg_08_belt_3rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 4 },
+      "model": "rfe_builtin:item/item_attachments/mg_08_belt_4rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 5 },
+      "model": "rfe_builtin:item/item_attachments/mg_08_belt_5rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 6 },
+      "model": "rfe_builtin:item/item_attachments/mg_08_belt_6rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 7 },
+      "model": "rfe_builtin:item/item_attachments/mg_08_belt_7rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 8 },
+      "model": "rfe_builtin:item/item_attachments/mg_08_belt_8rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 9 },
+      "model": "rfe_builtin:item/item_attachments/mg_08_belt_9rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 10 },
+      "model": "rfe_builtin:item/item_attachments/mg_08_belt_10rds"
+    }
+  ]
+}

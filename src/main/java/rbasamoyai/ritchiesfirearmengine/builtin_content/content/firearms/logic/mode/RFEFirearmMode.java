@@ -911,7 +911,7 @@ public class RFEFirearmMode {
             if (this.isJammed(itemStack)) {
                 return;
             } else {
-                this.finishCharge(itemStack, entity);
+                this.finishCharge(itemStack, entity, true);
             }
         }
         if (entity.level().isClientSide)
@@ -1029,7 +1029,7 @@ public class RFEFirearmMode {
         if (phaseType == ReloadPhase.PhaseType.INDEX)
             this.indexMagazine(itemStack, entity, phase.indexCount());
         if (phase.chargeFirearm())
-            this.finishCharge(itemStack, entity);
+            this.finishCharge(itemStack, entity, false);
         if (phase.ejectMagazine()) {
             ItemStack previousMagazine = this.setMagazine(itemStack, entity, ItemStack.EMPTY);
             RFEItemUtils.addItemToEntity(previousMagazine, entity);
@@ -1495,7 +1495,7 @@ public class RFEFirearmMode {
         if (phaseType == ReloadPhase.PhaseType.INDEX)
             this.indexMagazine(itemStack, entity, phase.indexCount());
         if (phase.chargeFirearm())
-            this.finishCharge(itemStack, entity);
+            this.finishCharge(itemStack, entity, false);
         if (phaseType == ReloadPhase.PhaseType.FINISH) {
             this.saveModeData(itemStack, FirearmDataUtils.cancelUnload(itemStack, this.getModeData(itemStack)));
             return;
@@ -1694,7 +1694,7 @@ public class RFEFirearmMode {
         boolean isClientside = entity.level().isClientSide;
         if (!isClientside && action.cycleMagazine())
             this.indexMagazine(itemStack, entity, 1);
-        this.finishCharge(itemStack, entity);
+        this.finishCharge(itemStack, entity, false);
         if (!isClientside && action.ejectMagazine()) {
             ItemStack previousMagazine = this.setMagazine(itemStack, entity, ItemStack.EMPTY);
             RFEItemUtils.addItemToEntity(previousMagazine, entity);
@@ -1709,12 +1709,12 @@ public class RFEFirearmMode {
         }
     }
 
-    public void finishCharge(ItemStack itemStack, LivingEntity entity) {
+    public void finishCharge(ItemStack itemStack, LivingEntity entity, boolean chargeAfterFiring) {
         this.setCharged(itemStack, entity, true);
         this.setJammed(itemStack, entity, false);
         if (entity.level().isClientSide)
             return;
-        if (this.canOverheat) {
+        if (this.canOverheat && !chargeAfterFiring) {
             DataComponentPatch modeData = this.getModeData(itemStack);
             float heat = FirearmDataUtils.getHeat(modeData);
             heat -= this.getHandlingProperties(itemStack).heatProperties().heatRemovedOnCharge();
@@ -2251,6 +2251,30 @@ public class RFEFirearmMode {
                 return true;
         }
         return false;
+    }
+
+    public boolean usesMagazines(ItemStack itemStack) { return this.internalCapacity <= 0; }
+
+    public int bestMagazineAmmoCount(ItemStack itemStack, LivingEntity entity) {
+        RFEFirearmModeAmmoProperties ammoProperties = this.getAmmoProperties(itemStack);
+        Predicate<ItemStack> ammoPred = RFEUtils.orAllPredicates(ammoProperties.primaryAmmoPredicates());
+        Predicate<ItemStack> magazinePred = ammoProperties.extraMagazineItemPredicate();
+        ItemStack fullestMagazine = RFEItemUtils.findFullestMagazine(entity, magazinePred, ammoPred, false);
+        if (fullestMagazine.getItem() instanceof MagazineItem magazineItem) {
+            int count = magazineItem.countAmmo(fullestMagazine);
+            if (count > 0)
+                return count;
+        }
+        if (!RFEFirearmItem.canEntityInfiniteReload(entity, itemStack))
+            return 0;
+        List<ItemStack> infiniteStacks = ammoProperties.unlimitedPrimaryReloadItems();
+        for (ItemStack s : infiniteStacks) {
+            if (!(s.getItem() instanceof MagazineItem magazineItem))
+                continue;
+            if (magazinePred.test(s))
+                return magazineItem.countAmmo(s);
+        }
+        return 0;
     }
 
     public int bestSpeedloaderAmmoCount(ItemStack itemStack, LivingEntity entity) {

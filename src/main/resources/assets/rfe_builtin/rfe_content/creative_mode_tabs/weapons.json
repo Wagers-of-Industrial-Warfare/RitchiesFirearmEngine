@@ -94,6 +94,10 @@
     },
     "rfe_builtin:drilling",
     {
+      "id": "rfe_builtin:mg_08_15",
+      "components": {"ritchiesfirearmengine:firearm_mode_data":{"MainMode":{"ritchiesfirearmengine:detached_magazine":[{"item":{"id":"rfe_builtin:machine_gun_drum_magazine_100rds"},"slot":0}]}}}
+    },
+    {
       "id": "rfe_builtin:m1911",
       "components": {"ritchiesfirearmengine:firearm_mode_data":{"MainMode":{"ritchiesfirearmengine:detached_magazine":[{"item":{"id":"rfe_builtin:pistol_magazine_7rds"},"slot":0}]}}}
     },

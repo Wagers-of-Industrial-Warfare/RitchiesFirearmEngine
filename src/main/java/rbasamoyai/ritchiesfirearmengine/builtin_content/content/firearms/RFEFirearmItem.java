@@ -589,6 +589,13 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         return false;
     }
 
+    public boolean betterMagazineExists(ItemStack itemStack, LivingEntity entity) {
+        RFEFirearmMode mode = this.getCurrentMode(itemStack);
+        if (!mode.usesMagazines(itemStack))
+            return false;
+        return mode.getLoadedAmmoCount(itemStack, entity, false) < mode.bestMagazineAmmoCount(itemStack, entity);
+    }
+
     public boolean laysFlatOnGround(ItemStack stack) {
         return true;
     }

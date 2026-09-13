@@ -278,6 +278,184 @@
     ],
     "subtitle": "subtitles.rfe_builtin.item.generic.launcher.rocket.unload"
   },
+  "item.generic.machine_gun.aim": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/aim",
+        "volume": 0.25,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "item.generic.machine_gun.draw": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/draw",
+        "volume": 0.25,
+        "pitch": 0.67
+      },
+      {
+        "name": "rfe_builtin:item/generic/firearm/draw",
+        "volume": 0.25,
+        "pitch": 0.68
+      },
+      {
+        "name": "rfe_builtin:item/generic/firearm/draw",
+        "volume": 0.25,
+        "pitch": 0.7
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.machine_gun.draw"
+  },
+  "item.generic.machine_gun.magazine.reload": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_reload",
+        "volume": 0.25,
+        "pitch": 0.85
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.machine_gun.magazine.reload"
+  },
+  "item.generic.machine_gun.magazine.unload": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/magazine_unload",
+        "volume": 0.25,
+        "pitch": 0.85
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.machine_gun.magazine.unload"
+  },
+  "item.generic.machine_gun.magazine.wound": {
+    "sounds": [
+      {
+        "name": "minecraft:item/spyglass/use",
+        "volume": 0.25,
+        "pitch": 1.35
+      },
+      {
+        "name": "minecraft:item/spyglass/use",
+        "volume": 0.25,
+        "pitch": 1.33
+      },
+      {
+        "name": "minecraft:item/spyglass/use",
+        "volume": 0.25,
+        "pitch": 1.32
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.machine_gun.magazine.wound"
+  },
+  "item.generic.machine_gun.overheat": {
+    "sounds": [
+      {
+        "name": "minecraft:random/fizz",
+        "volume": 0.25,
+        "pitch": 1.9
+      },
+      {
+        "name": "minecraft:random/fizz",
+        "volume": 0.25,
+        "pitch": 1.95
+      },
+      {
+        "name": "minecraft:random/fizz",
+        "volume": 0.25,
+        "pitch": 2.0
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.machine_gun.overheat"
+  },
+  "item.generic.machine_gun.rack": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 0.75
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 0.73
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle",
+        "volume": 0.25,
+        "pitch": 0.71
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.machine_gun.rack"
+  },
+  "item.generic.machine_gun.rack_end": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 0.75
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 0.73
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_end",
+        "volume": 0.25,
+        "pitch": 0.71
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.machine_gun.rack"
+  },
+  "item.generic.machine_gun.rack_start": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 0.75
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 0.73
+      },
+      {
+        "name": "rfe_builtin:item/generic/rifle/bolt_cycle_start",
+        "volume": 0.25,
+        "pitch": 0.71
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.machine_gun.rack"
+  },
+  "item.generic.machine_gun.shot.old": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/semi_auto_rifle/shot",
+        "volume": 1.0,
+        "pitch": 1.45
+      },
+      {
+        "name": "rfe_builtin:item/generic/semi_auto_rifle/shot",
+        "volume": 1.0,
+        "pitch": 1.43
+      },
+      {
+        "name": "rfe_builtin:item/generic/semi_auto_rifle/shot",
+        "volume": 1.0,
+        "pitch": 1.42
+      }
+    ],
+    "subtitle": "subtitles.rfe_builtin.item.generic.machine_gun.shot"
+  },
+  "item.generic.machine_gun.unaim": {
+    "sounds": [
+      {
+        "name": "rfe_builtin:item/generic/firearm/aim",
+        "volume": 0.25,
+        "pitch": 0.5
+      }
+    ]
+  },
   "item.generic.musket.aim": {
     "sounds": [
       {

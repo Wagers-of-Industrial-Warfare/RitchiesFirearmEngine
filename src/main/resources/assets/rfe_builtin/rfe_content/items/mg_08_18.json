@@ -1,0 +1,677 @@
+{
+  "type": "ritchiesfirearmengine:firearm",
+  "firearm_attachments": {
+    "rfe_builtin:bipod": {
+      "type": "ritchiesfirearmengine:bipod",
+      "integral_attachment": true,
+      "default_settings": {"ritchiesfirearmengine:deployed_setting": true}
+    }
+  },
+  "magazine_attachment_slot": "rfe_builtin:magazine",
+  "item_length": 2.5,
+  "movement_speed_modifier": -0.25,
+  "drawing": {
+    "draw_time": 25,
+    "sound": "rfe_builtin:item.generic.machine_gun.draw"
+  },
+  "mode_change": {
+    "mode_change_time": 1,
+    "sound": "rfe_builtin:item.generic.firearm.mode_change.switch"
+  },
+  "aiming": {
+    "aim_time": 5,
+    "aim_sound": "rfe_builtin:item.generic.machine_gun.aim",
+    "unaim_sound": "rfe_builtin:item.generic.machine_gun.unaim"
+  },
+  "ammo": {
+    "ammo_required": true,
+    "plus_1_capacity": false
+  },
+  "firing": {
+    "fire_mode": "full_auto",
+    "rpm": 600,
+    "sound": "rfe_builtin:item.generic.machine_gun.shot.old"
+  },
+  "reload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
+            {
+              "or": [
+                { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 0 },
+                {
+                  "and": [
+                    { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+                    { "compare": "ritchiesfirearmengine:better_magazine_exists", "operator": "equals", "value": 1 }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "time": 1
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
+            {
+              "or": [
+                { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 20 },
+                { "compare": "ritchiesfirearmengine:firearm_ammo_count", "operator": "less_than_or_equal_to", "value": 0 }
+              ]
+            }
+          ]
+        },
+        "time": 42,
+        "unload_type": "magazines",
+        "unload_time": 15,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 40 }
+          ]
+        },
+        "time": 57,
+        "unload_type": "magazines",
+        "unload_time": 30,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 60 }
+          ]
+        },
+        "time": 72,
+        "unload_type": "magazines",
+        "unload_time": 45,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 80 }
+          ]
+        },
+        "time": 87,
+        "unload_type": "magazines",
+        "unload_time": 60,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 100 }
+          ]
+        },
+        "time": 102,
+        "unload_type": "magazines",
+        "unload_time": 75,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 70, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 120 }
+          ]
+        },
+        "time": 117,
+        "unload_type": "magazines",
+        "unload_time": 90,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 70, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 85, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 140 }
+          ]
+        },
+        "time": 132,
+        "unload_type": "magazines",
+        "unload_time": 105,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 70, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 85, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 100, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 160 }
+          ]
+        },
+        "time": 147,
+        "unload_type": "magazines",
+        "unload_time": 120,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 70, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 85, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 100, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 115, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 180 }
+          ]
+        },
+        "time": 162,
+        "unload_type": "magazines",
+        "unload_time": 135,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 70, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 85, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 100, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 115, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 130, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 200 }
+          ]
+        },
+        "time": 177,
+        "unload_type": "magazines",
+        "unload_time": 150,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 70, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 85, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 100, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 115, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 130, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 145, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than", "value": 200 }
+          ]
+        },
+        "time": 192,
+        "unload_type": "magazines",
+        "unload_time": 165,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 70, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 85, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 100, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 115, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 130, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 145, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 160, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "reload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 0 },
+            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 }
+          ]
+        },
+        "time": 30,
+        "reload_type": "magazines",
+        "reload_time": 15,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.reload" }
+        ],
+        "accessible_phases": {
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "finish",
+        "time": 35,
+        "charge_firearm": true,
+        "sounds": [
+          { "time": 5, "sound": "rfe_builtin:item.generic.machine_gun.rack" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.rack" }
+        ]
+      }
+    ]
+  },
+  "unload": {
+    "phases": [
+      {
+        "phase": "prepare",
+        "condition": { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+        "time": 1
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            {
+              "or": [
+                { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 20 },
+                { "compare": "ritchiesfirearmengine:firearm_ammo_count", "operator": "less_than_or_equal_to", "value": 20 }
+              ]
+            }
+          ]
+        },
+        "time": 42,
+        "unload_type": "magazines",
+        "unload_time": 15,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 40 }
+          ]
+        },
+        "time": 57,
+        "unload_type": "magazines",
+        "unload_time": 30,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 60 }
+          ]
+        },
+        "time": 72,
+        "unload_type": "magazines",
+        "unload_time": 45,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 80 }
+          ]
+        },
+        "time": 87,
+        "unload_type": "magazines",
+        "unload_time": 60,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 100 }
+          ]
+        },
+        "time": 102,
+        "unload_type": "magazines",
+        "unload_time": 75,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 70, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 120 }
+          ]
+        },
+        "time": 117,
+        "unload_type": "magazines",
+        "unload_time": 90,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 70, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 85, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 140 }
+          ]
+        },
+        "time": 132,
+        "unload_type": "magazines",
+        "unload_time": 105,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 70, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 85, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 100, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 160 }
+          ]
+        },
+        "time": 147,
+        "unload_type": "magazines",
+        "unload_time": 120,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 70, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 85, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 100, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 115, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 180 }
+          ]
+        },
+        "time": 162,
+        "unload_type": "magazines",
+        "unload_time": 135,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 70, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 85, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 100, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 115, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 130, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 200 }
+          ]
+        },
+        "time": 177,
+        "unload_type": "magazines",
+        "unload_time": 150,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 70, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 85, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 100, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 115, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 130, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 145, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "unload",
+        "condition": {
+          "and": [
+            { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
+            { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than", "value": 200 }
+          ]
+        },
+        "time": 192,
+        "unload_type": "magazines",
+        "unload_time": 165,
+        "sounds": [
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 40, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 55, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 70, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 85, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 100, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 115, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 130, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 145, "sound": "rfe_builtin:item.generic.machine_gun.magazine.wound" },
+          { "time": 160, "sound": "rfe_builtin:item.generic.machine_gun.magazine.unload" }
+        ],
+        "accessible_phases": {
+          "reload": "all",
+          "finish": "all"
+        }
+      },
+      {
+        "phase": "finish",
+        "time": 1
+      }
+    ]
+  },
+  "charge": {
+    "actions": [
+      {
+        "condition": { "macro": "rfe_builtin:can_charge" },
+        "time": 20,
+        "sound": "rfe_builtin:item.generic.machine_gun.rack"
+      }
+    ]
+  },
+  "melee": {
+    "can_melee": false
+  },
+  "overheating": {
+    "cant_overheat": false,
+    "heat_capacity": 66,
+    "heat_removed_per_tick": 1,
+    "heat_removed_on_charge": 20,
+    "heat_added_on_firing": 2,
+    "cooling_delay_time": 10,
+    "cooldown_time": 45,
+    "sound": "rfe_builtin:item.generic.machine_gun.overheat"
+  },
+  "modes": {
+    "safety": {
+      "firing": {
+        "fire_mode": "safety"
+      }
+    }
+  }
+}

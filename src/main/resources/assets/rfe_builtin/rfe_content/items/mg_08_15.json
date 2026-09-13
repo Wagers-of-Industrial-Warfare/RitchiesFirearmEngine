@@ -375,7 +375,6 @@
         "condition": {
           "and": [
             { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
             {
               "or": [
                 { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 20 },
@@ -400,7 +399,6 @@
         "condition": {
           "and": [
             { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
             { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 40 }
           ]
         },
@@ -421,7 +419,6 @@
         "condition": {
           "and": [
             { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
             { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 60 }
           ]
         },
@@ -443,7 +440,6 @@
         "condition": {
           "and": [
             { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
             { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 80 }
           ]
         },
@@ -466,7 +462,6 @@
         "condition": {
           "and": [
             { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
             { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 100 }
           ]
         },
@@ -490,7 +485,6 @@
         "condition": {
           "and": [
             { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
             { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 120 }
           ]
         },
@@ -515,7 +509,6 @@
         "condition": {
           "and": [
             { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
             { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 140 }
           ]
         },
@@ -541,7 +534,6 @@
         "condition": {
           "and": [
             { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
             { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 160 }
           ]
         },
@@ -568,7 +560,6 @@
         "condition": {
           "and": [
             { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
             { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 180 }
           ]
         },
@@ -596,7 +587,6 @@
         "condition": {
           "and": [
             { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
             { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "less_than_or_equal_to", "value": 200 }
           ]
         },
@@ -625,7 +615,6 @@
         "condition": {
           "and": [
             { "compare": "ritchiesfirearmengine:firearm_has_magazine", "operator": "equals", "value": 1 },
-            { "compare": "ritchiesfirearmengine:entity_has_magazine", "operator": "equals", "value": 1 },
             { "compare": "ritchiesfirearmengine:free_ammo_space", "operator": "greater_than", "value": 200 }
           ]
         },

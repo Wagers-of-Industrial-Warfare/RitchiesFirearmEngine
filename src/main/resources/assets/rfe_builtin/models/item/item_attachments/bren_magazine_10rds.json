@@ -1,0 +1,45 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "rfe_builtin:item/bren_10rds"
+	},
+	"elements": [
+		{
+			"from": [7.28, 8.5, 11],
+			"to": [8.72, 10.5, 15],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 10, 13]},
+			"faces": {
+				"north": {"uv": [10, 1, 12, 3], "texture": "#0"},
+				"east": {"uv": [0, 1, 4, 3], "texture": "#0"},
+				"south": {"uv": [10, 5, 12, 7], "texture": "#0"},
+				"west": {"uv": [0, 5, 4, 7], "texture": "#0"},
+				"up": {"uv": [0, 8, 2, 12], "texture": "#0"},
+				"down": {"uv": [3, 8, 5, 12], "texture": "#0"}
+			}
+		},
+		{
+			"from": [7.265, 9.7, 11.025],
+			"to": [8.735, 11.7, 15.025],
+			"rotation": {"angle": -22.5, "axis": "x", "origin": [8, 10, 13]},
+			"faces": {
+				"north": {"uv": [12, 9, 14, 11], "texture": "#0"},
+				"east": {"uv": [5, 1, 9, 3], "texture": "#0"},
+				"south": {"uv": [12, 13, 14, 15], "texture": "#0"},
+				"west": {"uv": [5, 5, 9, 7], "texture": "#0"},
+				"up": {"uv": [6, 8, 8, 12], "texture": "#0"},
+				"down": {"uv": [9, 8, 11, 12], "texture": "#0"}
+			}
+		}
+	],
+	"display": {},
+	"groups": [
+		{
+			"name": "magazine",
+			"origin": [8, 8, 8],
+			"scope": 0,
+			"color": 0,
+			"children": [0, 1]
+		}
+	]
+}

@@ -1,0 +1,55 @@
+{
+  "replace_primary_ammo": false,
+  "primary_ammo": [
+    {
+      "ammo": "rfe_builtin:rifle_cartridge",
+      "fires": "rfe_builtin:303_british_mg"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_rifle_cartridge",
+      "fires": "rfe_builtin:303_british_mg"
+    },
+    {
+      "ammo": "rfe_builtin:tracer_rifle_cartridge",
+      "fires": "rfe_builtin:303_british_tracer_mg"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_tracer_rifle_cartridge",
+      "fires": "rfe_builtin:303_british_tracer_mg"
+    },
+    {
+      "ammo": "rfe_builtin:sp_rifle_cartridge",
+      "fires": "rfe_builtin:303_british_sp_mg"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_sp_rifle_cartridge",
+      "fires": "rfe_builtin:303_british_sp_mg"
+    },
+    {
+      "ammo": "rfe_builtin:hp_rifle_cartridge",
+      "fires": "rfe_builtin:303_british_hp_mg"
+    },
+    {
+      "ammo": "rfe_builtin:infinite_hp_rifle_cartridge",
+      "fires": "rfe_builtin:303_british_hp_mg"
+    }
+  ],
+  "replace_magazines": false,
+  "magazines": [
+    "#rfe_builtin:rifle_magazines"
+  ],
+  "replace_speedloaders": false,
+  "speedloaders": [
+  ],
+  "replace_secondary_ammo": false,
+  "secondary_ammo": [
+  ],
+  "unlimited_primary_reload_items": [
+    {
+      "id": "rfe_builtin:rifle_magazine_30rds",
+      "components": {"ritchiesfirearmengine:rounds":[{"item":{"id":"rfe_builtin:rifle_cartridge","count":30},"slot":0}]}
+    }
+  ],
+  "modes": {
+  }
+}

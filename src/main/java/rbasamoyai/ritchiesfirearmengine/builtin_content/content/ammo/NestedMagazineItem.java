@@ -5,11 +5,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.AmmoPredicate;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemContainerContents;
@@ -217,6 +219,19 @@ public class NestedMagazineItem extends MagazineItem {
                 break;
         }
         return Pair.of(Optional.of(primaryCount), Optional.of(secondaryCount));
+    }
+
+    @Override
+    protected void addAmmoLinesToTooltip(ItemStack itemStack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        ItemStack nestedMagazine = this.getNestedMagazine(itemStack);
+        if (nestedMagazine.isEmpty())
+            return;
+        tooltip.add(nestedMagazine.getDisplayName());
+        List<Component> innerMagazineLines = new ArrayList<>();
+        this.addAmmoLinesToTooltipFromItems(this.getStoredAmmo(itemStack), innerMagazineLines);
+        this.addAmmoLinesToTooltipFromItems(this.getStoredSecondaryAmmo(itemStack), innerMagazineLines);
+        for (Component component : innerMagazineLines)
+            tooltip.add(Component.literal("  ").append(component));
     }
 
     public static class Builder implements RFEItemBuilder {

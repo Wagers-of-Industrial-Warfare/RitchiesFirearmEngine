@@ -288,11 +288,15 @@ public class MagazineItem extends Item {
     @Override
     public void appendHoverText(ItemStack itemStack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(itemStack, context, tooltip, flag);
-        this.addAmmoLinesToTooltip(this.getStoredAmmo(itemStack), tooltip);
-        this.addAmmoLinesToTooltip(this.getStoredSecondaryAmmo(itemStack), tooltip);
+        this.addAmmoLinesToTooltip(itemStack, context, tooltip, flag);
     }
 
-    protected void addAmmoLinesToTooltip(List<ItemStack> storedAmmo, List<Component> tooltip) {
+    protected void addAmmoLinesToTooltip(ItemStack itemStack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        this.addAmmoLinesToTooltipFromItems(this.getStoredAmmo(itemStack), tooltip);
+        this.addAmmoLinesToTooltipFromItems(this.getStoredSecondaryAmmo(itemStack), tooltip);
+    }
+
+    protected void addAmmoLinesToTooltipFromItems(List<ItemStack> storedAmmo, List<Component> tooltip) {
         Map<Item, Integer> storedIndex = new LinkedHashMap<>();
         for (ItemStack ammoStack : storedAmmo) {
             if (!ammoStack.isEmpty())

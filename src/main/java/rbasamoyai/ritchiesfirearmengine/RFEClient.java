@@ -113,6 +113,10 @@ public class RFEClient {
             return itemStack.getItem() instanceof RFEFirearmItem firearm
                     && firearm.getCurrentAction(itemStack) == RFEFirearmItem.Action.DRAW ? 1 : 0;
         });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_cooling_down"), (itemStack, level, entity, seed) -> {
+            return itemStack.getItem() instanceof RFEFirearmItem firearm
+                    && firearm.getCurrentAction(itemStack) == RFEFirearmItem.Action.COOLDOWN ? 1 : 0;
+        });
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_charged"), (itemStack, level, entity, seed) -> {
             return itemStack.getItem() instanceof RFEFirearmItem firearm && firearm.isCharged(itemStack) ? 1 : 0;
         });
@@ -153,6 +157,9 @@ public class RFEClient {
         });
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("has_bayonet"), (itemStack, level, entity, seed) -> {
             return itemStack.getItem() instanceof RFEFirearmItem firearm && firearm.hasBayonet(itemStack) ? 1 : 0;
+        });
+        ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("has_bipod_stabilization"), (itemStack, level, entity, seed) -> {
+            return itemStack.getItem() instanceof RFEFirearmItem firearm && firearm.isBipodDeployed(itemStack, entity) ? 1 : 0;
         });
         ItemProperties.registerGeneric(RitchiesFirearmEngine.resource("is_deployed"), (itemStack, level, entity, seed) -> {
             return itemStack.getOrDefault(BuiltInRFEPlugin.RFEDataComponents.DEPLOYED_SETTING, false) ? 1 : 0;

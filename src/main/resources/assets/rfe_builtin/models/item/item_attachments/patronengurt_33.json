@@ -1,0 +1,45 @@
+{
+  "parent": "rfe_builtin:item/item_attachments/patronengurt_33_0rds",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 1 },
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33_1rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 2 },
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33_2rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 3 },
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33_3rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 4 },
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33_4rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 5 },
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33_5rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 6 },
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33_6rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 7 },
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33_7rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 8 },
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33_8rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 9 },
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33_9rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 10 },
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33_10rds"
+    }
+  ]
+}

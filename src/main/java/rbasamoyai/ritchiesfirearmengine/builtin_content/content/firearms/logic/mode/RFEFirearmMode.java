@@ -660,6 +660,8 @@ public class RFEFirearmMode {
     }
 
     public boolean isInBipodPosition(LivingEntity entity, ItemStack itemStack) {
+        if (entity == null)
+            return false;
         // TODO other entities?
         Vec3 aimDirection = entity.getViewVector(0);
         Vec3 eyePos = entity.getEyePosition();

@@ -1,0 +1,17 @@
+{
+  "parent": "rfe_builtin:item/item_attachments/gurttrommel_34_0rds",
+  "overrides": [
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 1 },
+      "model": "rfe_builtin:item/item_attachments/gurttrommel_34_1rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 2 },
+      "model": "rfe_builtin:item/item_attachments/gurttrommel_34_2rds"
+    },
+    {
+      "predicate": { "ritchiesfirearmengine:round_count": 3 },
+      "model": "rfe_builtin:item/item_attachments/gurttrommel_34_3rds"
+    }
+  ]
+}

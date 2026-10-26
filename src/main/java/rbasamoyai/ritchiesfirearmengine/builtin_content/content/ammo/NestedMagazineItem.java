@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
@@ -13,12 +14,14 @@ import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.A
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.firearms.logic.FirearmDataUtils;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.item_handling.RFEItemContainerContents;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.default_index.BuiltInRFEPlugin.RFEDataComponents;
+import rbasamoyai.ritchiesfirearmengine.foundation.RFETags;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.items.RFEItemBuilder;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class NestedMagazineItem extends MagazineItem {
@@ -179,6 +182,41 @@ public class NestedMagazineItem extends MagazineItem {
         ItemStack nested = this.getNestedMagazine(itemStack);
         return magazinePredicate.test(nested) && nested.getItem() instanceof MagazineItem magazineItem
                 && magazineItem.testInnerData(nested, magazinePredicate, recursionDepth - 1);
+    }
+
+    @Override
+    public Pair<Optional<Integer>, Optional<Integer>> getInventoryAmmoCountForHUD(ItemStack itemStack, List<ItemStack> inventory, boolean countLooseRounds) {
+        Predicate<ItemStack> nestedMagazinePredicate = RFEUtils.orAllPredicates(this.getAmmoPredicates(itemStack));
+        int primaryCount = 0;
+        int secondaryCount = 0;
+        for (ItemStack invStack : inventory) {
+            if (itemStack == invStack)
+                continue;
+            if (nestedMagazinePredicate.test(invStack) && invStack.getItem() instanceof MagazineItem magazineItem) {
+                List<ItemStack> magAmmo = magazineItem.getStoredAmmo(invStack);
+                List<ItemStack> magSecondaryAmmo = magazineItem.getStoredSecondaryAmmo(invStack);
+                if (magAmmo.isEmpty() && magSecondaryAmmo.isEmpty()
+                        || magazineItem.getMagazineCapacity(invStack) > this.primaryCapacity
+                        || magazineItem.getSecondaryMagazineCapacity(invStack) > this.secondaryCapacity)
+                    continue;
+                int magCount = RFEItemUtils.countItems(magAmmo);
+                int magSecondaryCount = RFEItemUtils.countItems(magSecondaryAmmo);
+                if (invStack.is(RFETags.RFEItemTags.INFINITE_AMMO.tag)) {
+                    if (magCount > 0)
+                        primaryCount = -1;
+                    if (magSecondaryCount > 0)
+                        secondaryCount = -1;
+                } else {
+                    if (primaryCount > -1)
+                        primaryCount += magCount;
+                    if (secondaryCount > -1)
+                        secondaryCount += magSecondaryCount;
+                }
+            }
+            if (primaryCount == -1 && secondaryCount == -1)
+                break;
+        }
+        return Pair.of(Optional.of(primaryCount), Optional.of(secondaryCount));
     }
 
     public static class Builder implements RFEItemBuilder {

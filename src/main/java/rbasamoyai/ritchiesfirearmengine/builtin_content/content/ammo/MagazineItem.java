@@ -366,8 +366,10 @@ public class MagazineItem extends Item {
                     if (magSecondaryCount > 0)
                         secondaryCount = -1;
                 } else {
-                    primaryCount += magCount;
-                    secondaryCount += magSecondaryCount;
+                    if (primaryCount > -1)
+                        primaryCount += magCount;
+                    if (secondaryCount > -1)
+                        secondaryCount += magSecondaryCount;
                 }
             }
             if (primaryCount == -1 && secondaryCount == -1)

@@ -1,0 +1,120 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench",
+	"textures": {
+		"1": "rfe_builtin:item/gurttrommel_34"
+	},
+	"elements": [
+		{
+			"from": [5, 5.3, 10.5125],
+			"to": [7.5, 6.8, 10.5125],
+			"rotation": {"angle": 22.5, "axis": "z", "origin": [6.25, 6.55, 9.5]},
+			"faces": {
+				"north": {"uv": [7, 6, 9.5, 7.5], "texture": "#1"},
+				"south": {"uv": [0, 8, 2.5, 9.5], "texture": "#1"}
+			}
+		},
+		{
+			"from": [6, 6.8, 10.5125],
+			"to": [7.5, 7.3, 10.5125],
+			"rotation": {"angle": 22.5, "axis": "z", "origin": [6.25, 6.55, 9.5]},
+			"faces": {
+				"north": {"uv": [8, 12, 9.5, 12.5], "texture": "#1"},
+				"south": {"uv": [11, 12, 12.5, 12.5], "texture": "#1"}
+			}
+		},
+		{
+			"from": [7.25, 7.25, 8.525],
+			"to": [8.25, 7.75, 10.475],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7.75, 5.75, 8.5]},
+			"faces": {
+				"north": {"uv": [13, 0, 14, 0.5], "texture": "#1"},
+				"east": {"uv": [11, 6, 13, 6.5], "texture": "#1"},
+				"south": {"uv": [12.5, 2, 13.5, 2.5], "texture": "#1"},
+				"west": {"uv": [11, 8, 13, 8.5], "texture": "#1"},
+				"up": {"uv": [10.5, 0, 11.5, 2], "texture": "#1"},
+				"down": {"uv": [10.5, 3, 11.5, 5], "texture": "#1"}
+			}
+		},
+		{
+			"from": [8, 7.5, 9],
+			"to": [9, 7.5, 10],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 5.75, 8.5]},
+			"faces": {
+				"up": {"uv": [11, 10, 12, 11], "texture": "#1"},
+				"down": {"uv": [3, 12, 4, 13], "texture": "#1"}
+			}
+		},
+		{
+			"from": [9, 4.5, 9],
+			"to": [9, 7.5, 10],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 5.75, 8.5]},
+			"faces": {
+				"east": {"uv": [4, 8, 5, 11], "texture": "#1"},
+				"west": {"uv": [6, 9, 7, 12], "texture": "#1"}
+			}
+		},
+		{
+			"from": [5, 5.3, 8.5],
+			"to": [7.5, 7.8, 10.5],
+			"rotation": {"angle": 22.5, "axis": "z", "origin": [6.25, 6.55, 9.5]},
+			"faces": {
+				"north": {"uv": [0, 0, 2.5, 2.5], "texture": "#1"},
+				"east": {"uv": [4, 0, 6, 2.5], "texture": "#1"},
+				"south": {"uv": [0, 4, 2.5, 6.5], "texture": "#1"},
+				"west": {"uv": [4, 4, 6, 6.5], "texture": "#1"},
+				"up": {"uv": [7, 0, 9.5, 2], "texture": "#1"},
+				"down": {"uv": [7, 3, 9.5, 5], "texture": "#1"}
+			}
+		},
+		{
+			"from": [6, 7.8125, 8.5],
+			"to": [7.5, 7.8125, 10.5],
+			"rotation": {"angle": 22.5, "axis": "z", "origin": [6.25, 6.55, 9.5]},
+			"faces": {
+				"up": {"uv": [8, 9, 9.5, 11], "texture": "#1"},
+				"down": {"uv": [0, 11, 1.5, 13], "texture": "#1"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "magazine",
+			"origin": [8, 8, 8],
+			"scope": 0,
+			"color": 0,
+			"children": [
+				{
+					"name": "handle",
+					"origin": [8, 8, 8],
+					"scope": 0,
+					"color": 0,
+					"children": [0]
+				},
+				{
+					"name": "latch",
+					"origin": [8, 8, 8],
+					"scope": 0,
+					"color": 0,
+					"children": [1]
+				},
+				{
+					"name": "feed_ammo",
+					"origin": [8, 8, 8],
+					"scope": 0,
+					"color": 0,
+					"children": [2]
+				},
+				{
+					"name": "output_belt",
+					"origin": [8, 8, 8],
+					"scope": 0,
+					"color": 0,
+					"children": [3, 4]
+				},
+				5,
+				6
+			]
+		}
+	]
+}

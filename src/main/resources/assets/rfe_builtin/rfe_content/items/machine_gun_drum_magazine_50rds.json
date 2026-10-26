@@ -1,0 +1,11 @@
+{
+  "type": "ritchiesfirearmengine:nested_magazine",
+  "stacks_to": 64,
+  "rarity": "common",
+  "glint": false,
+  "capacity": 50,
+  "reload_cooldown": 40,
+  "valid_magazines": [
+    "#rfe_builtin:machine_gun_belts"
+  ]
+}

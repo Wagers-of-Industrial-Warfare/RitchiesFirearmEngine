@@ -784,6 +784,28 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
         return false;
     }
 
+    public boolean hasBipod(ItemStack itemStack) {
+        RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);
+        for (ResourceLocation slotId : this.firearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BIPOD)) {
+            ItemStack attachmentStack = firearmAttachmentContents.copySlot(slotId);
+            if (attachmentStack.isEmpty())
+                continue;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getData(itemStack, attachmentStack, slotId);
+            if (attachmentData instanceof BipodAttachmentProperties)
+                return true;
+        }
+        RFEIntegralAttachmentData integralAttachmentData = itemStack.getOrDefault(RFEDataComponents.INTEGRAL_ATTACHMENTS, RFEIntegralAttachmentData.EMPTY);
+        for (ResourceLocation slotId : this.integralFirearmAttachments.get(BuiltInRFEPlugin.AttachmentSlots.BIPOD)) {
+            DataComponentPatch integralData = integralAttachmentData.getSlot(slotId);
+            if (FirearmDataUtils.isAttachmentRemoved(integralData))
+                continue;
+            RFEItemAttachmentProperties attachmentData = RFEItemAttachmentsPropertiesHandler.getIntegralData(itemStack, slotId);
+            if (attachmentData instanceof BayonetAttachmentProperties)
+                return true;
+        }
+        return false;
+    }
+
     @Nullable
     public SuppressorAttachmentProperties getSuppressorProperties(ItemStack itemStack) {
         RFEItemAttachmentContents firearmAttachmentContents = itemStack.getOrDefault(RFEDataComponents.ITEM_ATTACHMENTS, RFEItemAttachmentContents.EMPTY);

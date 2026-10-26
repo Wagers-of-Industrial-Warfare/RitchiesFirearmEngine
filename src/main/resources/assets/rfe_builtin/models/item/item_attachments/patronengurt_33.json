@@ -1,45 +1,45 @@
 {
-  "parent": "rfe_builtin:item/item_attachments/patronengurt_33_0rds",
+  "parent": "rfe_builtin:item/item_attachments/patronengurt_33/0rds",
   "overrides": [
     {
       "predicate": { "ritchiesfirearmengine:round_count": 1 },
-      "model": "rfe_builtin:item/item_attachments/patronengurt_33_1rds"
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33/1rds"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 2 },
-      "model": "rfe_builtin:item/item_attachments/patronengurt_33_2rds"
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33/2rds"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 3 },
-      "model": "rfe_builtin:item/item_attachments/patronengurt_33_3rds"
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33/3rds"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 4 },
-      "model": "rfe_builtin:item/item_attachments/patronengurt_33_4rds"
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33/4rds"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 5 },
-      "model": "rfe_builtin:item/item_attachments/patronengurt_33_5rds"
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33/5rds"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 6 },
-      "model": "rfe_builtin:item/item_attachments/patronengurt_33_6rds"
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33/6rds"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 7 },
-      "model": "rfe_builtin:item/item_attachments/patronengurt_33_7rds"
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33/7rds"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 8 },
-      "model": "rfe_builtin:item/item_attachments/patronengurt_33_8rds"
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33/8rds"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 9 },
-      "model": "rfe_builtin:item/item_attachments/patronengurt_33_9rds"
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33/9rds"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 10 },
-      "model": "rfe_builtin:item/item_attachments/patronengurt_33_10rds"
+      "model": "rfe_builtin:item/item_attachments/patronengurt_33/10rds"
     }
   ]
 }

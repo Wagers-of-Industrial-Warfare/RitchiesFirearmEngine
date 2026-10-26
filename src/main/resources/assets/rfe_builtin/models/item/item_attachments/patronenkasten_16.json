@@ -1,21 +1,21 @@
 {
-  "parent": "rfe_builtin:item/item_attachments/patronenkasten_16_0rds",
+  "parent": "rfe_builtin:item/item_attachments/patronenkasten_16/0rds",
   "overrides": [
     {
       "predicate": { "ritchiesfirearmengine:round_count": 1 },
-      "model": "rfe_builtin:item/item_attachments/patronenkasten_16_1rds"
+      "model": "rfe_builtin:item/item_attachments/patronenkasten_16/1rds"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 2 },
-      "model": "rfe_builtin:item/item_attachments/patronenkasten_16_2rds"
+      "model": "rfe_builtin:item/item_attachments/patronenkasten_16/2rds"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 3 },
-      "model": "rfe_builtin:item/item_attachments/patronenkasten_16_3rds"
+      "model": "rfe_builtin:item/item_attachments/patronenkasten_16/3rds"
     },
     {
       "predicate": { "ritchiesfirearmengine:round_count": 4 },
-      "model": "rfe_builtin:item/item_attachments/patronenkasten_16_4rds"
+      "model": "rfe_builtin:item/item_attachments/patronenkasten_16/4rds"
     }
   ]
 }

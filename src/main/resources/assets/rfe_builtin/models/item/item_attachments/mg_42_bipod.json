@@ -1,9 +1,9 @@
 {
-  "parent": "rfe_builtin:item/item_attachments/mg_42_bipod_retracted",
+  "parent": "rfe_builtin:item/item_attachments/mg_42_bipod/retracted",
   "overrides": [
     {
       "predicate": { "ritchiesfirearmengine:is_deployed": 1 },
-      "model": "rfe_builtin:item/item_attachments/mg_42_bipod_deployed"
+      "model": "rfe_builtin:item/item_attachments/mg_42_bipod/deployed"
     }
   ]
 }

@@ -2,8 +2,19 @@
   "parent": "rfe_builtin:item/item_attachments/mg_34_bipod/retracted",
   "overrides": [
     {
+      "predicate": { "ritchiesfirearmengine:is_cooling_down": 1 },
+      "model": "rfe_builtin:item/item_attachments/mg_34_bipod/retracted_cooldown"
+    },
+    {
       "predicate": { "ritchiesfirearmengine:is_deployed": 1 },
       "model": "rfe_builtin:item/item_attachments/mg_34_bipod/deployed"
+    },
+    {
+      "predicate": {
+        "ritchiesfirearmengine:is_deployed": 1,
+        "ritchiesfirearmengine:is_cooling_down": 1
+      },
+      "model": "rfe_builtin:item/item_attachments/mg_34_bipod/deployed_cooldown"
     }
   ]
 }

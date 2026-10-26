@@ -46,13 +46,14 @@ public class SimpleSlotAttachmentRenderData implements RFEItemAttachmentRenderPr
                                   int combinedLight, int combinedOverlay, ItemRendererModificationContext renderContext) {
         if (renderContext.hideItem)
             return;
+        ItemStack contextItemStack = parentItem.copy();
+        contextItemStack.applyComponents(attachmentStack.getComponentsPatch()); // This could be better? e.g. different item
         BakedModel attachmentModel = modelShaper.getModelManager().getModel(this.model);
-        // TODO combine context from both attachment and firearm item, or pass extra context to attachment stack
-        BakedModel overrideModel = attachmentModel.getOverrides().resolve(attachmentModel, attachmentStack, null, null, 42);
+        BakedModel overrideModel = attachmentModel.getOverrides().resolve(attachmentModel, contextItemStack, null, null, 42);
         poseStack.scale(this.scale.x, this.scale.y, this.scale.z);
         poseStack.translate(this.translation.x / 16f, this.translation.y / 16f, this.translation.z / 16f);
         poseStack.mulPose(this.rotationMat);
-        renderOp.call(attachmentStack, displayContext, leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, overrideModel);
+        renderOp.call(contextItemStack, displayContext, leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, overrideModel);
     }
 
     @Override
@@ -62,7 +63,6 @@ public class SimpleSlotAttachmentRenderData implements RFEItemAttachmentRenderPr
                                                 int combinedLight, int combinedOverlay, ItemRendererModificationContext renderContext) {
         if (renderContext.hideItem)
             return;
-        // TODO combine context from both attachment and firearm item, or pass extra context to attachment stack
         ItemStack contextItemStack = parentItem.copy();
         contextItemStack.applyComponents(attachmentData); // This could be better? e.g. different item
         BakedModel attachmentModel = modelShaper.getModelManager().getModel(this.model);
@@ -70,7 +70,7 @@ public class SimpleSlotAttachmentRenderData implements RFEItemAttachmentRenderPr
         poseStack.scale(this.scale.x, this.scale.y, this.scale.z);
         poseStack.translate(this.translation.x / 16f, this.translation.y / 16f, this.translation.z / 16f);
         poseStack.mulPose(this.rotationMat);
-        renderOp.call(parentItem, displayContext, leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, overrideModel);
+        renderOp.call(contextItemStack, displayContext, leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, overrideModel);
     }
 
     @Override

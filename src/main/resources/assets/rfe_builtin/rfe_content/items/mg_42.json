@@ -92,11 +92,11 @@
       },
       {
         "phase": "finish",
+        "condition": { "macro": "rfe_builtin:can_charge" },
         "time": 34,
         "charge_firearm": true,
         "sounds": [
-          { "time": 5, "sound": "rfe_builtin:item.generic.machine_gun.rack" },
-          { "time": 25, "sound": "rfe_builtin:item.generic.machine_gun.rack" }
+          { "time": 10, "sound": "rfe_builtin:item.generic.machine_gun.rack" }
         ]
       },
       {

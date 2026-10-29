@@ -2,8 +2,9 @@
   "title": "itemGroup.rfe_builtin.base",
   "icon": "rfe_builtin:ammo_packet",
   "contents": [
-    "rfe_builtin:ammo_packet",
     "ritchiesfirearmengine:firearm_catalog",
+    "ritchiesfirearmengine:reloading_station",
+    "rfe_builtin:ammo_packet",
     "rfe_builtin:rifle_cartridge",
     "rfe_builtin:tracer_rifle_cartridge",
     "rfe_builtin:ap_rifle_cartridge",

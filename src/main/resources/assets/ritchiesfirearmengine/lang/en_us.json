@@ -1,4 +1,8 @@
 {
+  "block.ritchiesfirearmengine.reloading_station": "Reloading Station",
+  "container.ritchiesfirearmengine.reloading_station": "Reloading Station",
+  "container.ritchiesfirearmengine.reloading_station.slot.ammunition": "Ammunition",
+  "container.ritchiesfirearmengine.reloading_station.slot.magazine": "Magazine",
   "gui.ritchiesfirearmengine.attachments_menu": "Attachments",
   "gui.ritchiesfirearmengine.attachments_menu.blocked_by": "(Blocked by %s)",
   "gui.ritchiesfirearmengine.attachments_menu.blocked_by.extra": "(Blocked by %s, %s other slots)",

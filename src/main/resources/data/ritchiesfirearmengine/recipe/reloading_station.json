@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "H": { "item": "minecraft:hopper" },
+    "L": { "item": "minecraft:lever" },
+    "P": { "tag": "minecraft:planks" },
+    "G": { "tag": "c:gunpowders" }
+  },
+  "pattern": [
+    " H ",
+    "GLG",
+    " P "
+  ],
+  "result": {
+    "count": 1,
+    "id": "ritchiesfirearmengine:reloading_station"
+  }
+}

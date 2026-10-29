@@ -161,7 +161,21 @@ public class NestedMagazineItem extends MagazineItem {
     }
 
     @Override
-    protected boolean tryReloadForItem(ItemStack magazineStack, List<ItemStack> primaryAmmo, List<ItemStack> secondaryAmmo, ItemStack availableStack) {
+    protected boolean tryReloadForItem(ItemStack magazineStack, List<ItemStack> primaryAmmo, List<ItemStack> secondaryAmmo,
+                                       ItemStack availableStack, int maxConsumable) {
+        return false;
+    }
+
+    @Override
+    public boolean tryReloadingInMenu(ItemStack magazineStack, List<ItemStack> ammoStacks, boolean simulate) {
+        if (!this.getNestedMagazine(magazineStack).isEmpty())
+            return false;
+        for (ItemStack ammoStack : ammoStacks) {
+            if (this.canReloadNestedMagazine(magazineStack, 0, ammoStack)) {
+                this.setNestedMagazine(magazineStack, simulate ? ammoStack.copyWithCount(1) : ammoStack.split(1));
+                return true;
+            }
+        }
         return false;
     }
 

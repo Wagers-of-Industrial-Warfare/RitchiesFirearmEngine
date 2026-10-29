@@ -194,7 +194,7 @@ public class MagazineItem extends Item {
             return;
         boolean split = itemStack.getCount() > 1;
         RFEItemUtils.consumeItemsFromEntity(entity, s -> {
-            return s != itemStack && this.tryReloadForItem(itemStack, primaryAmmo, secondaryAmmo, s);
+            return s != itemStack && this.tryReloadForItem(itemStack, primaryAmmo, secondaryAmmo, s, 1);
         }, s -> {
             ItemStack writeTo = split ? itemStack.split(1) : itemStack;
             this.writeStoredAmmo(writeTo, primaryAmmo);
@@ -209,17 +209,18 @@ public class MagazineItem extends Item {
         });
     }
 
-    protected boolean tryReloadForItem(ItemStack magazineStack, List<ItemStack> primaryAmmo, List<ItemStack> secondaryAmmo, ItemStack availableStack) {
-        if (this.matchesAmmoItem(magazineStack, availableStack)
-                && RFEItemUtils.countItems(primaryAmmo) < this.getMagazineCapacity(magazineStack)) {
-            int consumed = FirearmDataUtils.addAmmo(primaryAmmo, availableStack, false, this.trackEmptySlots, 1);
+    protected boolean tryReloadForItem(ItemStack magazineStack, List<ItemStack> primaryAmmo, List<ItemStack> secondaryAmmo,
+                                       ItemStack availableStack, int maxConsumable) {
+        int primaryAddable = this.getMagazineCapacity(magazineStack) - RFEItemUtils.countItems(primaryAmmo);
+        if (this.matchesAmmoItem(magazineStack, availableStack) && primaryAddable > 0) {
+            int consumed = FirearmDataUtils.addAmmo(primaryAmmo, availableStack, false, this.trackEmptySlots, Math.min(primaryAddable, maxConsumable));
             if (!availableStack.is(RFEItemTags.INFINITE_AMMO.tag))
                 availableStack.shrink(consumed);
             return true;
         }
-        if (this.matchesSecondaryItem(magazineStack, availableStack)
-                && RFEItemUtils.countItemsConditional(secondaryAmmo, Predicate.not(FirearmDataUtils::isUsedPrimer)) < this.getSecondaryMagazineCapacity(magazineStack)) {
-            int consumed = FirearmDataUtils.addAmmo(secondaryAmmo, availableStack, false, this.trackEmptySecondarySlots, 1);
+        int secondaryAddable = this.getSecondaryMagazineCapacity(magazineStack) - RFEItemUtils.countItemsConditional(secondaryAmmo, Predicate.not(FirearmDataUtils::isUsedPrimer));
+        if (this.matchesSecondaryItem(magazineStack, availableStack) && secondaryAddable > 0) {
+            int consumed = FirearmDataUtils.addAmmo(secondaryAmmo, availableStack, false, this.trackEmptySecondarySlots, Math.min(secondaryAddable, maxConsumable));
             if (!availableStack.is(RFEItemTags.INFINITE_AMMO.tag))
                 availableStack.shrink(consumed);
             return true;
@@ -250,6 +251,21 @@ public class MagazineItem extends Item {
             return true;
         }
         return false;
+    }
+
+    public boolean tryReloadingInMenu(ItemStack magazineStack, List<ItemStack> ammoStacks, boolean simulate) {
+        List<ItemStack> primaryAmmo = this.getStoredAmmo(magazineStack);
+        List<ItemStack> secondaryAmmo = this.getStoredSecondaryAmmo(magazineStack);
+        boolean success = false;
+        for (ItemStack ammoStack : ammoStacks) {
+            if (this.tryReloadForItem(magazineStack, primaryAmmo, secondaryAmmo, simulate ? ammoStack.copy() : ammoStack, ammoStack.getMaxStackSize()))
+                success = true;
+        }
+        if (!success)
+            return false;
+        this.writeStoredAmmo(magazineStack, primaryAmmo);
+        this.writeStoredSecondaryAmmo(magazineStack, secondaryAmmo);
+        return true;
     }
 
     public void tryUnloadingOutsideOfMenu(ItemStack itemStack, LivingEntity entity) {

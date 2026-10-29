@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "ritchiesfirearmengine:block/reloading_station",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "ritchiesfirearmengine:block/reloading_station",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "ritchiesfirearmengine:block/reloading_station"
+    },
+    "facing=west": {
+      "model": "ritchiesfirearmengine:block/reloading_station",
+      "y": 90
+    }
+  }
+}

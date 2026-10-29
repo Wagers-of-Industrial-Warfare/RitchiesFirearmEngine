@@ -1,5 +1,6 @@
 package rbasamoyai.ritchiesfirearmengine.foundation.index;
 
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -13,5 +14,8 @@ public class FoundationItems {
 
     public static final DeferredItem<FirearmCatalogItem> FIREARM_CATALOG = ITEMS.register("firearm_catalog", () ->
             new FirearmCatalogItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
+
+    public static final DeferredItem<BlockItem> RELOADING_STATION = ITEMS.register("reloading_station", () ->
+            new BlockItem(FoundationBlocks.RELOADING_STATION.get(), new Item.Properties()));
 
 }

@@ -1,6 +1,7 @@
 {
   "type": "ritchiesfirearmengine:magazine",
   "stacks_to": 64,
+  "stacks_to_when_filled": 4,
   "rarity": "epic",
   "glint": true,
   "capacity": 7,

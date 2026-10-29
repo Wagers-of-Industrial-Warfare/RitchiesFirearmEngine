@@ -1,6 +1,7 @@
 {
   "type": "ritchiesfirearmengine:nested_magazine",
   "stacks_to": 64,
+  "stacks_to_when_filled": 2,
   "rarity": "epic",
   "glint": true,
   "capacity": 50,

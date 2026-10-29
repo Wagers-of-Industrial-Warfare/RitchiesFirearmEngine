@@ -24,6 +24,7 @@ import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class NestedMagazineItem extends MagazineItem {
@@ -162,12 +163,12 @@ public class NestedMagazineItem extends MagazineItem {
 
     @Override
     protected boolean tryReloadForItem(ItemStack magazineStack, List<ItemStack> primaryAmmo, List<ItemStack> secondaryAmmo,
-                                       ItemStack availableStack, int maxConsumable) {
+                                       ItemStack availableStack, int maxConsumable, Consumer<ItemStack> extraItems) {
         return false;
     }
 
     @Override
-    public boolean tryReloadingInMenu(ItemStack magazineStack, List<ItemStack> ammoStacks, boolean simulate) {
+    public boolean tryReloadingInMenu(ItemStack magazineStack, List<ItemStack> ammoStacks, boolean simulate, Consumer<ItemStack> extraItems) {
         if (!this.getNestedMagazine(magazineStack).isEmpty())
             return false;
         for (ItemStack ammoStack : ammoStacks) {
@@ -216,6 +217,7 @@ public class NestedMagazineItem extends MagazineItem {
                         || magazineItem.getSecondaryMagazineCapacity(invStack) > this.secondaryCapacity)
                     continue;
                 int magCount = RFEItemUtils.countItems(magAmmo);
+                int magStackCount = invStack.getCount();
                 int magSecondaryCount = RFEItemUtils.countItems(magSecondaryAmmo);
                 if (invStack.is(RFETags.RFEItemTags.INFINITE_AMMO.tag)) {
                     if (magCount > 0)
@@ -224,9 +226,9 @@ public class NestedMagazineItem extends MagazineItem {
                         secondaryCount = -1;
                 } else {
                     if (primaryCount > -1)
-                        primaryCount += magCount;
+                        primaryCount += magCount * magStackCount;
                     if (secondaryCount > -1)
-                        secondaryCount += magSecondaryCount;
+                        secondaryCount += magSecondaryCount * magStackCount;
                 }
             }
             if (primaryCount == -1 && secondaryCount == -1)

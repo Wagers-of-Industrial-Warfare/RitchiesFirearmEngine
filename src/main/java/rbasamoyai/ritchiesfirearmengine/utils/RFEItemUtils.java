@@ -162,13 +162,13 @@ public class RFEItemUtils {
                 continue;
             int ammoCount = countItems(storedAmmo);
             if (ammoCount == bestCount)
-                return take && !itemStack.is(RFEItemTags.INFINITE_AMMO.tag) ? itemStack : itemStack.copy();
+                return take && !itemStack.is(RFEItemTags.INFINITE_AMMO.tag) ? itemStack.split(1) : itemStack.copyWithCount(1);
             if (ammoCount > bestCount || ammoCount <= largestCount)
                 continue;
             largestCount = ammoCount;
             bestStack = itemStack;
         }
-        return take && !bestStack.is(RFEItemTags.INFINITE_AMMO.tag) ? bestStack.split(bestStack.getCount()) : bestStack.copy();
+        return take && !bestStack.is(RFEItemTags.INFINITE_AMMO.tag) ? bestStack.split(1) : bestStack.copyWithCount(1);
     }
 
     public static ItemStack findFullestMagazine(LivingEntity entity, Predicate<ItemStack> magazinePredicate, Predicate<ItemStack> ammoPredicate, boolean take) {
@@ -196,7 +196,7 @@ public class RFEItemUtils {
                 bestStack = itemStack;
             }
         }
-        return take && !bestStack.is(RFEItemTags.INFINITE_AMMO.tag) ? bestStack.split(bestStack.getCount()) : bestStack.copy();
+        return take && !bestStack.is(RFEItemTags.INFINITE_AMMO.tag) ? bestStack.split(1) : bestStack.copyWithCount(1);
     }
 
     private RFEItemUtils() {}

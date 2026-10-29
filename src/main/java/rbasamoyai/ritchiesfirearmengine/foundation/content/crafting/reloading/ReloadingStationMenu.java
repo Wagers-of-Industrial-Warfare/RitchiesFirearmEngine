@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import rbasamoyai.ritchiesfirearmengine.builtin_content.content.ammo.MagazineItem;
 import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationBlocks;
 import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationMenus;
+import rbasamoyai.ritchiesfirearmengine.utils.RFEItemUtils;
 
 public class ReloadingStationMenu extends AbstractContainerMenu {
 
@@ -38,8 +39,8 @@ public class ReloadingStationMenu extends AbstractContainerMenu {
         this.addSlot(new ReloadingResultSlot(this, this.resultSlot, 0, 107, 59));
 
         for (int i = 0; i < 5; i++)
-            this.addSlot(new ReloadingIngredientSlot(this.ammoSlots, i, 44 + i * 18, 23, ReloadingIngredientSlot.Type.AMMO));
-        this.addSlot(new ReloadingIngredientSlot(this.magazineSlot, 0, 53, 59, ReloadingIngredientSlot.Type.MAGAZINE));
+            this.addSlot(new ReloadingIngredientSlot(this, this.ammoSlots, i, 44 + i * 18, 23, ReloadingIngredientSlot.Type.AMMO));
+        this.addSlot(new ReloadingIngredientSlot(this, this.magazineSlot, 0, 53, 59, ReloadingIngredientSlot.Type.MAGAZINE));
 
         for (int rowIdx = 0; rowIdx < 3; rowIdx++) {
             for (int colIdx = 0; colIdx < 9; colIdx++)
@@ -108,7 +109,13 @@ public class ReloadingStationMenu extends AbstractContainerMenu {
     protected ItemStack tryReloadingMagazine(boolean simulate) {
         ItemStack magazineStack = this.magazineSlot.getItem(0).copyWithCount(1);
         return magazineStack.getItem() instanceof MagazineItem magazineItem
-                && magazineItem.tryReloadingInMenu(magazineStack, this.ammoSlots.getItems(), simulate) ? magazineStack : ItemStack.EMPTY;
+                && magazineItem.tryReloadingInMenu(magazineStack, this.ammoSlots.getItems(), simulate, this::handleExtraItem)
+                ? magazineStack : ItemStack.EMPTY;
+    }
+
+    protected void handleExtraItem(ItemStack itemStack) {
+        if (!this.player.level().isClientSide)
+            RFEItemUtils.addItemToEntity(itemStack, this.player);
     }
 
     protected void decrementMagazineSlot() { this.magazineSlot.removeItem(0, 1); }

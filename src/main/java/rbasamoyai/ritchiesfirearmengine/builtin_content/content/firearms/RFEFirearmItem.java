@@ -970,6 +970,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             } else if (magazineAndSpeedloaderPred.test(invStack) && invStack.getItem() instanceof MagazineItem magazineItem) {
                 List<ItemStack> magAmmo = magazineItem.getStoredAmmo(invStack);
                 int magCount = 0;
+                int magStackCount = invStack.getCount();
                 if (magAmmo.isEmpty())
                     continue;
                 boolean valid = true;
@@ -994,7 +995,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
                 }
                 if (valid && invStack.is(RFEItemTags.INFINITE_AMMO.tag))
                     return Optional.of(-1);
-                count += magCount;
+                count += magCount * magStackCount;
             }
         }
         return Optional.of(count);
@@ -1017,6 +1018,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             } else if (magazinePred.test(invStack) && invStack.getItem() instanceof MagazineItem magazineItem) {
                 List<ItemStack> magAmmo = magazineItem.getStoredSecondaryAmmo(invStack);
                 int magCount = 0;
+                int magStackCount = invStack.getCount();
                 if (magAmmo.isEmpty())
                     continue;
                 boolean valid = true;
@@ -1041,7 +1043,7 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
                 }
                 if (valid && invStack.is(RFEItemTags.INFINITE_AMMO.tag))
                     return Optional.of(-1);
-                count += magCount;
+                count += magCount * magStackCount;
             }
         }
         return Optional.of(count);

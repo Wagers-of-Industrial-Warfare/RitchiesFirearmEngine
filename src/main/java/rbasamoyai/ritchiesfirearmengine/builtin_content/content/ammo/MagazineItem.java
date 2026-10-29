@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class MagazineItem extends Item {
@@ -194,7 +195,8 @@ public class MagazineItem extends Item {
             return;
         boolean split = itemStack.getCount() > 1;
         RFEItemUtils.consumeItemsFromEntity(entity, s -> {
-            return s != itemStack && this.tryReloadForItem(itemStack, primaryAmmo, secondaryAmmo, s, 1);
+            return s != itemStack && this.tryReloadForItem(itemStack, primaryAmmo, secondaryAmmo, s, 1,
+                    extra -> RFEItemUtils.addItemToEntity(extra, entity));
         }, s -> {
             ItemStack writeTo = split ? itemStack.split(1) : itemStack;
             this.writeStoredAmmo(writeTo, primaryAmmo);
@@ -210,7 +212,7 @@ public class MagazineItem extends Item {
     }
 
     protected boolean tryReloadForItem(ItemStack magazineStack, List<ItemStack> primaryAmmo, List<ItemStack> secondaryAmmo,
-                                       ItemStack availableStack, int maxConsumable) {
+                                       ItemStack availableStack, int maxConsumable, Consumer<ItemStack> extraItems) {
         int primaryAddable = this.getMagazineCapacity(magazineStack) - RFEItemUtils.countItems(primaryAmmo);
         if (this.matchesAmmoItem(magazineStack, availableStack) && primaryAddable > 0) {
             int consumed = FirearmDataUtils.addAmmo(primaryAmmo, availableStack, false, this.trackEmptySlots, Math.min(primaryAddable, maxConsumable));
@@ -242,23 +244,31 @@ public class MagazineItem extends Item {
             }
             int primaryAdded = FirearmDataUtils.addMultipleAmmo(primaryAmmo, speedloaderAmmo, false, true, this.trackEmptySlots, this.getMagazineCapacity(magazineStack));
             int secondaryAdded = FirearmDataUtils.addMultipleAmmo(secondaryAmmo, speedloaderSecondary, false, true, this.trackEmptySecondarySlots, this.getSecondaryMagazineCapacity(magazineStack));
+            if (primaryAdded < 1 && secondaryAdded < 1)
+                return false;
             if (!availableStack.is(RFEItemTags.INFINITE_AMMO.tag)) {
+                boolean split = availableStack.getCount() > 1;
+                ItemStack writeTo = split ? availableStack.split(1) : availableStack;
                 FirearmDataUtils.stripMultipleAmmo(speedloaderAmmo, primaryAdded, true, false, this.trackEmptySlots, true);
                 FirearmDataUtils.stripMultipleAmmo(speedloaderSecondary, secondaryAdded, true, false, this.trackEmptySecondarySlots, true);
-                speedloader.writeStoredAmmo(availableStack, speedloaderAmmo);
-                speedloader.writeStoredSecondaryAmmo(availableStack, speedloaderSecondary);
+                speedloader.writeStoredAmmo(writeTo, speedloaderAmmo);
+                speedloader.writeStoredSecondaryAmmo(writeTo, speedloaderSecondary);
+                if (split)
+                    extraItems.accept(writeTo);
             }
             return true;
         }
         return false;
     }
 
-    public boolean tryReloadingInMenu(ItemStack magazineStack, List<ItemStack> ammoStacks, boolean simulate) {
+    public boolean tryReloadingInMenu(ItemStack magazineStack, List<ItemStack> ammoStacks, boolean simulate, Consumer<ItemStack> extraItems) {
         List<ItemStack> primaryAmmo = this.getStoredAmmo(magazineStack);
         List<ItemStack> secondaryAmmo = this.getStoredSecondaryAmmo(magazineStack);
         boolean success = false;
         for (ItemStack ammoStack : ammoStacks) {
-            if (this.tryReloadForItem(magazineStack, primaryAmmo, secondaryAmmo, simulate ? ammoStack.copy() : ammoStack, ammoStack.getMaxStackSize()))
+            if (this.tryReloadForItem(magazineStack, primaryAmmo, secondaryAmmo,
+                    simulate ? ammoStack.copy() : ammoStack, ammoStack.getMaxStackSize(),
+                    simulate ? s -> {} : extraItems))
                 success = true;
         }
         if (!success)
@@ -360,6 +370,7 @@ public class MagazineItem extends Item {
                     secondaryCount += invStack.getCount();
                 }
             } else if (speedloaderPredicate.test(invStack) && invStack.getItem() instanceof MagazineItem magazineItem) {
+                int magStackCount = invStack.getCount();
                 List<ItemStack> magAmmo = magazineItem.getStoredAmmo(invStack);
                 List<ItemStack> magSecondaryAmmo = magazineItem.getStoredSecondaryAmmo(invStack);
                 if (magAmmo.isEmpty() && magSecondaryAmmo.isEmpty())
@@ -387,9 +398,9 @@ public class MagazineItem extends Item {
                         secondaryCount = -1;
                 } else {
                     if (primaryCount > -1)
-                        primaryCount += magCount;
+                        primaryCount += magCount * magStackCount;
                     if (secondaryCount > -1)
-                        secondaryCount += magSecondaryCount;
+                        secondaryCount += magSecondaryCount * magStackCount;
                 }
             }
             if (primaryCount == -1 && secondaryCount == -1)

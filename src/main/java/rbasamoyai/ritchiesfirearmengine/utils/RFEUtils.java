@@ -7,6 +7,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -115,5 +119,13 @@ public class RFEUtils {
     }
 
     public static boolean isProduction() { return FMLLoader.isProduction(); }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Recipe<?>> Optional<RecipeHolder<T>> getTypedRecipeByKey(RecipeManager manager, RecipeType<T> type, ResourceLocation key) {
+        Optional<RecipeHolder<?>> recipeHolder = manager.byKey(key);
+        if (recipeHolder.isEmpty() || !recipeHolder.get().value().getType().equals(type))
+            return Optional.empty();
+        return Optional.of((RecipeHolder<T>) recipeHolder.get());
+    }
 
 }

@@ -31,10 +31,7 @@ import org.slf4j.Logger;
 import rbasamoyai.ritchiesfirearmengine.foundation.api.content_creation.plugins.RFEPluginManager;
 import rbasamoyai.ritchiesfirearmengine.foundation.compat.sable.SableCompat;
 import rbasamoyai.ritchiesfirearmengine.foundation.config.RFEConfig;
-import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationBlocks;
-import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationDataComponents;
-import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationItems;
-import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationMenus;
+import rbasamoyai.ritchiesfirearmengine.foundation.index.*;
 import rbasamoyai.ritchiesfirearmengine.foundation.pack_loading.RFEPackLoader;
 import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.utils.RFEUtils;
@@ -57,6 +54,8 @@ public class RitchiesFirearmEngine {
         FoundationBlocks.BLOCKS.register(modBus);
         FoundationItems.ITEMS.register(modBus);
         FoundationMenus.MENU_TYPES.register(modBus);
+        FoundationRecipeTypes.RECIPE_TYPES.register(modBus);
+        FoundationRecipeSerializers.RECIPE_SERIALIZERS.register(modBus);
 
         forgeBus.addListener(this::onAddReloadListeners);
         forgeBus.addListener(this::onSyncDatapack);

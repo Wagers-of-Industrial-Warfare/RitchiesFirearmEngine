@@ -79,6 +79,7 @@ neoForge {
 
         server {
             server()
+            gameDirectory = project.file('run-server')
             programArgument "--nogui"
             systemProperty "neoforge.enabledGameTestNamespaces", project.mod_id
         }
@@ -143,7 +144,7 @@ dependencies {
     runtimeOnly("curse.maven:moonlight-499980:${moonlight_cf_file}")
     runtimeOnly("curse.maven:dummymod-225738:${dummy_mod_cf_file}")
     runtimeOnly("curse.maven:configured-457570:${configured_cf_file}")
-    runtimeOnly("curse.maven:freecam-557076:${freecam_cf_file}")
+    //runtimeOnly("curse.maven:freecam-557076:${freecam_cf_file}")
     implementation("curse.maven:shoulder_surfing-243190:${shoulder_surfing_cf_file}")
     runtimeOnly("curse.maven:squake-1305018:${squake_cf_file}")
 

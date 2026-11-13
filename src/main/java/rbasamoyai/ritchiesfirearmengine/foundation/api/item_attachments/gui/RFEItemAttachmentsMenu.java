@@ -21,7 +21,10 @@ import rbasamoyai.ritchiesfirearmengine.foundation.api.item_attachments.properti
 import rbasamoyai.ritchiesfirearmengine.foundation.index.FoundationMenus;
 import rbasamoyai.ritchiesfirearmengine.network.ServerboundUpdateAttachmentOptionPacket;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class RFEItemAttachmentsMenu extends AbstractContainerMenu implements IRFEItemAttachmentsMenu {
@@ -73,14 +76,15 @@ public class RFEItemAttachmentsMenu extends AbstractContainerMenu implements IRF
         if (targetStack.getItem() instanceof IHasRFEItemAttachments hasAttachments) {
             MenuTypeSlotsConfig menuConfig = RFEItemAttachmentsMenuSlotsHandler.getConfig(targetStack, this.getType());
             ImmutableMap<ResourceLocation, SlotConfig> slotConfigById = menuConfig.slotConfig();
+            List<ResourceLocation> slotOrder = menuConfig.slotOrdering();
             Set<ResourceLocation> itemSlots = hasAttachments.getAttachmentSlots(targetStack);
             int i = 0;
-            for (Map.Entry<ResourceLocation, SlotConfig> entry : slotConfigById.entrySet()) {
-                if (!itemSlots.contains(entry.getKey()))
+            for (ResourceLocation slot : slotOrder) {
+                if (!slotConfigById.containsKey(slot) || !itemSlots.contains(slot))
                     continue;
                 int x = i / 5 * -18 - 17;
                 int y = i % 5 * 18 + 1;
-                this.addAttachmentSlot(new RFEItemAttachmentSlot(this.targetSlot, entry.getKey(), x, y, entry.getValue(), inventory.player));
+                this.addAttachmentSlot(new RFEItemAttachmentSlot(this.targetSlot, slot, x, y, slotConfigById.get(slot), inventory.player));
                 ++i;
             }
         }

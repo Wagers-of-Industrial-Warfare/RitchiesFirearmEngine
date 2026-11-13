@@ -31,10 +31,7 @@ import rbasamoyai.ritchiesfirearmengine.network.RFENetwork;
 import rbasamoyai.ritchiesfirearmengine.network.RFEPacket;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Executor;
 
 public class RFEItemAttachmentsMenuSlotsHandler {
@@ -85,21 +82,28 @@ public class RFEItemAttachmentsMenuSlotsHandler {
     }
 
     public record MenuTypeSlotsConfig(ImmutableMap<ResourceLocation, SlotConfig> slotConfig,
-                                      ImmutableMap<ResourceLocation, String> otherSlotTextKeys) {
-        private static final MenuTypeSlotsConfig EMPTY = new MenuTypeSlotsConfig(ImmutableMap.of(), ImmutableMap.of());
+                                      ImmutableMap<ResourceLocation, String> otherSlotTextKeys,
+                                      List<ResourceLocation> slotOrdering) {
+        private static final MenuTypeSlotsConfig EMPTY = MenuTypeSlotsConfig.autoOrdering(ImmutableMap.of(), ImmutableMap.of());
+
+        public static MenuTypeSlotsConfig autoOrdering(ImmutableMap<ResourceLocation, SlotConfig> slotConfig,
+                                                       ImmutableMap<ResourceLocation, String> otherSlotTextKeys) {
+            return new MenuTypeSlotsConfig(slotConfig, otherSlotTextKeys, new ArrayList<>(slotConfig.keySet()));
+        }
 
         public static final Codec<MenuTypeSlotsConfig> CODEC = RecordCodecBuilder.create(o -> o.group(
                 Codec.unboundedMap(ResourceLocation.CODEC, SlotConfig.CODEC).xmap(ImmutableMap::copyOf, LinkedHashMap::new)
                         .fieldOf("slots").forGetter(MenuTypeSlotsConfig::slotConfig),
                 Codec.unboundedMap(ResourceLocation.CODEC, Codec.STRING).xmap(ImmutableMap::copyOf, LinkedHashMap::new)
                         .optionalFieldOf("other_slot_text", ImmutableMap.of()).forGetter(MenuTypeSlotsConfig::otherSlotTextKeys)
-        ).apply(o, MenuTypeSlotsConfig::new));
+        ).apply(o, MenuTypeSlotsConfig::autoOrdering));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, MenuTypeSlotsConfig> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, SlotConfig.STREAM_CODEC)
                         .map(ImmutableMap::copyOf, HashMap::new), MenuTypeSlotsConfig::slotConfig,
                 ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, ByteBufCodecs.STRING_UTF8)
                         .map(ImmutableMap::copyOf, HashMap::new), MenuTypeSlotsConfig::otherSlotTextKeys,
+                ResourceLocation.STREAM_CODEC.apply(ByteBufCodecs.list()), MenuTypeSlotsConfig::slotOrdering,
                 MenuTypeSlotsConfig::new);
     }
 

@@ -326,12 +326,13 @@ public abstract class RFEFirearmItem extends Item implements IFirearmItem, IHasR
             return; // Do not accept more than 1 clientbound shot from an entity/player each tick
         }
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
-        mode.handleFiringInputOnServer(itemStack, entity, firingInputs, jam, recoilUUID, hand);
+        if (mode.canFireProjectile(itemStack, entity))
+            mode.handleFiringInputOnServer(itemStack, entity, firingInputs, jam, recoilUUID, hand);
     }
 
     @Override
-    public void handleServerAutomaticFireOnClient(ItemStack itemStack, LivingEntity entity, InteractionHand hand,
-                                                  RFERecoilClientImpulse recoil, @Nullable UUID recoilUUID, boolean inBipodPosition) {
+    public void handleServerFiringOnClient(ItemStack itemStack, LivingEntity entity, InteractionHand hand,
+                                           RFERecoilClientImpulse recoil, @Nullable UUID recoilUUID, boolean inBipodPosition) {
         RFEFirearmMode mode = this.getCurrentMode(itemStack);
         mode.handleServerRecoil(itemStack, entity, hand, recoil, recoilUUID, inBipodPosition);
         mode.fireFirearm(itemStack, entity, RFEFirearmMode.FiringType.AUTOMATIC);

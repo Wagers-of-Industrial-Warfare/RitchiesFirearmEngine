@@ -70,13 +70,13 @@ public class RFEClientNetworkHandlers {
         mc.setScreen(new RFEPackMismatchDisconnectScreen(new JoinMultiplayerScreen(new TitleScreen()), CommonComponents.CONNECT_FAILED, reason, mismatched));
     }
 
-    public static void handleAutomaticFire(ClientboundRunFiringLogicPacket packet) {
+    public static void handleServerFiringOnClient(ClientboundRunFiringLogicPacket packet) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null)
             return;
         ItemStack itemStack = mc.player.getItemInHand(packet.hand());
         if (itemStack.getItem() instanceof IFirearmItem firearm)
-            firearm.handleServerAutomaticFireOnClient(itemStack, mc.player, packet.hand(), packet.recoil(), packet.recoilUUID(), packet.inBipodPosition());
+            firearm.handleServerFiringOnClient(itemStack, mc.player, packet.hand(), packet.recoil(), packet.recoilUUID(), packet.inBipodPosition());
     }
 
     public static void handleExplosionPacket(RFEExplosionPacket<?> packet) {

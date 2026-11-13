@@ -27,7 +27,7 @@ public record ClientboundRunFiringLogicPacket(InteractionHand hand, RFERecoilCli
 
     @Override
     public void handle(Executor exec, PacketListener listener, Player player) {
-        EnvExecute.runOnClient(() -> () -> RFEClientNetworkHandlers.handleAutomaticFire(this));
+        EnvExecute.runOnClient(() -> () -> RFEClientNetworkHandlers.handleServerFiringOnClient(this));
     }
 
 }

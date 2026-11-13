@@ -745,28 +745,11 @@ public class RFEFirearmMode {
             }
         }
 
-        boolean inBipodPosition = this.isInBipodPosition(entity, itemStack);
-        RFERecoilClientImpulse impulse = new RFERecoilClientImpulse(RFEAimAngles.ZERO_ANGLES, RFEAimAngles.ZERO_ANGLES, 0);
-        if (!firingInputs.isEmpty()) {
-            RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(entity, itemStack);
-            RFERecoilProvider provider = this.getRecoilProvider(entity, itemStack, inBipodPosition);
-            if (recoilInstance == null || provider != RFERecoilManager.getCurrentProvider(entity, hand)) {
-                recoilInstance = provider.createRecoilInstance(itemStack, entity, entity.getRandom());
-                RFERecoilManager.trackRecoil(recoilInstance, provider, entity, itemStack, hand);
-            }
-            impulse = recoilInstance.updateRecoil(itemStack, entity);
-        }
-
         UUID recoilUUID = RFERecoilManager.getRecoilId(itemStack);
         if (entity.level().isClientSide) {
             if (entity instanceof Player)
                 RFENetwork.sendToServer(new ServerboundRunFiringLogicPacket(firingInputs, jam, hand, recoilUUID));
         } else {
-            if (entity instanceof ServerPlayer splayer) {
-                RFENetwork.sendToPlayer(new ClientboundRunFiringLogicPacket(hand, impulse, recoilUUID, inBipodPosition), splayer);
-            } else if (!(entity instanceof Player)) {
-                this.handleServerRecoil(itemStack, entity, hand, impulse, recoilUUID, inBipodPosition);
-            }
             this.handleFiringInputOnServer(itemStack, entity, firingInputs, jam, recoilUUID, hand);
         }
     }
@@ -814,10 +797,20 @@ public class RFEFirearmMode {
 
         boolean inBipodPosition = this.isInBipodPosition(entity, itemStack);
         RFESpreadInstance spreadInstance = RFESpreadManager.getSpreadInstance(entity, itemStack);
-        RFESpreadProvider provider = this.getSpreadProvider(entity, itemStack, inBipodPosition);
-        if (spreadInstance == null || provider != RFESpreadManager.getCurrentProvider(entity, hand)) {
-            spreadInstance = provider.createSpreadInstance(itemStack, entity, entity.getRandom());
-            RFESpreadManager.trackSpread(spreadInstance, provider, entity, itemStack, hand);
+        RFESpreadProvider spreadProvider = this.getSpreadProvider(entity, itemStack, inBipodPosition);
+        if (spreadInstance == null || spreadProvider != RFESpreadManager.getCurrentProvider(entity, hand)) {
+            spreadInstance = spreadProvider.createSpreadInstance(itemStack, entity, entity.getRandom());
+            RFESpreadManager.trackSpread(spreadInstance, spreadProvider, entity, itemStack, hand);
+        }
+        RFERecoilClientImpulse impulse = new RFERecoilClientImpulse(RFEAimAngles.ZERO_ANGLES, RFEAimAngles.ZERO_ANGLES, 0);
+        if (!firingInputs.isEmpty()) {
+            RFERecoilInstance recoilInstance = RFERecoilManager.getRecoilInstance(entity, itemStack);
+            RFERecoilProvider recoilProvider = this.getRecoilProvider(entity, itemStack, inBipodPosition);
+            if (recoilInstance == null || recoilProvider != RFERecoilManager.getCurrentProvider(entity, hand)) {
+                recoilInstance = recoilProvider.createRecoilInstance(itemStack, entity, entity.getRandom());
+                RFERecoilManager.trackRecoil(recoilInstance, recoilProvider, entity, itemStack, hand);
+            }
+            impulse = recoilInstance.updateRecoil(itemStack, entity);
         }
 
         for (RFEFiringInput input : firingInputs) {
@@ -837,6 +830,9 @@ public class RFEFirearmMode {
         }
         DataComponentPatch modeData = this.getModeData(itemStack);
         this.saveModeData(itemStack, FirearmDataUtils.setShotCount(modeData, FirearmDataUtils.getShotCount(modeData) + firingInputs.size()));
+
+        if (entity instanceof ServerPlayer splayer)
+            RFENetwork.sendToPlayer(new ClientboundRunFiringLogicPacket(hand, impulse, recoilUUID, inBipodPosition), splayer);
 
         this.fireFirearm(itemStack, entity, FiringType.EFFECTS);
     }

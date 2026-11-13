@@ -19,8 +19,8 @@ public interface IFirearmItem extends HoldAttackKeyInteraction, FovModifyingItem
     void handleClientFireInputOnServer(ItemStack itemStack, LivingEntity entity, List<RFEFiringInput> firingInputs, boolean jam,
                                        @Nullable UUID recoilUUID, InteractionHand hand);
 
-    void handleServerAutomaticFireOnClient(ItemStack itemStack, LivingEntity entity, InteractionHand hand,
-                                           RFERecoilClientImpulse impulse, @Nullable UUID recoilUUID, boolean inBipodPosition);
+    void handleServerFiringOnClient(ItemStack itemStack, LivingEntity entity, InteractionHand hand,
+                                    RFERecoilClientImpulse impulse, @Nullable UUID recoilUUID, boolean inBipodPosition);
 
     boolean isMeleeing(ItemStack itemStack, LivingEntity entity);
 
